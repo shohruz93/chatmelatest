@@ -1,0 +1,90 @@
+<div class="modal-overlay" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="close()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <div class="profile-header">
+            <div class="avatar-container">
+                @if (user.avatar) {
+                <img [src]="user.avatar" [alt]="user.name" class="avatar-img" />
+                } @else {
+                <div class="avatar-placeholder" [style.background]="getAvatarColor(user.name)">
+                    {{ getInitials(user.name) }}
+                </div>
+                }
+                <div class="status-indicator" [class.online]="user.isOnline" [class.offline]="!user.isOnline"></div>
+            </div>
+
+            <h2 class="user-name">{{ user.name }}</h2>
+
+            <div class="user-meta">
+                @if (user.location) {
+                <div class="meta-item">
+                    <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
+                        (error)="$event.target.style.display='none'" />
+                    <span>{{ getLocationLabel(user.location) }}</span>
+                </div>
+                }
+                @if (user.gender) {
+                <div class="meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>{{ user.gender }}</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <div class="profile-body">
+            @if (user.bio) {
+            <div class="section">
+                <h3 class="section-title">About</h3>
+                <p class="bio-text">{{ user.bio }}</p>
+            </div>
+            }
+
+            @if (user.native_language || user.learning_language) {
+            <div class="section">
+                <h3 class="section-title">Languages</h3>
+                <div class="languages-grid">
+                    @if (user.native_language) {
+                    @for (lang of getLanguageArray(user.native_language); track lang) {
+                    <div class="lang-badge">
+                        <span class="lang-type">Native</span>
+                        {{ getLanguageLabel(lang) }}
+                    </div>
+                    }
+                    }
+                    @if (user.learning_language) {
+                    @for (lang of getLanguageArray(user.learning_language); track lang) {
+                    <div class="lang-badge">
+                        <span class="lang-type">Learning</span>
+                        {{ getLanguageLabel(lang) }}
+                    </div>
+                    }
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="profile-footer">
+            <button class="send-msg-btn" (click)="sendMessage()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                Send Message
+            </button>
+        </div>
+    </div>
+</div>

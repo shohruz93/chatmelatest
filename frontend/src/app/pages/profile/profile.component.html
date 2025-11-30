@@ -1,0 +1,219 @@
+<div class="profile-page">
+    <header class="page-header">
+        <h2>My Profile</h2>
+        <div class="header-actions">
+            <button class="btn-logout" (click)="logout()" title="Logout">
+                <span class="logout-icon">🚪</span>
+                <span class="logout-text">Logout</span>
+            </button>
+            <button class="theme-toggle" (click)="toggleTheme()">
+                {{ isDarkMode() ? '☀️' : '🌙' }}
+            </button>
+        </div>
+    </header>
+
+    <div class="profile-content">
+        @if (loading && !isEditing) {
+        <div class="loading-state">
+            <div class="loader-large"></div>
+            <p>Loading profile...</p>
+        </div>
+        } @else {
+        <div class="profile-card">
+            <div class="avatar-section">
+                <div class="avatar-wrapper">
+                    @if (previewUrl || user?.avatar) {
+                    <img [src]="previewUrl || user.avatar" alt="Profile Avatar">
+                    } @else {
+                    <div class="avatar-placeholder">{{ user?.name?.charAt(0) || 'U' }}</div>
+                    }
+
+                    @if (isEditing) {
+                    <label class="avatar-upload-btn" title="Upload photo">
+                        <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+                        📷
+                    </label>
+                    }
+                </div>
+            </div>
+
+            <div class="info-section">
+                @if (isEditing) {
+                <div class="edit-form">
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea [(ngModel)]="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select [(ngModel)]="gender" class="form-select">
+                            @for (option of genderOptions; track option.value) {
+                            <option [value]="option.value" [selected]="gender === option.value">{{ option.label }}
+                            </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location</label>
+                        <select [(ngModel)]="location" class="form-select">
+                            <option value="">Select a country</option>
+                            @for (country of countries; track country.code) {
+                            <option [value]="country.name" [selected]="location === country.name">{{ country.flag }}
+                                {{ country.name }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="language-row">
+                        <div class="form-group">
+                            <label>Native Language</label>
+                            <div class="language-input-group">
+                                <select (change)="addLanguage('native', $event)" class="form-select">
+                                    <option value="">Select to add...</option>
+                                    @for (lang of languages; track lang.code) {
+                                    <option [value]="lang.code" [disabled]="nativeLanguages.includes(lang.code)">
+                                        {{ lang.name }}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="language-tags">
+                                @for (code of nativeLanguages; track code) {
+                                <span class="language-tag">
+                                    {{ getLanguageName(code) }}
+                                    <button class="btn-remove-tag" (click)="removeLanguage('native', code)">×</button>
+                                </span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Learning Language</label>
+                            <div class="language-input-group">
+                                <select (change)="addLanguage('learning', $event)" class="form-select">
+                                    <option value="">Select to add...</option>
+                                    @for (lang of languages; track lang.code) {
+                                    <option [value]="lang.code" [disabled]="learningLanguages.includes(lang.code)">
+                                        {{ lang.name }}
+                                    </option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="language-tags">
+                                @for (code of learningLanguages; track code) {
+                                <span class="language-tag">
+                                    {{ getLanguageName(code) }}
+                                    <button class="btn-remove-tag" (click)="removeLanguage('learning', code)">×</button>
+                                </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Interests</label>
+                        <div class="interests-input-group">
+                            <input type="text" [(ngModel)]="newInterest" (keyup.enter)="addInterest()"
+                                placeholder="Add an interest (e.g. Coding, Music)">
+                            <button class="btn-add" (click)="addInterest()"
+                                [disabled]="!newInterest.trim()">Add</button>
+                        </div>
+                        <div class="interests-list edit-mode">
+                            @for (interest of interests; track interest; let i = $index) {
+                            <span class="interest-tag">
+                                {{ interest.name || interest }}
+                                <button class="btn-remove-tag" (click)="removeInterest(i)">×</button>
+                            </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="edit-actions">
+                        <button class="btn-cancel" (click)="toggleEdit()">Cancel</button>
+                        <button class="btn-save" (click)="saveProfile()" [disabled]="loading">
+                            {{ loading ? 'Saving...' : 'Save Changes' }}
+                        </button>
+                    </div>
+                </div>
+                } @else {
+                <div class="view-mode">
+                    <h1 class="user-name">{{ user?.name }}</h1>
+                    <div class="user-email">{{ user?.email }}</div>
+
+                    <div class="user-rating">
+                        <span class="star">★</span>
+                        <span class="rating-value">{{ ratings.average | number:'1.1-1' }}</span>
+                        <span class="rating-count">({{ ratings.count }} reviews)</span>
+                    </div>
+
+                    @if (bio) {
+                    <div class="bio-section">
+                        <h3>About</h3>
+                        <p class="bio-text">{{ bio }}</p>
+                    </div>
+                    }
+
+                    <div class="details-section">
+                        <h3>Details</h3>
+                        @if (gender) {
+                        <p><strong>Gender:</strong> {{ gender | titlecase }} {{ getGenderIcon(gender) }}</p>
+                        }
+                        @if (location) {
+                        <p><strong>Location:</strong> {{ location }} {{ getCountryFlag(location) }}</p>
+                        }
+
+                        <div class="language-display">
+                            <p><strong>Native:</strong>
+                                @if (nativeLanguages.length) {
+                                <span class="language-tags-view">
+                                    @for (code of nativeLanguages; track code) {
+                                    <span class="language-tag-view">{{ getLanguageName(code) }}</span>
+                                    }
+                                </span>
+                                } @else {
+                                <span class="text-muted">Not specified</span>
+                                }
+                            </p>
+                            <p><strong>Learning:</strong>
+                                @if (learningLanguages.length) {
+                                <span class="language-tags-view">
+                                    @for (code of learningLanguages; track code) {
+                                    <span class="language-tag-view">{{ getLanguageName(code) }}</span>
+                                    }
+                                </span>
+                                } @else {
+                                <span class="text-muted">Not specified</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="interests-section">
+                        <h3>Interests</h3>
+                        @if (interests.length) {
+                        <div class="interests-list">
+                            @for (interest of interests; track interest) {
+                            <span class="interest-tag">{{ interest.name || interest }}</span>
+                            }
+                        </div>
+                        } @else {
+                        <p class="no-interests">No interests added yet.</p>
+                        }
+                    </div>
+
+                    <button class="btn-edit" (click)="toggleEdit()">Edit Profile</button>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Logout Confirmation Dialog -->
+    <app-confirm-dialog [isOpen]="showLogoutDialog" title="Logout"
+        message="Are you sure you want to logout? You'll need to sign in again to access your account."
+        confirmText="Logout" cancelText="Stay" confirmButtonClass="btn-danger" icon="🚪" (confirmed)="confirmLogout()"
+        (cancelled)="cancelLogout()"></app-confirm-dialog>
+</div>

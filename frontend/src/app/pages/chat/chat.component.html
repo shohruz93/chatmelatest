@@ -1,0 +1,194 @@
+<div class="chat-page">
+    <!-- Header -->
+    <header class="chat-header glass-panel">
+        <div class="header-user-info" *ngIf="partnerId">
+            <div class="avatar-container">
+                <img [src]="partnerAvatar || 'assets/default-avatar.png'" alt="Partner Avatar" class="header-avatar">
+                <span class="status-indicator" [class.online]="isPartnerOnline"></span>
+            </div>
+            <div class="user-details">
+                <h2 class="user-name">{{ partnerName || 'Chat Partner' }}</h2>
+                <span class="user-status">{{ isPartnerOnline ? 'Online' : 'Offline' }}</span>
+            </div>
+        </div>
+        <div class="header-user-info" *ngIf="!partnerId">
+            <div class="avatar-container placeholder">
+                <span class="icon">💬</span>
+            </div>
+            <div class="user-details">
+                <h2 class="user-name">Select a Conversation</h2>
+                <span class="user-status">Start chatting now</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Messages Area -->
+    <main class="messages-container" #messagesContainer>
+        <div class="messages-content">
+            <div class="empty-state" *ngIf="!partnerId">
+                <div class="empty-icon">👋</div>
+                <h3>Welcome to Chatme</h3>
+                <p>Select a conversation or find a new match to start chatting.</p>
+            </div>
+
+            <div class="message-wrapper" *ngFor="let msg of messages"
+                [ngClass]="{'message-sent': msg.sender_id === currentUser.id, 'message-received': msg.sender_id !== currentUser.id}">
+
+                <div class="message-bubble glass-panel">
+                    <!-- Text Message -->
+                    <p *ngIf="msg.messageType === 'text'" class="message-text">{{ msg.content }}</p>
+
+                    <!-- Image Message -->
+                    <div *ngIf="msg.messageType === 'image'" class="message-image-container">
+                        <img [src]="msg.content" alt="Shared Image" class="message-image"
+                            (click)="openImageModal(msg.content)">
+                    </div>
+
+                    <!-- Voice Message -->
+                    <div *ngIf="msg.messageType === 'voice'" class="message-voice">
+                        <audio [src]="msg.content" controls></audio>
+                    </div>
+
+                    <!-- Sticker Message -->
+                    <div *ngIf="msg.messageType === 'sticker'" class="message-sticker">
+                        <img [src]="msg.content" alt="Sticker" class="sticker-img">
+                    </div>
+
+                    <div class="message-meta">
+                        <span class="message-time">{{ msg.created_at | date:'shortTime' }}</span>
+                        <span class="message-status" *ngIf="msg.sender_id === currentUser.id">
+                            <span *ngIf="msg.status === 'sent'">✓</span>
+                            <span *ngIf="msg.status === 'delivered'">✓✓</span>
+                            <span *ngIf="msg.status === 'read'" class="read">✓✓</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator-wrapper" *ngIf="isPartnerTyping">
+                <div class="typing-indicator glass-panel">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Input Area -->
+    <footer class="chat-input-area glass-panel" *ngIf="partnerId">
+        <div class="input-wrapper">
+            <!-- Toggle Button for Mobile -->
+            <button class="btn-toggle-media" [class.active]="showMediaMenu" (click)="toggleMediaMenu()">
+                <span class="toggle-icon">+</span>
+            </button>
+
+            <!-- Media Actions -->
+            <div class="media-actions" [class.show]="showMediaMenu">
+                <button class="btn-media" (click)="triggerFileInput()" title="Send Image">
+                    <span class="icon">📷</span>
+                </button>
+                <button class="btn-media" (click)="toggleStickerPicker()" title="Send Sticker">
+                    <span class="icon">😊</span>
+                </button>
+                <button class="btn-media" (click)="toggleRecording()" [class.recording]="isRecording"
+                    title="Voice Message">
+                    <span class="icon">{{ isRecording ? '⏹️' : '🎤' }}</span>
+                </button>
+            </div>
+
+            <!-- Text Input -->
+            <div class="text-input-container">
+                <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" (input)="onTyping()"
+                    placeholder="Type a message..." class="message-input">
+                <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim() && !selectedImage">
+                    <span class="icon">➤</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sticker Picker -->
+        <div class="sticker-picker glass-panel" *ngIf="showStickerPicker">
+            <div class="sticker-grid">
+                <img *ngFor="let sticker of stickers" [src]="sticker" (click)="sendSticker(sticker)"
+                    class="sticker-item">
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal-overlay" *ngIf="showRatingModal" (click)="skipRating()">
+        <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Rate Experience</h3>
+                <button class="modal-close" (click)="skipRating()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>How was your conversation?</p>
+                <div class="star-rating">
+                    <button *ngFor="let star of [1,2,3,4,5]" class="star-btn" [class.active]="star <= selectedRating"
+                        (click)="setRating(star)">
+                        {{ star <= selectedRating ? '★' : '☆' }} </button>
+                </div>
+                <textarea [(ngModel)]="ratingComment" placeholder="Any comments?" class="rating-input"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="skipRating()">Skip</button>
+                <button class="btn-primary" (click)="submitRating()" [disabled]="!selectedRating">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" *ngIf="incomingRequest">
+        <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>New Chat Request</h3>
+            </div>
+            <div class="modal-body center-content">
+                <div class="avatar-large">
+                    <img [src]="incomingRequest.avatar || 'assets/default-avatar.png'" alt="User">
+                </div>
+                <h3>{{ incomingRequest.name || 'Anonymous' }}</h3>
+                <p>wants to chat with you!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="rejectRequest()">Decline</button>
+                <button class="btn-primary" (click)="acceptRequest()">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" *ngIf="showFilterModal" (click)="closeFilterModal()">
+        <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Find Match</h3>
+                <button class="modal-close" (click)="closeFilterModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select [(ngModel)]="filterGender" class="form-select">
+                        <option *ngFor="let opt of genderOptions" [value]="opt.value">{{ opt.label }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <select [(ngModel)]="filterLocation" class="form-select">
+                        <option *ngFor="let opt of locationOptions" [value]="opt.value">{{ opt.label }}</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" [(ngModel)]="filterOnlineOnly"> Online Only
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeFilterModal()">Cancel</button>
+                <button class="btn-primary" (click)="startSearch()">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" #fileInput accept="image/*" style="display: none;" (change)="onImageSelected($event)">
+</div>

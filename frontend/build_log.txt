@@ -1,0 +1,54 @@
+Node.js version v25.2.1 detected.
+Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
+[33m❯[39m Building...
+[32m✔[39m Building...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m                  [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-5YNCZMK6.js[39m  [2m | [22m[2m-[22m                      [2m | [22m[36m391.36 kB[39m[2m | [22m              [36m105.08 kB[39m
+[32mmain-245MWC7Z.js[39m   [2m | [22m[2mmain[22m                   [2m | [22m[36m173.87 kB[39m[2m | [22m               [36m35.00 kB[39m
+[32mchunk-2MIXNL5Z.js[39m  [2m | [22m[2m-[22m                      [2m | [22m [36m44.47 kB[39m[2m | [22m               [36m12.62 kB[39m
+[32mchunk-G3LVXJA7.js[39m  [2m | [22m[2m-[22m                      [2m | [22m [36m26.91 kB[39m[2m | [22m                [36m5.98 kB[39m
+[32mstyles-VQE3RD7N.css[39m[2m | [22m[2mstyles[22m                 [2m | [22m [36m20.29 kB[39m[2m | [22m                [36m4.68 kB[39m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m          [2m | [22m[1m[93m656.89 kB[39m[22m[2m | [22m              [1m163.35 kB[22m
+
+[1mLazy chunk files[22m   [2m | [22m[1mNames[22m                  [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+[32mchunk-MDU2WEVT.js[39m  [2m | [22m[2mprofile-component[22m      [2m | [22m[36m730.64 kB[39m[2m | [22m               [36m99.41 kB[39m
+[32mchunk-T4XQP3RD.js[39m  [2m | [22m[2mexplore-component[22m      [2m | [22m [36m32.43 kB[39m[2m | [22m                [36m7.01 kB[39m
+[32mchunk-Y5PWXZWY.js[39m  [2m | [22m[2madmin-routes[22m           [2m | [22m [36m30.41 kB[39m[2m | [22m                [36m6.51 kB[39m
+[32mchunk-NX7RNTOA.js[39m  [2m | [22m[2mconversations-component[22m[2m | [22m  [36m9.10 kB[39m[2m | [22m                [36m2.61 kB[39m
+
+Application bundle generation failed. [9.476 seconds] - 2025-11-29T15:19:36.491Z
+
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 500.00 kB was not met by 156.89 kB with a total of 656.89 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/pages/explore/explore.component.css exceeded maximum budget. Budget 4.00 kB was not met by 2.17 kB with a total of 6.17 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/pages/dashboard/dashboard.component.css exceeded maximum budget. Budget 4.00 kB was not met by 975 bytes with a total of 4.97 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/pages/login/login.component.css exceeded maximum budget. Budget 4.00 kB was not met by 886 bytes with a total of 4.89 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/pages/chat/chat.component.css exceeded maximum budget. Budget 4.00 kB was not met by 4.30 kB with a total of 8.30 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1msrc/app/pages/profile/profile.component.css exceeded maximum budget. Budget 4.00 kB was not met by 3.19 kB with a total of 7.20 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mnode_modules/tailwindcss/index.css exceeded maximum budget. Budget 4.00 kB was not met by 18.74 kB with a total of 22.74 kB.[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mnode_modules/tailwindcss/index.css exceeded maximum budget. Budget 4.00 kB was not met by 18.20 kB with a total of 22.20 kB.[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1msrc/app/pages/chat/chat.component.css exceeded maximum budget. Budget 8.00 kB was not met by 305 bytes with a total of 8.30 kB.[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mnode_modules/tailwindcss/index.css exceeded maximum budget. Budget 8.00 kB was not met by 14.74 kB with a total of 22.74 kB.[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mnode_modules/tailwindcss/index.css exceeded maximum budget. Budget 8.00 kB was not met by 14.20 kB with a total of 22.20 kB.[0m
+
+[39m[22m

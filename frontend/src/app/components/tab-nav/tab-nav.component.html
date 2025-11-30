@@ -1,0 +1,15 @@
+<nav class="tab-nav">
+    <a routerLink="/dashboard/chat" class="tab-link" [class.active]="isActive('/dashboard/chat')">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">Chat</span>
+    </a>
+    <a routerLink="/dashboard/conversations" class="tab-link" [class.active]="isActive('/dashboard/conversations')">
+        <span class="tab-icon">📬</span>
+        <span class="tab-label">Messages</span>
+        <span *ngIf="unreadCount() > 0" class="badge">{{ unreadCount() }}</span>
+    </a>
+    <a routerLink="/dashboard/profile" class="tab-link" [class.active]="isActive('/dashboard/profile')">
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Profile</span>
+    </a>
+</nav>

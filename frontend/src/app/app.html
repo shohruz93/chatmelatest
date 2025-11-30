@@ -1,0 +1,40 @@
+<router-outlet />
+
+<!-- Global Incoming Chat Request Modal -->
+@if (showIncomingRequestModal && incomingRequest) {
+<div class="modal-overlay" (click)="rejectChatRequest()">
+    <div class="modal-content request-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Incoming Chat Request</h3>
+            <button class="modal-close" (click)="rejectChatRequest()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="request-user-info">
+                @if (incomingRequest.avatar) {
+                <img [src]="incomingRequest.avatar" alt="User avatar" class="request-avatar">
+                } @else {
+                <div class="request-avatar-placeholder">{{ incomingRequest.name?.charAt(0) || 'U' }}</div>
+                }
+                <div class="request-details">
+                    <h4>{{ incomingRequest.name }}</h4>
+                    @if (incomingRequest.gender || incomingRequest.location) {
+                    <p class="request-meta">
+                        @if (incomingRequest.gender) {
+                        <span>{{ incomingRequest.gender | titlecase }}</span>
+                        }
+                        @if (incomingRequest.location) {
+                        <span>• {{ incomingRequest.location }}</span>
+                        }
+                    </p>
+                    }
+                </div>
+            </div>
+            <p class="request-message">wants to chat with you!</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-reject" (click)="rejectChatRequest()">Reject</button>
+            <button class="btn-accept" (click)="acceptChatRequest()">Accept</button>
+        </div>
+    </div>
+</div>
+}

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300" style="background-color: #0A0F1E;">
+  <!-- Filters for neon glow and rim lighting -->
+  <defs>
+    <filter id="neon-purple-glow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#A020F0" flood-opacity="0.8" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="neon-blue-glow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#00BFFF" flood-opacity="0.8" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="skin-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5D6A3;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#D4A76A;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="hair-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A2E1B;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#2E1A0F;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="phone-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#333333;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#1A1A1A;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Central Smartphone -->
+  <rect x="150" y="100" width="100" height="150" rx="10" fill="url(#phone-gradient)" filter="url(#neon-blue-glow)"/>
+  <rect x="155" y="105" width="90" height="140" rx="5" fill="#FFFFFF" opacity="0.2"/> <!-- Screen glow -->
+
+  <!-- Diverse Group of Friends (Simplified 3D-style with gradients for depth) -->
+  <!-- Friend 1: Young woman, diverse (e.g., East Asian features), laughing -->
+  <circle cx="120" cy="130" r="20" fill="url(#skin-gradient)" filter="url(#neon-purple-glow)"/> <!-- Head -->
+  <path d="M110 110 Q120 100 130 110" stroke="#000" stroke-width="2" fill="none"/> <!-- Hair -->
+  <path d="M115 135 Q120 140 125 135" stroke="#FFF" stroke-width="2" fill="none"/> <!-- Smile -->
+  <circle cx="115" cy="125" r="2" fill="#000"/> <!-- Eye -->
+  <circle cx="125" cy="125" r="2" fill="#000"/> <!-- Eye -->
+
+  <!-- Friend 2: Young man, diverse (e.g., Black features), laughing -->
+  <circle cx="180" cy="80" r="20" fill="url(#skin-gradient)" filter="url(#neon-blue-glow)"/> <!-- Head -->
+  <rect x="170" y="60" width="20" height="10" fill="url(#hair-gradient)"/> <!-- Hair -->
+  <path d="M170 85 Q180 90 190 85" stroke="#FFF" stroke-width="2" fill="none"/> <!-- Smile -->
+  <circle cx="175" cy="75" r="2" fill="#000"/> <!-- Eye -->
+  <circle cx="185" cy="75" r="2" fill="#000"/> <!-- Eye -->
+
+  <!-- Friend 3: Young person, diverse (e.g., South Asian features), laughing -->
+  <circle cx="220" cy="130" r="20" fill="url(#skin-gradient)" filter="url(#neon-purple-glow)"/> <!-- Head -->
+  <path d="M210 110 Q220 100 230 110" stroke="#000" stroke-width="2" fill="none"/> <!-- Hair -->
+  <path d="M215 135 Q220 140 225 135" stroke="#FFF" stroke-width="2" fill="none"/> <!-- Smile -->
+  <circle cx="215" cy="125" r="2" fill="#000"/> <!-- Eye -->
+  <circle cx="225" cy="125" r="2" fill="#000"/> <!-- Eye -->
+
+  <!-- Friend 4: Young woman, diverse (e.g., White features), laughing -->
+  <circle cx="280" cy="100" r="20" fill="url(#skin-gradient)" filter="url(#neon-blue-glow)"/> <!-- Head -->
+  <path d="M270 80 Q280 70 290 80" stroke="#FFD700" stroke-width="2" fill="none"/> <!-- Hair -->
+  <path d="M275 105 Q280 110 285 105" stroke="#FFF" stroke-width="2" fill="none"/> <!-- Smile -->
+  <circle cx="275" cy="95" r="2" fill="#000"/> <!-- Eye -->
+  <circle cx="285" cy="95" r="2" fill="#000"/> <!-- Eye -->
+
+  <!-- Floating Glowing Chat Bubbles with Icons -->
+  <!-- Bubble 1: With heart -->
+  <circle cx="100" cy="50" r="20" fill="#FFFFFF" opacity="0.1" filter="url(#neon-purple-glow)"/>
+  <path d="M100 40 Q90 30 100 20 Q110 30 100 40" fill="red" filter="url(#neon-purple-glow)"/> <!-- Heart -->
+
+  <!-- Bubble 2: With translation icon (globe) -->
+  <circle cx="300" cy="50" r="20" fill="#FFFFFF" opacity="0.1" filter="url(#neon-blue-glow)"/>
+  <circle cx="300" cy="50" r="10" stroke="#00BFFF" stroke-width="2" fill="none"/> <!-- Globe -->
+  <line x1="295" y1="50" x2="305" y2="50" stroke="#00BFFF" stroke-width="2"/> <!-- Equator -->
+
+  <!-- Bubble 3: With heart and translation -->
+  <circle cx="200" cy="200" r="25" fill="#FFFFFF" opacity="0.1" filter="url(#neon-purple-glow)"/>
+  <path d="M200 190 Q190 180 200 170 Q210 180 200 190" fill="red" filter="url(#neon-purple-glow)"/> <!-- Heart -->
+  <text x="195" y="210" font-size="10" fill="#00BFFF">🌐</text> <!-- Translation icon (emoji approximation) -->
+
+  <!-- Additional glow particles for cyberpunk effect -->
+  <circle cx="50" cy="250" r="5" fill="#A020F0" opacity="0.5" filter="url(#neon-purple-glow)"/>
+  <circle cx="350" cy="200" r="3" fill="#00BFFF" opacity="0.5" filter="url(#neon-blue-glow)"/>
+</svg>

@@ -1,0 +1,23 @@
+<header class="header">
+    <div class="logo" routerLink="/">Chatme</div>
+    <nav class="nav">
+        <a routerLink="/" class="nav-link" [class.active]="isActive('/')">Home</a>
+        <a routerLink="/features" class="nav-link" [class.active]="isActive('/features')">Features</a>
+        <a routerLink="/about" class="nav-link" [class.active]="isActive('/about')">About</a>
+    </nav>
+    <div class="header-right">
+        <button class="btn-login" routerLink="/login" title="Login">👤</button>
+        <button class="theme-toggle" (click)="toggleTheme()">{{ isDarkMode() ? '☀️' : '🌙' }}</button>
+        <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+            <span class="hamburger"></span>
+        </button>
+    </div>
+</header>
+
+<div class="mobile-nav" [class.open]="isMobileMenuOpen()">
+    <a routerLink="/" class="mobile-nav-link" [class.active]="isActive('/')" (click)="closeMobileMenu()">Home</a>
+    <a routerLink="/features" class="mobile-nav-link" [class.active]="isActive('/features')"
+        (click)="closeMobileMenu()">Features</a>
+    <a routerLink="/about" class="mobile-nav-link" [class.active]="isActive('/about')"
+        (click)="closeMobileMenu()">About</a>
+</div>

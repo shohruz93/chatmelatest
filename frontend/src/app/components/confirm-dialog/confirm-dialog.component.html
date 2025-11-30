@@ -1,0 +1,20 @@
+@if (isOpen) {
+<div class="modal-backdrop" (click)="onBackdropClick()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-icon">{{ icon }}</div>
+            <h2 class="modal-title">{{ title }}</h2>
+            <p class="modal-message">{{ message }}</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-cancel" (click)="onCancel()">
+                    {{ cancelText }}
+                </button>
+                <button [class]="'btn ' + confirmButtonClass" (click)="onConfirm()">
+                    {{ confirmText }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+}

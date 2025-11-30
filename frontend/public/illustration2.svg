@@ -1,0 +1,521 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="3840" height="2880"
+     viewBox="0 0 3840 2880"
+     role="img"
+     aria-label="Diverse group of young friends laughing together at a smartphone with glowing chat bubbles in neon cyberpunk lighting">
+  <defs>
+    <!-- Deep navy background -->
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#040717"/>
+      <stop offset="50%" stop-color="#050816"/>
+      <stop offset="100%" stop-color="#02030b"/>
+    </linearGradient>
+
+    <!-- Soft central glow behind the group -->
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.35"/>
+      <stop offset="40%" stop-color="#7c3aed" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Neon purple-blue phone glow -->
+    <radialGradient id="phoneGlow" cx="50%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.7"/>
+      <stop offset="35%" stop-color="#6366f1" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Screen gradient -->
+    <linearGradient id="screenGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1d2441"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </linearGradient>
+
+    <!-- Chat bubble gradients -->
+    <linearGradient id="bubblePurple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+
+    <linearGradient id="bubbleBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <!-- Skin tones -->
+    <linearGradient id="skinTone1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f9d3b4"/>
+      <stop offset="100%" stop-color="#f2b48c"/>
+    </linearGradient>
+
+    <linearGradient id="skinTone2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f4c7a4"/>
+      <stop offset="100%" stop-color="#e89a63"/>
+    </linearGradient>
+
+    <linearGradient id="skinTone3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c68642"/>
+      <stop offset="100%" stop-color="#8d5524"/>
+    </linearGradient>
+
+    <linearGradient id="skinTone4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8d5524"/>
+      <stop offset="100%" stop-color="#5a3315"/>
+    </linearGradient>
+
+    <!-- Hair gradients -->
+    <linearGradient id="hairDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#0b1120"/>
+    </linearGradient>
+
+    <linearGradient id="hairCurly" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+
+    <linearGradient id="hairHighlightPurple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f2937"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+
+    <linearGradient id="hairHighlightBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <!-- Clothing gradients -->
+    <linearGradient id="hoodiePurple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+
+    <linearGradient id="hoodieBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="40%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <linearGradient id="shirtTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+
+    <linearGradient id="shirtPink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+
+    <!-- Neon rim light overlay -->
+    <linearGradient id="rimLightPurple" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#a855f7" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="rimLightBlue" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#38bdf8" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Glow filters -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+                     values="0 0 0 0 0.55
+                             0 0 0 0 0.42
+                             0 0 0 0 0.97
+                             0 0 0 0.9 0"
+                     result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+      </feMerge>
+    </filter>
+
+    <filter id="bubbleGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="bBlur"/>
+      <feColorMatrix in="bBlur" type="matrix"
+                     values="0 0 0 0 0.6
+                             0 0 0 0 0.5
+                             0 0 0 0 1
+                             0 0 0 0.9 0"/>
+      <feMerge>
+        <feMergeNode/>
+      </feMerge>
+    </filter>
+
+    <filter id="heartGlow" x="-200%" y="-200%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="8" result="hBlur"/>
+      <feColorMatrix in="hBlur" type="matrix"
+                     values="0 0 0 0 1
+                             0 0 0 0 0.2
+                             0 0 0 0 0.5
+                             0 0 0 0.9 0"/>
+      <feMerge>
+        <feMergeNode/>
+      </feMerge>
+    </filter>
+
+    <!-- Simple inner shadow for phone -->
+    <filter id="innerShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset dx="0" dy="8" result="off"/>
+      <feGaussianBlur in="off" stdDeviation="10" result="blur"/>
+      <feComposite in="blur" in2="SourceAlpha" operator="arithmetic"
+                   k2="-1" k3="1" result="shadowDiff"/>
+      <feColorMatrix in="shadowDiff" type="matrix"
+                     values="0 0 0 0 0
+                             0 0 0 0 0
+                             0 0 0 0 0
+                             0 0 0 0.6 0"/>
+      <feComposite in="SourceGraphic" in2="shadowDiff" operator="over"/>
+    </filter>
+
+    <!-- Heart shape path as symbol -->
+    <symbol id="heartIcon" viewBox="0 0 32 32">
+      <path d="M16 28s-6.2-3.7-9.8-7.3C3.2 17.6 2 15.5 2 13.1 2 9.9 4.5 7 7.8 7c1.9 0 3.7 0.9 4.9 2.3C14.5 7.9 16.3 7 18.2 7 21.5 7 24 9.9 24 13.1c0 2.4-1.2 4.5-4.2 7.6C22.2 24.3 16 28 16 28z"
+            fill="url(#bubblePurple)" stroke="#f9a8d4" stroke-width="1.2"
+            stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- Translation icon symbol (A + 文) -->
+    <symbol id="translateIcon" viewBox="0 0 32 32">
+      <rect x="1" y="1" width="30" height="30" rx="6"
+            fill="none" stroke="#e5e7eb" stroke-width="1.4"/>
+      <text x="8.4" y="15" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="8" fill="#e5e7eb" font-weight="700">A</text>
+      <text x="15" y="22.5" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            font-size="9" fill="#e5e7eb" font-weight="600">文</text>
+    </symbol>
+
+    <!-- Generic rounded chat bubble symbol -->
+    <symbol id="chatBubble" viewBox="0 0 100 72">
+      <path d="M12 6h76c6.6 0 12 5.4 12 12v26c0 11-9 20-20 20H42l-14 8c-2.2 1.2-4-0.1-4-2.7V64H12C5.4 64 0 58.6 0 52V18C0 11.4 5.4 6 12 6z"
+            fill="url(#bubblePurple)"/>
+    </symbol>
+
+    <!-- Sparkle/star -->
+    <symbol id="sparkle" viewBox="0 0 24 24">
+      <path d="M12 1.5l1.8 5.1 5.2 1.8-5.2 1.8L12 15.3 10.2 10.2 5 8.4l5.2-1.8L12 1.5z"
+            fill="#e5e7eb"/>
+    </symbol>
+  </defs>
+
+  <!-- Background -->
+  <rect width="3840" height="2880" fill="url(#bgGradient)"/>
+
+  <!-- Central glow -->
+  <rect x="0" y="0" width="3840" height="2880" fill="url(#centerGlow)"/>
+
+  <!-- Phone glow halo -->
+  <ellipse cx="1920" cy="1800" rx="980" ry="520" fill="url(#phoneGlow)" filter="url(#softGlow)" opacity="0.9"/>
+
+  <!-- Group container (slight scale for visual balance) -->
+  <g id="group" transform="translate(0,-60)">
+
+    <!-- Phone and hands at center -->
+    <g id="phone-group" transform="translate(0,120)">
+      <!-- Phone body -->
+      <g id="phone" transform="translate(0,120)">
+        <!-- Outer phone shape -->
+        <rect x="1580" y="1520" width="680" height="1040" rx="120"
+              fill="#020617"
+              stroke="#0ea5e9" stroke-width="6"/>
+        <!-- Inner screen -->
+        <rect x="1640" y="1600" width="560" height="840" rx="80"
+              fill="url(#screenGradient)" filter="url(#innerShadow)"/>
+        <!-- Status bar glow -->
+        <rect x="1660" y="1620" width="520" height="80" rx="40"
+              fill="#020617" opacity="0.7"/>
+        <circle cx="1700" cy="1660" r="10" fill="#22c55e"/>
+        <rect x="1740" y="1646" width="180" height="28" rx="14" fill="#111827"/>
+        <rect x="1938" y="1650" width="60" height="20" rx="10" fill="#111827"/>
+        <!-- Chat bubbles on screen -->
+        <g transform="translate(0,40)">
+          <rect x="1700" y="1730" width="260" height="90" rx="32"
+                fill="#0b1120" stroke="#6366f1" stroke-width="2"/>
+          <rect x="1880" y="1860" width="260" height="90" rx="32"
+                fill="#020617" stroke="#22d3ee" stroke-width="2"/>
+          <rect x="1700" y="1990" width="240" height="90" rx="32"
+                fill="#0b1120" stroke="#a855f7" stroke-width="2"/>
+          <!-- Tiny message glyphs -->
+          <circle cx="1732" cy="1762" r="6" fill="#22c55e"/>
+          <rect x="1750" y="1752" width="160" height="10" rx="5" fill="#e5e7eb" opacity="0.7"/>
+          <rect x="1750" y="1774" width="110" height="8" rx="4" fill="#9ca3af" opacity="0.7"/>
+
+          <circle cx="1908" cy="1892" r="6" fill="#38bdf8"/>
+          <rect x="1926" y="1882" width="140" height="10" rx="5" fill="#e5e7eb" opacity="0.7"/>
+          <rect x="1926" y="1904" width="80" height="8" rx="4" fill="#9ca3af" opacity="0.7"/>
+
+          <circle cx="1732" cy="2022" r="6" fill="#f97316"/>
+          <rect x="1750" y="2012" width="120" height="10" rx="5" fill="#e5e7eb" opacity="0.7"/>
+          <rect x="1750" y="2034" width="90" height="8" rx="4" fill="#9ca3af" opacity="0.7"/>
+        </g>
+        <!-- Phone bottom glow line -->
+        <rect x="1760" y="2430" width="320" height="10" rx="5"
+              fill="#22d3ee" opacity="0.7"/>
+      </g>
+
+      <!-- Hands around phone -->
+      <!-- Left darker-skinned hand -->
+      <g transform="translate(-220,120)">
+        <path d="M1770 1820c-40 80-48 150-26 210 16 44 56 80 102 102 34 16 74 24 118 20 14-1 26-3 36-5 10-2 18-10 22-20 4-10 6-25-4-32-9-6-24-5-36-6-36-3-68-14-98-32-46-28-78-72-108-124-6-10-16-20-21-24-10-8-22-5-29 11z"
+              fill="url(#skinTone4)"/>
+        <!-- Rim light -->
+        <path d="M1780 1824c-10 22-14 41-12 62 0 4 1 8 3 12 4 7 10 11 16 10 9-1 13-12 18-24 4-12 10-24 16-36"
+              fill="none" stroke="#6366f1" stroke-width="6" stroke-linecap="round" opacity="0.8"/>
+      </g>
+
+      <!-- Right lighter-skinned hand -->
+      <g transform="translate(260,120)">
+        <path d="M2100 1824c32 70 42 130 30 182-6 27-20 52-40 72-22 22-52 38-84 44-26 5-54 4-80-2-16-4-30-7-42-16-11-8-14-25-9-36 5-11 18-18 31-17 21 1 40 2 60-3 47-12 86-43 118-86 16-22 28-46 38-72 5-12 14-18 24-17 10 1 19 7 24 21z"
+              fill="url(#skinTone1)"/>
+        <!-- Rim light -->
+        <path d="M2090 1824c10 20 15 38 16 56 0 5-1 10-3 14-4 7-11 11-17 10-8-1-13-9-20-18-6-8-12-18-18-28"
+              fill="none" stroke="#38bdf8" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
+      </g>
+    </g>
+
+    <!-- Characters: four friends surrounding the phone -->
+    <!-- Friend 1: Left, curly hair, darker skin, teal shirt, laughing -->
+    <g id="friend1" transform="translate(-540,-80)">
+      <!-- Body -->
+      <path d="M1500 1900c-120-40-200-20-252 30-52 50-73 140-58 210 10 46 35 92 72 122 46 38 112 56 178 46 68-10 132-50 166-106 24-40 28-92 10-136-18-44-58-84-116-112z"
+            fill="url(#shirtTeal)"/>
+      <!-- Head -->
+      <g transform="translate(0,-200)">
+        <ellipse cx="1500" cy="1900" rx="120" ry="140" fill="url(#skinTone3)"/>
+        <!-- Ear -->
+        <ellipse cx="1386" cy="1908" rx="20" ry="30" fill="url(#skinTone3)"/>
+        <!-- Hair (curly afro-ish) -->
+        <path d="M1384 1870c-6-60 24-120 76-146 40-20 92-22 130-4 42 20 68 64 66 116-2 56-28 88-54 92-22 3-42-8-58-22-12 14-36 24-60 22-26-2-54-18-74-42-14 12-28 18-42 14-12-3-24-14-30-30-6-14-8-32-4-48z"
+              fill="url(#hairCurly)"/>
+        <!-- Eyes -->
+        <ellipse cx="1470" cy="1900" rx="10" ry="8" fill="#020617"/>
+        <ellipse cx="1534" cy="1904" rx="10" ry="8" fill="#020617"/>
+        <circle cx="1472" cy="1898" r="3" fill="#e5e7eb"/>
+        <circle cx="1536" cy="1902" r="3" fill="#e5e7eb"/>
+        <!-- Eyebrows -->
+        <path d="M1436 1888c10-10 22-14 36-14" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <path d="M1514 1890c10-8 22-10 34-8" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <!-- Mouth (big laugh) -->
+        <path d="M1462 1946c10 34 32 52 60 52 26 0 50-18 64-46"
+              fill="none" stroke="#020617" stroke-width="8" stroke-linecap="round"/>
+        <path d="M1470 1954c8 22 26 34 46 34 18 0 34-10 44-28"
+              fill="#ef4444"/>
+        <!-- Cheek highlights -->
+        <ellipse cx="1426" cy="1928" rx="22" ry="12" fill="#f97316" opacity="0.3"/>
+        <ellipse cx="1580" cy="1932" rx="22" ry="12" fill="#f97316" opacity="0.3"/>
+        <!-- Purple rim light on left side -->
+        <path d="M1388 1848c8-40 34-72 72-90"
+              fill="none" stroke="#a855f7" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+      </g>
+      <!-- Arm towards phone -->
+      <path d="M1536 2080c-40 20-58 48-64 80-6 34 4 72 24 96 22 28 52 44 86 48 36 4 74-6 104-28 20-14 36-32 44-54 6-18 4-40-8-54-12-16-32-22-50-18-16 4-30 14-44 24-18 12-36 22-54 22-16 0-32-6-46-18-10-8-16-20-18-32-2-12 0-26 4-40z"
+            fill="url(#skinTone3)"/>
+    </g>
+
+    <!-- Friend 2: Center-left, medium skin, purple hoodie -->
+    <g id="friend2" transform="translate(-200,-160)">
+      <!-- Body / hoodie -->
+      <path d="M1760 1860c-120 10-194 66-234 144-38 72-44 166-14 240 24 60 70 112 132 142 66 32 150 40 224 16 78-26 142-86 170-156 24-60 22-134-6-190-30-60-86-106-158-134-38-14-78-22-114-22z"
+            fill="url(#hoodiePurple)"/>
+      <!-- Hoodie chest fold -->
+      <path d="M1770 2100c46 40 80 78 104 122 10 18 18 38 22 58"
+            fill="none" stroke="#4c1d95" stroke-width="30" stroke-linecap="round" opacity="0.6"/>
+      <!-- Head -->
+      <g transform="translate(40,-190)">
+        <ellipse cx="1760" cy="1880" rx="116" ry="140" fill="url(#skinTone2)"/>
+        <!-- Ear -->
+        <ellipse cx="1866" cy="1884" rx="20" ry="30" fill="url(#skinTone2)"/>
+        <!-- Hair (short, with purple-blue highlight) -->
+        <path d="M1678 1840c12-60 54-108 112-124 56-14 122 6 156 52 22 30 30 72 22 110-6 30-20 54-40 68-22 14-48 14-70 0-16-10-28-26-36-44-10 20-26 36-46 44-22 8-48 6-70-6-24-14-42-40-52-70-2-8-4-18-4-30 0-8 0-10-2-12-4-4-8-8-12-12z"
+              fill="url(#hairHighlightPurple)"/>
+        <!-- Eyes -->
+        <ellipse cx="1732" cy="1884" rx="10" ry="8" fill="#020617"/>
+        <ellipse cx="1796" cy="1888" rx="10" ry="8" fill="#020617"/>
+        <circle cx="1734" cy="1882" r="3" fill="#e5e7eb"/>
+        <circle cx="1798" cy="1886" r="3" fill="#e5e7eb"/>
+        <!-- Brows -->
+        <path d="M1698 1872c10-10 24-14 38-12" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <path d="M1776 1874c10-8 24-10 38-8" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <!-- Smile -->
+        <path d="M1726 1932c12 24 32 38 58 38 24 0 46-12 60-34"
+              fill="none" stroke="#020617" stroke-width="8" stroke-linecap="round"/>
+        <!-- Teeth -->
+        <path d="M1736 1932c10 16 24 22 42 22 16 0 30-6 40-20"
+              fill="#f9fafb"/>
+        <!-- Cheeks -->
+        <ellipse cx="1704" cy="1916" rx="20" ry="10" fill="#fb7185" opacity="0.35"/>
+        <ellipse cx="1822" cy="1920" rx="20" ry="10" fill="#fb7185" opacity="0.35"/>
+      </g>
+      <!-- Left arm around friend3 -->
+      <path d="M1684 2106c-46 14-80 40-102 72-22 32-32 70-30 106 2 32 14 64 34 88 24 30 60 52 98 60 36 8 72 4 104-10 26-12 46-30 60-52 12-18 18-42 14-60-4-18-18-32-34-36-14-4-30 0-44 8-18 10-36 18-54 18-16 0-32-6-44-18-12-12-20-28-22-48-2-18-2-38 0-56 2-18 8-34 20-56z"
+            fill="url(#skinTone2)"/>
+    </g>
+
+    <!-- Friend 3: Center-right, light skin, blue hoodie, looking over phone -->
+    <g id="friend3" transform="translate(200,-160)">
+      <!-- Body / hoodie -->
+      <path d="M1920 1868c120 10 204 70 246 146 40 72 48 160 22 236-22 68-74 126-140 160-70 34-156 42-234 18-78-26-140-88-166-162-22-62-18-138 14-196 34-64 96-112 176-138 28-10 58-16 82-18z"
+            fill="url(#hoodieBlue)"/>
+      <!-- Head -->
+      <g transform="translate(10,-196)">
+        <ellipse cx="1920" cy="1890" rx="114" ry="138" fill="url(#skinTone1)"/>
+        <!-- Ear -->
+        <ellipse cx="1816" cy="1894" rx="20" ry="30" fill="url(#skinTone1)"/>
+        <!-- Hair (short, swept, blue highlight) -->
+        <path d="M1838 1860c10-52 46-96 94-116 50-20 112-16 154 16 34 26 54 70 52 116-2 38-18 72-42 94-22 22-50 32-78 30-26-2-50-14-68-32-14 18-34 30-58 34-24 4-52-2-76-16-30-16-54-44-68-78-6-12-10-28-12-42-2-12-2-26 2-36 2-6-10-6-14-12z"
+              fill="url(#hairHighlightBlue)"/>
+        <!-- Eyes -->
+        <ellipse cx="1894" cy="1892" rx="10" ry="8" fill="#020617"/>
+        <ellipse cx="1956" cy="1896" rx="10" ry="8" fill="#020617"/>
+        <circle cx="1896" cy="1890" r="3" fill="#e5e7eb"/>
+        <circle cx="1958" cy="1894" r="3" fill="#e5e7eb"/>
+        <!-- Brows -->
+        <path d="M1860 1880c10-8 24-12 38-10" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <path d="M1938 1884c10-8 24-10 40-8" stroke="#020617" stroke-width="4" stroke-linecap="round"/>
+        <!-- Smile -->
+        <path d="M1888 1940c12 26 32 42 60 42 26 0 50-14 64-38"
+              fill="none" stroke="#020617" stroke-width="8" stroke-linecap="round"/>
+        <!-- Teeth -->
+        <path d="M1898 1940c12 16 26 24 46 24 18 0 34-8 44-22"
+              fill="#f9fafb"/>
+        <!-- Chin highlight -->
+        <ellipse cx="1920" cy="1960" rx="28" ry="10" fill="#f97316" opacity="0.22"/>
+      </g>
+      <!-- Right arm reaching down to phone -->
+      <path d="M1956 2112c34 10 62 26 84 46 24 22 40 50 48 80 10 36 8 76-10 108-16 30-46 54-82 66-36 12-76 10-110-6-26-12-48-30-62-50-12-18-20-40-18-60 2-18 12-36 26-46 14-10 32-12 48-8 16 6 32 12 48 16 16 4 30 4 42-2 14-6 24-18 30-34 6-18 8-40 6-60-2-16-6-32-10-50z"
+            fill="url(#skinTone1)"/>
+    </g>
+
+    <!-- Friend 4: Rightmost, hijab / scarf, darker skin, pink/orange shirt -->
+    <g id="friend4" transform="translate(560,-40)">
+      <!-- Body / shirt -->
+      <path d="M2040 1920c100 0 174 34 226 90 52 56 78 138 72 212-6 66-34 130-78 176-52 54-126 90-204 96-74 6-152-14-210-56-62-44-104-110-114-182-10-72 10-152 56-210 46-58 116-98 200-112 18-2 36-4 52-4z"
+            fill="url(#shirtPink)"/>
+      <!-- Head -->
+      <g transform="translate(40,-210)">
+        <ellipse cx="2040" cy="1920" rx="110" ry="136" fill="url(#skinTone4)"/>
+        <!-- Ear (subtle) -->
+        <ellipse cx="2142" cy="1920" rx="16" ry="26" fill="url(#skinTone4)"/>
+        <!-- Hijab / scarf -->
+        <path d="M1952 1884c18-56 60-98 110-114 52-16 112-8 152 26 40 36 60 94 52 152-6 46-26 88-54 118-30 32-70 52-110 60-46 8-94 4-134-16-40-20-72-54-92-98-14-32-22-70-20-106 2-36 12-72 26-102 2-4 2-10 0-14-4-6-16-4-22-6z"
+              fill="#020617"/>
+        <!-- Scarf neon edges -->
+        <path d="M1960 1888c18-42 50-72 92-88 48-18 108-14 154 18"
+              fill="none" stroke="#6366f1" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+        <path d="M1954 1990c10 40 28 72 54 98 32 32 78 52 126 56"
+              fill="none" stroke="#22d3ee" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+        <!-- Face details (framed by scarf) -->
+        <!-- Eyes -->
+        <ellipse cx="2014" cy="1920" rx="9" ry="8" fill="#020617"/>
+        <ellipse cx="2076" cy="1922" rx="9" ry="8" fill="#020617"/>
+        <circle cx="2016" cy="1918" r="3" fill="#e5e7eb"/>
+        <circle cx="2078" cy="1920" r="3" fill="#e5e7eb"/>
+        <!-- Brows -->
+        <path d="M1986 1910c8-8 20-12 32-10" stroke="#020617" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M2058 1912c8-6 20-8 30-6" stroke="#020617" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Nose -->
+        <path d="M2040 1922c0 12-4 22-10 30" stroke="#020617" stroke-width="3" stroke-linecap="round"/>
+        <!-- Smile -->
+        <path d="M2004 1960c8 18 22 30 40 34 20 4 40-4 52-20"
+              fill="none" stroke="#020617" stroke-width="7" stroke-linecap="round"/>
+        <!-- Cheeks -->
+        <ellipse cx="1988" cy="1944" rx="18" ry="10" fill="#fb7185" opacity="0.35"/>
+        <ellipse cx="2092" cy="1948" rx="18" ry="10" fill="#fb7185" opacity="0.35"/>
+      </g>
+      <!-- Arm reaching in -->
+      <path d="M2004 2136c-34 18-60 42-78 72-16 24-26 52-28 82-2 34 6 70 26 100 22 34 58 60 96 74 40 14 84 16 122 6 32-8 60-26 78-50 16-20 26-46 26-70 0-20-8-38-22-52-14-12-32-18-50-16-18 2-34 12-50 18-16 8-36 12-52 8-18-4-32-16-44-32-12-16-22-36-28-56-6-20-10-42-10-64z"
+            fill="url(#skinTone4)"/>
+    </g>
+  </g>
+
+  <!-- Foreground rim lights (purple left, blue right) -->
+  <rect x="0" y="640" width="1920" height="1400" fill="url(#rimLightPurple)" opacity="0.7"/>
+  <rect x="1920" y="640" width="1920" height="1400" fill="url(#rimLightBlue)" opacity="0.7"/>
+
+  <!-- Floating chat bubbles and icons around the group -->
+
+  <!-- Top-left purple bubble with translation icon -->
+  <g transform="translate(560,560)">
+    <use href="#chatBubble" width="240" height="172"
+         transform="scale(1.1)"
+         fill="url(#bubblePurple)" opacity="0.9"/>
+    <!-- Glow -->
+    <ellipse cx="110" cy="60" rx="120" ry="70" fill="url(#bubblePurple)" filter="url(#bubbleGlow)" opacity="0.7"/>
+    <!-- Icon inside -->
+    <g transform="translate(55,32) scale(1.1)">
+      <use href="#translateIcon"/>
+    </g>
+  </g>
+
+  <!-- Top-right blue bubble with hearts -->
+  <g transform="translate(2760,620)">
+    <use href="#chatBubble" width="260" height="180"
+         transform="scale(1.0)"
+         fill="url(#bubbleBlue)" opacity="0.95"/>
+    <!-- Glow -->
+    <ellipse cx="120" cy="62" rx="130" ry="72" fill="url(#bubbleBlue)" filter="url(#bubbleGlow)" opacity="0.8"/>
+    <!-- Tiny hearts -->
+    <g transform="translate(78,42) scale(0.6)">
+      <use href="#heartIcon"/>
+    </g>
+    <g transform="translate(118,30) scale(0.5)">
+      <use href="#heartIcon"/>
+    </g>
+    <g transform="translate(152,52) scale(0.4)">
+      <use href="#heartIcon"/>
+    </g>
+  </g>
+
+  <!-- Mid-left small speech bubble -->
+  <g transform="translate(480,1320) scale(0.9)">
+    <use href="#chatBubble" width="220" height="160"
+         fill="url(#bubbleBlue)" opacity="0.85"/>
+    <ellipse cx="100" cy="58" rx="110" ry="64" fill="url(#bubbleBlue)" filter="url(#bubbleGlow)" opacity="0.7"/>
+    <!-- Horizontal lines as text -->
+    <rect x="40" y="42" width="120" height="10" rx="5" fill="#e5e7eb" opacity="0.8"/>
+    <rect x="40" y="60" width="80" height="8" rx="4" fill="#cbd5f5" opacity="0.8"/>
+  </g>
+
+  <!-- Mid-right small bubble with translation icon -->
+  <g transform="translate(2920,1360) scale(0.9)">
+    <use href="#chatBubble" width="220" height="160"
+         fill="url(#bubblePurple)" opacity="0.9"/>
+    <ellipse cx="100" cy="58" rx="110" ry="64" fill="url(#bubblePurple)" filter="url(#bubbleGlow)" opacity="0.7"/>
+    <g transform="translate(64,32) scale(0.85)">
+      <use href="#translateIcon"/>
+    </g>
+  </g>
+
+  <!-- Small floating hearts near center -->
+  <g opacity="0.95">
+    <g transform="translate(2200,1180) scale(0.7)">
+      <use href="#heartIcon" filter="url(#heartGlow)"/>
+    </g>
+    <g transform="translate(2120,1100) scale(0.5)">
+      <use href="#heartIcon" filter="url(#heartGlow)"/>
+    </g>
+    <g transform="translate(2060,1200) scale(0.45)">
+      <use href="#heartIcon" filter="url(#heartGlow)"/>
+    </g>
+  </g>
+
+  <!-- Small sparkles for cyberpunk feel -->
+  <g fill="#e5e7eb" opacity="0.85">
+    <use href="#sparkle" x="700" y="760" width="18" height="18"/>
+    <use href="#sparkle" x="3140" y="840" width="20" height="20"/>
+    <use href="#sparkle" x="980" y="540" width="14" height="14"/>
+    <use href="#sparkle" x="2700" y="580" width="16" height="16"/>
+    <circle cx="900" cy="1520" r="3" fill="#a5b4fc"/>
+    <circle cx="3040" cy="1500" r="3" fill="#93c5fd"/>
+    <circle cx="2600" cy="1900" r="2.5" fill="#bef264"/>
+  </g>
+</svg>
