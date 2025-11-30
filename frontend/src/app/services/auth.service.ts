@@ -52,7 +52,7 @@ export class AuthService {
                         if (response.user.needsOnboarding) {
                             this.router.navigate(['/onboarding']);
                         } else {
-                            this.router.navigate(['/chat']);
+                            this.router.navigate(['/dashboard/profile']);
                         }
                     }
                 })
