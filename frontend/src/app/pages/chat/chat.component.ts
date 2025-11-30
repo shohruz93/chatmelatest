@@ -60,7 +60,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     selectedImage: string | null = null;
 
     get partnerId() { return this.partner?.id; }
-    get partnerName() { return this.partner?.display_name || this.partner?.username; }
+    get partnerName() { return this.partner?.display_name || this.partner?.username || this.partner?.name; }
     get partnerAvatar() { return this.partner?.avatar; }
     get isPartnerOnline() { return this.partnerStatus === 'online'; }
     get isPartnerTyping() { return this.partnerTyping; }

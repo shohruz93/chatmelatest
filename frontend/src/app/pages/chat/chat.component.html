@@ -23,7 +23,7 @@
     </header>
 
     <!-- Messages Area -->
-    <main class="messages-container" #messagesContainer>
+    <main class="messages-container" #messagesContainer (scroll)="onScroll($event)">
         <div class="messages-content">
             <div class="empty-state" *ngIf="!partnerId">
                 <div class="empty-icon">👋</div>
