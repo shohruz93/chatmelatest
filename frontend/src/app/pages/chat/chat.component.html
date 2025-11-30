@@ -32,7 +32,7 @@
             </div>
 
             <div class="message-wrapper" *ngFor="let msg of messages"
-                [ngClass]="{'message-sent': msg.sender_id === currentUser.id, 'message-received': msg.sender_id !== currentUser.id}">
+                [ngClass]="{'message-sent': msg.type === 'sent', 'message-received': msg.type !== 'sent'}">
 
                 <div class="message-bubble glass-panel">
                     <!-- Text Message -->
@@ -56,7 +56,7 @@
 
                     <div class="message-meta">
                         <span class="message-time">{{ msg.created_at | date:'shortTime' }}</span>
-                        <span class="message-status" *ngIf="msg.sender_id === currentUser.id">
+                        <span class="message-status" *ngIf="msg.type === 'sent'">
                             <span *ngIf="msg.status === 'sent'">✓</span>
                             <span *ngIf="msg.status === 'delivered'">✓✓</span>
                             <span *ngIf="msg.status === 'read'" class="read">✓✓</span>
