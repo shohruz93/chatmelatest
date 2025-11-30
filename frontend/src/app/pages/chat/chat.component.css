@@ -826,3 +826,38 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
 }
+
+/* Fix Send Button Icon Visibility */
+.btn-send {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+.btn-send .icon {
+    display: block;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: white;
+}
+
+.btn-send:hover:not(:disabled) {
+    transform: scale(1.1) rotate(-10deg);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-send:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #9ca3af;
+}
