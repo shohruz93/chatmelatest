@@ -235,6 +235,19 @@
     word-wrap: break-word;
 }
 
+/* Audio Message Styles */
+.message-voice {
+    width: 100%;
+    min-width: 200px;
+}
+
+.message-voice audio {
+    width: 100%;
+    max-width: 100%;
+    height: 40px;
+    border-radius: 20px;
+}
+
 .message-meta {
     display: flex;
     justify-content: flex-end;
@@ -810,6 +823,7 @@
         border-radius: 12px;
         padding: 0.5rem;
         margin-bottom: 0.5rem;
+        z-index: 1000;
     }
 
     .media-actions.show {
@@ -830,7 +844,7 @@
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 100;
+    z-index: 1000;
     overflow-y: auto;
     padding: 1rem;
     margin-bottom: 0.5rem;
