@@ -124,8 +124,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             // Redirect to login or handle appropriately
         }
 
-        // ... existing code ...
-
         // Listen for incoming chat requests
         this.requestSub = this.socketService.onChatRequestReceived().subscribe(data => {
             this.incomingRequest = data;

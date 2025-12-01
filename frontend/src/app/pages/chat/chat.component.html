@@ -110,8 +110,9 @@
         <!-- Sticker Picker -->
         <div class="sticker-picker glass-panel" *ngIf="showStickerPicker">
             <div class="sticker-grid">
-                <img *ngFor="let sticker of stickers" [src]="sticker" (click)="sendSticker(sticker)"
-                    class="sticker-item">
+                <button *ngFor="let sticker of stickers" (click)="sendSticker(sticker)" class="sticker-item">
+                    {{ sticker }}
+                </button>
             </div>
         </div>
     </footer>
