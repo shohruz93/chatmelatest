@@ -19,9 +19,10 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Interests</label>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    <button *ngFor="let interest of interests" (click)="toggleInterest(interest)"
-                        [class.ring-2]="interest.selected" [class.ring-indigo-500]="interest.selected"
-                        [class.bg-indigo-50]="interest.selected" [class.dark:bg-indigo-900]="interest.selected"
+                    @for (interest of interests; track interest.name) {
+                    <button (click)="toggleInterest(interest)" [class.ring-2]="interest.selected"
+                        [class.ring-indigo-500]="interest.selected" [class.bg-indigo-50]="interest.selected"
+                        [class.dark:bg-indigo-900]="interest.selected"
                         class="relative rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 transition-all">
                         <div class="flex-1 min-w-0">
                             <span class="absolute inset-0" aria-hidden="true"></span>
@@ -29,6 +30,7 @@
                             </p>
                         </div>
                     </button>
+                    }
                 </div>
             </div>
 

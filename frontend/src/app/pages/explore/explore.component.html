@@ -15,45 +15,55 @@
     <div class="filter-section">
       <label>Status</label>
       <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
-        <option *ngFor="let option of statusOptions" [value]="option.value">
+        @for (option of statusOptions; track option.value) {
+        <option [value]="option.value">
           {{ option.label }}
         </option>
+        }
       </select>
     </div>
 
     <div class="filter-section">
       <label>Gender</label>
       <select [(ngModel)]="filterGender" (change)="onFilterChange()" class="filter-select">
-        <option *ngFor="let option of genderOptions" [value]="option.value">
+        @for (option of genderOptions; track option.value) {
+        <option [value]="option.value">
           {{ option.label }}
         </option>
+        }
       </select>
     </div>
 
     <div class="filter-section">
       <label>Location</label>
       <select [(ngModel)]="filterLocation" (change)="onFilterChange()" class="filter-select">
-        <option *ngFor="let option of locationOptions" [value]="option.value">
+        @for (option of locationOptions; track option.value) {
+        <option [value]="option.value">
           {{ option.label }}
         </option>
+        }
       </select>
     </div>
 
     <div class="filter-section">
       <label>Native Language</label>
       <select [(ngModel)]="filterNativeLanguage" (change)="onFilterChange()" class="filter-select">
-        <option *ngFor="let option of languageOptions" [value]="option.value">
+        @for (option of languageOptions; track option.value) {
+        <option [value]="option.value">
           {{ option.label }}
         </option>
+        }
       </select>
     </div>
 
     <div class="filter-section">
       <label>Learning Language</label>
       <select [(ngModel)]="filterLearningLanguage" (change)="onFilterChange()" class="filter-select">
-        <option *ngFor="let option of languageOptions" [value]="option.value">
+        @for (option of languageOptions; track option.value) {
+        <option [value]="option.value">
           {{ option.label }}
         </option>
+        }
       </select>
     </div>
   </aside>
@@ -66,28 +76,33 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading()" class="loading-state">
+    @if (isLoading()) {
+    <div class="loading-state">
       <div class="spinner"></div>
       <p>Loading users...</p>
     </div>
+    }
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading() && filteredUsers.length === 0" class="empty-state">
+    @if (!isLoading() && filteredUsers.length === 0) {
+    <div class="empty-state">
       <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
         <circle cx="9" cy="7" r="4"></circle>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
       </svg>
       <h3>No users found</h3>
       <p>Try adjusting your filters to see more results</p>
       <button class="reset-btn-large" (click)="resetFilters()">Reset Filters</button>
     </div>
+    }
 
     <!-- User Grid -->
-    <div *ngIf="!isLoading() && filteredUsers.length > 0" class="user-grid">
-      <div *ngFor="let user of filteredUsers" class="user-card" (click)="openProfile(user)">
+    @if (!isLoading() && filteredUsers.length > 0) {
+    <div class="user-grid">
+      @for (user of filteredUsers; track user.id) {
+      <div class="user-card" (click)="openProfile(user)">
         <!-- Online Status Badge -->
         <div class="status-badge" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
           <span class="status-dot"></span>
@@ -110,14 +125,17 @@
           <h3 class="user-name">{{ user.name }}</h3>
 
           <!-- Location with Flag -->
-          <div class="user-location" *ngIf="user.location">
+          @if (user.location) {
+          <div class="user-location">
             <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
               (error)="$event.target.style.display='none'" />
             <span>{{ getLocationLabel(user.location) }}</span>
           </div>
+          }
 
           <!-- Gender -->
-          <div class="user-detail" *ngIf="user.gender">
+          @if (user.gender) {
+          <div class="user-detail">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -125,21 +143,30 @@
             </svg>
             <span>{{ user.gender }}</span>
           </div>
+          }
 
           <!-- Bio -->
-          <p class="user-bio" *ngIf="user.bio">{{ user.bio }}</p>
+          @if (user.bio) {
+          <p class="user-bio">{{ user.bio }}</p>
+          }
 
           <!-- Languages -->
-          <div class="user-languages" *ngIf="user.native_language || user.learning_language">
-            <div class="language-tag" *ngIf="user.native_language">
+          @if (user.native_language || user.learning_language) {
+          <div class="user-languages">
+            @if (user.native_language) {
+            <div class="language-tag">
               <span class="tag-label">Native:</span>
               <span>{{ getLanguagesDisplay(user.native_language) }}</span>
             </div>
-            <div class="language-tag" *ngIf="user.learning_language">
+            }
+            @if (user.learning_language) {
+            <div class="language-tag">
               <span class="tag-label">Learning:</span>
               <span>{{ getLanguagesDisplay(user.learning_language) }}</span>
             </div>
+            }
           </div>
+          }
         </div>
 
         <!-- Action Button -->
@@ -152,10 +179,14 @@
           Send Message
         </button>
       </div>
+      }
     </div>
+    }
   </main>
 
   <!-- Profile Modal -->
-  <app-user-profile-modal *ngIf="selectedUser" [user]="selectedUser" (closeEvent)="closeProfile()">
+  @if (selectedUser) {
+  <app-user-profile-modal [user]="selectedUser" (closeEvent)="closeProfile()">
   </app-user-profile-modal>
+  }
 </div>
