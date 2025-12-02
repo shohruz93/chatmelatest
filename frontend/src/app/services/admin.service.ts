@@ -1,25 +1,41 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  is_admin: number;
+  created_at: string;
+  last_active: string;
+}
+
+export interface GetUsersResponse {
+  users: User[];
+  total: number;
+  page: number;
+  pages: number;
+}
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class AdminService {
-    private apiUrl = 'http://localhost:8000'; // Hardcoded for now as per environment usually
+  private apiUrl = 'http://localhost/api';
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    getStats(): Observable<any> {
-        return this.http.get(`${this.apiUrl}/admin/stats`);
-    }
+  getUsers(page: number = 1, search: string = ''): Observable<GetUsersResponse> {
+    return this.http.get<GetUsersResponse>(`${this.apiUrl}/admin/users`, {
+      params: {
+        page: page.toString(),
+        search
+      }
+    });
+  }
 
-    getUsers(page: number = 1, search: string = ''): Observable<any> {
-        return this.http.get(`${this.apiUrl}/admin/users?page=${page}&search=${search}`);
-    }
-
-    banUser(userId: number): Observable<any> {
-        return this.http.post(`${this.apiUrl}/admin/users/ban`, { user_id: userId });
-    }
+  banUser(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/ban`, { userId });
+  }
 }

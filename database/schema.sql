@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     avatar VARCHAR(1024),
     bio TEXT,
+    gender VARCHAR(50) NULL,
+    location VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
