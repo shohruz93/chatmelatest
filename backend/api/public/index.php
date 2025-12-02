@@ -58,6 +58,31 @@ $router->add('POST', '/profile/rating', function() use ($profile) {
     $profile->addRating();
 });
 
+$router->add('POST', '/profile/view', function() use ($profile) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $viewerId = $data['viewerId'] ?? 0;
+    $viewedId = $data['viewedId'] ?? 0;
+    $profile->recordView($viewerId, $viewedId);
+});
+
+$router->add('GET', '/profile/guests', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getGuests($userId);
+});
+
+$router->add('GET', '/profile/comments', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getComments($userId);
+});
+
+$router->add('POST', '/profile/comment/reply', function() use ($profile) {
+    $profile->addReply();
+});
+
+$router->add('POST', '/profile/comment/like', function() use ($profile) {
+    $profile->likeComment();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

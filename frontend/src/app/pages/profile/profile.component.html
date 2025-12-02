@@ -1,11 +1,13 @@
 <div class="profile-page">
     <header class="page-header">
-        <h2>My Profile</h2>
+        <h2>{{ isOwnProfile ? 'My Profile' : profileUser?.name + "'s Profile" }}</h2>
         <div class="header-actions">
+            @if (isOwnProfile) {
             <button class="btn-logout" (click)="logout()" title="Logout">
                 <span class="logout-icon">🚪</span>
                 <span class="logout-text">Logout</span>
             </button>
+            }
             <button class="theme-toggle" (click)="toggleTheme()">
                 {{ isDarkMode() ? '☀️' : '🌙' }}
             </button>
@@ -22,10 +24,10 @@
         <div class="profile-card">
             <div class="avatar-section">
                 <div class="avatar-wrapper">
-                    @if (previewUrl || user?.avatar) {
-                    <img [src]="previewUrl || user.avatar" alt="Profile Avatar">
+                    @if (previewUrl || profileUser?.avatar) {
+                    <img [src]="previewUrl || profileUser.avatar" alt="Profile Avatar">
                     } @else {
-                    <div class="avatar-placeholder">{{ user?.name?.charAt(0) || 'U' }}</div>
+                    <div class="avatar-placeholder">{{ profileUser?.name?.charAt(0) || 'U' }}</div>
                     }
 
                     @if (isEditing) {
@@ -139,8 +141,8 @@
                 </div>
                 } @else {
                 <div class="view-mode">
-                    <h1 class="user-name">{{ user?.name }}</h1>
-                    <div class="user-email">{{ user?.email }}</div>
+                    <h1 class="user-name">{{ profileUser?.name }}</h1>
+                    <div class="user-email">{{ profileUser?.email }}</div>
 
                     <div class="user-rating">
                         <span class="star">★</span>
@@ -203,8 +205,82 @@
                         }
                     </div>
 
+                    @if (isOwnProfile) {
                     <button class="btn-edit" (click)="toggleEdit()">Edit Profile</button>
+                    }
                 </div>
+                }
+            </div>
+        </div>
+
+        <!-- Comments & Ratings Section -->
+        <div class="comments-section">
+            <h3>Comments & Ratings</h3>
+
+            @if (!isOwnProfile && currentUser) {
+            <div class="add-rating-form">
+                <h4>Rate this user</h4>
+                <div class="rating-stars">
+                    @for (star of [1,2,3,4,5]; track star) {
+                    <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
+                    }
+                </div>
+                <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
+                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit</button>
+            </div>
+            }
+
+            <div class="comments-list">
+                @for (comment of comments; track comment.id) {
+                <div class="comment-card">
+                    <div class="comment-header">
+                        <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
+                        <div class="comment-meta">
+                            <span class="comment-author">{{ comment.rater_name }}</span>
+                            <span class="comment-rating">
+                                @for (star of [1,2,3,4,5]; track star) {
+                                <span class="star-display" [class.filled]="star <= comment.rating">★</span>
+                                }
+                            </span>
+                            <span class="comment-date">{{ comment.created_at | date }}</span>
+                        </div>
+                    </div>
+                    <div class="comment-body">
+                        {{ comment.comment }}
+                    </div>
+                    <div class="comment-actions">
+                        <button class="btn-action" (click)="likeComment(comment.id, 'like')">
+                            👍 {{ comment.likes }}
+                        </button>
+                        <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
+                            👎 {{ comment.dislikes }}
+                        </button>
+                        <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                    </div>
+
+                    @if (showReplyInput[comment.id]) {
+                    <div class="reply-input">
+                        <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
+                        <button (click)="submitReply(comment.id)">Send</button>
+                    </div>
+                    }
+
+                    @if (comment.replies?.length) {
+                    <div class="replies-list">
+                        @for (reply of comment.replies; track reply.id) {
+                        <div class="reply-item">
+                            <img [src]="reply.replier_avatar || 'assets/default-avatar.png'" class="reply-avatar">
+                            <div class="reply-content">
+                                <span class="reply-author">{{ reply.replier_name }}</span>
+                                <span class="reply-text">{{ reply.content }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+                } @empty {
+                <p class="no-comments">No comments yet.</p>
                 }
             </div>
         </div>

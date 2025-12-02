@@ -308,7 +308,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
             event.stopPropagation();
         }
         // Navigate to chat with this user
-        this.router.navigate(['/chat', user.id]);
+        this.router.navigate(['/dashboard/chat', user.id]);
     }
 
     openProfile(user: UserProfile) {

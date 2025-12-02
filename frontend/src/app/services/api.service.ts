@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
     providedIn: 'root'
 })
 export class ApiService {
-    private apiUrl = 'http://localhost:8000'; // Adjust if PHP server port differs
+    private apiUrl = 'http://localhost:8000'; // PHP Server
 
     constructor(private http: HttpClient) { }
 
@@ -25,5 +25,27 @@ export class ApiService {
 
     post(endpoint: string, data: any): Observable<any> {
         return this.http.post(`${this.apiUrl}${endpoint}`, data, { headers: this.getHeaders() });
+    }
+
+    // Guests
+    recordView(viewerId: number, viewedId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/profile/view`, { viewerId, viewedId });
+    }
+
+    getGuests(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile/guests?userId=${userId}`);
+    }
+
+    // Comments & Ratings
+    getComments(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile/comments?userId=${userId}`);
+    }
+
+    addReply(ratingId: number, userId: number, content: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/profile/comment/reply`, { ratingId, userId, content });
+    }
+
+    likeComment(ratingId: number, userId: number, type: 'like' | 'dislike'): Observable<any> {
+        return this.http.post(`${this.apiUrl}/profile/comment/like`, { ratingId, userId, type });
     }
 }

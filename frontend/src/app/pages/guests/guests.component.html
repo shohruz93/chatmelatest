@@ -1,0 +1,37 @@
+<div class="guests-page">
+    <header class="page-header">
+        <h2>Profile Guests</h2>
+        <p class="subtitle">See who's been checking you out!</p>
+    </header>
+
+    <div class="guests-content">
+        @if (loading) {
+        <div class="loading-state">
+            <div class="loader"></div>
+            <p>Loading guests...</p>
+        </div>
+        } @else {
+        @if (guests.length > 0) {
+        <div class="guests-grid">
+            @for (guest of guests; track guest.id) {
+            <div class="guest-card" [routerLink]="['/profile', guest.id]">
+                <div class="guest-avatar">
+                    <img [src]="guest.avatar || 'assets/default-avatar.png'" [alt]="guest.name">
+                </div>
+                <div class="guest-info">
+                    <h3>{{ guest.name }}</h3>
+                    <p class="visit-time">Visited {{ guest.viewed_at | date:'medium' }}</p>
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="empty-state">
+            <span class="empty-icon">👀</span>
+            <h3>No guests yet</h3>
+            <p>When people visit your profile, they'll appear here.</p>
+        </div>
+        }
+        }
+    </div>
+</div>

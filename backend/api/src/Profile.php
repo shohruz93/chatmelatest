@@ -207,6 +207,117 @@ class Profile {
         ]);
     }
     
+    public function recordView($viewerId, $viewedId) {
+        if ($viewerId == $viewedId) return;
+
+        $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at) 
+                  VALUES (:viewer_id, :viewed_id, NOW()) 
+                  ON DUPLICATE KEY UPDATE viewed_at = NOW()";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":viewer_id", $viewerId);
+        $stmt->bindParam(":viewed_id", $viewedId);
+        $stmt->execute();
+    }
+
+    public function getGuests($userId) {
+        $query = "SELECT u.id, u.name, u.avatar, u.bio, pv.viewed_at 
+                  FROM profile_views pv 
+                  JOIN users u ON pv.viewer_id = u.id 
+                  WHERE pv.viewed_id = :user_id 
+                  ORDER BY pv.viewed_at DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        $guests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($guests);
+    }
+
+    public function getComments($userId) {
+        // Get ratings/comments
+        $query = "SELECT ur.*, u.name as rater_name, u.avatar as rater_avatar 
+                  FROM user_ratings ur 
+                  JOIN users u ON ur.rater_id = u.id 
+                  WHERE ur.rated_id = :user_id 
+                  ORDER BY ur.created_at DESC";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // For each comment, get replies and likes
+        foreach ($comments as &$comment) {
+            // Get replies
+            $query = "SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar 
+                      FROM comment_replies cr 
+                      JOIN users u ON cr.user_id = u.id 
+                      WHERE cr.rating_id = :rating_id 
+                      ORDER BY cr.created_at ASC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":rating_id", $comment['id']);
+            $stmt->execute();
+            $comment['replies'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Get likes count
+            $query = "SELECT 
+                        SUM(CASE WHEN type = 'like' THEN 1 ELSE 0 END) as likes,
+                        SUM(CASE WHEN type = 'dislike' THEN 1 ELSE 0 END) as dislikes
+                      FROM comment_likes 
+                      WHERE rating_id = :rating_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":rating_id", $comment['id']);
+            $stmt->execute();
+            $likesData = $stmt->fetch(PDO::FETCH_ASSOC);
+            $comment['likes'] = $likesData['likes'] ?? 0;
+            $comment['dislikes'] = $likesData['dislikes'] ?? 0;
+        }
+
+        echo json_encode($comments);
+    }
+
+    public function addReply() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $ratingId = $data['ratingId'];
+        $userId = $data['userId'];
+        $content = $data['content'];
+
+        $query = "INSERT INTO comment_replies (rating_id, user_id, content) VALUES (:rating_id, :user_id, :content)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":rating_id", $ratingId);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->bindParam(":content", $content);
+        
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Reply added"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to add reply"]);
+        }
+    }
+
+    public function likeComment() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $ratingId = $data['ratingId'];
+        $userId = $data['userId'];
+        $type = $data['type']; // 'like' or 'dislike'
+
+        // Check if already liked/disliked
+        $query = "INSERT INTO comment_likes (rating_id, user_id, type) 
+                  VALUES (:rating_id, :user_id, :type) 
+                  ON DUPLICATE KEY UPDATE type = :type_update";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":rating_id", $ratingId);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->bindParam(":type", $type);
+        $stmt->bindParam(":type_update", $type);
+        
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Action recorded"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to record action"]);
+        }
+    }
+
     public function addRating() {
         $data = json_decode(file_get_contents("php://input"), true);
         $raterId = $data['raterId'];

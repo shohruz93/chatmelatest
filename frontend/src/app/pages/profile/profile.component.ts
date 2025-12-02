@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
@@ -18,21 +18,34 @@ export class ProfileComponent implements OnInit {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private router = inject(Router);
+    private route = inject(ActivatedRoute);
 
-    user: any;
+    currentUser: any; // The logged-in user
+    profileUser: any; // The user whose profile is being viewed
+
     bio: string = '';
     interests: any[] = [];
     ratings: any = { average: 0, count: 0 };
+    comments: any[] = [];
     loading: boolean = false;
     isEditing: boolean = false;
+    isOwnProfile: boolean = false;
+
     selectedFile: File | null = null;
     previewUrl: string | null = null;
     newInterest: string = '';
     showLogoutDialog: boolean = false;
+
     gender: string = '';
     location: string = '';
     nativeLanguages: string[] = [];
     learningLanguages: string[] = [];
+
+    // Rating & Comment Inputs
+    newRating: number = 0;
+    newComment: string = '';
+    replyContent: { [key: number]: string } = {};
+    showReplyInput: { [key: number]: boolean } = {};
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -64,40 +77,46 @@ export class ProfileComponent implements OnInit {
         const savedTheme = localStorage.getItem('theme') || 'light';
         this.isDarkMode.set(savedTheme === 'dark');
 
-        // Process world-countries data to get name, code, and flag
         this.countries = countries.map(country => ({
             name: country.name.common,
             code: country.cca2,
             flag: country.flag
         })).sort((a, b) => a.name.localeCompare(b.name));
 
-        this.user = this.auth.currentUserValue;
-        if (this.user) {
-            this.loadProfile();
-        }
+        this.currentUser = this.auth.currentUserValue;
+
+        this.route.params.subscribe(params => {
+            const userId = params['id'] ? +params['id'] : this.currentUser?.id;
+
+            if (userId) {
+                this.isOwnProfile = (userId === this.currentUser?.id);
+                this.loadProfile(userId);
+
+                if (!this.isOwnProfile && this.currentUser) {
+                    this.api.recordView(this.currentUser.id, userId).subscribe();
+                }
+            }
+        });
     }
 
-    loadProfile() {
+    loadProfile(userId: number) {
         this.loading = true;
-        this.api.get(`/profile?userId=${this.user.id}`).subscribe({
+        this.api.get(`/profile?userId=${userId}`).subscribe({
             next: (data) => {
+                this.profileUser = { ...data }; // Create a copy
                 this.bio = data.bio || '';
                 this.interests = data.interests || [];
                 this.gender = data.gender || '';
                 this.location = data.location || '';
 
-                // Parse comma-separated strings into arrays
                 this.nativeLanguages = data.native_language ? data.native_language.split(',') : [];
                 this.learningLanguages = data.learning_language ? data.learning_language.split(',') : [];
 
-                // Handle avatar
                 if (data.avatar) {
-                    // If it's a full URL (e.g. Google photo), use it. 
-                    // Otherwise prepend API URL if it's a relative path
                     if (data.avatar.startsWith('http')) {
-                        this.user.avatar = data.avatar;
+                        this.profileUser.avatar = data.avatar;
                     } else {
-                        this.user.avatar = `http://localhost:8000${data.avatar}`;
+                        this.profileUser.avatar = `http://localhost:8000${data.avatar}`;
                     }
                 }
 
@@ -105,6 +124,8 @@ export class ProfileComponent implements OnInit {
                     average: data.rating || 0,
                     count: data.rating_count || 0
                 };
+
+                this.loadComments(userId);
                 this.loading = false;
             },
             error: (err) => {
@@ -114,10 +135,20 @@ export class ProfileComponent implements OnInit {
         });
     }
 
+    loadComments(userId: number) {
+        this.api.getComments(userId).subscribe({
+            next: (data) => {
+                this.comments = data;
+            },
+            error: (err) => console.error('Error loading comments', err)
+        });
+    }
+
     toggleEdit() {
+        if (!this.isOwnProfile) return;
         this.isEditing = !this.isEditing;
         if (!this.isEditing) {
-            this.loadProfile();
+            this.loadProfile(this.currentUser.id);
             this.selectedFile = null;
             this.previewUrl = null;
             this.newInterest = '';
@@ -159,8 +190,6 @@ export class ProfileComponent implements OnInit {
         if (!targetArray.includes(code)) {
             targetArray.push(code);
         }
-
-        // Reset select
         event.target.value = '';
     }
 
@@ -183,8 +212,6 @@ export class ProfileComponent implements OnInit {
         formData.append('bio', this.bio);
         formData.append('gender', this.gender);
         formData.append('location', this.location);
-
-        // Join arrays into comma-separated strings
         formData.append('native_language', this.nativeLanguages.join(','));
         formData.append('learning_language', this.learningLanguages.join(','));
 
@@ -197,17 +224,18 @@ export class ProfileComponent implements OnInit {
             formData.append('avatar', this.selectedFile);
         }
 
-        this.api.post(`/profile?userId=${this.user.id}`, formData).subscribe({
+        this.api.post(`/profile?userId=${this.currentUser.id}`, formData).subscribe({
             next: (res: any) => {
                 this.isEditing = false;
                 this.selectedFile = null;
                 this.previewUrl = null;
 
                 if (res.avatar) {
-                    this.user.avatar = 'http://localhost:8000' + res.avatar;
+                    this.currentUser.avatar = 'http://localhost:8000' + res.avatar;
+                    // Update auth service if needed
                 }
 
-                this.loadProfile();
+                this.loadProfile(this.currentUser.id);
                 alert('Profile updated successfully!');
             },
             error: (err) => {
@@ -215,6 +243,61 @@ export class ProfileComponent implements OnInit {
                 this.loading = false;
                 alert('Failed to save profile. Please try again.');
             }
+        });
+    }
+
+    // Comments & Ratings Logic
+    setRating(stars: number) {
+        this.newRating = stars;
+    }
+
+    submitRating() {
+        if (this.newRating === 0) {
+            alert('Please select a rating');
+            return;
+        }
+
+        const data = {
+            raterId: this.currentUser.id,
+            ratedId: this.profileUser.id,
+            rating: this.newRating,
+            comment: this.newComment
+        };
+
+        this.api.post('/profile/rating', data).subscribe({
+            next: () => {
+                this.newRating = 0;
+                this.newComment = '';
+                this.loadProfile(this.profileUser.id); // Reload to get new stats and comments
+            },
+            error: (err) => alert('Failed to submit rating')
+        });
+    }
+
+    toggleReply(commentId: number) {
+        this.showReplyInput[commentId] = !this.showReplyInput[commentId];
+    }
+
+    submitReply(commentId: number) {
+        const content = this.replyContent[commentId];
+        if (!content?.trim()) return;
+
+        this.api.addReply(commentId, this.currentUser.id, content).subscribe({
+            next: () => {
+                this.replyContent[commentId] = '';
+                this.showReplyInput[commentId] = false;
+                this.loadComments(this.profileUser.id);
+            },
+            error: (err) => alert('Failed to reply')
+        });
+    }
+
+    likeComment(commentId: number, type: 'like' | 'dislike') {
+        this.api.likeComment(commentId, this.currentUser.id, type).subscribe({
+            next: () => {
+                this.loadComments(this.profileUser.id);
+            },
+            error: (err) => console.error('Failed to like/dislike', err)
         });
     }
 

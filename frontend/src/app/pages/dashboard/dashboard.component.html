@@ -38,6 +38,12 @@
                 <span>Explore</span>
             </a>
 
+            <!-- Guests Link -->
+            <a routerLink="guests" routerLinkActive="active" class="btn-messages">
+                <span class="btn-icon">👥</span>
+                <span>Guests</span>
+            </a>
+
             <!-- Admin Link -->
             @if (currentUser?.is_admin) {
             <a routerLink="/admin" routerLinkActive="active" class="btn-messages admin-link">
