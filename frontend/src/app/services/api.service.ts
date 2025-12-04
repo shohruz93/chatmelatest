@@ -48,4 +48,8 @@ export class ApiService {
     likeComment(ratingId: number, userId: number, type: 'like' | 'dislike'): Observable<any> {
         return this.http.post(`${this.apiUrl}/profile/comment/like`, { ratingId, userId, type });
     }
+
+    addComment(userId: number, ratedId: number, comment: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/profile/comment`, { userId, ratedId, comment });
+    }
 }

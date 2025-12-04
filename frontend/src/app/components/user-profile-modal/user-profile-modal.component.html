@@ -22,6 +22,12 @@
 
             <h2 class="user-name">{{ user.name }}</h2>
 
+            <div class="user-rating">
+                <span class="star">★</span>
+                <span class="rating-value">{{ ratings.average | number:'1.1-1' }}</span>
+                <span class="rating-count">({{ ratings.count }} reviews)</span>
+            </div>
+
             <div class="user-meta">
                 @if (user.location) {
                 <div class="meta-item">
@@ -70,6 +76,96 @@
                         {{ getLanguageLabel(lang) }}
                     </div>
                     }
+                    }
+                </div>
+            </div>
+            }
+
+            <!-- Comments & Ratings Section -->
+            @if (currentUser && currentUser.id !== user.id) {
+            <div class="comments-section">
+                <h3 class="section-title">Comments & Ratings</h3>
+
+                <!-- Rating Form (only if user hasn't rated yet) -->
+                @if (!hasRated) {
+                <div class="add-rating-form">
+                    <h4>Rate this user</h4>
+                    <div class="rating-stars">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
+                        }
+                    </div>
+                    <textarea [(ngModel)]="newComment" placeholder="Write a comment (optional)..." rows="3"></textarea>
+                    <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit
+                        Rating</button>
+                </div>
+                }
+
+                <!-- Comment-only Form (if user has already rated) -->
+                @if (hasRated) {
+                <div class="add-comment-form">
+                    <h4>Add a comment</h4>
+                    <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
+                    <button class="btn-submit-comment" (click)="submitComment()">Add Comment</button>
+                </div>
+                }
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    @for (comment of comments; track comment.id) {
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
+                            <div class="comment-meta">
+                                <span class="comment-author">{{ comment.rater_name }}</span>
+                                @if (comment.rating && comment.rating > 0) {
+                                <span class="comment-rating">
+                                    @for (star of [1,2,3,4,5]; track star) {
+                                    <span class="star-display" [class.filled]="star <= comment.rating">★</span>
+                                    }
+                                </span>
+                                }
+                                <span class="comment-date">{{ comment.created_at | date }}</span>
+                            </div>
+                        </div>
+                        @if (comment.comment) {
+                        <div class="comment-body">
+                            {{ comment.comment }}
+                        </div>
+                        }
+                        <div class="comment-actions">
+                            <button class="btn-action" (click)="likeComment(comment.id, 'like')">
+                                👍 {{ comment.likes || 0 }}
+                            </button>
+                            <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
+                                👎 {{ comment.dislikes || 0 }}
+                            </button>
+                            <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                        </div>
+
+                        @if (showReplyInput[comment.id]) {
+                        <div class="reply-input">
+                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
+                            <button (click)="submitReply(comment.id)">Send</button>
+                        </div>
+                        }
+
+                        @if (comment.replies?.length) {
+                        <div class="replies-list">
+                            @for (reply of comment.replies; track reply.id) {
+                            <div class="reply-item">
+                                <img [src]="reply.replier_avatar || 'assets/default-avatar.png'" class="reply-avatar">
+                                <div class="reply-content">
+                                    <span class="reply-author">{{ reply.replier_name }}</span>
+                                    <span class="reply-text">{{ reply.content }}</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                    } @empty {
+                    <p class="no-comments">No comments yet.</p>
                     }
                 </div>
             </div>

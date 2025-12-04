@@ -58,6 +58,10 @@ $router->add('POST', '/profile/rating', function() use ($profile) {
     $profile->addRating();
 });
 
+$router->add('POST', '/profile/comment', function() use ($profile) {
+    $profile->addComment();
+});
+
 $router->add('POST', '/profile/view', function() use ($profile) {
     $data = json_decode(file_get_contents("php://input"), true);
     $viewerId = $data['viewerId'] ?? 0;

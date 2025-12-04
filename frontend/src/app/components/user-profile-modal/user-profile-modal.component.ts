@@ -1,19 +1,34 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-user-profile-modal',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './user-profile-modal.component.html',
     styleUrls: ['./user-profile-modal.component.css']
 })
-export class UserProfileModalComponent {
+export class UserProfileModalComponent implements OnInit {
     @Input() user: any;
     @Output() closeEvent = new EventEmitter<void>();
 
     private router = inject(Router);
+    private api = inject(ApiService);
+    private auth = inject(AuthService);
+
+    currentUser: any;
+    ratings: any = { average: 0, count: 0 };
+    comments: any[] = [];
+    newRating: number = 0;
+    newComment: string = '';
+    hasRated: boolean = false;
+    userRating: any = null;
+    replyContent: { [key: number]: string } = {};
+    showReplyInput: { [key: number]: boolean } = {};
 
     languageOptions = [
         { value: 'any', label: 'Any Language' },
@@ -146,5 +161,122 @@ export class UserProfileModalComponent {
     getLanguageArray(languages: string | string[]): string[] {
         if (!languages) return [];
         return Array.isArray(languages) ? languages : [languages];
+    }
+
+    ngOnInit() {
+        this.currentUser = this.auth.currentUserValue;
+        if (this.user && this.user.id) {
+            // Record profile view if viewing another user's profile
+            if (this.currentUser && this.currentUser.id !== this.user.id) {
+                this.api.recordView(this.currentUser.id, this.user.id).subscribe({
+                    next: () => console.log('Profile view recorded'),
+                    error: (err) => console.error('Error recording view', err)
+                });
+            }
+
+            this.loadRatingsAndComments();
+        }
+    }
+
+    loadRatingsAndComments() {
+        // Load user's rating stats
+        this.api.get(`/profile?userId=${this.user.id}`).subscribe({
+            next: (data) => {
+                this.ratings = {
+                    average: data.rating || 0,
+                    count: data.rating_count || 0
+                };
+            },
+            error: (err) => console.error('Error loading ratings', err)
+        });
+
+        // Load comments
+        this.loadComments();
+    }
+
+    loadComments() {
+        this.api.getComments(this.user.id).subscribe({
+            next: (data) => {
+                this.comments = data;
+
+                // Check if current user has already rated
+                if (this.currentUser) {
+                    this.userRating = this.comments.find(
+                        c => c.rater_id === this.currentUser.id && c.rating !== null && c.rating > 0
+                    );
+                    this.hasRated = !!this.userRating;
+                }
+            },
+            error: (err) => console.error('Error loading comments', err)
+        });
+    }
+
+    setRating(stars: number) {
+        this.newRating = stars;
+    }
+
+    submitRating() {
+        if (this.newRating === 0) {
+            alert('Please select a rating');
+            return;
+        }
+
+        const data = {
+            raterId: this.currentUser.id,
+            ratedId: this.user.id,
+            rating: this.newRating,
+            comment: this.newComment
+        };
+
+        this.api.post('/profile/rating', data).subscribe({
+            next: () => {
+                this.newRating = 0;
+                this.newComment = '';
+                this.loadRatingsAndComments();
+            },
+            error: (err) => alert('Failed to submit rating')
+        });
+    }
+
+    submitComment() {
+        if (!this.newComment.trim()) {
+            alert('Please enter a comment');
+            return;
+        }
+
+        this.api.addComment(this.currentUser.id, this.user.id, this.newComment).subscribe({
+            next: () => {
+                this.newComment = '';
+                this.loadComments();
+            },
+            error: (err) => alert('Failed to submit comment')
+        });
+    }
+
+    toggleReply(commentId: number) {
+        this.showReplyInput[commentId] = !this.showReplyInput[commentId];
+    }
+
+    submitReply(commentId: number) {
+        const content = this.replyContent[commentId];
+        if (!content?.trim()) return;
+
+        this.api.addReply(commentId, this.currentUser.id, content).subscribe({
+            next: () => {
+                this.replyContent[commentId] = '';
+                this.showReplyInput[commentId] = false;
+                this.loadComments();
+            },
+            error: (err) => alert('Failed to reply')
+        });
+    }
+
+    likeComment(commentId: number, type: 'like' | 'dislike') {
+        this.api.likeComment(commentId, this.currentUser.id, type).subscribe({
+            next: () => {
+                this.loadComments();
+            },
+            error: (err) => console.error('Failed to like/dislike', err)
+        });
     }
 }
