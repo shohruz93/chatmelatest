@@ -73,10 +73,13 @@ class Auth {
         if (isset($payload['sub'])) {
             // Map Google payload to our user structure
             // Google returns 'picture' for avatar, 'sub' for ID
+            // Also extract given_name and family_name if available
             $userData = [
                 'sub' => $payload['sub'],
                 'email' => $payload['email'] ?? '',
                 'name' => $payload['name'] ?? 'User',
+                'given_name' => $payload['given_name'] ?? '',
+                'family_name' => $payload['family_name'] ?? '',
                 'picture' => $payload['picture'] ?? ''
             ];
 
@@ -84,7 +87,7 @@ class Auth {
             
             if ($userId) {
                 // Fetch full user profile from database to get avatar and other fields
-                $query = "SELECT id, name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
+                $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
                 $stmt = $this->db->prepare($query);
                 $stmt->bindParam(":id", $userId);
                 $stmt->execute();
@@ -104,6 +107,8 @@ class Auth {
                     "user" => [
                         "id" => $userId,
                         "name" => $userProfile['name'] ?: $userData['name'],
+                        "first_name" => $userProfile['first_name'] ?: $userData['given_name'],
+                        "family_name" => $userProfile['family_name'] ?: $userData['family_name'],
                         "email" => $userProfile['email'] ?: $userData['email'],
                         "avatar" => $userProfile['avatar'], // Database avatar takes priority
                         "photoURL" => $userData['picture'], // Keep Google picture as fallback

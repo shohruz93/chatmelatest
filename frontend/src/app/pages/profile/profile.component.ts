@@ -231,8 +231,10 @@ export class ProfileComponent implements OnInit {
                 this.previewUrl = null;
 
                 if (res.avatar) {
-                    this.currentUser.avatar = 'http://localhost:8000' + res.avatar;
-                    // Update auth service if needed
+                    const avatarUrl = 'http://localhost:8000' + res.avatar;
+                    this.currentUser.avatar = avatarUrl;
+                    // Update auth service to persist the avatar in localStorage
+                    this.auth.updateUser({ avatar: avatarUrl });
                 }
 
                 this.loadProfile(this.currentUser.id);

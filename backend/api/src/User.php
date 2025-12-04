@@ -22,21 +22,37 @@ class User {
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
-            // Update existing user
+            // Update existing user with latest name information
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $row['id'];
-            // Ideally update name/avatar if changed, but for now just return id
+            
+            // Update name fields if provided by Google
+            $updateQuery = "UPDATE " . $this->table_name . " 
+                           SET name = :name, 
+                               first_name = :first_name, 
+                               family_name = :family_name 
+                           WHERE id = :id";
+            $updateStmt = $this->conn->prepare($updateQuery);
+            $updateStmt->bindParam(":name", $googleUser['name']);
+            $updateStmt->bindParam(":first_name", $googleUser['given_name']);
+            $updateStmt->bindParam(":family_name", $googleUser['family_name']);
+            $updateStmt->bindParam(":id", $this->id);
+            $updateStmt->execute();
+            
             return $this->id;
         } else {
             // Create new user
             $query = "INSERT INTO " . $this->table_name . " 
-                    SET google_id=:google_id, email=:email, name=:name, avatar=:avatar";
+                    SET google_id=:google_id, email=:email, name=:name, 
+                        first_name=:first_name, family_name=:family_name, avatar=:avatar";
             
             $stmt = $this->conn->prepare($query);
 
             $stmt->bindParam(":google_id", $googleUser['sub']);
             $stmt->bindParam(":email", $googleUser['email']);
             $stmt->bindParam(":name", $googleUser['name']);
+            $stmt->bindParam(":first_name", $googleUser['given_name']);
+            $stmt->bindParam(":family_name", $googleUser['family_name']);
             $stmt->bindParam(":avatar", $googleUser['picture']);
 
             if ($stmt->execute()) {
@@ -48,7 +64,7 @@ class User {
     }
 
     public function getProfile($id) {
-        $query = "SELECT id, name, email, avatar, bio, gender, location, native_language, learning_language FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();

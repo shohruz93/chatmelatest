@@ -80,4 +80,10 @@ export class AuthService {
     get firebaseUser() {
         return this.firebaseService.getCurrentUser();
     }
+
+    updateUser(userData: any) {
+        const updatedUser = { ...this.userSubject.value, ...userData };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        this.userSubject.next(updatedUser);
+    }
 }
