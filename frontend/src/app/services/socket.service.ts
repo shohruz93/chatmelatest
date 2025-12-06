@@ -2,13 +2,14 @@ import { Injectable, signal } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SocketService {
     private socket: Socket;
-    private url = 'http://localhost:3001';
+    private url = environment.nodeBaseUrl;
     public isSearching = signal(false);
     public selectedLanguage = signal('en');
     public onlineUsers = signal<Set<number>>(new Set());

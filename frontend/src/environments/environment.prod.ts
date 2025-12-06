@@ -1,5 +1,7 @@
 export const environment = {
     production: true,
+    phpBaseUrl: 'http://your-production-php-url.com',
+    nodeBaseUrl: 'http://your-production-node-url.com',
     firebase: {
         apiKey: "AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE",
         authDomain: "chatme-f1d8a.firebaseapp.com",
