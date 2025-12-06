@@ -52,6 +52,15 @@ class Profile {
             }
         }
 
+        // Update name
+        if (isset($data['name']) && !empty($data['name'])) {
+            $query = "UPDATE users SET name = :name WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":name", $data['name']);
+            $stmt->bindParam(":id", $userId);
+            $stmt->execute();
+        }
+
         // Update bio
         if (isset($data['bio'])) {
             $query = "UPDATE users SET bio = :bio WHERE id = :id";

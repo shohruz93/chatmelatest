@@ -24,6 +24,7 @@ export class ProfileComponent implements OnInit {
     profileUser: any; // The user whose profile is being viewed
 
     bio: string = '';
+    userName: string = '';
     interests: any[] = [];
     ratings: any = { average: 0, count: 0 };
     comments: any[] = [];
@@ -57,19 +58,66 @@ export class ProfileComponent implements OnInit {
     ];
 
     languages = [
-        { code: 'en', name: 'English' },
-        { code: 'tj', name: 'Tajik' },
-        { code: 'ru', name: 'Russian' },
-        { code: 'es', name: 'Spanish' },
-        { code: 'fr', name: 'French' },
-        { code: 'de', name: 'German' },
-        { code: 'it', name: 'Italian' },
-        { code: 'pt', name: 'Portuguese' },
-        { code: 'ar', name: 'Arabic' },
-        { code: 'zh', name: 'Chinese' },
-        { code: 'ja', name: 'Japanese' },
-        { code: 'ko', name: 'Korean' }
-    ];
+        { code: 'en', name: 'English', countryCode: 'gb', flag: '🇬🇧' },
+        { code: 'tj', name: 'Tajik', countryCode: 'tj', flag: '🇹🇯' },
+        { code: 'ru', name: 'Russian', countryCode: 'ru', flag: '🇷🇺' },
+        { code: 'es', name: 'Spanish', countryCode: 'es', flag: '🇪🇸' },
+        { code: 'fr', name: 'French', countryCode: 'fr', flag: '🇫🇷' },
+        { code: 'de', name: 'German', countryCode: 'de', flag: '🇩🇪' },
+        { code: 'it', name: 'Italian', countryCode: 'it', flag: '🇮🇹' },
+        { code: 'pt', name: 'Portuguese', countryCode: 'pt', flag: '🇵🇹' },
+        { code: 'ar', name: 'Arabic', countryCode: 'sa', flag: '🇸🇦' },
+        { code: 'zh', name: 'Chinese', countryCode: 'cn', flag: '🇨🇳' },
+        { code: 'ja', name: 'Japanese', countryCode: 'jp', flag: '🇯🇵' },
+        { code: 'ko', name: 'Korean', countryCode: 'kr', flag: '🇰🇷' },
+        { code: 'hi', name: 'Hindi', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'tr', name: 'Turkish', countryCode: 'tr', flag: '🇹🇷' },
+        { code: 'pl', name: 'Polish', countryCode: 'pl', flag: '🇵🇱' },
+        { code: 'uk', name: 'Ukrainian', countryCode: 'ua', flag: '🇺🇦' },
+        { code: 'vi', name: 'Vietnamese', countryCode: 'vn', flag: '🇻🇳' },
+        { code: 'th', name: 'Thai', countryCode: 'th', flag: '🇹🇭' },
+        { code: 'id', name: 'Indonesian', countryCode: 'id', flag: '🇮🇩' },
+        { code: 'nl', name: 'Dutch', countryCode: 'nl', flag: '🇳🇱' },
+        { code: 'sv', name: 'Swedish', countryCode: 'se', flag: '🇸🇪' },
+        { code: 'el', name: 'Greek', countryCode: 'gr', flag: '🇬🇷' },
+        { code: 'he', name: 'Hebrew', countryCode: 'il', flag: '🇮🇱' },
+        { code: 'cs', name: 'Czech', countryCode: 'cz', flag: '🇨🇿' },
+        { code: 'ro', name: 'Romanian', countryCode: 'ro', flag: '🇷🇴' },
+        { code: 'hu', name: 'Hungarian', countryCode: 'hu', flag: '🇭🇺' },
+        { code: 'fa', name: 'Persian', countryCode: 'ir', flag: '🇮🇷' },
+        { code: 'bn', name: 'Bengali', countryCode: 'bd', flag: '🇧🇩' },
+        { code: 'ms', name: 'Malay', countryCode: 'my', flag: '🇲🇾' },
+        { code: 'fil', name: 'Filipino', countryCode: 'ph', flag: '🇵🇭' },
+        { code: 'da', name: 'Danish', countryCode: 'dk', flag: '🇩🇰' },
+        { code: 'fi', name: 'Finnish', countryCode: 'fi', flag: '🇫🇮' },
+        { code: 'no', name: 'Norwegian', countryCode: 'no', flag: '🇳🇴' },
+        { code: 'sk', name: 'Slovak', countryCode: 'sk', flag: '🇸🇰' },
+        { code: 'bg', name: 'Bulgarian', countryCode: 'bg', flag: '🇧🇬' },
+        { code: 'hr', name: 'Croatian', countryCode: 'hr', flag: '🇭🇷' },
+        { code: 'sr', name: 'Serbian', countryCode: 'rs', flag: '🇷🇸' },
+        { code: 'sl', name: 'Slovenian', countryCode: 'si', flag: '🇸🇮' },
+        { code: 'lt', name: 'Lithuanian', countryCode: 'lt', flag: '🇱🇹' },
+        { code: 'lv', name: 'Latvian', countryCode: 'lv', flag: '🇱🇻' },
+        { code: 'et', name: 'Estonian', countryCode: 'ee', flag: '🇪🇪' },
+        { code: 'ka', name: 'Georgian', countryCode: 'ge', flag: '🇬🇪' },
+        { code: 'hy', name: 'Armenian', countryCode: 'am', flag: '🇦🇲' },
+        { code: 'az', name: 'Azerbaijani', countryCode: 'az', flag: '🇦🇿' },
+        { code: 'kk', name: 'Kazakh', countryCode: 'kz', flag: '🇰🇿' },
+        { code: 'uz', name: 'Uzbek', countryCode: 'uz', flag: '🇺🇿' },
+        { code: 'ky', name: 'Kyrgyz', countryCode: 'kg', flag: '🇰🇬' },
+        { code: 'mn', name: 'Mongolian', countryCode: 'mn', flag: '🇲🇳' },
+        { code: 'ne', name: 'Nepali', countryCode: 'np', flag: '🇳🇵' },
+        { code: 'si', name: 'Sinhala', countryCode: 'lk', flag: '🇱🇰' },
+        { code: 'ta', name: 'Tamil', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'te', name: 'Telugu', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'mr', name: 'Marathi', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'gu', name: 'Gujarati', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'pa', name: 'Punjabi', countryCode: 'in', flag: '🇮🇳' },
+        { code: 'ur', name: 'Urdu', countryCode: 'pk', flag: '🇵🇰' },
+        { code: 'sw', name: 'Swahili', countryCode: 'tz', flag: '🇹🇿' },
+        { code: 'af', name: 'Afrikaans', countryCode: 'za', flag: '🇿🇦' },
+        { code: 'am', name: 'Amharic', countryCode: 'et', flag: '🇪🇹' }
+    ].sort((a, b) => a.name.localeCompare(b.name));
 
     countries: { name: string, code: string, flag: string }[] = [];
 
@@ -107,6 +155,7 @@ export class ProfileComponent implements OnInit {
             next: (data) => {
                 this.profileUser = { ...data }; // Create a copy
                 this.bio = data.bio || '';
+                this.userName = data.name || '';
                 this.interests = data.interests || [];
                 this.gender = data.gender || '';
                 this.location = data.location || '';
@@ -214,9 +263,15 @@ export class ProfileComponent implements OnInit {
         return lang ? lang.name : code;
     }
 
+    getLanguageFlag(code: string): string {
+        const lang = this.languages.find(l => l.code === code);
+        return lang ? lang.flag : '';
+    }
+
     saveProfile() {
         this.loading = true;
         const formData = new FormData();
+        formData.append('name', this.userName);
         formData.append('bio', this.bio);
         formData.append('gender', this.gender);
         formData.append('location', this.location);
@@ -364,6 +419,11 @@ export class ProfileComponent implements OnInit {
         return country ? country.flag : '';
     }
 
+    getCountryFlagUrl(countryName: string): string {
+        const country = this.countries.find(c => c.name === countryName);
+        return country ? `/flags/${country.code.toLowerCase()}.png` : '';
+    }
+
     getGenderIcon(gender: string): string {
         const icons: { [key: string]: string } = {
             'male': '👨',
@@ -372,5 +432,10 @@ export class ProfileComponent implements OnInit {
             '': ''
         };
         return icons[gender.toLowerCase()] || '';
+    }
+
+    getLanguageFlagUrl(languageCode: string): string {
+        const lang = this.languages.find(l => l.code === languageCode);
+        return lang ? `/flags/${lang.countryCode}.png` : '';
     }
 }

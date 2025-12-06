@@ -43,6 +43,11 @@
                 @if (isEditing) {
                 <div class="edit-form">
                     <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" [(ngModel)]="userName" placeholder="Enter your display name">
+                    </div>
+
+                    <div class="form-group">
                         <label>Bio</label>
                         <textarea [(ngModel)]="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
                     </div>
@@ -76,7 +81,7 @@
                                     <option value="">Select to add...</option>
                                     @for (lang of languages; track lang.code) {
                                     <option [value]="lang.code" [disabled]="nativeLanguages.includes(lang.code)">
-                                        {{ lang.name }}
+                                        {{ lang.flag }} {{ lang.name }}
                                     </option>
                                     }
                                 </select>
@@ -84,6 +89,8 @@
                             <div class="language-tags">
                                 @for (code of nativeLanguages; track code) {
                                 <span class="language-tag">
+                                    <img *ngIf="getLanguageFlagUrl(code)" [src]="getLanguageFlagUrl(code)"
+                                        class="language-flag-icon">
                                     {{ getLanguageName(code) }}
                                     <button class="btn-remove-tag" (click)="removeLanguage('native', code)">×</button>
                                 </span>
@@ -98,7 +105,7 @@
                                     <option value="">Select to add...</option>
                                     @for (lang of languages; track lang.code) {
                                     <option [value]="lang.code" [disabled]="learningLanguages.includes(lang.code)">
-                                        {{ lang.name }}
+                                        {{ lang.flag }} {{ lang.name }}
                                     </option>
                                     }
                                 </select>
@@ -106,6 +113,8 @@
                             <div class="language-tags">
                                 @for (code of learningLanguages; track code) {
                                 <span class="language-tag">
+                                    <img *ngIf="getLanguageFlagUrl(code)" [src]="getLanguageFlagUrl(code)"
+                                        class="language-flag-icon">
                                     {{ getLanguageName(code) }}
                                     <button class="btn-remove-tag" (click)="removeLanguage('learning', code)">×</button>
                                 </span>
@@ -163,7 +172,9 @@
                         <p><strong>Gender:</strong> {{ gender | titlecase }} {{ getGenderIcon(gender) }}</p>
                         }
                         @if (location) {
-                        <p><strong>Location:</strong> {{ location }} {{ getCountryFlag(location) }}</p>
+                        <p><strong>Location:</strong> <span class="location-inline">{{ location }} <img
+                                    *ngIf="getCountryFlagUrl(location)" [src]="getCountryFlagUrl(location)"
+                                    [alt]="location + ' flag'" class="country-flag-icon"></span></p>
                         }
 
                         <div class="language-display">
@@ -171,7 +182,9 @@
                                 @if (nativeLanguages.length) {
                                 <span class="language-tags-view">
                                     @for (code of nativeLanguages; track code) {
-                                    <span class="language-tag-view">{{ getLanguageName(code) }}</span>
+                                    <span class="language-tag-view"><img *ngIf="getLanguageFlagUrl(code)"
+                                            [src]="getLanguageFlagUrl(code)" class="language-flag-icon-view">{{
+                                        getLanguageName(code) }}</span>
                                     }
                                 </span>
                                 } @else {
@@ -182,7 +195,9 @@
                                 @if (learningLanguages.length) {
                                 <span class="language-tags-view">
                                     @for (code of learningLanguages; track code) {
-                                    <span class="language-tag-view">{{ getLanguageName(code) }}</span>
+                                    <span class="language-tag-view"><img *ngIf="getLanguageFlagUrl(code)"
+                                            [src]="getLanguageFlagUrl(code)" class="language-flag-icon-view">{{
+                                        getLanguageName(code) }}</span>
                                     }
                                 </span>
                                 } @else {
