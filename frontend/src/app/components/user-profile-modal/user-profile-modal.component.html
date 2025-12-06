@@ -31,6 +31,12 @@
             <div class="user-meta">
                 @if (user.location) {
                 <div class="meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="location-icon">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
                     <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
                         (error)="$event.target.style.display='none'" />
                     <span>{{ getLocationLabel(user.location) }}</span>
@@ -63,16 +69,35 @@
                 <div class="languages-grid">
                     @if (user.native_language) {
                     @for (lang of getLanguageArray(user.native_language); track lang) {
-                    <div class="lang-badge">
+                    <div class="lang-badge native">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lang-icon">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
                         <span class="lang-type">Native</span>
+                        <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
+                            (error)="$event.target.style.display='none'" />
                         {{ getLanguageLabel(lang) }}
                     </div>
                     }
                     }
                     @if (user.learning_language) {
                     @for (lang of getLanguageArray(user.learning_language); track lang) {
-                    <div class="lang-badge">
+                    <div class="lang-badge learning">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lang-icon">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
                         <span class="lang-type">Learning</span>
+                        <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
+                            (error)="$event.target.style.display='none'" />
                         {{ getLanguageLabel(lang) }}
                     </div>
                     }
@@ -140,17 +165,32 @@
                             <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
                                 👎 {{ comment.dislikes || 0 }}
                             </button>
-                            <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                            <button class="btn-action" (click)="toggleReply(comment.id, $event)">
+                                {{ showReplyInput[comment.id] ? 'Cancel' : 'Reply' }}
+                            </button>
                         </div>
 
                         @if (showReplyInput[comment.id]) {
                         <div class="reply-input">
-                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
-                            <button (click)="submitReply(comment.id)">Send</button>
+                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply..."
+                                (keyup.enter)="submitReply(comment.id)">
+                            <button (click)="submitReply(comment.id)"
+                                [disabled]="!replyContent[comment.id]?.trim()">Send</button>
                         </div>
                         }
 
                         @if (comment.replies?.length) {
+                        <button class="toggle-replies-btn" (click)="toggleRepliesVisibility(comment.id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" [class.rotated]="showReplies[comment.id]">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                            {{ showReplies[comment.id] ? 'Hide' : 'Show' }} {{ comment.replies.length }} {{
+                            comment.replies.length === 1 ? 'reply' : 'replies' }}
+                        </button>
+
+                        @if (showReplies[comment.id]) {
                         <div class="replies-list">
                             @for (reply of comment.replies; track reply.id) {
                             <div class="reply-item">
@@ -162,6 +202,7 @@
                             </div>
                             }
                         </div>
+                        }
                         }
                     </div>
                     } @empty {

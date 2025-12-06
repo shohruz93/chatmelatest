@@ -29,6 +29,7 @@ export class UserProfileModalComponent implements OnInit {
     userRating: any = null;
     replyContent: { [key: number]: string } = {};
     showReplyInput: { [key: number]: boolean } = {};
+    showReplies: { [key: number]: boolean } = {};
 
     languageOptions = [
         { value: 'any', label: 'Any Language' },
@@ -163,6 +164,19 @@ export class UserProfileModalComponent implements OnInit {
         return Array.isArray(languages) ? languages : [languages];
     }
 
+    // Map language codes to country codes for flags
+    private languageToCountry: { [key: string]: string } = {
+        'en': 'gb', 'es': 'es', 'fr': 'fr', 'de': 'de', 'ru': 'ru',
+        'zh': 'cn', 'ja': 'jp', 'ko': 'kr', 'ar': 'sa', 'pt': 'pt',
+        'hi': 'in', 'tg': 'tj', 'tr': 'tr', 'it': 'it'
+    };
+
+    getLanguageFlagUrl(langCode: string): string {
+        if (!langCode) return '';
+        const countryCode = this.languageToCountry[langCode.toLowerCase()] || langCode.toLowerCase();
+        return `/flags/${countryCode}.png`;
+    }
+
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
         if (this.user && this.user.id) {
@@ -253,7 +267,16 @@ export class UserProfileModalComponent implements OnInit {
         });
     }
 
-    toggleReply(commentId: number) {
+    toggleReply(commentId: number, event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        // If closing the reply input, clear the content
+        if (this.showReplyInput[commentId]) {
+            this.replyContent[commentId] = '';
+        }
+
         this.showReplyInput[commentId] = !this.showReplyInput[commentId];
     }
 
@@ -278,5 +301,9 @@ export class UserProfileModalComponent implements OnInit {
             },
             error: (err) => console.error('Failed to like/dislike', err)
         });
+    }
+
+    toggleRepliesVisibility(commentId: number) {
+        this.showReplies[commentId] = !this.showReplies[commentId];
     }
 }
