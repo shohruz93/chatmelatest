@@ -241,6 +241,14 @@ $router->add('POST', '/admin/users/ban', function() use ($adminController) {
     $adminController->banUser();
 });
 
+$router->add('POST', '/admin/users/unban', function() use ($adminController) {
+    $adminController->unbanUser();
+});
+
+$router->add('POST', '/admin/users/toggle-admin', function() use ($adminController) {
+    $adminController->toggleAdmin();
+});
+
 // Test Route
 $router->add('GET', '/', function() {
     echo json_encode(["message" => "Welcome to Chatme API"]);

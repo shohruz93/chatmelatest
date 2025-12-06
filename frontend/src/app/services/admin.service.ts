@@ -26,16 +26,29 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getUsers(page: number = 1, search: string = ''): Observable<GetUsersResponse> {
+  getUsers(page: number = 1, search: string = '', status: string = 'all'): Observable<GetUsersResponse> {
     return this.http.get<GetUsersResponse>(`${this.apiUrl}/admin/users`, {
       params: {
         page: page.toString(),
-        search
+        search,
+        status
       }
     });
   }
 
   banUser(userId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/users/ban`, { userId });
+  }
+
+  unbanUser(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/unban`, { userId });
+  }
+
+  toggleAdmin(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/toggle-admin`, { userId });
+  }
+
+  getStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/stats`);
   }
 }
