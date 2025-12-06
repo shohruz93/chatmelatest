@@ -7,6 +7,7 @@ import { OnboardingComponent } from './pages/onboarding/onboarding.component';
 import { ChatComponent } from './pages/chat/chat.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { authGuard, loginGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -50,6 +51,12 @@ export const routes: Routes = [
     },
     {
         path: 'admin',
-        loadChildren: () => import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
-    }
+        loadChildren: () => import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES),
+        canActivate: [AdminGuard]
+    },
+    {
+        path: '404',
+        loadComponent: () => import('./pages/not-found/not-found').then(m => m.NotFound)
+    },
+    { path: '**', redirectTo: '/404' }
 ];
