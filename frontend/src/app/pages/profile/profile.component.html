@@ -222,6 +222,10 @@
 
                     @if (isOwnProfile) {
                     <button class="btn-edit" (click)="toggleEdit()">Edit Profile</button>
+                    } @else {
+                    <button class="btn-message" (click)="sendMessage()">
+                        <span class="message-icon">✉️</span> Send Message
+                    </button>
                     }
                 </div>
                 }

@@ -438,4 +438,10 @@ export class ProfileComponent implements OnInit {
         const lang = this.languages.find(l => l.code === languageCode);
         return lang ? `/flags/${lang.countryCode}.png` : '';
     }
+
+    sendMessage() {
+        if (this.profileUser && this.profileUser.id) {
+            this.router.navigate(['/dashboard', 'chat', this.profileUser.id]);
+        }
+    }
 }
