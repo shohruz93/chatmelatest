@@ -218,6 +218,8 @@
             <h3>Comments & Ratings</h3>
 
             @if (!isOwnProfile && currentUser) {
+            <!-- Rating form (only if user hasn't rated yet) -->
+            @if (!hasRated) {
             <div class="add-rating-form">
                 <h4>Rate this user</h4>
                 <div class="rating-stars">
@@ -226,8 +228,17 @@
                     }
                 </div>
                 <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
-                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit</button>
+                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit
+                    Rating</button>
             </div>
+            } @else {
+            <!-- Comment-only form (if user has already rated) -->
+            <div class="add-comment-form">
+                <h4>Add a comment</h4>
+                <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
+                <button class="btn-submit-comment" (click)="submitComment()">Add Comment</button>
+            </div>
+            }
             }
 
             <div class="comments-list">

@@ -437,6 +437,35 @@ input[type="text"] {
     cursor: not-allowed;
 }
 
+.add-comment-form {
+    background: var(--bg-primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.add-comment-form h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary);
+}
+
+.btn-submit-comment {
+    margin-top: 1rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-submit-comment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
 .comments-list {
     display: flex;
     flex-direction: column;

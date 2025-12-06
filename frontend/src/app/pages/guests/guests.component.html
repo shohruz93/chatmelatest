@@ -14,7 +14,7 @@
         @if (guests.length > 0) {
         <div class="guests-grid">
             @for (guest of guests; track guest.id) {
-            <div class="guest-card" [routerLink]="['/profile', guest.id]">
+            <div class="guest-card" [routerLink]="['/dashboard/profile', guest.id]">
                 <div class="guest-avatar">
                     <img [src]="guest.avatar || 'assets/default-avatar.png'" [alt]="guest.name">
                 </div>

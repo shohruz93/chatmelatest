@@ -348,43 +348,19 @@ class Profile {
         $rating = $data['rating'];
         $comment = $data['comment'] ?? '';
         
-        // Check if user has already rated this profile
-        $checkQuery = "SELECT id, rating FROM user_ratings WHERE rater_id = :rater AND rated_id = :rated AND rating IS NOT NULL AND rating > 0 LIMIT 1";
-        $checkStmt = $this->db->prepare($checkQuery);
-        $checkStmt->bindParam(":rater", $raterId);
-        $checkStmt->bindParam(":rated", $ratedId);
-        $checkStmt->execute();
-        $existingRating = $checkStmt->fetch(PDO::FETCH_ASSOC);
+        // Always insert a new record (no update)
+        $query = "INSERT INTO user_ratings (rater_id, rated_id, rating, comment) VALUES (:rater, :rated, :rating, :comment)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":rater", $raterId);
+        $stmt->bindParam(":rated", $ratedId);
+        $stmt->bindParam(":rating", $rating);
+        $stmt->bindParam(":comment", $comment);
         
-        if ($existingRating) {
-            // User has already rated - update the existing rating
-            $query = "UPDATE user_ratings SET rating = :rating, comment = :comment, created_at = NOW() WHERE id = :id";
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":rating", $rating);
-            $stmt->bindParam(":comment", $comment);
-            $stmt->bindParam(":id", $existingRating['id']);
-            
-            if ($stmt->execute()) {
-                echo json_encode(["message" => "Rating updated", "updated" => true]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["message" => "Failed to update rating"]);
-            }
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Rating added", "updated" => false]);
         } else {
-            // No existing rating - insert new one
-            $query = "INSERT INTO user_ratings (rater_id, rated_id, rating, comment) VALUES (:rater, :rated, :rating, :comment)";
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":rater", $raterId);
-            $stmt->bindParam(":rated", $ratedId);
-            $stmt->bindParam(":rating", $rating);
-            $stmt->bindParam(":comment", $comment);
-            
-            if ($stmt->execute()) {
-                echo json_encode(["message" => "Rating added", "updated" => false]);
-            } else {
-                http_response_code(500);
-                echo json_encode(["message" => "Failed to add rating"]);
-            }
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to add rating"]);
         }
     }
     

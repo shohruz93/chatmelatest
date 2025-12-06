@@ -47,6 +47,7 @@ export class ProfileComponent implements OnInit {
     replyContent: { [key: number]: string } = {};
     showReplyInput: { [key: number]: boolean } = {};
     showReplies: { [key: number]: boolean } = {};
+    hasRated: boolean = false;
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -140,6 +141,12 @@ export class ProfileComponent implements OnInit {
         this.api.getComments(userId).subscribe({
             next: (data) => {
                 this.comments = data;
+                // Check if current user has already rated this profile
+                if (this.currentUser) {
+                    this.hasRated = this.comments.some(
+                        c => c.rater_id === this.currentUser.id && c.rating !== null && c.rating > 0
+                    );
+                }
             },
             error: (err) => console.error('Error loading comments', err)
         });
@@ -274,6 +281,21 @@ export class ProfileComponent implements OnInit {
                 this.loadProfile(this.profileUser.id); // Reload to get new stats and comments
             },
             error: (err) => alert('Failed to submit rating')
+        });
+    }
+
+    submitComment() {
+        if (!this.newComment.trim()) {
+            alert('Please enter a comment');
+            return;
+        }
+
+        this.api.addComment(this.currentUser.id, this.profileUser.id, this.newComment).subscribe({
+            next: () => {
+                this.newComment = '';
+                this.loadComments(this.profileUser.id);
+            },
+            error: (err) => alert('Failed to submit comment')
         });
     }
 
