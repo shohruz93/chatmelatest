@@ -229,8 +229,17 @@ class Profile {
         $stmt->bindParam(":user_id", $userId);
         $stmt->execute();
         $guests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fix guest avatar URLs
+        foreach ($guests as &$guest) {
+            if ($guest['avatar'] && !str_starts_with($guest['avatar'], 'http')) {
+                $guest['avatar'] = 'http://localhost:8000' . $guest['avatar'];
+            }
+        }
+
         echo json_encode($guests);
     }
+
 
     public function getComments($userId) {
         // Get ratings/comments
@@ -246,6 +255,11 @@ class Profile {
 
         // For each comment, get replies and likes
         foreach ($comments as &$comment) {
+            // Fix rater avatar URL
+            if ($comment['rater_avatar'] && !str_starts_with($comment['rater_avatar'], 'http')) {
+                $comment['rater_avatar'] = 'http://localhost:8000' . $comment['rater_avatar'];
+            }
+
             // Get replies
             $query = "SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar 
                       FROM comment_replies cr 
@@ -255,7 +269,15 @@ class Profile {
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(":rating_id", $comment['id']);
             $stmt->execute();
-            $comment['replies'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fix replier avatar URLs
+            foreach ($replies as &$reply) {
+                if ($reply['replier_avatar'] && !str_starts_with($reply['replier_avatar'], 'http')) {
+                    $reply['replier_avatar'] = 'http://localhost:8000' . $reply['replier_avatar'];
+                }
+            }
+            $comment['replies'] = $replies;
 
             // Get likes count
             $query = "SELECT 
@@ -273,6 +295,7 @@ class Profile {
 
         echo json_encode($comments);
     }
+
 
     public function addReply() {
         $data = json_decode(file_get_contents("php://input"), true);

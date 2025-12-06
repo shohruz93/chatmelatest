@@ -231,7 +231,7 @@
             }
 
             <div class="comments-list">
-                @for (comment of comments; track comment.id) {
+                @for (comment of displayedComments; track comment.id) {
                 <div class="comment-card">
                     <div class="comment-header">
                         <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
@@ -256,6 +256,11 @@
                             👎 {{ comment.dislikes }}
                         </button>
                         <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                        @if (comment.replies?.length) {
+                        <button class="btn-action btn-toggle-replies" (click)="toggleReplies(comment.id)">
+                            {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} replies
+                        </button>
+                        }
                     </div>
 
                     @if (showReplyInput[comment.id]) {
@@ -265,7 +270,7 @@
                     </div>
                     }
 
-                    @if (comment.replies?.length) {
+                    @if (comment.replies?.length && showReplies[comment.id]) {
                     <div class="replies-list">
                         @for (reply of comment.replies; track reply.id) {
                         <div class="reply-item">
@@ -281,6 +286,12 @@
                 </div>
                 } @empty {
                 <p class="no-comments">No comments yet.</p>
+                }
+
+                @if (hasMoreComments) {
+                <a class="view-all-link" [routerLink]="['/dashboard/profile', profileUser.id, 'comments']">
+                    View all {{ comments.length }} comments →
+                </a>
                 }
             </div>
         </div>

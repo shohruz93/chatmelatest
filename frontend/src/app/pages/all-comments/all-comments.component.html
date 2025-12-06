@@ -1,0 +1,76 @@
+<div class="all-comments-page">
+    <header class="page-header">
+        <a class="back-link" [routerLink]="['/dashboard/profile', userId]">
+            ← Back to Profile
+        </a>
+        <h2>All Comments {{ profileUser ? 'for ' + profileUser.name : '' }}</h2>
+    </header>
+
+    <div class="comments-content">
+        @if (loading) {
+        <div class="loading-state">
+            <div class="loader"></div>
+            <p>Loading comments...</p>
+        </div>
+        } @else {
+        <div class="comments-list">
+            @for (comment of comments; track comment.id) {
+            <div class="comment-card">
+                <div class="comment-header">
+                    <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
+                    <div class="comment-meta">
+                        <span class="comment-author">{{ comment.rater_name }}</span>
+                        <span class="comment-rating">
+                            @for (star of [1,2,3,4,5]; track star) {
+                            <span class="star-display" [class.filled]="star <= comment.rating">★</span>
+                            }
+                        </span>
+                        <span class="comment-date">{{ comment.created_at | date }}</span>
+                    </div>
+                </div>
+                <div class="comment-body">
+                    {{ comment.comment }}
+                </div>
+                <div class="comment-actions">
+                    <button class="btn-action" (click)="likeComment(comment.id, 'like')">
+                        👍 {{ comment.likes }}
+                    </button>
+                    <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
+                        👎 {{ comment.dislikes }}
+                    </button>
+                    <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                    @if (comment.replies?.length) {
+                    <button class="btn-action btn-toggle-replies" (click)="toggleReplies(comment.id)">
+                        {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} replies
+                    </button>
+                    }
+                </div>
+
+                @if (showReplyInput[comment.id]) {
+                <div class="reply-input">
+                    <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
+                    <button (click)="submitReply(comment.id)">Send</button>
+                </div>
+                }
+
+                @if (comment.replies?.length && showReplies[comment.id]) {
+                <div class="replies-list">
+                    @for (reply of comment.replies; track reply.id) {
+                    <div class="reply-item">
+                        <img [src]="reply.replier_avatar || 'assets/default-avatar.png'" class="reply-avatar">
+                        <div class="reply-content">
+                            <span class="reply-author">{{ reply.replier_name }}</span>
+                            <span class="reply-text">{{ reply.content }}</span>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            } @empty {
+            <p class="no-comments">No comments yet.</p>
+            }
+        </div>
+        }
+    </div>
+</div>

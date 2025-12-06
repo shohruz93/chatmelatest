@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
@@ -10,7 +10,7 @@ import countries from 'world-countries';
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ConfirmDialogComponent],
+    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -46,6 +46,7 @@ export class ProfileComponent implements OnInit {
     newComment: string = '';
     replyContent: { [key: number]: string } = {};
     showReplyInput: { [key: number]: boolean } = {};
+    showReplies: { [key: number]: boolean } = {};
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -278,6 +279,18 @@ export class ProfileComponent implements OnInit {
 
     toggleReply(commentId: number) {
         this.showReplyInput[commentId] = !this.showReplyInput[commentId];
+    }
+
+    toggleReplies(commentId: number) {
+        this.showReplies[commentId] = !this.showReplies[commentId];
+    }
+
+    get displayedComments() {
+        return this.comments.slice(0, 10);
+    }
+
+    get hasMoreComments() {
+        return this.comments.length > 10;
     }
 
     submitReply(commentId: number) {

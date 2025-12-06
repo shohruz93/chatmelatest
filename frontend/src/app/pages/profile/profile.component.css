@@ -603,3 +603,27 @@ input[type="text"] {
         justify-content: center;
     }
 }
+
+.view-all-link {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 1rem;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.view-all-link:hover {
+    background: var(--bg-secondary);
+    text-decoration: none;
+}
+
+.btn-toggle-replies {
+    color: var(--primary-color) !important;
+    font-weight: 500;
+}
