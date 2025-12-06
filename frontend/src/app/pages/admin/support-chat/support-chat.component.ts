@@ -35,12 +35,16 @@ import { HttpClient } from '@angular/common/http';
               </span>
             </div>
             
-            <div class="ml-4 flex-1">
+            <div class="ml-4 flex-1 overflow-hidden">
               <div class="flex justify-between items-start">
                 <h3 class="font-semibold text-gray-800 dark:text-white">{{conv.name}}</h3>
                 <span class="text-xs text-gray-400">{{formatDate(conv.last_message_time)}}</span>
               </div>
-              <p class="text-sm text-gray-500 dark:text-gray-400 truncate w-48">{{conv.last_message}}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 truncate w-full">
+                <span *ngIf="detectMessageType(conv.last_message) === 'image'">📷 Image</span>
+                <span *ngIf="detectMessageType(conv.last_message) === 'voice'">🎤 Voice Message</span>
+                <span *ngIf="detectMessageType(conv.last_message) === 'text'">{{conv.last_message}}</span>
+              </p>
             </div>
           </div>
         </div>
@@ -78,8 +82,25 @@ import { HttpClient } from '@angular/common/http';
                <div [ngClass]="{
                    'bg-blue-600 text-white rounded-tr-none': isCurrentUser(message.sender_id),
                    'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none border border-gray-200 dark:border-gray-700': !isCurrentUser(message.sender_id)
-                 }" class="px-4 py-2 rounded-2xl shadow-sm">
-                 <p>{{message.content}}</p>
+                 }" class="px-4 py-2 rounded-2xl shadow-sm overflow-hidden break-words max-w-full">
+                 
+                  <!-- Content Switch -->
+                  <ng-container [ngSwitch]="message.messageType">
+                    <!-- Image -->
+                    <div *ngSwitchCase="'image'">
+                        <img [src]="message.content" class="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" 
+                             style="max-height: 300px;" (click)="viewImage(message.content)">
+                    </div>
+                    
+                    <!-- Voice -->
+                    <div *ngSwitchCase="'voice'" class="flex items-center space-x-2 min-w-[200px]">
+                        <audio [src]="message.content" controls class="w-full h-8 max-w-[250px]"></audio>
+                    </div>
+                    
+                    <!-- Text (Default) -->
+                    <p *ngSwitchDefault class="whitespace-pre-wrap break-words">{{message.content}}</p>
+                  </ng-container>
+
                </div>
                <span class="text-xs text-gray-400 mt-1">{{formatTime(message.created_at)}}</span>
              </div>
@@ -157,7 +178,8 @@ export class SupportChatComponent implements OnInit {
         this.messages.push({
           sender_id: msg.senderId,
           content: msg.content,
-          created_at: new Date()
+          created_at: new Date(),
+          messageType: this.detectMessageType(msg.content, msg.type)
         });
         this.scrollToBottom();
       }
@@ -186,7 +208,10 @@ export class SupportChatComponent implements OnInit {
     // Subscribe to loaded messages (one-time)
     const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
       if (data.roomId === this.roomId) {
-        this.messages = data.messages;
+        this.messages = data.messages.map((msg: any) => ({
+          ...msg,
+          messageType: this.detectMessageType(msg.content, msg.type)
+        }));
         this.scrollToBottom();
         sub.unsubscribe();
       }
@@ -204,13 +229,14 @@ export class SupportChatComponent implements OnInit {
     if (!this.newMessage.trim() || !this.roomId) return;
 
     const content = this.newMessage;
-    this.socketService.sendMessage(this.roomId, content, 'en'); // Admin sends in En default for now
+    this.socketService.sendMessage(this.roomId, content, 'en', 'text'); // Admin sends in En default for now
 
     // Optimistic update
     this.messages.push({
       sender_id: this.currentUser.id,
       content: content,
-      created_at: new Date()
+      created_at: new Date(),
+      messageType: 'text'
     });
 
     this.newMessage = '';
@@ -241,5 +267,27 @@ export class SupportChatComponent implements OnInit {
 
   formatTime(dateStr: string): string {
     return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  detectMessageType(content: string, providedType?: string): string {
+    // Logic from ChatComponent
+    if (providedType && providedType !== 'text') {
+      return providedType;
+    }
+
+    if (content && typeof content === 'string') {
+      if (content.startsWith('data:audio') || content.endsWith('.webm') || content.endsWith('.mp3') || content.endsWith('.wav')) {
+        return 'voice';
+      }
+      if (content.startsWith('data:image') || content.match(/\.(jpeg|jpg|gif|png)$/i) != null) {
+        return 'image';
+      }
+    }
+
+    return 'text';
+  }
+
+  viewImage(imageUrl: string) {
+    window.open(imageUrl, '_blank');
   }
 }
