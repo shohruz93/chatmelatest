@@ -51,7 +51,7 @@ import { HttpClient } from '@angular/common/http';
       </div>
 
       <!-- Chat Area -->
-      <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 relative">
+      <div class="flex-1 flex flex-col bg-white dark:bg-gray-900 relative min-h-0">
         <div *ngIf="!selectedUser" class="flex-1 flex flex-col items-center justify-center text-gray-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -59,9 +59,9 @@ import { HttpClient } from '@angular/common/http';
             <p>Select a conversation to start chatting</p>
         </div>
 
-        <div *ngIf="selectedUser" class="flex-1 flex flex-col">
+        <div *ngIf="selectedUser" class="flex-1 flex flex-col min-h-0">
           <!-- Chat Header -->
-          <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between shrink-0">
             <div class="flex items-center">
               <img [src]="selectedUser.avatar || 'assets/default-avatar.png'" class="w-10 h-10 rounded-full object-cover">
               <div class="ml-3">
@@ -72,7 +72,7 @@ import { HttpClient } from '@angular/common/http';
           </div>
 
           <!-- Messages -->
-          <div #messagesContainer class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
+          <div #messagesContainer class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900 scroll-smooth">
              <div *ngFor="let message of messages" 
                   [ngClass]="{'self-end': isCurrentUser(message.sender_id), 'self-start': !isCurrentUser(message.sender_id)}"
                   class="flex flex-col max-w-[70%]" 
@@ -107,7 +107,7 @@ import { HttpClient } from '@angular/common/http';
           </div>
 
           <!-- Input Area -->
-          <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0">
             <form (submit)="sendMessage()" class="flex items-center space-x-2">
               <input type="text" [(ngModel)]="newMessage" name="message" placeholder="Type your reply..." 
                      class="flex-1 px-4 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -182,6 +182,11 @@ export class SupportChatComponent implements OnInit {
           messageType: this.detectMessageType(msg.content, msg.type)
         });
         this.scrollToBottom();
+
+        // Mark as read immediately if the message is from the user we are chatting with
+        if (msg.senderId == this.selectedUser.user_id) {
+          this.markAsRead(msg.senderId);
+        }
       }
       // Refresh conversations to update last message/unread count
       this.loadConversations();
@@ -217,12 +222,17 @@ export class SupportChatComponent implements OnInit {
       }
     });
 
-    // Mark as read (optional, can implement later)
+    // Mark as read immediately when opening chat
     this.markAsRead(user.user_id);
   }
 
   markAsRead(senderId: number) {
-    // Implement mark read logic if needed
+    if (this.roomId) {
+      this.socketService.emit('mark_as_read', {
+        roomId: this.roomId,
+        senderId: senderId
+      });
+    }
   }
 
   sendMessage() {
