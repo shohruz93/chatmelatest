@@ -56,7 +56,7 @@ class AdminController {
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $status = isset($_GET['status']) ? $_GET['status'] : 'all'; // all, banned, admin
 
-        $query = "SELECT id, name, email, is_admin, status, gender, country, created_at, last_active FROM users";
+        $query = "SELECT id, name, email, is_admin, status, gender, avatar, created_at, last_active FROM users";
         $countQuery = "SELECT COUNT(*) as count FROM users";
         
         $conditions = [];
@@ -169,7 +169,7 @@ class AdminController {
             echo json_encode(['error' => 'User not found']);
             return;
         }
-        
+
         $newStatus = $user['is_admin'] == 1 ? 0 : 1;
 
         $query = "UPDATE users SET is_admin = :new_status WHERE id = :id";
@@ -184,4 +184,49 @@ class AdminController {
             echo json_encode(['error' => 'Failed to update admin status']);
         }
     }
+
+    public function getUserDetails() {
+        if (!isset($_GET['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User ID required']);
+            return;
+        }
+
+        $userId = $_GET['id'];
+        
+        // Get basic profile
+        $userProfile = $this->user->getProfile($userId);
+        
+        if (!$userProfile) {
+            http_response_code(404);
+            echo json_encode(['error' => 'User not found']);
+            return;
+        }
+
+        // Get interests
+        $query = "SELECT i.id, i.name FROM interests i 
+                  JOIN user_interests ui ON i.id = ui.interest_id 
+                  WHERE ui.user_id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        $userProfile['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get stats for this user
+        $statsQuery = "SELECT 
+            (SELECT COUNT(*) FROM messages WHERE sender_id = :uid) as messages_sent,
+            (SELECT COUNT(DISTINCT CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END) 
+             FROM messages 
+             WHERE sender_id = :uid OR receiver_id = :uid) as total_conversations
+        ";
+        $statsStmt = $this->db->prepare($statsQuery);
+        $statsStmt->bindParam(":uid", $userId);
+        $statsStmt->execute();
+        $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
+        
+        $userProfile['stats'] = $stats;
+
+        echo json_encode($userProfile);
+    }
 }
+

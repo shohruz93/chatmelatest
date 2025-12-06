@@ -249,6 +249,10 @@ $router->add('POST', '/admin/users/toggle-admin', function() use ($adminControll
     $adminController->toggleAdmin();
 });
 
+$router->add('GET', '/admin/users/details', function() use ($adminController) {
+    $adminController->getUserDetails();
+});
+
 // Test Route
 $router->add('GET', '/', function() {
     echo json_encode(["message" => "Welcome to Chatme API"]);

@@ -3,14 +3,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, GetUsersResponse } from '../../services/admin.service';
-import { Observable, BehaviorSubject, switchMap, debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
-    selector: 'app-admin-users',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
-    <div class="space-y-6">
+   selector: 'app-admin-users',
+   standalone: true,
+   imports: [CommonModule, FormsModule],
+   template: `
+    <div class="space-y-6 relative">
        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h2 class="text-3xl font-bold text-gray-800 dark:text-white">User Management</h2>
           
@@ -49,11 +49,14 @@ import { Observable, BehaviorSubject, switchMap, debounceTime, distinctUntilChan
                    </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                   <tr *ngFor="let user of response.users" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group">
+                   <tr *ngFor="let user of response.users" (click)="viewUser(user)" class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group cursor-pointer">
                       <td class="px-6 py-4">
                          <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center text-gray-600 font-bold uppercase text-sm">
-                                {{ user.name.substring(0,2) }}
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                                <img *ngIf="user.avatar" [src]="getAvatarUrl(user.avatar)" class="w-full h-full object-cover">
+                                <div *ngIf="!user.avatar" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 text-gray-600 font-bold uppercase text-sm">
+                                    {{ user.name.substring(0,2) }}
+                                </div>
                             </div>
                             <div>
                                <div class="font-bold text-gray-800 dark:text-white">{{ user.name }}</div>
@@ -81,23 +84,14 @@ import { Observable, BehaviorSubject, switchMap, debounceTime, distinctUntilChan
                       <td class="px-6 py-4 text-sm text-gray-500">
                          {{ user.created_at | date:'mediumDate' }}
                       </td>
-                      <td class="px-6 py-4 text-right">
-                         <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button *ngIf="!isBanned(user)" (click)="banUser(user.id)" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all" title="Ban User">
-                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                               </svg>
-                            </button>
-                             <button *ngIf="isBanned(user)" (click)="unbanUser(user.id)" class="p-2 text-red-500 hover:text-green-500 hover:bg-green-50 rounded-lg transition-all" title="Unban User">
-                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                               </svg>
-                            </button>
-                            <button (click)="toggleAdmin(user.id)" class="p-2 text-gray-400 hover:text-purple-500 hover:bg-purple-50 rounded-lg transition-all" [title]="user.is_admin ? 'Remove Admin' : 'Make Admin'">
-                               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                               </svg>
-                            </button>
+                      <td class="px-6 py-4 text-right" (click)="$event.stopPropagation()">
+                         <div class="flex items-center justify-end gap-2 text-gray-500">
+                             <button (click)="viewUser(user)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                             </button>
                          </div>
                       </td>
                    </tr>
@@ -114,71 +108,232 @@ import { Observable, BehaviorSubject, switchMap, debounceTime, distinctUntilChan
               </div>
           </div>
        </div>
+
+       <!-- User Details Drawer -->
+       <div *ngIf="selectedUser" class="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+            <div class="absolute inset-0 overflow-hidden">
+                <!-- Backdrop -->
+                <div class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" (click)="closeUserDrawer()"></div>
+                
+                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                    <div class="pointer-events-auto w-screen max-w-md">
+                        <div class="flex h-full flex-col overflow-y-scroll bg-white dark:bg-gray-800 shadow-xl">
+                            <!-- Header -->
+                            <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6 border-b dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white" id="slide-over-title">User Profile</h2>
+                                    <div class="ml-3 flex h-7 items-center">
+                                        <button type="button" class="rounded-md bg-transparent text-gray-400 hover:text-gray-500 focus:outline-none" (click)="closeUserDrawer()">
+                                            <span class="sr-only">Close panel</span>
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="relative flex-1 px-4 py-6 sm:px-6 space-y-6" *ngIf="userDetails; else loadingDetails">
+                                <!-- Profile Info -->
+                                <div class="flex flex-col items-center">
+                                    <div class="w-24 h-24 rounded-full overflow-hidden shadow-md mb-4">
+                                        <img *ngIf="userDetails.avatar" [src]="getAvatarUrl(userDetails.avatar)" class="w-full h-full object-cover">
+                                        <div *ngIf="!userDetails.avatar" class="w-full h-full flex items-center justify-center bg-gray-200 text-3xl font-bold text-gray-600">
+                                            {{ userDetails.name.substring(0,2).toUpperCase() }}
+                                        </div>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white text-center">{{ userDetails.name }}</h3>
+                                    <p class="text-gray-500 text-sm">{{ userDetails.email }}</p>
+                                    
+                                    <div class="flex mt-4 gap-2">
+                                        <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="isBanned(selectedUser) ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'">
+                                            {{ isBanned(selectedUser) ? 'Banned' : 'Active' }}
+                                        </span>
+                                        <span *ngIf="userDetails.is_admin" class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                                            Admin
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button *ngIf="!isBanned(selectedUser)" (click)="banUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-full">
+                                        Ban Check
+                                    </button>
+                                     <button *ngIf="isBanned(selectedUser)" (click)="unbanUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full">
+                                        Unban User
+                                    </button>
+                                    <button (click)="toggleAdmin(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 w-full">
+                                        {{ selectedUser.is_admin ? 'Demote Admin' : 'Make Admin' }}
+                                    </button>
+                                </div>
+
+                                <!-- Stats -->
+                                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
+                                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Activity Stats</h4>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.messages_sent || 0 }}</div>
+                                            <div class="text-xs text-gray-500">Messages Sent</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.total_conversations || 0 }}</div>
+                                            <div class="text-xs text-gray-500">Conversations</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Details List -->
+                                <div class="space-y-4">
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Bio</h4>
+                                        <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.bio || 'No bio provided' }}</p>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</h4>
+                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200 capitalize">{{ userDetails.gender || 'Not specified' }}</p>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</h4>
+                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.location || 'Not specified' }}</p>
+                                        </div>
+                                         <div>
+                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Native Lang</h4>
+                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.native_language || '-' }}</p>
+                                        </div>
+                                        <div>
+                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Learning Lang</h4>
+                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.learning_language || '-' }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div *ngIf="userDetails.interests?.length">
+                                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span *ngFor="let interest of userDetails.interests" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                                {{ interest.name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                             <ng-template #loadingDetails>
+                                <div class="flex items-center justify-center h-64">
+                                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       </div>
+
     </div>
   `
 })
 export class AdminUsersComponent implements OnInit {
-    usersResponse$!: Observable<GetUsersResponse>;
-    searchTerm: string = '';
-    currentStatus: string = 'all';
-    currentPage: number = 1;
-    searchSubject = new Subject<string>();
+   usersResponse$!: Observable<GetUsersResponse>;
+   searchTerm: string = '';
+   currentStatus: string = 'all';
+   currentPage: number = 1;
+   searchSubject = new Subject<string>();
 
-    constructor(private adminService: AdminService) {
-        this.searchSubject.pipe(
-            debounceTime(300),
-            distinctUntilChanged()
-        ).subscribe(term => {
-            this.searchTerm = term;
-            this.currentPage = 1;
+   selectedUser: any = null;
+   userDetails: any = null;
+
+   constructor(private adminService: AdminService) {
+      this.searchSubject.pipe(
+         debounceTime(300),
+         distinctUntilChanged()
+      ).subscribe(term => {
+         this.searchTerm = term;
+         this.currentPage = 1;
+         this.loadUsers();
+      });
+   }
+
+   ngOnInit() {
+      this.loadUsers();
+   }
+
+   onSearch(term: string) {
+      this.searchSubject.next(term);
+   }
+
+   setStatusFilter(status: string) {
+      this.currentStatus = status;
+      this.currentPage = 1;
+      this.loadUsers();
+   }
+
+   loadPage(page: number) {
+      this.currentPage = page;
+      this.loadUsers();
+   }
+
+   loadUsers() {
+      this.usersResponse$ = this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus);
+   }
+
+   isBanned(user: any): boolean {
+      return user && user.status === 'banned';
+   }
+
+   getAvatarUrl(path: string | undefined): string {
+      if (!path) return '';
+      if (path.startsWith('http')) return path;
+      return `http://localhost:8000/${path}`;
+   }
+
+   viewUser(user: any) {
+      this.selectedUser = user;
+      this.userDetails = null; // Clear previous details
+      this.adminService.getUserDetails(user.id).subscribe(details => {
+         this.userDetails = details;
+      });
+   }
+
+   closeUserDrawer() {
+      this.selectedUser = null;
+      this.userDetails = null;
+   }
+
+   banUser(userId: number) {
+      if (confirm('Are you sure you want to ban this user?')) {
+         this.adminService.banUser(userId).subscribe(() => {
             this.loadUsers();
-        });
-    }
+            if (this.selectedUser && this.selectedUser.id === userId) {
+               this.selectedUser.status = 'banned';
+               if (this.userDetails) this.userDetails.status = 'banned';
+            }
+         });
+      }
+   }
 
-    ngOnInit() {
-        this.loadUsers();
-    }
+   unbanUser(userId: number) {
+      if (confirm('Are you sure you want to unban this user?')) {
+         this.adminService.unbanUser(userId).subscribe(() => {
+            this.loadUsers();
+            if (this.selectedUser && this.selectedUser.id === userId) {
+               this.selectedUser.status = 'active';
+               if (this.userDetails) this.userDetails.status = 'active';
+            }
+         });
+      }
+   }
 
-    onSearch(term: string) {
-        this.searchSubject.next(term);
-    }
-
-    setStatusFilter(status: string) {
-        this.currentStatus = status;
-        this.currentPage = 1;
-        this.loadUsers();
-    }
-
-    loadPage(page: number) {
-        this.currentPage = page;
-        this.loadUsers();
-    }
-
-    loadUsers() {
-        this.usersResponse$ = this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus);
-    }
-
-    isBanned(user: any): boolean {
-        // Logic depends on what backend returns. Assuming 'status' field or check.
-        // Backend returns 'status' field now.
-        return user.status === 'banned';
-    }
-
-    banUser(userId: number) {
-        if (confirm('Are you sure you want to ban this user?')) {
-            this.adminService.banUser(userId).subscribe(() => this.loadUsers());
-        }
-    }
-
-    unbanUser(userId: number) {
-        if (confirm('Are you sure you want to unban this user?')) {
-            this.adminService.unbanUser(userId).subscribe(() => this.loadUsers());
-        }
-    }
-
-    toggleAdmin(userId: number) {
-        if (confirm('Change admin status for this user?')) {
-            this.adminService.toggleAdmin(userId).subscribe(() => this.loadUsers());
-        }
-    }
+   toggleAdmin(userId: number) {
+      if (confirm('Change admin status for this user?')) {
+         this.adminService.toggleAdmin(userId).subscribe((res: any) => {
+            this.loadUsers();
+            if (this.selectedUser && this.selectedUser.id === userId) {
+               this.selectedUser.is_admin = !this.selectedUser.is_admin;
+               if (this.userDetails) this.userDetails.is_admin = !this.userDetails.is_admin;
+            }
+         });
+      }
+   }
 }

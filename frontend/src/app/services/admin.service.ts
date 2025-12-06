@@ -6,7 +6,10 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  is_admin: number;
+  is_admin: number; // 0 or 1
+  avatar?: string;
+  gender?: string;
+  status?: string;
   created_at: string;
   last_active: string;
 }
@@ -46,6 +49,12 @@ export class AdminService {
 
   toggleAdmin(userId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/users/toggle-admin`, { userId });
+  }
+
+  getUserDetails(userId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/users/details`, {
+      params: { id: userId.toString() }
+    });
   }
 
   getStats(): Observable<any> {
