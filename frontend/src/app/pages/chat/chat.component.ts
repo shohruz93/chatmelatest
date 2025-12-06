@@ -321,6 +321,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 });
             }
         });
+
+        // Listen for translation results globally
+        this.socketService.onTranslationResult().subscribe((data: any) => {
+            const message = this.messages.find(m => m.id === data.messageId);
+            if (message) {
+                if (data.success) {
+                    message.translatedContent = data.translatedText;
+                    message.showTranslation = true;
+                } else {
+                    console.error('Translation failed:', data.error);
+                    // Optionally show error state on message
+                }
+                message.isTranslating = false;
+            }
+        });
     }
 
     sendRequest() {
@@ -583,25 +598,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             return;
         }
 
+        // Ensure we have an ID
+        if (!msg.id) {
+            console.error('Message has no ID, assigning temp ID');
+            msg.id = Date.now();
+        }
+
         msg.isTranslating = true;
         const targetLang = this.socketService.selectedLanguage() || 'en';
 
+        console.log(`[TRANSLATE] Requesting translation for msg ${msg.id} to ${targetLang}`);
+
         // Request translation from socket server
         this.socketService.emit('translate_message', {
+            messageId: msg.id,
             text: msg.content,
             targetLang
-        });
-
-        // Listen for translation result
-        const sub = this.socketService.onTranslationResult().subscribe((data: any) => {
-            if (data.success) {
-                msg.translatedContent = data.translatedText;
-                msg.showTranslation = true;
-            } else {
-                console.error('Translation failed:', data.error);
-            }
-            msg.isTranslating = false;
-            sub.unsubscribe(); // Clean up after receiving result
         });
     }
 

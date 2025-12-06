@@ -43,7 +43,21 @@
                 <div class="message-bubble glass-panel">
                     <!-- Text Message -->
                     @if (msg.messageType === 'text') {
-                    <p class="message-text">{{ msg.content }}</p>
+                    <div class="message-text-group">
+                        <p class="message-text">{{ msg.content }}</p>
+                        @if (msg.type !== 'sent') {
+                        <button class="btn-translate" (click)="translateMessage(msg)"
+                            [class.active]="msg.showTranslation"
+                            [title]="msg.showTranslation ? 'Hide translation' : 'Translate'">
+                            <span class="icon" [class.spinning]="msg.isTranslating">🌐</span>
+                        </button>
+                        }
+                    </div>
+                    @if (msg.showTranslation && msg.translatedContent) {
+                    <p class="message-translation">
+                        {{ msg.translatedContent }}
+                    </p>
+                    }
                     }
 
                     <!-- Image Message -->

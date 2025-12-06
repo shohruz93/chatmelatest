@@ -526,28 +526,47 @@ io.on('connection', (socket) => {
     });
 
     // Handle translation requests
-    socket.on('translate_message', async ({ text, targetLang }) => {
-        console.log(`[TRANSLATE] Request for text to ${targetLang}`);
+    socket.on('translate_message', async ({ messageId, text, targetLang }) => {
+        console.log(`[TRANSLATE] Request for message ${messageId} to ${targetLang}`);
         try {
-            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${targetLang}`);
+            // New Custom API
+            const url = `https://ftapi.pythonanywhere.com/translate?sl=auto&dl=${targetLang}&text=${encodeURIComponent(text)}`;
+            console.log('[TRANSLATE] Fetching URL:', url);
+
+            const response = await fetch(url);
             const data = await response.json();
 
-            if (data.responseStatus === 200 && data.responseData) {
+            console.log('[TRANSLATE] API Response:', JSON.stringify(data));
+
+            // Check for various response formats
+            let translatedText = null;
+            if (data['destination-text']) {
+                translatedText = data['destination-text'];
+            } else if (data.translatedText) {
+                translatedText = data.translatedText;
+            } else if (data.responseData && data.responseData.translatedText) {
+                translatedText = data.responseData.translatedText;
+            }
+
+            if (translatedText) {
                 socket.emit('translation_result', {
+                    messageId: messageId,
                     success: true,
-                    translatedText: data.responseData.translatedText
+                    translatedText: translatedText
                 });
             } else {
                 socket.emit('translation_result', {
+                    messageId: messageId,
                     success: false,
-                    error: 'Translation failed'
+                    error: 'Structure mismatch: ' + JSON.stringify(data)
                 });
             }
         } catch (error) {
             console.error('[TRANSLATE] Error:', error);
             socket.emit('translation_result', {
+                messageId: messageId,
                 success: false,
-                error: 'Translation service unavailable'
+                error: 'Translation service unavailable: ' + error.message
             });
         }
     });
