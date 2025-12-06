@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
     selector: 'app-conversations',
@@ -15,6 +16,7 @@ export class ConversationsComponent implements OnInit {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private router = inject(Router);
+    public socketService = inject(SocketService);
 
     conversations: any[] = [];
     loading = true;
