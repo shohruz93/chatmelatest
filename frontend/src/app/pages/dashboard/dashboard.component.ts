@@ -97,8 +97,10 @@ export class DashboardComponent implements OnInit {
             const senderId = message.senderId || message.sender_id;
 
             if (senderId !== this.currentUser.id) {
-                // Only increment if we are not currently in the chat with this user
-                if (this.router.url !== `/chat/${senderId}`) {
+                // Check if we are currently chatting with this user
+                const isChattingWithUser = this.router.url === `/dashboard/chat/${senderId}`;
+
+                if (!isChattingWithUser) {
                     this.unreadCount++;
                     this.socketService.playNotificationSound();
                 }

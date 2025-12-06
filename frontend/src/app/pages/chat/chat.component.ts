@@ -259,10 +259,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 // Mark as read immediately if we are in the room
                 this.markMessagesAsRead();
-            } else if (messageRoomId) {
-                // Message from another room - play sound
-                console.log('[NOTIFICATION] Message from another room:', messageRoomId);
-                this.socketService.playNotificationSound();
             }
         });
 
