@@ -264,6 +264,7 @@
     padding: 1.5rem;
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
+    position: relative;
 }
 
 .input-wrapper {

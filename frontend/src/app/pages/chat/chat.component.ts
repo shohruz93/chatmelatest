@@ -741,8 +741,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     sendSticker(sticker: string) {
-        this.sendMediaMessage(sticker, 'sticker');
-        this.showStickerPicker = false;
+        this.newMessage += sticker;
+        // this.showStickerPicker = false; // Keep open for multiple stickers
+        this.onInputChange(); // Trigger typing indicator or other input logic if needed
     }
 
     onTyping() {
