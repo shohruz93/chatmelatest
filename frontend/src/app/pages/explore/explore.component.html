@@ -127,6 +127,12 @@
           <!-- Location with Flag -->
           @if (user.location) {
           <div class="user-location">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="location-icon">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
             <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
               (error)="$event.target.style.display='none'" />
             <span>{{ getLocationLabel(user.location) }}</span>
@@ -155,14 +161,46 @@
           <div class="user-languages">
             @if (user.native_language) {
             <div class="language-tag">
-              <span class="tag-label">Native:</span>
-              <span>{{ getLanguagesDisplay(user.native_language) }}</span>
+              <span class="tag-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                  </path>
+                </svg>
+                Native
+              </span>
+              <div class="language-list">
+                @for (lang of getLanguagesArray(user.native_language); track lang) {
+                <span class="lang-item">
+                  <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag-icon"
+                    (error)="$event.target.style.display='none'" />
+                  {{ getLanguageLabel(lang) }}
+                </span>
+                }
+              </div>
             </div>
             }
             @if (user.learning_language) {
             <div class="language-tag">
-              <span class="tag-label">Learning:</span>
-              <span>{{ getLanguagesDisplay(user.learning_language) }}</span>
+              <span class="tag-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Learning
+              </span>
+              <div class="language-list">
+                @for (lang of getLanguagesArray(user.learning_language); track lang) {
+                <span class="lang-item">
+                  <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag-icon"
+                    (error)="$event.target.style.display='none'" />
+                  {{ getLanguageLabel(lang) }}
+                </span>
+                }
+              </div>
             </div>
             }
           </div>

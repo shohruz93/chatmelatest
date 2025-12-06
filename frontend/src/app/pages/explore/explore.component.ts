@@ -335,6 +335,35 @@ export class ExploreComponent implements OnInit, OnDestroy {
         return langArray.map(l => this.getLanguageLabel(l)).join(', ');
     }
 
+    getLanguagesArray(languages: string | string[]): string[] {
+        if (!languages) return [];
+        return Array.isArray(languages) ? languages : [languages];
+    }
+
+    // Map language codes to country codes for flags
+    private languageToCountry: { [key: string]: string } = {
+        'en': 'gb',
+        'es': 'es',
+        'fr': 'fr',
+        'de': 'de',
+        'ru': 'ru',
+        'zh': 'cn',
+        'ja': 'jp',
+        'ko': 'kr',
+        'ar': 'sa',
+        'pt': 'pt',
+        'hi': 'in',
+        'tg': 'tj',
+        'tr': 'tr',
+        'it': 'it'
+    };
+
+    getLanguageFlagUrl(langCode: string): string {
+        if (!langCode) return '';
+        const countryCode = this.languageToCountry[langCode.toLowerCase()] || langCode.toLowerCase();
+        return `/flags/${countryCode}.png`;
+    }
+
     getAvatarColor(name: string): string {
         const colors = [
             'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%)',
