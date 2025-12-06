@@ -106,6 +106,19 @@
             </div>
             }
 
+            @if (user.interests && user.interests.length > 0) {
+            <div class="section">
+                <h3 class="section-title">Interests</h3>
+                <div class="interests-grid">
+                    @for (interest of user.interests; track interest.id) {
+                    <div class="interest-chip">
+                        {{ interest.name }}
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
             <!-- Comments & Ratings Section -->
             @if (currentUser && currentUser.id !== user.id) {
             <div class="comments-section">

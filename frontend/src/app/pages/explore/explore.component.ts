@@ -17,6 +17,7 @@ interface UserProfile {
     native_language: string | string[];
     learning_language: string | string[];
     isOnline?: boolean;
+    interests?: { id: number; name: string }[];
 }
 
 @Component({

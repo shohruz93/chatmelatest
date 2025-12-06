@@ -109,6 +109,19 @@ class User {
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->execute();
         
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Fetch interests for each user
+        foreach ($users as &$user) {
+            $query = "SELECT i.id, i.name FROM interests i 
+                      JOIN user_interests ui ON i.id = ui.interest_id 
+                      WHERE ui.user_id = :user_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":user_id", $user['id']);
+            $stmt->execute();
+            $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return $users;
     }
 }
