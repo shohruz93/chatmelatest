@@ -42,6 +42,9 @@
             <a routerLink="guests" routerLinkActive="active" class="btn-messages">
                 <span class="btn-icon">👥</span>
                 <span>Guests</span>
+                @if (newGuestsCount > 0) {
+                <span class="badge">{{ newGuestsCount }}</span>
+                }
             </a>
 
             <!-- Admin Link -->

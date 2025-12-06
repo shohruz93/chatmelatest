@@ -34,6 +34,8 @@ export class GuestsComponent implements OnInit {
             next: (data) => {
                 this.guests = data;
                 this.loading = false;
+                // Mark guests as seen after loading
+                this.apiService.markGuestsAsSeen(this.currentUser.id).subscribe();
             },
             error: (error) => {
                 console.error('Error loading guests:', error);

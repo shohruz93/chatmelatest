@@ -36,6 +36,14 @@ export class ApiService {
         return this.http.get(`${this.apiUrl}/profile/guests?userId=${userId}`);
     }
 
+    getNewGuestsCount(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile/guests/new?userId=${userId}`);
+    }
+
+    markGuestsAsSeen(userId: number): Observable<any> {
+        return this.http.post(`${this.apiUrl}/profile/guests/seen`, { userId });
+    }
+
     // Comments & Ratings
     getComments(userId: number): Observable<any> {
         return this.http.get(`${this.apiUrl}/profile/comments?userId=${userId}`);

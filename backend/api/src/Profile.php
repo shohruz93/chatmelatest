@@ -219,9 +219,9 @@ class Profile {
     public function recordView($viewerId, $viewedId) {
         if ($viewerId == $viewedId) return;
 
-        $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at) 
-                  VALUES (:viewer_id, :viewed_id, NOW()) 
-                  ON DUPLICATE KEY UPDATE viewed_at = NOW()";
+        $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at, seen) 
+                  VALUES (:viewer_id, :viewed_id, NOW(), 0) 
+                  ON DUPLICATE KEY UPDATE viewed_at = NOW(), seen = 0";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":viewer_id", $viewerId);
         $stmt->bindParam(":viewed_id", $viewedId);
@@ -398,5 +398,22 @@ class Profile {
             http_response_code(500);
             echo json_encode(["message" => "Failed to add comment"]);
         }
+    }
+
+    public function getNewGuestsCount($userId) {
+        $query = "SELECT COUNT(*) as count FROM profile_views WHERE viewed_id = :user_id AND seen = 0";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode(["count" => (int)$result['count']]);
+    }
+
+    public function markGuestsAsSeen($userId) {
+        $query = "UPDATE profile_views SET seen = 1 WHERE viewed_id = :user_id AND seen = 0";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":user_id", $userId);
+        $stmt->execute();
+        echo json_encode(["message" => "Guests marked as seen"]);
     }
 }

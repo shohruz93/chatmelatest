@@ -24,6 +24,7 @@ export class DashboardComponent implements OnInit {
     currentUser = this.auth.currentUserValue;
     isDarkMode = signal(false);
     unreadCount = 0;
+    newGuestsCount = 0;
 
     userAvatar: string | null = null;
     userDisplayName: string = '';
@@ -77,10 +78,12 @@ export class DashboardComponent implements OnInit {
         }
 
         this.checkUnread();
+        this.checkNewGuests();
 
-        // Refresh unread count on navigation
+        // Refresh unread/guests count on navigation
         this.router.events.subscribe(() => {
             this.checkUnread();
+            this.checkNewGuests();
         });
 
         this.socketService.onMatchFound().subscribe(() => {
@@ -118,6 +121,17 @@ export class DashboardComponent implements OnInit {
                     this.unreadCount = total;
                 },
                 error: () => this.unreadCount = 0
+            });
+        }
+    }
+
+    checkNewGuests() {
+        if (this.currentUser) {
+            this.api.getNewGuestsCount(this.currentUser.id).subscribe({
+                next: (data: any) => {
+                    this.newGuestsCount = data.count || 0;
+                },
+                error: () => this.newGuestsCount = 0
             });
         }
     }

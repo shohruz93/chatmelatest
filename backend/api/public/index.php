@@ -74,6 +74,17 @@ $router->add('GET', '/profile/guests', function() use ($profile) {
     $profile->getGuests($userId);
 });
 
+$router->add('GET', '/profile/guests/new', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getNewGuestsCount($userId);
+});
+
+$router->add('POST', '/profile/guests/seen', function() use ($profile) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $userId = $data['userId'] ?? 0;
+    $profile->markGuestsAsSeen($userId);
+});
+
 $router->add('GET', '/profile/comments', function() use ($profile) {
     $userId = $_GET['userId'] ?? 0;
     $profile->getComments($userId);
