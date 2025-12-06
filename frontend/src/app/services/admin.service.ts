@@ -22,7 +22,7 @@ export interface GetUsersResponse {
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://localhost/api';
+  private apiUrl = 'http://localhost:8000';
 
   constructor(private http: HttpClient) { }
 
