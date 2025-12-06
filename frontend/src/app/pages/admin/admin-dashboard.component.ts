@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../services/admin.service';
+import { SocketService } from '../../services/socket.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -29,7 +30,6 @@ import { Observable } from 'rxjs';
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
-                <!-- Optional trend indicator -->
             </div>
             <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Users</h3>
             <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ stats.total_users }}</p>
@@ -65,7 +65,7 @@ import { Observable } from 'rxjs';
                 </div>
             </div>
             <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Online Now</h3>
-            <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ stats.online_users }}</p>
+            <p class="text-3xl font-bold text-gray-800 dark:text-white mt-1">{{ socketService.onlineUsers().size }}</p>
             <p class="text-sm text-gray-400 mt-2">currently browsing</p>
         </div>
 
@@ -103,7 +103,7 @@ import { Observable } from 'rxjs';
                         <span class="font-bold text-gray-800 dark:text-white">{{item.count}}</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                        <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="(item.count / stats.total_users) * 100"></div>
+                         <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="(item.count / stats.total_users) * 100"></div>
                     </div>
                 </div>
              </div>
@@ -115,7 +115,10 @@ import { Observable } from 'rxjs';
 export class AdminDashboardComponent implements OnInit {
     stats$!: Observable<any>;
 
-    constructor(private adminService: AdminService) { }
+    constructor(
+        private adminService: AdminService,
+        public socketService: SocketService
+    ) { }
 
     ngOnInit() {
         this.stats$ = this.adminService.getStats();
