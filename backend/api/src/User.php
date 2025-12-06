@@ -124,4 +124,11 @@ class User {
 
         return $users;
     }
+
+    public function getAdminUser() {
+        $query = "SELECT id, name, avatar FROM " . $this->table_name . " WHERE is_admin = 1 LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

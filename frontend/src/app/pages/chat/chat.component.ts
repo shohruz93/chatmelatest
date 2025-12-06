@@ -114,6 +114,65 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     retryMessage: string = '';
     currentMatchId: number | null = null;
 
+    // Language mapping based on country codes
+    // Language mapping based on country names (matches ProfileComponent)
+    countryLanguageMap: { [key: string]: string } = {
+        'United Kingdom': 'en', 'United States': 'en', 'Australia': 'en', 'Canada': 'en', 'New Zealand': 'en',
+        'Tajikistan': 'tg',
+        'Russia': 'ru',
+        'Spain': 'es', 'Mexico': 'es', 'Argentina': 'es', 'Colombia': 'es',
+        'France': 'fr',
+        'Germany': 'de',
+        'Italy': 'it',
+        'Portugal': 'pt', 'Brazil': 'pt',
+        'Saudi Arabia': 'ar', 'United Arab Emirates': 'ar', 'Egypt': 'ar',
+        'China': 'zh',
+        'Japan': 'ja',
+        'South Korea': 'ko',
+        'India': 'hi',
+        'Turkey': 'tr',
+        'Poland': 'pl',
+        'Ukraine': 'uk',
+        'Vietnam': 'vi',
+        'Thailand': 'th',
+        'Indonesia': 'id',
+        'Netherlands': 'nl',
+        'Sweden': 'sv',
+        'Greece': 'el',
+        'Israel': 'he',
+        'Czech Republic': 'cs', 'Czechia': 'cs',
+        'Romania': 'ro',
+        'Hungary': 'hu',
+        'Iran': 'fa',
+        'Bangladesh': 'bn',
+        'Malaysia': 'ms',
+        'Philippines': 'fil',
+        'Denmark': 'da',
+        'Finland': 'fi',
+        'Norway': 'no',
+        'Slovakia': 'sk',
+        'Bulgaria': 'bg',
+        'Croatia': 'hr',
+        'Serbia': 'sr',
+        'Slovenia': 'sl',
+        'Lithuania': 'lt',
+        'Latvia': 'lv',
+        'Estonia': 'et',
+        'Georgia': 'ka',
+        'Armenia': 'hy',
+        'Azerbaijan': 'az',
+        'Kazakhstan': 'kk',
+        'Uzbekistan': 'uz',
+        'Kyrgyzstan': 'ky',
+        'Mongolia': 'mn',
+        'Nepal': 'ne',
+        'Sri Lanka': 'si',
+        'Pakistan': 'ur',
+        'Tanzania': 'sw',
+        'South Africa': 'af',
+        'Ethiopia': 'am'
+    };
+
     ngOnInit() {
         // Initialize current user from localStorage
         const userStr = localStorage.getItem('user');
@@ -605,9 +664,27 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         msg.isTranslating = true;
-        const targetLang = this.socketService.selectedLanguage() || 'en';
 
-        console.log(`[TRANSLATE] Requesting translation for msg ${msg.id} to ${targetLang}`);
+        // Determine target language from user location
+        let targetLang = 'en'; // Default
+        if (this.currentUser && this.currentUser.location) {
+            // Profile stores full country name (e.g. "Tajikistan", "Iran")
+            const userLocation = this.currentUser.location;
+
+            // Direct lookup
+            if (this.countryLanguageMap[userLocation]) {
+                targetLang = this.countryLanguageMap[userLocation];
+            } else {
+                // Try case-insensitive lookup if direct failed
+                const upperLoc = userLocation.toUpperCase();
+                const matchedKey = Object.keys(this.countryLanguageMap).find(k => k.toUpperCase() === upperLoc);
+                if (matchedKey) {
+                    targetLang = this.countryLanguageMap[matchedKey];
+                }
+            }
+        }
+
+        console.log(`[TRANSLATE] Requesting translation for msg ${msg.id} to ${targetLang} (User Loc: ${this.currentUser?.location})`);
 
         // Request translation from socket server
         this.socketService.emit('translate_message', {

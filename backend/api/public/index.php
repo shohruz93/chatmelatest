@@ -253,6 +253,24 @@ $router->add('GET', '/admin/users/details', function() use ($adminController) {
     $adminController->getUserDetails();
 });
 
+$router->add('POST', '/admin/support/conversations', function() use ($adminController) {
+    $adminController->getSupportConversations();
+});
+
+$router->add('GET', '/support/admin-contact', function() use ($db) {
+    // Quick inline logic or move to controller
+    $query = "SELECT id, name, avatar FROM users WHERE is_admin = 1 LIMIT 1";
+    $stmt = $db->prepare($query);
+    $stmt->execute();
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($admin) {
+        echo json_encode($admin);
+    } else {
+        http_response_code(404);
+        echo json_encode(['error' => 'No admin available']);
+    }
+});
+
 // Test Route
 $router->add('GET', '/', function() {
     echo json_encode(["message" => "Welcome to Chatme API"]);

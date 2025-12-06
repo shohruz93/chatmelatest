@@ -49,6 +49,10 @@ export class ApiService {
         return this.http.get(`${this.apiUrl}/profile/comments?userId=${userId}`);
     }
 
+    getAdminContact(): Observable<any> {
+        return this.http.get(`${this.apiUrl}/support/admin-contact`);
+    }
+
     addReply(ratingId: number, userId: number, content: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/profile/comment/reply`, { ratingId, userId, content });
     }

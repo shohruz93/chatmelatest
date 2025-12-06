@@ -138,6 +138,24 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    contactAdmin() {
+        this.api.getAdminContact().subscribe({
+            next: (admin: any) => {
+                if (admin && admin.id) {
+                    this.router.navigate(['/dashboard/chat', admin.id]);
+                    // If on mobile sidebar, close it
+                    if (window.innerWidth < 1024) {
+                        this.ui.sidebarOpen.set(false);
+                    }
+                }
+            },
+            error: (err) => {
+                console.error('Failed to get admin contact', err);
+                alert('Support is currently unavailable.');
+            }
+        });
+    }
+
     findMatch() {
         if (this.socketService.isSearching()) return;
         this.showFilterModal = true;

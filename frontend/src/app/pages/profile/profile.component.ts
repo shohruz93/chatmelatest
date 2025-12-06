@@ -293,12 +293,26 @@ export class ProfileComponent implements OnInit {
                 this.selectedFile = null;
                 this.previewUrl = null;
 
+                let avatarUrl = this.currentUser.avatar;
                 if (res.avatar) {
-                    const avatarUrl = 'http://localhost:8000' + res.avatar;
+                    avatarUrl = 'http://localhost:8000' + res.avatar;
                     this.currentUser.avatar = avatarUrl;
-                    // Update auth service to persist the avatar in localStorage
-                    this.auth.updateUser({ avatar: avatarUrl });
                 }
+
+                // Update auth service to persist ALL changes in localStorage
+                const updatedUser = {
+                    ...this.currentUser,
+                    name: this.userName,
+                    bio: this.bio,
+                    gender: this.gender,
+                    location: this.location,
+                    native_language: this.nativeLanguages.join(','),
+                    learning_language: this.learningLanguages.join(','),
+                    interests: this.interests,
+                    avatar: avatarUrl
+                };
+
+                this.auth.updateUser(updatedUser);
 
                 this.loadProfile(this.currentUser.id);
                 alert('Profile updated successfully!');

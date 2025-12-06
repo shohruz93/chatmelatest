@@ -228,5 +228,59 @@ class AdminController {
 
         echo json_encode($userProfile);
     }
+
+    public function getSupportConversations() {
+        $data = json_decode(file_get_contents("php://input"));
+        $adminId = isset($data->adminId) ? $data->adminId : null;
+
+        if (!$adminId) {
+            // Try to find admin ID if not provided
+            $adminUser = $this->user->getAdminUser();
+            if ($adminUser) {
+                $adminId = $adminUser['id'];
+            } else {
+                 http_response_code(404);
+                 echo json_encode(['error' => 'No admin found']);
+                 return;
+            }
+        }
+
+        // Get recent conversations for this admin
+        // We want the user details and the last message
+        $query = "
+            SELECT 
+                u.id as user_id, 
+                u.name, 
+                u.avatar, 
+                u.email,
+                m.content as last_message,
+                m.created_at as last_message_time,
+                (SELECT COUNT(*) FROM messages m2 WHERE m2.sender_id = u.id AND m2.receiver_id = :admin_id AND m2.is_read = 0) as unread_count
+            FROM users u
+            JOIN (
+                SELECT 
+                    CASE 
+                        WHEN sender_id = :admin_id THEN receiver_id 
+                        ELSE sender_id 
+                    END as other_user_id,
+                    MAX(created_at) as max_created_at
+                FROM messages
+                WHERE sender_id = :admin_id OR receiver_id = :admin_id
+                GROUP BY other_user_id
+            ) latest_msg ON u.id = latest_msg.other_user_id
+            JOIN messages m ON (
+                (m.sender_id = :admin_id AND m.receiver_id = u.id) OR 
+                (m.sender_id = u.id AND m.receiver_id = :admin_id)
+            ) AND m.created_at = latest_msg.max_created_at
+            ORDER BY m.created_at DESC
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':admin_id', $adminId);
+        $stmt->execute();
+        $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode($conversations);
+    }
 }
 
