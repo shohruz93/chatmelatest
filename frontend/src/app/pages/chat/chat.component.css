@@ -330,6 +330,7 @@
     font-size: 1.2rem;
     display: block;
     line-height: 1;
+    transform: rotate(-90deg);
 }
 
 .translation-indicator {
