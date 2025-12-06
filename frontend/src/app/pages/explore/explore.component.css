@@ -376,6 +376,51 @@
     flex-shrink: 0;
 }
 
+/* User Meta Row (Location + Gender) */
+.user-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.user-location,
+.user-detail {
+    margin-bottom: 0;
+}
+
+.meta-divider {
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+}
+
+/* Interests Preview */
+.user-interests-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.5rem 0 1rem;
+}
+
+.interest-pill {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.interest-more {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+}
+
 .language-list {
     display: flex;
     flex-wrap: wrap;

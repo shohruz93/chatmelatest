@@ -124,36 +124,50 @@
         <div class="user-info">
           <h3 class="user-name">{{ user.name }}</h3>
 
-          <!-- Location with Flag -->
-          @if (user.location) {
-          <div class="user-location">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="location-icon">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
-              (error)="$event.target.style.display='none'" />
-            <span>{{ getLocationLabel(user.location) }}</span>
-          </div>
-          }
+          <!-- Location & Gender (Inline) -->
+          <div class="user-meta-row">
+            @if (user.location) {
+            <div class="user-location">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="location-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
+                (error)="$event.target.style.display='none'" />
+              <span>{{ getLocationLabel(user.location) }}</span>
+            </div>
+            }
 
-          <!-- Gender -->
-          @if (user.gender) {
-          <div class="user-detail">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>{{ user.gender }}</span>
+            @if (user.gender) {
+            <div class="meta-divider">•</div>
+            <div class="user-detail">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>{{ user.gender }}</span>
+            </div>
+            }
           </div>
-          }
 
           <!-- Bio -->
           @if (user.bio) {
           <p class="user-bio">{{ user.bio }}</p>
+          }
+
+          <!-- Interests -->
+          @if (user.interests && user.interests.length > 0) {
+          <div class="user-interests-preview">
+            @for (interest of user.interests.slice(0, 3); track interest.id) {
+            <span class="interest-pill">{{ interest.name }}</span>
+            }
+            @if (user.interests.length > 3) {
+            <span class="interest-more">+{{ user.interests.length - 3 }}</span>
+            }
+          </div>
           }
 
           <!-- Languages -->
