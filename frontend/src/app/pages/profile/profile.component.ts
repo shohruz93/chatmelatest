@@ -190,8 +190,17 @@ export class ProfileComponent implements OnInit {
         this.api.getComments(userId).subscribe({
             next: (data) => {
                 this.comments = data;
+                this.comments.map(comment => {
+                    comment.rater_avatar = `${this.api.phpBaseUrl}${comment.rater_avatar}`;
+                    comment.replies?.map((reply: any) => {
+                        reply.replier_avatar = `${this.api.phpBaseUrl}${reply.replier_avatar}`;
+                        return reply;
+                    })
+                })
+                
                 // Check if current user has already rated this profile
                 if (this.currentUser) {
+                   
                     this.hasRated = this.comments.some(
                         c => c.rater_id === this.currentUser.id && c.rating !== null && c.rating > 0
                     );

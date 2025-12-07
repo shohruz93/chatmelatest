@@ -44,9 +44,29 @@ export class UserProfileModalComponent implements OnInit {
         { value: 'ar', label: 'Arabic' },
         { value: 'pt', label: 'Portuguese' },
         { value: 'hi', label: 'Hindi' },
-        { value: 'tg', label: 'Tajik' },
+        { value: 'tj', label: 'Tajik' },
         { value: 'tr', label: 'Turkish' },
-        { value: 'it', label: 'Italian' }
+        { value: 'it', label: 'Italian' },
+        { value: 'fa', label: 'Persian' },
+        { value: 'tg', label: 'Tajik' },
+        { value: 'he', label: 'Hebrew' },
+        { value: 'cs', label: 'Czech' },
+        { value: 'ro', label: 'Romanian' },
+        { value: 'hu', label: 'Hungarian' },
+        { value: 'el', label: 'Greek' },
+        { value: 'hr', label: 'Croatian' },
+        { value: 'sr', label: 'Serbian' },
+        { value: 'sl', label: 'Slovenian' },
+        { value: 'lt', label: 'Lithuanian' },
+        { value: 'lv', label: 'Latvian' },
+        { value: 'et', label: 'Estonian' },
+        { value: 'ka', label: 'Georgian' },
+        { value: 'hy', label: 'Armenian' },
+        { value: 'az', label: 'Azerbaijani' },
+        { value: 'kk', label: 'Kazakh' },
+        { value: 'uz', label: 'Uzbek' },
+        { value: 'ky', label: 'Kyrgyz' }
+
     ];
 
     locationOptions = [
@@ -67,7 +87,52 @@ export class UserProfileModalComponent implements OnInit {
         { value: 'ES', label: 'Spain' },
         { value: 'IT', label: 'Italy' },
         { value: 'CA', label: 'Canada' },
-        { value: 'AU', label: 'Australia' }
+        { value: 'AU', label: 'Australia' },
+        { value: 'CH', label: 'Switzerland' },
+        { value: 'NL', label: 'Netherlands' },
+        { value: 'BE', label: 'Belgium' },
+        { value: 'SE', label: 'Sweden' },
+        { value: 'NO', label: 'Norway' },
+        { value: 'DK', label: 'Denmark' },
+        { value: 'FI', label: 'Finland' },
+        { value: 'PL', label: 'Poland' },
+        { value: 'PT', label: 'Portugal' },
+        { value: 'GR', label: 'Greece' },
+        { value: 'AT', label: 'Austria' },
+        { value: 'CZ', label: 'Czech Republic' },
+        { value: 'IE', label: 'Ireland' },
+        { value: 'NZ', label: 'New Zealand' },
+        { value: 'SG', label: 'Singapore' },
+        { value: 'MY', label: 'Malaysia' },
+        { value: 'TH', label: 'Thailand' },
+        { value: 'VN', label: 'Vietnam' },
+        { value: 'PH', label: 'Philippines' },
+        { value: 'ID', label: 'Indonesia' },
+        { value: 'PK', label: 'Pakistan' },
+        { value: 'BD', label: 'Bangladesh' },
+        { value: 'EG', label: 'Egypt' },
+        { value: 'ZA', label: 'South Africa' },
+        { value: 'NG', label: 'Nigeria' },
+        { value: 'KE', label: 'Kenya' },
+        { value: 'AR', label: 'Argentina' },
+        { value: 'CL', label: 'Chile' },
+        { value: 'CO', label: 'Colombia' },
+        { value: 'PE', label: 'Peru' },
+        { value: 'VE', label: 'Venezuela' },
+        { value: 'UA', label: 'Ukraine' },
+        { value: 'RO', label: 'Romania' },
+        { value: 'HU', label: 'Hungary' },
+        { value: 'IL', label: 'Israel' },
+        { value: 'SA', label: 'Saudi Arabia' },
+        { value: 'AE', label: 'United Arab Emirates' },
+        { value: 'IR', label: 'Iran' },
+        { value: 'IQ', label: 'Iraq' },
+        { value: 'SY', label: 'Syria' },
+        { value: 'LB', label: 'Lebanon' },
+        { value: 'JO', label: 'Jordan' },
+        { value: 'MA', label: 'Morocco' },
+        { value: 'TN', label: 'Tunisia' },
+        { value: 'DZ', label: 'Algeria' }
     ];
 
     close() {
@@ -75,7 +140,7 @@ export class UserProfileModalComponent implements OnInit {
     }
 
     sendMessage() {
-        this.router.navigate(['/chat', this.user.id]);
+        this.router.navigate(['dashboard/chat', this.user.id]);
         this.close();
     }
 
@@ -91,8 +156,15 @@ export class UserProfileModalComponent implements OnInit {
 
     // Map country names to ISO 2-letter codes
     private countryNameToCode: { [key: string]: string } = {
-        'united states': 'us', 'united kingdom': 'gb', 'russia': 'ru', 'tajikistan': 'tj',
-        'germany': 'de', 'france': 'fr', 'turkey': 'tr', 'china': 'cn', 'japan': 'jp',
+        'united states': 'us',
+        'united kingdom': 'gb',
+        'russia': 'ru',
+        'tajikistan': 'tj',
+        'germany': 'de',
+        'france': 'fr',
+        'turkey': 'tr',
+        'china': 'cn',
+        'japan': 'jp',
         'south korea': 'kr', 'korea': 'kr', 'india': 'in', 'brazil': 'br', 'mexico': 'mx',
         'spain': 'es', 'italy': 'it', 'canada': 'ca', 'australia': 'au', 'switzerland': 'ch',
         'netherlands': 'nl', 'belgium': 'be', 'sweden': 'se', 'norway': 'no', 'denmark': 'dk',
@@ -103,7 +175,8 @@ export class UserProfileModalComponent implements OnInit {
         'south africa': 'za', 'nigeria': 'ng', 'kenya': 'ke', 'argentina': 'ar',
         'chile': 'cl', 'colombia': 'co', 'peru': 'pe', 'venezuela': 've', 'ukraine': 'ua',
         'romania': 'ro', 'hungary': 'hu', 'israel': 'il', 'saudi arabia': 'sa',
-        'uae': 'ae', 'united arab emirates': 'ae'
+        'uae': 'ae', 'united arab emirates': 'ae', 'iran': 'ir', 'iraq': 'iq', 'syria': 'sy',
+        'lebanon': 'lb', 'jordan': 'jo', 'morocco': 'ma', 'tunisia': 'tn', 'algeria': 'dz'
     };
 
     getFlagIcon(location: string): string {
@@ -166,9 +239,21 @@ export class UserProfileModalComponent implements OnInit {
 
     // Map language codes to country codes for flags
     private languageToCountry: { [key: string]: string } = {
-        'en': 'gb', 'es': 'es', 'fr': 'fr', 'de': 'de', 'ru': 'ru',
-        'zh': 'cn', 'ja': 'jp', 'ko': 'kr', 'ar': 'sa', 'pt': 'pt',
-        'hi': 'in', 'tg': 'tj', 'tr': 'tr', 'it': 'it'
+        'en': 'gb',
+        'es': 'es',
+        'fr': 'fr',
+        'de': 'de',
+        'ru': 'ru',
+        'zh': 'cn',
+        'ja': 'jp',
+        'ko': 'kr',
+        'ar': 'sa',
+        'pt': 'pt',
+        'hi': 'in',
+        'tg': 'tj',
+        'tr': 'tr',
+        'it': 'it',
+        'fa': 'ir'
     };
 
     getLanguageFlagUrl(langCode: string): string {
@@ -212,6 +297,15 @@ export class UserProfileModalComponent implements OnInit {
         this.api.getComments(this.user.id).subscribe({
             next: (data) => {
                 this.comments = data;
+                this.comments.map(comment => {
+                    comment.rater_avatar = `${this.api.phpBaseUrl}${comment.rater_avatar}`;
+                    comment.replies?.map((reply: any) => {
+                        reply.replier_avatar = `${this.api.phpBaseUrl}${reply.replier_avatar}`;
+                        return reply;
+                    });
+                    return comment;
+                });
+
 
                 // Check if current user has already rated
                 if (this.currentUser) {

@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
 
             // Use advanced compatibility matching
             const response = await fetch(
-                `http://localhost:8000/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`
+                `https://shphbjeio23.chatme.tj/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`
             );
             const compatibleUsers = await response.json();
 
@@ -221,7 +221,7 @@ io.on('connection', (socket) => {
     // Check mutual compatibility
     async function checkMutualCompatibility(userId1, userId2) {
         try {
-            const response = await fetch(`http://localhost:8000/match/compatible?userId=${userId2}&limit=20`);
+            const response = await fetch(`https://shphbjeio23.chatme.tj/match/compatible?userId=${userId2}&limit=20`);
             const matches = await response.json();
 
             // Check if userId1 is in userId2's compatible matches
@@ -248,7 +248,7 @@ io.on('connection', (socket) => {
     // Record match history
     async function recordMatchHistory(user1Id, user2Id, score, reasons) {
         try {
-            await fetch('http://localhost:8000/match/history', {
+            await fetch('https://shphbjeio23.chatme.tj/match/history', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -405,7 +405,7 @@ io.on('connection', (socket) => {
 
         // Save message via PHP API
         try {
-            const response = await fetch('http://localhost:8000/messages', {
+            const response = await fetch('https://shphbjeio23.chatme.tj/messages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -435,7 +435,7 @@ io.on('connection', (socket) => {
 
     socket.on('load_messages', async ({ roomId, limit = 50, offset = 0 }) => {
         try {
-            const response = await fetch(`http://localhost:8000/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`);
+            const response = await fetch(`https://shphbjeio23.chatme.tj/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`);
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
@@ -477,8 +477,8 @@ io.on('connection', (socket) => {
 
             // Fetch profiles
             const [profile1Res, profile2Res] = await Promise.all([
-                fetch(`http://localhost:8000/profile?userId=${user1}`),
-                fetch(`http://localhost:8000/profile?userId=${user2}`)
+                fetch(`https://shphbjeio23.chatme.tj/profile?userId=${user1}`),
+                fetch(`https://shphbjeio23.chatme.tj/profile?userId=${user2}`)
             ]);
 
             const profile1 = await profile1Res.json();
@@ -500,7 +500,7 @@ io.on('connection', (socket) => {
 
         try {
             // Call PHP API to mark messages as read
-            const response = await fetch('http://localhost:8000/conversations/read', {
+            const response = await fetch('https://shphbjeio23.chatme.tj/conversations/read', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
