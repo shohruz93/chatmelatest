@@ -32,7 +32,12 @@ export class GuestsComponent implements OnInit {
         this.loading = true;
         this.apiService.getGuests(this.currentUser.id).subscribe({
             next: (data) => {
-                this.guests = data;
+                this.guests = data.map((guest: any) => {
+                    if (guest.avatar && !guest.avatar.startsWith('http')) {
+                        guest.avatar = `${this.apiService.phpBaseUrl}${guest.avatar}`;
+                    }
+                    return guest;
+                });
                 this.loading = false;
                 // Mark guests as seen after loading
                 this.apiService.markGuestsAsSeen(this.currentUser.id).subscribe();

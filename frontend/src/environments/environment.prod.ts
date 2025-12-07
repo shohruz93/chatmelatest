@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    phpBaseUrl: 'http://your-production-php-url.com',
+    phpBaseUrl: 'https://shphbjeio23.chatme.tj',
     nodeBaseUrl: 'http://your-production-node-url.com',
     firebase: {
         apiKey: "AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE",

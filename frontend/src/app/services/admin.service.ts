@@ -26,7 +26,7 @@ export interface GetUsersResponse {
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = environment.phpBaseUrl;
+  public apiUrl = environment.phpBaseUrl;
 
   constructor(private http: HttpClient) { }
 

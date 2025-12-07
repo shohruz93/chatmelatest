@@ -167,7 +167,7 @@ export class ProfileComponent implements OnInit {
                     if (data.avatar.startsWith('http')) {
                         this.profileUser.avatar = data.avatar;
                     } else {
-                        this.profileUser.avatar = `http://localhost:8000${data.avatar}`;
+                        this.profileUser.avatar = `${this.api.phpBaseUrl}${data.avatar}`;
                     }
                 }
 
@@ -295,7 +295,7 @@ export class ProfileComponent implements OnInit {
 
                 let avatarUrl = this.currentUser.avatar;
                 if (res.avatar) {
-                    avatarUrl = 'http://localhost:8000' + res.avatar;
+                    avatarUrl = this.api.phpBaseUrl + res.avatar;
                     this.currentUser.avatar = avatarUrl;
                 }
 

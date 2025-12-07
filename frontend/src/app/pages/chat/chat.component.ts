@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
-import { Subscription } from 'rxjs';
+import { ApiService } from '../../services/api.service';
+import { Subscription, lastValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../services/translation.service';
 
@@ -22,6 +23,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private auth = inject(AuthService);
     private route = inject(ActivatedRoute);
     private translationService = inject(TranslationService);
+    private api = inject(ApiService);
 
     messages: any[] = [];
     newMessage: string = '';
@@ -275,7 +277,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                     // Normalize avatar URL
                     if (partnerProfile.avatar && !partnerProfile.avatar.startsWith('http')) {
-                        partnerProfile.avatar = `http://localhost:8000${partnerProfile.avatar}`;
+                        partnerProfile.avatar = `${this.api.phpBaseUrl}${partnerProfile.avatar}`;
                     }
 
                     this.partner = partnerProfile;
@@ -358,7 +360,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 // Normalize avatar
                 if (data.user.avatar && !data.user.avatar.startsWith('http')) {
-                    data.user.avatar = `http://localhost:8000${data.user.avatar}`;
+                    data.user.avatar = `${this.api.phpBaseUrl}${data.user.avatar}`;
                 }
 
                 this.foundUser = data.user;
@@ -726,20 +728,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         try {
-            const response = await fetch('http://localhost:8000/profile/rating', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    raterId: this.currentUser.id,
-                    ratedId: this.partnerIdToRate,
-                    rating: this.selectedRating,
-                    comment: this.ratingComment
-                })
-            });
-
-            if (response.ok) {
-                console.log('Rating submitted successfully');
-            }
+            await lastValueFrom(this.api.post('/profile/rating', {
+                raterId: this.currentUser.id,
+                ratedId: this.partnerIdToRate,
+                rating: this.selectedRating,
+                comment: this.ratingComment
+            }));
+            console.log('Rating submitted successfully');
         } catch (error) {
             console.error('Error submitting rating:', error);
         }

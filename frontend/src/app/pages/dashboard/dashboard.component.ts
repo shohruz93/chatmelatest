@@ -69,7 +69,7 @@ export class DashboardComponent implements OnInit {
 
             // Normalize avatar URL if it's a relative path
             if (avatar && !avatar.startsWith('http')) {
-                avatar = `http://localhost:8000${avatar}`;
+                avatar = `${this.api.phpBaseUrl}${avatar}`;
             }
 
             this.userAvatar = avatar;

@@ -285,7 +285,7 @@ export class AdminUsersComponent implements OnInit {
    getAvatarUrl(path: string | undefined): string {
       if (!path) return '';
       if (path.startsWith('http')) return path;
-      return `http://localhost:8000/${path}`;
+      return `${this.adminService.apiUrl}/${path}`;
    }
 
    viewUser(user: any) {

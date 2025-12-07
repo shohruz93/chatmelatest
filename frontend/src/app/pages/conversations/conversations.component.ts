@@ -40,7 +40,7 @@ export class ConversationsComponent implements OnInit {
                 // Normalize avatar URLs
                 this.conversations = data.map((conv: any) => {
                     if (conv.partner_avatar && !conv.partner_avatar.startsWith('http')) {
-                        conv.partner_avatar = `http://localhost:8000${conv.partner_avatar}`;
+                        conv.partner_avatar = `${this.api.phpBaseUrl}${conv.partner_avatar}`;
                     }
                     return conv;
                 });

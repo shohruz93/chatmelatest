@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
-    phpBaseUrl: 'http://localhost:8000',
+    phpBaseUrl: 'https://shphbjeio23.chatme.tj',
     nodeBaseUrl: 'http://localhost:3001',
     firebase: {
         apiKey: "AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE",

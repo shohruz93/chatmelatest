@@ -157,12 +157,12 @@ export class SupportChatComponent implements OnInit {
   }
 
   loadConversations() {
-    this.http.post<any[]>('http://localhost:8000/admin/support/conversations', { adminId: this.currentUser.id })
+    this.apiService.post('/admin/support/conversations', { adminId: this.currentUser.id })
       .subscribe({
         next: (data: any[]) => {
           this.conversations = data.map((conv: any) => {
             if (conv.avatar && !conv.avatar.startsWith('http')) {
-              conv.avatar = `http://localhost:8000${conv.avatar}`;
+              conv.avatar = `${this.apiService.phpBaseUrl}${conv.avatar}`;
             }
             return conv;
           });
@@ -196,7 +196,7 @@ export class SupportChatComponent implements OnInit {
   selectUser(user: any) {
     // Avatar fix
     if (user.avatar && !user.avatar.startsWith('http')) {
-      user.avatar = `http://localhost:8000${user.avatar}`;
+      user.avatar = `${this.apiService.phpBaseUrl}${user.avatar}`;
     }
     this.selectedUser = user;
     this.messages = [];

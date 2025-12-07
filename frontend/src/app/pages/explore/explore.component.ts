@@ -2,8 +2,10 @@ import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { lastValueFrom } from 'rxjs';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
+import { ApiService } from '../../services/api.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 
 interface UserProfile {
@@ -31,6 +33,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     private router = inject(Router);
     private socketService = inject(SocketService);
     private auth = inject(AuthService);
+    private api = inject(ApiService);
 
     users: UserProfile[] = [];
     filteredUsers: UserProfile[] = [];
@@ -139,19 +142,18 @@ export class ExploreComponent implements OnInit, OnDestroy {
     async loadUsers() {
         this.isLoading.set(true);
         try {
-            const params = new URLSearchParams({
+            const params = {
                 userId: this.currentUser?.id?.toString() || '0',
                 limit: '50'
-            });
+            };
 
-            const response = await fetch(`http://localhost:8000/users/random?${params}`);
-            const users = await response.json();
+            const users = await lastValueFrom(this.api.get('/users/random', params));
 
             // Normalize user data
             this.users = users.map((user: any) => {
                 // Normalize avatar URL
                 if (user.avatar && !user.avatar.startsWith('http')) {
-                    user.avatar = `http://localhost:8000${user.avatar}`;
+                    user.avatar = `${this.api.phpBaseUrl}${user.avatar}`;
                 }
 
                 // Parse languages if they're strings

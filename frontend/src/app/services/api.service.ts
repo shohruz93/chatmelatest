@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class ApiService {
     private apiUrl = environment.phpBaseUrl;
+    public phpBaseUrl = environment.phpBaseUrl;
 
     constructor(private http: HttpClient) { }
 
