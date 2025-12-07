@@ -1,7 +1,7 @@
 export const environment = {
     production: true,
     phpBaseUrl: 'https://shphbjeio23.chatme.tj',
-    nodeBaseUrl: 'http://your-production-node-url.com',
+    nodeBaseUrl: 'https://chatme-vercel-b.vercel.app',
     firebase: {
         apiKey: "AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE",
         authDomain: "chatme-f1d8a.firebaseapp.com",
