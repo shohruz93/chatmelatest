@@ -241,8 +241,8 @@ class Profile {
 
         // Fix guest avatar URLs
         foreach ($guests as &$guest) {
-            if ($guest['avatar'] && !str_starts_with($guest['avatar'], 'http')) {
-                $guest['avatar'] = 'http://localhost:8000' . $guest['avatar'];
+            if ($guest['avatar']) {
+                $guest['avatar'] = $guest['avatar'];
             }
         }
 
@@ -265,8 +265,8 @@ class Profile {
         // For each comment, get replies and likes
         foreach ($comments as &$comment) {
             // Fix rater avatar URL
-            if ($comment['rater_avatar'] && !str_starts_with($comment['rater_avatar'], 'http')) {
-                $comment['rater_avatar'] = 'http://localhost:8000' . $comment['rater_avatar'];
+            if ($comment['rater_avatar']) {
+                $comment['rater_avatar'] = $comment['rater_avatar'];
             }
 
             // Get replies
@@ -282,8 +282,8 @@ class Profile {
 
             // Fix replier avatar URLs
             foreach ($replies as &$reply) {
-                if ($reply['replier_avatar'] && !str_starts_with($reply['replier_avatar'], 'http')) {
-                    $reply['replier_avatar'] = 'http://localhost:8000' . $reply['replier_avatar'];
+                if ($reply['replier_avatar']) {
+                    $reply['replier_avatar'] = $reply['replier_avatar'];
                 }
             }
             $comment['replies'] = $replies;
