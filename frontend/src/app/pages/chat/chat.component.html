@@ -228,11 +228,8 @@
                 </div>
                 <div class="form-group">
                     <label>Location</label>
-                    <select [(ngModel)]="filterLocation" class="form-select">
-                        @for (opt of locationOptions; track opt.value) {
-                        <option [value]="opt.value">{{ opt.label }}</option>
-                        }
-                    </select>
+                    <app-country-select [(ngModel)]="filterLocation" [showAny]="true" [label]="'Any Location'">
+                    </app-country-select>
                 </div>
                 <div class="form-group checkbox">
                     <label>

@@ -36,35 +36,80 @@
 
     <div class="filter-section">
       <label>Location</label>
-      <select [(ngModel)]="filterLocation" (change)="onFilterChange()" class="filter-select">
-        @for (option of locationOptions; track option.value) {
-        <option [value]="option.value">
-          {{ option.label }}
-        </option>
+      <div class="custom-select-container">
+        <div class="custom-select" (click)="toggleLocationDropdown()">
+          @if (filterLocation !== 'any') {
+          <img class="select-flag" [src]="getSelectedLocationFlag()" alt="" />
+          }
+          <span>{{ getSelectedLocationLabel() }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        @if (showLocationDropdown) {
+        <div class="custom-dropdown">
+          @for (option of locationOptions; track option.value) {
+          <div class="dropdown-option" [class.selected]="filterLocation === option.value"
+            (click)="selectLocation(option.value)">
+            @if (option.flagUrl) {
+            <img class="option-flag" [src]="option.flagUrl" alt="" />
+            }
+            <span>{{ option.label }}</span>
+          </div>
+          }
+        </div>
         }
-      </select>
+      </div>
     </div>
 
     <div class="filter-section">
       <label>Native Language</label>
-      <select [(ngModel)]="filterNativeLanguage" (change)="onFilterChange()" class="filter-select">
-        @for (option of languageOptions; track option.value) {
-        <option [value]="option.value">
-          {{ option.label }}
-        </option>
+      <div class="custom-select-container">
+        <div class="custom-select" (click)="toggleNativeLanguageDropdown()">
+          @if (filterNativeLanguage !== 'any') {
+          <img class="select-flag" [src]="getSelectedNativeLanguageFlag()" alt="" />
+          }
+          <span>{{ getSelectedNativeLanguageLabel() }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        @if (showNativeLanguageDropdown) {
+        <div class="custom-dropdown">
+          @for (option of languageOptions; track option.value) {
+          <div class="dropdown-option" [class.selected]="filterNativeLanguage === option.value"
+            (click)="selectNativeLanguage(option.value)">
+            @if (option.flagUrl) {
+            <img class="option-flag" [src]="option.flagUrl" alt="" />
+            }
+            <span>{{ option.label }}</span>
+          </div>
+          }
+        </div>
         }
-      </select>
+      </div>
     </div>
 
     <div class="filter-section">
       <label>Learning Language</label>
-      <select [(ngModel)]="filterLearningLanguage" (change)="onFilterChange()" class="filter-select">
-        @for (option of languageOptions; track option.value) {
-        <option [value]="option.value">
-          {{ option.label }}
-        </option>
+      <div class="custom-select-container">
+        <div class="custom-select" (click)="toggleLearningLanguageDropdown()">
+          @if (filterLearningLanguage !== 'any') {
+          <img class="select-flag" [src]="getSelectedLearningLanguageFlag()" alt="" />
+          }
+          <span>{{ getSelectedLearningLanguageLabel() }}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        @if (showLearningLanguageDropdown) {
+        <div class="custom-dropdown">
+          @for (option of languageOptions; track option.value) {
+          <div class="dropdown-option" [class.selected]="filterLearningLanguage === option.value"
+            (click)="selectLearningLanguage(option.value)">
+            @if (option.flagUrl) {
+            <img class="option-flag" [src]="option.flagUrl" alt="" />
+            }
+            <span>{{ option.label }}</span>
+          </div>
+          }
+        </div>
         }
-      </select>
+      </div>
     </div>
   </aside>
 

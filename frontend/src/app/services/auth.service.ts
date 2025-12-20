@@ -57,6 +57,9 @@ export class AuthService {
             return await firstValueFrom(request$);
         } catch (error: any) {
             console.error('Google Sign-In Error:', error);
+            if (window.hasOwnProperty('Capacitor')) {
+                alert('Auth Error: ' + (error.message || JSON.stringify(error)));
+            }
             throw error;
         }
     }

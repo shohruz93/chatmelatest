@@ -5,14 +5,16 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { CountryService } from '../../services/country.service';
 import { Subscription, lastValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../services/translation.service';
+import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css']
 })
@@ -24,6 +26,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private route = inject(ActivatedRoute);
     private translationService = inject(TranslationService);
     private api = inject(ApiService);
+    private countryService = inject(CountryService);
 
     messages: any[] = [];
     newMessage: string = '';
@@ -73,6 +76,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private partnerLeftSub!: Subscription;
     private randomUserSub!: Subscription;
     private roomDetailsSub!: Subscription;
+    private statusSub!: Subscription;
+    private requestSub!: Subscription;
 
     // Filter modal
     showFilterModal = false;
@@ -86,16 +91,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         { value: 'female', label: 'Female' }
     ];
 
-    locationOptions = [
-        { value: 'any', label: 'Any Location' },
-        { value: 'US', label: 'United States' },
-        { value: 'UK', label: 'United Kingdom' },
-        { value: 'RU', label: 'Russia' },
-        { value: 'TJ', label: 'Tajikistan' },
-        { value: 'DE', label: 'Germany' },
-        { value: 'FR', label: 'France' },
-        { value: 'TR', label: 'Turkey' }
-    ];
+    locationOptions: any[] = [];
 
     // Incoming Request Modal
     // Found User Modal
@@ -104,7 +100,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Incoming Request Modal
     incomingRequest: any = null;
-    requestSub: any;
 
     // Advanced matching features
     queuePosition: number = 0;
@@ -116,66 +111,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     retryMessage: string = '';
     currentMatchId: number | null = null;
 
-    // Language mapping based on country codes
-    // Language mapping based on country names (matches ProfileComponent)
-    countryLanguageMap: { [key: string]: string } = {
-        'United Kingdom': 'en', 'United States': 'en', 'Australia': 'en', 'Canada': 'en', 'New Zealand': 'en',
-        'Tajikistan': 'tg',
-        'Russia': 'ru',
-        'Spain': 'es', 'Mexico': 'es', 'Argentina': 'es', 'Colombia': 'es',
-        'France': 'fr',
-        'Germany': 'de',
-        'Italy': 'it',
-        'Portugal': 'pt', 'Brazil': 'pt',
-        'Saudi Arabia': 'ar', 'United Arab Emirates': 'ar', 'Egypt': 'ar',
-        'China': 'zh',
-        'Japan': 'ja',
-        'South Korea': 'ko',
-        'India': 'hi',
-        'Turkey': 'tr',
-        'Poland': 'pl',
-        'Ukraine': 'uk',
-        'Vietnam': 'vi',
-        'Thailand': 'th',
-        'Indonesia': 'id',
-        'Netherlands': 'nl',
-        'Sweden': 'sv',
-        'Greece': 'el',
-        'Israel': 'he',
-        'Czech Republic': 'cs', 'Czechia': 'cs',
-        'Romania': 'ro',
-        'Hungary': 'hu',
-        'Iran': 'fa',
-        'Bangladesh': 'bn',
-        'Malaysia': 'ms',
-        'Philippines': 'fil',
-        'Denmark': 'da',
-        'Finland': 'fi',
-        'Norway': 'no',
-        'Slovakia': 'sk',
-        'Bulgaria': 'bg',
-        'Croatia': 'hr',
-        'Serbia': 'sr',
-        'Slovenia': 'sl',
-        'Lithuania': 'lt',
-        'Latvia': 'lv',
-        'Estonia': 'et',
-        'Georgia': 'ka',
-        'Armenia': 'hy',
-        'Azerbaijan': 'az',
-        'Kazakhstan': 'kk',
-        'Uzbekistan': 'uz',
-        'Kyrgyzstan': 'ky',
-        'Mongolia': 'mn',
-        'Nepal': 'ne',
-        'Sri Lanka': 'si',
-        'Pakistan': 'ur',
-        'Tanzania': 'sw',
-        'South Africa': 'af',
-        'Ethiopia': 'am'
-    };
+
 
     ngOnInit() {
+        this.locationOptions = this.countryService.getCountryOptions();
         // Initialize current user from localStorage
         const userStr = localStorage.getItem('user');
         if (userStr) {
@@ -188,6 +127,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // Listen for incoming chat requests
         this.requestSub = this.socketService.onChatRequestReceived().subscribe(data => {
             this.incomingRequest = data;
+        });
+
+        // Listen for user status changes
+        this.statusSub = this.socketService.onUserStatusChanged().subscribe(data => {
+            if (this.partner && Number(data.userId) === Number(this.partner.id)) {
+                this.partnerStatus = data.status as 'online' | 'offline';
+            }
         });
 
         this.socketService.onChatRequestRejected().subscribe(() => {
@@ -281,8 +227,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     }
 
                     this.partner = partnerProfile;
-                    // Ensure status is set (default to online if in chat)
-                    this.partnerStatus = 'online';
+                    // Set partner initial status correctly
+                    this.partnerStatus = this.socketService.isUserOnline(partnerProfile.id) ? 'online' : 'offline';
                     this.partnerIdToRate = partnerProfile.id;
                 }
             }
@@ -450,6 +396,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.partnerLeftSub) this.partnerLeftSub.unsubscribe();
         if (this.randomUserSub) this.randomUserSub.unsubscribe();
         if (this.roomDetailsSub) this.roomDetailsSub.unsubscribe();
+        if (this.statusSub) this.statusSub.unsubscribe();
+        if (this.requestSub) this.requestSub.unsubscribe();
 
         if (this.roomId) {
             this.socketService.emitTyping(this.roomId, false);
@@ -650,23 +598,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         msg.isTranslating = true;
 
-        // Determine target language from user location
+        // Determine target language from user location using CountryService
         let targetLang = 'en'; // Default
         if (this.currentUser && this.currentUser.location) {
-            // Profile stores full country name (e.g. "Tajikistan", "Iran")
-            const userLocation = this.currentUser.location;
-
-            // Direct lookup
-            if (this.countryLanguageMap[userLocation]) {
-                targetLang = this.countryLanguageMap[userLocation];
-            } else {
-                // Try case-insensitive lookup if direct failed
-                const upperLoc = userLocation.toUpperCase();
-                const matchedKey = Object.keys(this.countryLanguageMap).find(k => k.toUpperCase() === upperLoc);
-                if (matchedKey) {
-                    targetLang = this.countryLanguageMap[matchedKey];
-                }
-            }
+            targetLang = this.countryService.getLanguageFromCountry(this.currentUser.location);
         }
 
         // Request translation from socket server
@@ -904,5 +839,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         return 'text';
+    }
+
+    getFlagIcon(location: string): string {
+        return this.countryService.getFlagUrl(location);
+    }
+
+    getLocationLabel(location: string): string {
+        return this.countryService.getCountryName(location);
     }
 }

@@ -60,27 +60,19 @@
 
                     <div class="form-group">
                         <label>Location</label>
-                        <select [(ngModel)]="location" class="form-select">
-                            <option value="">Select a country</option>
-                            @for (country of countries; track country.code) {
-                            <option [value]="country.name" [selected]="location === country.name">{{ country.flag }}
-                                {{ country.name }}</option>
-                            }
-                        </select>
+                        <app-country-select [(ngModel)]="location" [showAny]="false" placeholder="Select your location">
+                        </app-country-select>
                     </div>
 
                     <div class="language-row">
                         <div class="form-group">
                             <label>Native Language</label>
                             <div class="language-input-group">
-                                <select (change)="addLanguage('native', $event)" class="form-select">
-                                    <option value="">Select to add...</option>
-                                    @for (lang of languages; track lang.code) {
-                                    <option [value]="lang.code" [disabled]="nativeLanguages.includes(lang.code)">
-                                        {{ lang.flag }} {{ lang.name }}
-                                    </option>
-                                    }
-                                </select>
+                                <app-country-select type="language" [showAny]="false"
+                                    placeholder="Add native language..."
+                                    (selectionChange)="languageSelect.value = $event; addLanguage('native', {target: languageSelect}); languageSelect.value = ''">
+                                </app-country-select>
+                                <input #languageSelect type="hidden">
                             </div>
                             <div class="language-tags">
                                 @for (code of nativeLanguages; track code) {
@@ -97,14 +89,11 @@
                         <div class="form-group">
                             <label>Learning Language</label>
                             <div class="language-input-group">
-                                <select (change)="addLanguage('learning', $event)" class="form-select">
-                                    <option value="">Select to add...</option>
-                                    @for (lang of languages; track lang.code) {
-                                    <option [value]="lang.code" [disabled]="learningLanguages.includes(lang.code)">
-                                        {{ lang.flag }} {{ lang.name }}
-                                    </option>
-                                    }
-                                </select>
+                                <app-country-select type="language" [showAny]="false"
+                                    placeholder="Add learning language..."
+                                    (selectionChange)="learningSelect.value = $event; addLanguage('learning', {target: learningSelect}); learningSelect.value = ''">
+                                </app-country-select>
+                                <input #learningSelect type="hidden">
                             </div>
                             <div class="language-tags">
                                 @for (code of learningLanguages; track code) {

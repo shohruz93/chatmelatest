@@ -1,0 +1,32 @@
+# Robots.txt for ChatMe
+# https://chatme.tj
+
+User-agent: *
+Allow: /
+
+# Allow all search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+# Sitemap location
+Sitemap: https://chatme.tj/sitemap.xml
+
+# Disallow admin routes
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow private user areas (if accessed directly)
+Disallow: /dashboard/chat/
+Disallow: /dashboard/conversations/
+
+# Allow main public pages
+Allow: /home
+Allow: /login
+Allow: /about
+Allow: /features

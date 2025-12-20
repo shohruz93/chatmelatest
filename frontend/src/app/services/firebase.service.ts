@@ -38,6 +38,10 @@ export class FirebaseService {
             return credential?.idToken || null;
         } catch (error: any) {
             console.error('Error signing in with Google:', error);
+            // Alert for mobile debugging
+            if (window.hasOwnProperty('Capacitor')) {
+                alert('Sign-In Error: ' + (error.message || JSON.stringify(error)));
+            }
             throw error;
         }
     }

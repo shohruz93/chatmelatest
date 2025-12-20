@@ -6,6 +6,7 @@ import { lastValueFrom } from 'rxjs';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 
 interface UserProfile {
@@ -34,6 +35,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     private socketService = inject(SocketService);
     private auth = inject(AuthService);
     private api = inject(ApiService);
+    private countryService = inject(CountryService);
 
     users: UserProfile[] = [];
     filteredUsers: UserProfile[] = [];
@@ -60,91 +62,88 @@ export class ExploreComponent implements OnInit, OnDestroy {
         { value: 'female', label: 'Female' }
     ];
 
-    locationOptions = [
-        { value: 'any', label: 'Any Location' },
-        { value: 'US', label: 'United States' },
-        { value: 'GB', label: 'United Kingdom' },
-        { value: 'RU', label: 'Russia' },
-        { value: 'TJ', label: 'Tajikistan' },
-        { value: 'DE', label: 'Germany' },
-        { value: 'FR', label: 'France' },
-        { value: 'TR', label: 'Turkey' },
-        { value: 'CN', label: 'China' },
-        { value: 'JP', label: 'Japan' },
-        { value: 'KR', label: 'South Korea' },
-        { value: 'IN', label: 'India' },
-        { value: 'BR', label: 'Brazil' },
-        { value: 'MX', label: 'Mexico' },
-        { value: 'ES', label: 'Spain' },
-        { value: 'IT', label: 'Italy' },
-        { value: 'CA', label: 'Canada' },
-        { value: 'AU', label: 'Australia' }
-    ];
+    // Use CountryService for location options
+    get locationOptions() {
+        return this.countryService.getCountryOptions(true);
+    }
 
-    languageOptions = [
-        { value: 'any', label: 'Any Language' },
-        { value: 'en', label: 'English' },
-        { value: 'es', label: 'Spanish' },
-        { value: 'fr', label: 'French' },
-        { value: 'de', label: 'German' },
-        { value: 'ru', label: 'Russian' },
-        { value: 'zh', label: 'Chinese' },
-        { value: 'ja', label: 'Japanese' },
-        { value: 'ko', label: 'Korean' },
-        { value: 'ar', label: 'Arabic' },
-        { value: 'pt', label: 'Portuguese' },
-        { value: 'hi', label: 'Hindi' },
-        { value: 'tg', label: 'Tajik' },
-        { value: 'tr', label: 'Turkish' },
-        { value: 'it', label: 'Italian' },
-        { value: 'nl', label: 'Dutch' },
-        { value: 'sv', label: 'Swedish' },
-        { value: 'no', label: 'Norwegian' },
-        { value: 'da', label: 'Danish' },
-        { value: 'fi', label: 'Finnish' },
-        { value: 'el', label: 'Greek' },
-        { value: 'he', label: 'Hebrew' },
-        { value: 'cs', label: 'Czech' },
-        { value: 'ro', label: 'Romanian' },
-        { value: 'hu', label: 'Hungarian' },
-        { value: 'fa', label: 'Persian' },
-        { value: 'bn', label: 'Bengali' },
-        { value: 'ms', label: 'Malay' },
-        { value: 'fil', label: 'Filipino' },
-        { value: 'sk', label: 'Slovak' },
-        { value: 'bg', label: 'Bulgarian' },
-        { value: 'hr', label: 'Croatian' },
-        { value: 'sr', label: 'Serbian' },
-        { value: 'sl', label: 'Slovenian' },
-        { value: 'lt', label: 'Lithuanian' },
-        { value: 'lv', label: 'Latvian' },
-        { value: 'et', label: 'Estonian' },
-        { value: 'ka', label: 'Georgian' },
-        { value: 'hy', label: 'Armenian' },
-        { value: 'az', label: 'Azerbaijani' },
-        { value: 'kk', label: 'Kazakh' },
-        { value: 'uz', label: 'Uzbek' },
-        { value: 'ky', label: 'Kyrgyz' },
-        { value: 'mn', label: 'Mongolian' },
-        { value: 'ne', label: 'Nepali' },
-        { value: 'si', label: 'Sinhala' },
-        { value: 'ta', label: 'Tamil' },
-        { value: 'te', label: 'Telugu' },
-        { value: 'mr', label: 'Marathi' },
-        { value: 'gu', label: 'Gujarati' },
-        { value: 'pa', label: 'Punjabi' },
-        { value: 'ur', label: 'Urdu' },
-        { value: 'sw', label: 'Swahili' },
-        { value: 'af', label: 'Afrikaans' },
-        { value: 'am', label: 'Amharic' },
-        { value: 'yo', label: 'Yoruba' },
-        { value: 'ig', label: 'Igbo' },
-        { value: 'ha', label: 'Hausa' },
-        { value: 'so', label: 'Somali' },
-        { value: 'ny', label: 'Nyanja' },
-        { value: 'ti', label: 'Tigrinya' },
-        { value: 'tj', label: 'Tajik' }
-    ];
+    // Use CountryService for language options
+    get languageOptions() {
+        return this.countryService.getLanguageOptions(true);
+    }
+
+    // Dropdown toggle states
+    showLocationDropdown = false;
+    showNativeLanguageDropdown = false;
+    showLearningLanguageDropdown = false;
+
+    // Dropdown toggle methods
+    toggleLocationDropdown() {
+        this.showLocationDropdown = !this.showLocationDropdown;
+        this.showNativeLanguageDropdown = false;
+        this.showLearningLanguageDropdown = false;
+    }
+
+    toggleNativeLanguageDropdown() {
+        this.showNativeLanguageDropdown = !this.showNativeLanguageDropdown;
+        this.showLocationDropdown = false;
+        this.showLearningLanguageDropdown = false;
+    }
+
+    toggleLearningLanguageDropdown() {
+        this.showLearningLanguageDropdown = !this.showLearningLanguageDropdown;
+        this.showLocationDropdown = false;
+        this.showNativeLanguageDropdown = false;
+    }
+
+    selectLocation(value: string) {
+        this.filterLocation = value;
+        this.showLocationDropdown = false;
+        this.onFilterChange();
+    }
+
+    selectNativeLanguage(value: string) {
+        this.filterNativeLanguage = value;
+        this.showNativeLanguageDropdown = false;
+        this.onFilterChange();
+    }
+
+    selectLearningLanguage(value: string) {
+        this.filterLearningLanguage = value;
+        this.showLearningLanguageDropdown = false;
+        this.onFilterChange();
+    }
+
+    getSelectedLocationLabel(): string {
+        const option = this.locationOptions.find(o => o.value === this.filterLocation);
+        return option?.label || 'Any Location';
+    }
+
+    getSelectedLocationFlag(): string {
+        const option = this.locationOptions.find(o => o.value === this.filterLocation);
+        return option?.flagUrl || '';
+    }
+
+    getSelectedNativeLanguageLabel(): string {
+        const option = this.languageOptions.find(o => o.value === this.filterNativeLanguage);
+        return option?.label || 'Any Language';
+    }
+
+    getSelectedNativeLanguageFlag(): string {
+        const option = this.languageOptions.find(o => o.value === this.filterNativeLanguage);
+        return option?.flagUrl || '';
+    }
+
+    getSelectedLearningLanguageLabel(): string {
+        const option = this.languageOptions.find(o => o.value === this.filterLearningLanguage);
+        return option?.label || 'Any Language';
+    }
+
+    getSelectedLearningLanguageFlag(): string {
+        const option = this.languageOptions.find(o => o.value === this.filterLearningLanguage);
+        return option?.flagUrl || '';
+    }
+
 
     // Expose Array to template
     Array = Array;
@@ -272,85 +271,8 @@ export class ExploreComponent implements OnInit, OnDestroy {
         this.applyFilters();
     }
 
-    // Map country names to ISO 2-letter codes
-    private countryNameToCode: { [key: string]: string } = {
-        'united states': 'us',
-        'united kingdom': 'gb',
-        'russia': 'ru',
-        'tajikistan': 'tj',
-        'germany': 'de',
-        'france': 'fr',
-        'turkey': 'tr',
-        'china': 'cn',
-        'japan': 'jp',
-        'south korea': 'kr',
-        'korea': 'kr',
-        'india': 'in',
-        'brazil': 'br',
-        'mexico': 'mx',
-        'spain': 'es',
-        'italy': 'it',
-        'canada': 'ca',
-        'australia': 'au',
-        'switzerland': 'ch',
-        'netherlands': 'nl',
-        'belgium': 'be',
-        'sweden': 'se',
-        'norway': 'no',
-        'denmark': 'dk',
-        'finland': 'fi',
-        'poland': 'pl',
-        'portugal': 'pt',
-        'greece': 'gr',
-        'austria': 'at',
-        'czech republic': 'cz',
-        'ireland': 'ie',
-        'new zealand': 'nz',
-        'singapore': 'sg',
-        'malaysia': 'my',
-        'thailand': 'th',
-        'vietnam': 'vn',
-        'philippines': 'ph',
-        'indonesia': 'id',
-        'pakistan': 'pk',
-        'bangladesh': 'bd',
-        'egypt': 'eg',
-        'south africa': 'za',
-        'nigeria': 'ng',
-        'kenya': 'ke',
-        'argentina': 'ar',
-        'chile': 'cl',
-        'colombia': 'co',
-        'peru': 'pe',
-        'venezuela': 've',
-        'ukraine': 'ua',
-        'romania': 'ro',
-        'hungary': 'hu',
-        'israel': 'il',
-        'saudi arabia': 'sa',
-        'uae': 'ae',
-        'united arab emirates': 'ae'
-    };
-
     getFlagIcon(location: string): string {
-        if (!location) return '';
-
-        // Convert to lowercase for comparison
-        const locationLower = location.toLowerCase().trim();
-
-        // Check if it's already a 2-letter code
-        if (locationLower.length === 2) {
-            return `/flags/${locationLower}.png`;
-        }
-
-        // Try to map country name to code
-        const code = this.countryNameToCode[locationLower];
-        if (code) {
-            return `/flags/${code}.png`;
-        }
-
-        // Fallback: use the location as-is (might be a code already)
-        return `/flags/${locationLower}.png`;
+        return this.countryService.getFlagUrl(location);
     }
 
     sendMessage(user: UserProfile, event?: Event) {
@@ -370,13 +292,11 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     getLanguageLabel(code: string): string {
-        const lang = this.languageOptions.find(l => l.value === code);
-        return lang ? lang.label : code;
+        return this.countryService.getLanguageName(code);
     }
 
     getLocationLabel(code: string): string {
-        const loc = this.locationOptions.find(l => l.value === code);
-        return loc ? loc.label : code;
+        return this.countryService.getCountryName(code);
     }
 
     getLanguagesDisplay(languages: string | string[]): string {
@@ -390,47 +310,8 @@ export class ExploreComponent implements OnInit, OnDestroy {
         return Array.isArray(languages) ? languages : [languages];
     }
 
-    // Map language codes to country codes for flags
-    private languageToCountry: { [key: string]: string } = {
-        'en': 'gb',
-        'es': 'es',
-        'fr': 'fr',
-        'de': 'de',
-        'ru': 'ru',
-        'zh': 'cn',
-        'ja': 'jp',
-        'ko': 'kr',
-        'ar': 'sa',
-        'pt': 'pt',
-        'hi': 'in',
-        'tg': 'tj',
-        'tr': 'tr',
-        'it': 'it',
-        'nl': 'nl',
-        'sv': 'se',
-        'no': 'no',
-        'da': 'dk',
-        'fi': 'fi',
-        'el': 'gr',
-        'he': 'il',
-        'cs': 'cz',
-        'ro': 'ro',
-        'hu': 'hu',
-        'fa': 'ir',
-        'bn': 'bd',
-        'ms': 'my',
-        'fil': 'ph',
-        'sk': 'sk',
-        'bg': 'bg',
-        'hr': 'hr',
-        'sr': 'rs',
-        'sl': 'si',
-    };
-
     getLanguageFlagUrl(langCode: string): string {
-        if (!langCode) return '';
-        const countryCode = this.languageToCountry[langCode.toLowerCase()] || langCode.toLowerCase();
-        return `/flags/${countryCode}.png`;
+        return this.countryService.getLanguageFlagUrl(langCode);
     }
 
     getAvatarColor(name: string): string {

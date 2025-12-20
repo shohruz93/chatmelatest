@@ -1,0 +1,49 @@
+<div class="country-select-container" (clickOutside)="closeDropdown()">
+    <!-- Selected Value Display -->
+    <div class="select-trigger" [class.disabled]="disabled" [class.open]="isOpen" (click)="toggleDropdown()">
+        @if (selectedOption && selectedOption.flagUrl) {
+        <img class="flag-icon" [src]="selectedOption.flagUrl" [alt]="selectedOption.label" />
+        }
+        <span class="selected-label">{{ selectedOption?.label || placeholder }}</span>
+        <span class="dropdown-arrow">
+            <i class="fas fa-chevron-down"></i>
+        </span>
+    </div>
+
+    <!-- Dropdown -->
+    @if (isOpen) {
+    <div class="dropdown-menu">
+        <!-- Search Input -->
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" [(ngModel)]="searchTerm" placeholder="Search..."
+                (click)="$event.stopPropagation()" />
+        </div>
+
+        <!-- Options List -->
+        <div class="options-list">
+            @for (option of filteredOptions; track option.value) {
+            <div class="option" [class.selected]="option.value === value" (click)="selectOption(option)">
+                @if (option.flagUrl) {
+                <img class="flag-icon" [src]="option.flagUrl" [alt]="option.label" />
+                } @else {
+                <span class="flag-placeholder"></span>
+                }
+                <span class="option-label">{{ option.label }}</span>
+                @if (option.value === value) {
+                <i class="fas fa-check check-icon"></i>
+                }
+            </div>
+            }
+            @if (filteredOptions.length === 0) {
+            <div class="no-results">No results found</div>
+            }
+        </div>
+    </div>
+    }
+</div>
+
+<!-- Click Outside Overlay -->
+@if (isOpen) {
+<div class="backdrop" (click)="closeDropdown()"></div>
+}
