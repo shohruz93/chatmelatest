@@ -27,7 +27,6 @@ export class SocketService {
 
         // Listen for user status changes
         this.socket.on('user_status_changed', (data: { userId: any, status: string }) => {
-            console.log('Socket: user_status_changed', data);
             const users = new Set(this.onlineUsers());
             const userId = Number(data.userId);
 
@@ -41,7 +40,6 @@ export class SocketService {
 
         // Listen for online users list
         this.socket.on('online_users_list', (userIds: any[]) => {
-            console.log('Socket: online_users_list', userIds);
             const numericIds = new Set(userIds.map(id => Number(id)));
             this.onlineUsers.set(numericIds);
         });

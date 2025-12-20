@@ -268,8 +268,8 @@ export class UserProfileModalComponent implements OnInit {
             // Record profile view if viewing another user's profile
             if (this.currentUser && this.currentUser.id !== this.user.id) {
                 this.api.recordView(this.currentUser.id, this.user.id).subscribe({
-                    next: () => console.log('Profile view recorded'),
-                    error: (err) => console.error('Error recording view', err)
+                    next: () => { },
+                    error: () => { }
                 });
             }
 

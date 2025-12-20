@@ -23,11 +23,7 @@ export class AuthService {
 
         // Listen to Firebase auth state changes
         this.firebaseService.getAuthState().subscribe(user => {
-            if (user) {
-                console.log('Firebase user logged in:', user);
-            } else {
-                console.log('Firebase user logged out');
-            }
+            // Firebase auth state changed
         });
     }
 

@@ -1,5 +1,6 @@
 {
 	"appId": "com.chatme.frontend",
 	"appName": "ChatMe",
-	"webDir": "dist/frontend/browser"
+	"webDir": "dist/frontend/browser",
+	"bundledWebRuntime": false
 }

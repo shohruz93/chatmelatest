@@ -22,7 +22,6 @@ export class App implements OnInit, OnDestroy {
   ngOnInit() {
     // Global listener for incoming chat requests
     this.chatRequestSub = this.socketService.onChatRequestReceived().subscribe(request => {
-      console.log('App: Chat request received', request);
       // Always show modal in App component
       this.incomingRequest = request;
       this.showIncomingRequestModal = true;

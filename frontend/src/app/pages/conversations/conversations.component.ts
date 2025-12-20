@@ -63,7 +63,6 @@ export class ConversationsComponent implements OnInit {
             otherUserId: partnerId
         }).subscribe({
             next: () => {
-                console.log('Messages marked as read');
                 // Navigate to chat
                 this.router.navigate(['/dashboard/chat', partnerId]);
             },

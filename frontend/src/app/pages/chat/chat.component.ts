@@ -289,14 +289,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         });
 
         this.messageSub = this.socketService.onMessage().subscribe(message => {
-            console.log('[MESSAGE_RECEIVED]', message);
-
             // Construct roomId if missing (backward compatibility)
             let messageRoomId = message.roomId;
             if (!messageRoomId && message.senderId && message.receiverId) {
                 const sortedIds = [Number(message.senderId), Number(message.receiverId)].sort();
                 messageRoomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
-                console.log('[MESSAGE] Constructed roomId:', messageRoomId);
             }
 
             // Check if message belongs to current room
@@ -401,12 +398,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     sendRequest() {
         if (!this.foundUser) {
-            console.error('[SEND_REQUEST] No found user');
             return;
         }
-
-        console.log('[SEND_REQUEST] Found user:', this.foundUser);
-        console.log('[SEND_REQUEST] Found user ID:', this.foundUser.id);
 
         this.isSendingRequest = true;
 
@@ -416,9 +409,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             gender: this.currentUser.gender,
             location: this.currentUser.location
         };
-
-        console.log('[SEND_REQUEST] Sending to user ID:', this.foundUser.id);
-        console.log('[SEND_REQUEST] My profile:', myProfile);
 
         this.socketService.sendChatRequest(this.foundUser.id, myProfile);
 
@@ -602,26 +592,19 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     sendMessage() {
-        console.log('[SEND_MESSAGE] Called');
-        console.log('[SEND_MESSAGE] roomId:', this.roomId);
-        console.log('[SEND_MESSAGE] newMessage:', this.newMessage);
-
         if (!this.newMessage.trim()) {
             return;
         }
 
         if (!this.roomId && !this.waitingForResponse) {
-            console.log('[SEND_MESSAGE] Validation failed - roomId missing and not waiting');
             return;
         }
 
         const content = this.newMessage;
-        console.log('[SEND_MESSAGE] Sending message:', content);
 
         if (this.roomId) {
             this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text');
         } else if (this.waitingForResponse) {
-            console.log('[SEND_MESSAGE] Queuing message:', content);
             this.pendingMessages.push(content);
         }
 
@@ -686,8 +669,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }
 
-        console.log(`[TRANSLATE] Requesting translation for msg ${msg.id} to ${targetLang} (User Loc: ${this.currentUser?.location})`);
-
         // Request translation from socket server
         this.socketService.emit('translate_message', {
             messageId: msg.id,
@@ -734,9 +715,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 rating: this.selectedRating,
                 comment: this.ratingComment
             }));
-            console.log('Rating submitted successfully');
         } catch (error) {
-            console.error('Error submitting rating:', error);
+            // Error submitting rating
         }
 
         this.closeRatingModal();
@@ -910,20 +890,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     detectMessageType(content: string, providedType: string): string {
-        console.log('[DETECT_MESSAGE_TYPE] Content:', content?.substring(0, 50), 'ProvidedType:', providedType);
-
         if (providedType && providedType !== 'text') {
-            console.log('[DETECT_MESSAGE_TYPE] Using provided type:', providedType);
             return providedType;
         }
 
         if (content && typeof content === 'string') {
             if (content.startsWith('data:audio') || content.endsWith('.webm') || content.endsWith('.mp3') || content.endsWith('.wav')) {
-                console.log('[DETECT_MESSAGE_TYPE] Detected as voice');
                 return 'voice';
             }
             if (content.startsWith('data:image') || content.match(/\.(jpeg|jpg|gif|png)$/) != null) {
-                console.log('[DETECT_MESSAGE_TYPE] Detected as image');
                 return 'image';
             }
         }
