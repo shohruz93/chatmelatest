@@ -1,4 +1,4 @@
-package com.chatme.frontend;
+package com.shohruz.chatme;
 
 import com.getcapacitor.BridgeActivity;
 

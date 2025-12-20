@@ -3,6 +3,7 @@ import { ApiService } from './api.service';
 import { FirebaseService } from './firebase.service';
 import { BehaviorSubject, tap, firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
     providedIn: 'root'
@@ -57,7 +58,7 @@ export class AuthService {
             return await firstValueFrom(request$);
         } catch (error: any) {
             console.error('Google Sign-In Error:', error);
-            if (window.hasOwnProperty('Capacitor')) {
+            if (Capacitor.isNativePlatform()) {
                 alert('Auth Error: ' + (error.message || JSON.stringify(error)));
             }
             throw error;

@@ -10,6 +10,8 @@ import {
 } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
     providedIn: 'root'
@@ -30,16 +32,21 @@ export class FirebaseService {
         });
     }
 
-    // Sign in with Google popup
+    // Sign in with Google
     async signInWithGoogle(): Promise<string | null> {
         try {
+            if (Capacitor.isNativePlatform()) {
+                const result = await GoogleAuth.signIn();
+                return result.authentication.idToken;
+            }
+
             const result = await signInWithPopup(this.auth, this.googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             return credential?.idToken || null;
         } catch (error: any) {
             console.error('Error signing in with Google:', error);
             // Alert for mobile debugging
-            if (window.hasOwnProperty('Capacitor')) {
+            if (Capacitor.isNativePlatform()) {
                 alert('Sign-In Error: ' + (error.message || JSON.stringify(error)));
             }
             throw error;
