@@ -24,11 +24,7 @@
         <div class="profile-card">
             <div class="avatar-section">
                 <div class="avatar-wrapper">
-                    @if (previewUrl || profileUser?.avatar) {
-                    <img [src]="previewUrl || profileUser.avatar" alt="Profile Avatar">
-                    } @else {
-                    <div class="avatar-placeholder">{{ profileUser?.name?.charAt(0) || 'U' }}</div>
-                    }
+                    <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'" alt="Profile Avatar">
 
                     @if (isEditing) {
                     <label class="avatar-upload-btn" title="Upload photo">
@@ -264,7 +260,7 @@
                 @for (comment of displayedComments; track comment.id) {
                 <div class="comment-card">
                     <div class="comment-header">
-                        <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
+                        <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
                         <div class="comment-meta">
                             <span class="comment-author">{{ comment.rater_name }}</span>
                             <span class="comment-rating">
@@ -304,7 +300,7 @@
                     <div class="replies-list">
                         @for (reply of comment.replies; track reply.id) {
                         <div class="reply-item">
-                            <img [src]="reply.replier_avatar || 'assets/default-avatar.png'" class="reply-avatar">
+                            <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
                             <div class="reply-content">
                                 <span class="reply-author">{{ reply.replier_name }}</span>
                                 <span class="reply-text">{{ reply.content }}</span>

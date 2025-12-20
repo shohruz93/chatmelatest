@@ -16,7 +16,7 @@
             @for (guest of guests; track guest.id) {
             <div class="guest-card" [routerLink]="['/dashboard/profile', guest.id]">
                 <div class="guest-avatar">
-                    <img [src]="guest.avatar || 'assets/default-avatar.png'" [alt]="guest.name">
+                    <img [src]="guest.avatar || 'default-avatar.png'" [alt]="guest.name">
                 </div>
                 <div class="guest-info">
                     <h3>{{ guest.name }}</h3>

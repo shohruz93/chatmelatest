@@ -10,11 +10,7 @@
             <!-- Profile Link -->
             <div class="user-profile" routerLink="profile" routerLinkActive="active" title="Go to Profile">
                 <div class="profile-avatar">
-                    @if (userAvatar) {
-                    <img [src]="userAvatar" [alt]="userDisplayName">
-                    } @else {
-                    <span class="avatar-text">{{ userDisplayName.charAt(0) || 'U' }}</span>
-                    }
+                    <img [src]="userAvatar || 'default-avatar.png'" [alt]="userDisplayName">
                     <span class="online-status-dot"></span>
                 </div>
                 <div class="profile-info">

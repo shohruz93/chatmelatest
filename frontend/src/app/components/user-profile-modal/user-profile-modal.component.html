@@ -10,13 +10,7 @@
 
         <div class="profile-header">
             <div class="avatar-container">
-                @if (user.avatar) {
-                <img [src]="user.avatar" [alt]="user.name" class="avatar-img" />
-                } @else {
-                <div class="avatar-placeholder" [style.background]="getAvatarColor(user.name)">
-                    {{ getInitials(user.name) }}
-                </div>
-                }
+                <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
                 <div class="status-indicator" [class.online]="user.isOnline" [class.offline]="!user.isOnline"></div>
             </div>
 
@@ -153,7 +147,7 @@
                     @for (comment of comments; track comment.id) {
                     <div class="comment-card">
                         <div class="comment-header">
-                            <img [src]="comment.rater_avatar || 'assets/default-avatar.png'" class="comment-avatar">
+                            <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
                             <div class="comment-meta">
                                 <span class="comment-author">{{ comment.rater_name }}</span>
                                 @if (comment.rating && comment.rating > 0) {
@@ -207,7 +201,7 @@
                         <div class="replies-list">
                             @for (reply of comment.replies; track reply.id) {
                             <div class="reply-item">
-                                <img [src]="reply.replier_avatar || 'assets/default-avatar.png'" class="reply-avatar">
+                                <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
                                 <div class="reply-content">
                                     <span class="reply-author">{{ reply.replier_name }}</span>
                                     <span class="reply-text">{{ reply.content }}</span>

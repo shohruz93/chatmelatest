@@ -1,0 +1,88 @@
+{
+  "GREETING": "Hola",
+  "HOME": {
+    "HEADLINE": "Conecta con gente que comparte tu",
+    "VIBE": "onda.",
+    "SUBHEADLINE": "Experimenta un chat aleatorio en tiempo real con traducción automática y coincidencia de intereses. Rompe las barreras del idioma y encuentra tu tribu.",
+    "START_CHATTING": "Empezar a Chatear",
+    "FEATURES": {
+      "TITLE": "Funciones Potentes",
+      "SUBTITLE": "Todo lo que necesitas para conexiones significativas",
+      "REAL_TIME_TRANSLATION": {
+        "TITLE": "Traducción en Tiempo Real",
+        "DESCRIPTION": "Rompe las barreras del idioma con la traducción automática de mensajes. Chatea con cualquier persona de todo el mundo en tu idioma nativo."
+      },
+      "SMART_MATCHING": {
+        "TITLE": "Coincidencia Inteligente",
+        "DESCRIPTION": "Nuestro algoritmo impulsado por IA te conecta con personas que comparten tus intereses y tu onda para tener mejores conversaciones."
+      },
+      "INSTANT_CONNECTION": {
+        "TITLE": "Conexión Instantánea",
+        "DESCRIPTION": "Conecta con alguien nuevo en segundos. Sin esperas, sin algoritmos, solo una conversación espontánea y pura."
+      },
+      "PRIVACY_FIRST": {
+        "TITLE": "Privacidad Primero",
+        "DESCRIPTION": "Tus conversaciones están encriptadas y son privadas. No almacenamos el historial de chat ni compartimos tus datos personales."
+      },
+      "INTEREST_TAGS": {
+        "TITLE": "Etiquetas de Interés",
+        "DESCRIPTION": "Agrega etiquetas de interés a tu perfil y sé emparejado con personas que comparten tus pasatiempos y pasiones."
+      },
+      "DARK_LIGHT_MODE": {
+        "TITLE": "Modo Oscuro/Claro",
+        "DESCRIPTION": "Elige tu tema preferido con hermosos modos oscuro y claro para chatear cómodamente en cualquier momento."
+      }
+    },
+    "ABOUT": {
+      "TITLE": "Acerca de Chatme",
+      "SUBTITLE": "Rompiendo barreras, construyendo conexiones",
+      "OUR_MISSION": {
+        "TITLE": "Nuestra Misión",
+        "DESCRIPTION": "Chatme fue creado con una visión simple pero poderosa: conectar a personas de todos los ámbitos de la vida, sin importar el idioma o la ubicación. Creemos que las conversaciones significativas pueden ocurrir en cualquier lugar, en cualquier momento y entre cualquier persona."
+      },
+      "STATS": {
+        "ACTIVE_USERS": "Usuarios Activos",
+        "COUNTRIES": "Países",
+        "CONVERSATIONS": "Conversaciones",
+        "LANGUAGES": "Idiomas"
+      },
+      "JOIN_OUR_COMMUNITY": {
+        "TITLE": "Únete a Nuestra Comunidad",
+        "DESCRIPTION": "Ya sea que estés buscando practicar un nuevo idioma, hacer amigos de todo el mundo o simplemente tener conversaciones interesantes con personas de ideas afines, Chatme está aquí para ti. Únete a miles de usuarios que ya están rompiendo barreras y construyendo conexiones.",
+        "BUTTON": "Comienza Tu Viaje"
+      }
+    },
+    "FOOTER": "© 2025 Chatme. Todos los derechos reservados."
+  },
+  "FEATURES": {
+    "CTA": {
+      "TITLE": "¿Listo para empezar a chatear?",
+      "BUTTON": "Empezar"
+    }
+  },
+  "ABOUT": {
+    "WHAT_WE_DO": {
+      "TITLE": "Qué Hacemos",
+      "DESCRIPTION": "Ofrecemos una plataforma para conversaciones espontáneas en tiempo real con personas de todo el mundo. Nuestro algoritmo de coincidencia inteligente te conecta con personas que comparten tus intereses, mientras que nuestra avanzada tecnología de traducción garantiza que el idioma nunca sea una barrera para la conexión."
+    },
+    "OUR_VALUES": {
+      "TITLE": "Nuestros Valores",
+      "CONNECTION": {
+        "TITLE": "🤝 Conexión",
+        "DESCRIPTION": "Creemos en el poder de la conexión humana y las conversaciones auténticas."
+      },
+      "INCLUSIVITY": {
+        "TITLE": "🌍 Inclusividad",
+        "DESCRIPTION": "Todos merecen ser escuchados, sin importar de dónde son o qué idioma hablan."
+      },
+      "PRIVACY": {
+        "TITLE": "🔒 Privacidad",
+        "DESCRIPTION": "Tu privacidad y seguridad son nuestras principales prioridades. Nunca compartimos tus datos."
+      },
+      "INNOVATION": {
+        "TITLE": "✨ Innovación",
+        "DESCRIPTION": "Mejoramos continuamente nuestra plataforma con tecnología de vanguardia y los comentarios de los usuarios."
+      }
+    }
+  }
+}

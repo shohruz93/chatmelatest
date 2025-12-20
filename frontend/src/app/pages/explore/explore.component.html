@@ -111,13 +111,7 @@
 
         <!-- Avatar -->
         <div class="user-avatar">
-          @if (user.avatar) {
-          <img [src]="user.avatar" [alt]="user.name" class="avatar-img" />
-          } @else {
-          <div class="avatar-placeholder" [style.background]="getAvatarColor(user.name)">
-            {{ getInitials(user.name) }}
-          </div>
-          }
+          <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
         </div>
 
         <!-- User Info -->

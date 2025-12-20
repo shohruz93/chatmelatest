@@ -24,11 +24,7 @@
             @for (conv of conversations; track conv.partner_id) {
             <a (click)="openConversation($event, conv.partner_id)" class="conversation-item">
                 <div class="conversation-avatar">
-                    @if (conv.partner_avatar) {
-                    <img [src]="conv.partner_avatar" [alt]="conv.partner_name">
-                    } @else {
-                    <span class="avatar-text">{{ conv.partner_name?.charAt(0) || 'U' }}</span>
-                    }
+                    <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name">
                     @if (socketService.isUserOnline(conv.partner_id)) {
                     <span class="online-indicator"></span>
                     }

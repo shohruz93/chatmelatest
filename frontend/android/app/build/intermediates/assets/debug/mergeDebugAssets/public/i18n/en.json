@@ -1,0 +1,88 @@
+{
+  "GREETING": "Hello",
+  "HOME": {
+    "HEADLINE": "Connect with people who share your",
+    "VIBE": "vibe.",
+    "SUBHEADLINE": "Experience real-time random chat with automatic translation and interest matching. Break language barriers and find your tribe.",
+    "START_CHATTING": "Start Chatting",
+    "FEATURES": {
+      "TITLE": "Powerful Features",
+      "SUBTITLE": "Everything you need for meaningful connections",
+      "REAL_TIME_TRANSLATION": {
+        "TITLE": "Real-Time Translation",
+        "DESCRIPTION": "Break language barriers with automatic message translation. Chat with anyone worldwide in your native language."
+      },
+      "SMART_MATCHING": {
+        "TITLE": "Smart Matching",
+        "DESCRIPTION": "Our AI-powered algorithm matches you with people who share your interests and vibe for better conversations."
+      },
+      "INSTANT_CONNECTION": {
+        "TITLE": "Instant Connection",
+        "DESCRIPTION": "Connect with someone new in seconds. No waiting, no algorithms - just pure spontaneous conversation."
+      },
+      "PRIVACY_FIRST": {
+        "TITLE": "Privacy First",
+        "DESCRIPTION": "Your conversations are encrypted and private. We don't store chat history or share your personal data."
+      },
+      "INTEREST_TAGS": {
+        "TITLE": "Interest Tags",
+        "DESCRIPTION": "Add interest tags to your profile and get matched with people who share your hobbies and passions."
+      },
+      "DARK_LIGHT_MODE": {
+        "TITLE": "Dark/Light Mode",
+        "DESCRIPTION": "Choose your preferred theme with beautiful dark and light modes for comfortable chatting any time."
+      }
+    },
+    "ABOUT": {
+      "TITLE": "About Chatme",
+      "SUBTITLE": "Breaking barriers, building connections",
+      "OUR_MISSION": {
+        "TITLE": "Our Mission",
+        "DESCRIPTION": "Chatme was created with a simple yet powerful vision: to connect people from all walks of life, regardless of language or location. We believe that meaningful conversations can happen anywhere, at any time, between anyone."
+      },
+      "STATS": {
+        "ACTIVE_USERS": "Active Users",
+        "COUNTRIES": "Countries",
+        "CONVERSATIONS": "Conversations",
+        "LANGUAGES": "Languages"
+      },
+      "JOIN_OUR_COMMUNITY": {
+        "TITLE": "Join Our Community",
+        "DESCRIPTION": "Whether you're looking to practice a new language, make friends from around the world, or simply have interesting conversations with like-minded people, Chatme is here for you. Join thousands of users who are already breaking barriers and building connections.",
+        "BUTTON": "Start Your Journey"
+      }
+    },
+    "FOOTER": "© 2025 Chatme. All rights reserved."
+  },
+  "FEATURES": {
+    "CTA": {
+      "TITLE": "Ready to start chatting?",
+      "BUTTON": "Get Started"
+    }
+  },
+  "ABOUT": {
+    "WHAT_WE_DO": {
+      "TITLE": "What We Do",
+      "DESCRIPTION": "We provide a platform for spontaneous, real-time conversations with people around the world. Our smart matching algorithm connects you with individuals who share your interests, while our advanced translation technology ensures that language is never a barrier to connection."
+    },
+    "OUR_VALUES": {
+      "TITLE": "Our Values",
+      "CONNECTION": {
+        "TITLE": "🤝 Connection",
+        "DESCRIPTION": "We believe in the power of human connection and authentic conversations."
+      },
+      "INCLUSIVITY": {
+        "TITLE": "🌍 Inclusivity",
+        "DESCRIPTION": "Everyone deserves to be heard, regardless of where they're from or what language they speak."
+      },
+      "PRIVACY": {
+        "TITLE": "🔒 Privacy",
+        "DESCRIPTION": "Your privacy and security are our top priorities. We never share your data."
+      },
+      "INNOVATION": {
+        "TITLE": "✨ Innovation",
+        "DESCRIPTION": "We continuously improve our platform with cutting-edge technology and user feedback."
+      }
+    }
+  }
+}

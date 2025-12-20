@@ -4,7 +4,7 @@
         @if (partnerId) {
         <div class="header-user-info">
             <div class="avatar-container">
-                <img [src]="partnerAvatar || 'assets/default-avatar.png'" alt="Partner Avatar" class="header-avatar">
+                <img [src]="partnerAvatar || 'default-avatar.png'" alt="Partner Avatar" class="header-avatar">
                 <span class="status-indicator" [class.online]="isPartnerOnline"></span>
             </div>
             <div class="user-details">
@@ -197,7 +197,7 @@
             </div>
             <div class="modal-body center-content">
                 <div class="avatar-large">
-                    <img [src]="incomingRequest.avatar || 'assets/default-avatar.png'" alt="User">
+                    <img [src]="incomingRequest.avatar || 'default-avatar.png'" alt="User">
                 </div>
                 <h3>{{ incomingRequest.name || 'Anonymous' }}</h3>
                 <p>wants to chat with you!</p>
