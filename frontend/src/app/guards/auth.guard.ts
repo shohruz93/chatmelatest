@@ -20,7 +20,7 @@ export const loginGuard: CanActivateFn = (route, state) => {
 
     // If user is already logged in, redirect to dashboard profile
     if (auth.currentUserValue) {
-        router.navigate(['/dashboard/profile']);
+        router.navigate(['/dashboard/explore']);
         return false;
     }
 

@@ -1,6 +1,23 @@
 <header class="header">
     <div class="logo" routerLink="/">Chatme</div>
     <div class="header-right">
+        <div class="language-selector">
+            <button class="btn-lang" (click)="$event.stopPropagation(); showLangMenu = !showLangMenu"
+                [title]="'NAV.LANGUAGE' | translate">
+                {{ languageService.getCurrentLanguage() | uppercase }} 🌐
+            </button>
+            @if (showLangMenu) {
+            <div class="lang-dropdown glass-panel" (click)="$event.stopPropagation()">
+                @for (lang of languageService.supportedLanguages; track lang.code) {
+                <button class="lang-item" (click)="setLanguage(lang.code); showLangMenu = false"
+                    [class.active]="languageService.getCurrentLanguage() === lang.code">
+                    <span class="flag">{{ lang.flag }}</span>
+                    <span class="name">{{ lang.name }}</span>
+                </button>
+                }
+            </div>
+            }
+        </div>
         <button class="btn-login" routerLink="/login" title="Login">👤</button>
         <button class="theme-toggle" (click)="toggleTheme()">{{ isDarkMode() ? '☀️' : '🌙' }}</button>
     </div>

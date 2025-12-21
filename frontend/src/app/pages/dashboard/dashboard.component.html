@@ -57,6 +57,27 @@
                 <span>Contact Admin</span>
             </button>
 
+            <!-- Language Selector -->
+            <div class="sidebar-section">
+                <button class="btn-messages" (click)="showLangMenu = !showLangMenu">
+                    <span class="btn-icon">🌐</span>
+                    <span>{{ 'NAV.LANGUAGE' | translate }}</span>
+                    <span class="lang-badge">{{ languageService.getCurrentLanguage() | uppercase }}</span>
+                </button>
+
+                @if (showLangMenu) {
+                <div class="sidebar-lang-dropdown">
+                    @for (lang of languageService.supportedLanguages; track lang.code) {
+                    <button class="btn-messages lang-option" (click)="setLanguage(lang.code); showLangMenu = false"
+                        [class.active]="languageService.getCurrentLanguage() === lang.code">
+                        <span class="btn-icon">{{ lang.flag }}</span>
+                        <span>{{ lang.name }}</span>
+                    </button>
+                    }
+                </div>
+                }
+            </div>
+
             <!-- Theme Toggle -->
             <button class="btn-theme-sidebar" (click)="toggleTheme()">
                 <span class="btn-icon">{{ isDarkMode() ? '☀️' : '🌙' }}</span>

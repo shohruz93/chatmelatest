@@ -2,7 +2,7 @@
     <!-- Header -->
     <header class="chat-header glass-panel">
         @if (partnerId) {
-        <div class="header-user-info">
+        <div class="header-user-info" (click)="openPartnerProfile()" style="cursor: pointer;">
             <div class="avatar-container">
                 <img [src]="partnerAvatar || 'default-avatar.png'" alt="Partner Avatar" class="header-avatar">
                 <span class="status-indicator" [class.online]="isPartnerOnline"></span>
@@ -243,6 +243,11 @@
             </div>
         </div>
     </div>
+    }
+
+    @if (showPartnerProfileModal && partner) {
+    <app-user-profile-modal [user]="partner" (closeEvent)="closePartnerProfile()">
+    </app-user-profile-modal>
     }
 
     <input type="file" #fileInput accept="image/*" style="display: none;" (change)="onImageSelected($event)">

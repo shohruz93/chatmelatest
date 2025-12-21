@@ -10,11 +10,12 @@ import { Subscription, lastValueFrom } from 'rxjs';
 
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
+import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, UserProfileModalComponent],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css']
 })
@@ -44,6 +45,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     partnerIdToRate: number | null = null;
     selectedRating: number = 0;
     ratingComment: string = '';
+    showPartnerProfileModal = false;
 
     // Media & Stickers
     showMediaMenu = false;
@@ -630,6 +632,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     dismissPartnerLeftBanner() {
         this.showPartnerLeftBanner = false;
+    }
+
+    openPartnerProfile() {
+        if (this.partner) {
+            this.showPartnerProfileModal = true;
+        }
+    }
+
+    closePartnerProfile() {
+        this.showPartnerProfileModal = false;
     }
 
     // Rating methods

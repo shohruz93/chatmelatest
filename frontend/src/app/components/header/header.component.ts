@@ -5,11 +5,14 @@ import { filter } from 'rxjs/operators';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
+import { LanguageService } from '../../services/language.service';
+
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-header',
     standalone: true,
-    imports: [RouterModule, CommonModule],
+    imports: [RouterModule, CommonModule, TranslatePipe],
     templateUrl: './header.component.html',
     styleUrl: './header.component.css'
 })
@@ -21,7 +24,9 @@ export class HeaderComponent {
     private api = inject(ApiService); // Assuming ApiService is available in same scope or imported
     private auth = inject(AuthService); // Need auth to get user ID
     private socketService = inject(SocketService);
+    public languageService = inject(LanguageService);
     currentRoute = '';
+    showLangMenu = false;
 
     constructor() {
         this.router.events.pipe(
@@ -64,6 +69,10 @@ export class HeaderComponent {
 
     toggleMobileMenu() {
         this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+    }
+
+    setLanguage(lang: string) {
+        this.languageService.setLanguage(lang);
     }
 
     closeMobileMenu() {

@@ -1,16 +1,18 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { ApiService } from '../../services/api.service';
 import { UiService } from '../../services/ui.service';
+import { LanguageService } from '../../services/language.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, TranslatePipe],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.css'
 })
@@ -20,9 +22,11 @@ export class DashboardComponent implements OnInit {
     private api = inject(ApiService);
     private router = inject(Router);
     public ui = inject(UiService);
+    public languageService = inject(LanguageService);
 
     currentUser = this.auth.currentUserValue;
     isDarkMode = signal(false);
+    showLangMenu = false;
     unreadCount = 0;
     newGuestsCount = 0;
 
@@ -204,5 +208,9 @@ export class DashboardComponent implements OnInit {
 
     onLanguageChange(event: any) {
         this.socketService.selectedLanguage.set(event.target.value);
+    }
+
+    setLanguage(lang: string) {
+        this.languageService.setLanguage(lang);
     }
 }

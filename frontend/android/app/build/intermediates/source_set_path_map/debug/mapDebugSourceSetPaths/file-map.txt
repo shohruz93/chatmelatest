@@ -36,5 +36,6 @@ com.shohruz.chatme.app-debug-34 D:\ChatmeLast\frontend\android\app\src\debug\res
 com.shohruz.chatme.app-main-35 D:\ChatmeLast\frontend\android\app\src\main\res
 com.shohruz.chatme.app-debug-36 D:\ChatmeLast\frontend\android\capacitor-cordova-android-plugins\build\intermediates\packaged_res\debug\packageDebugResources
 com.shohruz.chatme.app-debug-37 D:\ChatmeLast\frontend\node_modules\@capacitor\android\capacitor\build\intermediates\packaged_res\debug\packageDebugResources
-com.shohruz.chatme.app-debug-38 D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\packaged_res\debug\packageDebugResources
-com.shohruz.chatme.app-debug-39 D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.shohruz.chatme.app-debug-38 D:\ChatmeLast\frontend\node_modules\@capacitor\app\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.shohruz.chatme.app-debug-39 D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\packaged_res\debug\packageDebugResources
+com.shohruz.chatme.app-debug-40 D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\packaged_res\debug\packageDebugResources
