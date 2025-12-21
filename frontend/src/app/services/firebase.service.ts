@@ -30,12 +30,31 @@ export class FirebaseService {
         this.googleProvider.setCustomParameters({
             prompt: 'select_account'
         });
+
+        // Initialize Google Auth for native platforms
+        if (Capacitor.isNativePlatform()) {
+            this.initializeNativeGoogleAuth();
+        }
+    }
+
+    private async initializeNativeGoogleAuth() {
+        try {
+            await GoogleAuth.initialize({
+                clientId: '1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com',
+                scopes: ['profile', 'email'],
+                grantOfflineAccess: true,
+            });
+        } catch (error) {
+            console.error('Error initializing Google Auth:', error);
+        }
     }
 
     // Sign in with Google
     async signInWithGoogle(): Promise<string | null> {
         try {
             if (Capacitor.isNativePlatform()) {
+                // Ensure initialization before sign-in
+                await this.initializeNativeGoogleAuth();
                 const result = await GoogleAuth.signIn();
                 return result.authentication.idToken;
             }

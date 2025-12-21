@@ -154,7 +154,7 @@ class Profile {
         // Handle Avatar Upload
         $avatarUrl = null;
         if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../public/uploads/';
+            $uploadDir = __DIR__ . '/../public_html/uploads/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }

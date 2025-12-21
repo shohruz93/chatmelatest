@@ -4,7 +4,7 @@
     "type": "COMPATIBLE_SCREEN_MANIFEST",
     "kind": "Directory"
   },
-  "applicationId": "com.chatme.frontend",
+  "applicationId": "com.shohruz.chatme",
   "variantName": "debug",
   "elements": []
 }

@@ -10,7 +10,7 @@ import { authGuard, loginGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent, pathMatch: 'full' },
+    { path: '', component: HomeComponent, pathMatch: 'full', canActivate: [loginGuard] },
     { path: 'features', component: FeaturesComponent },
     { path: 'about', component: AboutComponent },
     { path: 'login', component: LoginComponent, canActivate: [loginGuard] },

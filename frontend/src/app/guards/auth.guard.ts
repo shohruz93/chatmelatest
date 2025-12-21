@@ -18,9 +18,9 @@ export const loginGuard: CanActivateFn = (route, state) => {
     const auth = inject(AuthService);
     const router = inject(Router);
 
-    // If user is already logged in, redirect to chat
+    // If user is already logged in, redirect to dashboard profile
     if (auth.currentUserValue) {
-        router.navigate(['/dashboard/explore']);
+        router.navigate(['/dashboard/profile']);
         return false;
     }
 

@@ -11,10 +11,13 @@ INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:28
 	android:name
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:29:13-62
 manifest
-ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:1-42:12
+ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
+MERGED from [:capacitor-app] D:\ChatmeLast\frontend\node_modules\@capacitor\app\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
+MERGED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-10:12
 MERGED from [:capacitor-android] D:\ChatmeLast\frontend\node_modules\@capacitor\android\capacitor\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-cordova-android-plugins] D:\ChatmeLast\frontend\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-11:12
 MERGED from [org.apache.cordova:framework:14.0.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\e47013dec160bb8e8e78795049f410c2\transformed\framework-14.0.1\AndroidManifest.xml:20:1-27:12
@@ -22,6 +25,12 @@ MERGED from [androidx.core:core-splashscreen:1.2.0] C:\Users\ShShohruz\.gradle\c
 MERGED from [androidx.appcompat:appcompat-resources:1.7.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\bee8f78bb28e6cb788edd05c601f4778\transformed\appcompat-resources-1.7.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.appcompat:appcompat:1.7.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\c3f09e8abd8bb01c9314454bd06bb337\transformed\appcompat-1.7.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\ef97883a45eaa5cc79115d450cce1dbe\transformed\coordinatorlayout-1.3.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\1abeda55bbc177876076cad4cf446530\transformed\play-services-auth-api-phone-17.0.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth-base:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\3e7221b7b637ceb095d8637f6565cad6\transformed\play-services-auth-base-17.0.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:17:1-29:12
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\253dbe78197334688566857b17b7df2e\transformed\play-services-tasks-17.0.0\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:17:1-28:12
 MERGED from [androidx.fragment:fragment:1.8.9] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\754c4f1b691d2a1223e4f8f413992fee\transformed\fragment-1.8.9\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.activity:activity:1.11.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\4ce00e85fb17003296e7add5523825c1\transformed\activity-1.11.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\1e3e5961ccf37b13ee8a7c0a81228664\transformed\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
@@ -52,18 +61,27 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\ShShohruz\.gradle\c
 MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\1d9ef0194f51a6e0da4e440575587814\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\9275faa7fc56368462609e8a34802ec7\transformed\core-viewtree-1.0.0\AndroidManifest.xml:2:1-7:12
 	package
+		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:5-33
 		INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
 	android:versionName
 		INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
 	android:versionCode
 		INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
 	xmlns:android
-		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:2:11-69
+		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:11-69
 application
 ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:4:5-37:19
 INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:4:5-37:19
 MERGED from [:capacitor-cordova-android-plugins] D:\ChatmeLast\frontend\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-9:19
 MERGED from [:capacitor-cordova-android-plugins] D:\ChatmeLast\frontend\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-9:19
+MERGED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:22:5-27:19
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\253dbe78197334688566857b17b7df2e\transformed\play-services-tasks-17.0.0\AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\253dbe78197334688566857b17b7df2e\transformed\play-services-tasks-17.0.0\AndroidManifest.xml:7:5-20
+MERGED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:22:5-26:19
+MERGED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.emoji2:emoji2:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:23:5-33:19
 MERGED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:28:5-89
@@ -94,7 +112,7 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Sh
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:10:9-40
 	android:usesCleartextTraffic
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:11:9-44
-activity#com.chatme.frontend.MainActivity
+activity#com.shohruz.chatme.MainActivity
 ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:13:9-26:20
 	android:label
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:16:13-56
@@ -107,7 +125,7 @@ ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:13:9-
 	android:theme
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:17:13-62
 	android:name
-		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:15:13-41
+		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:15:13-40
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
 ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:21:13-24:29
 action#android.intent.action.MAIN
@@ -120,6 +138,8 @@ ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:23:17
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:23:27-74
 uses-permission#android.permission.INTERNET
 ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:41:5-67
+MERGED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-67
+MERGED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-67
 	android:name
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:41:22-64
 meta-data#android.support.FILE_PROVIDER_PATHS
@@ -132,6 +152,12 @@ uses-sdk
 INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
 INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
+MERGED from [:capacitor-app] D:\ChatmeLast\frontend\node_modules\@capacitor\app\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-app] D:\ChatmeLast\frontend\node_modules\@capacitor\app\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-android] D:\ChatmeLast\frontend\node_modules\@capacitor\android\capacitor\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-android] D:\ChatmeLast\frontend\node_modules\@capacitor\android\capacitor\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
 MERGED from [:capacitor-cordova-android-plugins] D:\ChatmeLast\frontend\android\capacitor-cordova-android-plugins\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
@@ -146,6 +172,18 @@ MERGED from [androidx.appcompat:appcompat:1.7.1] C:\Users\ShShohruz\.gradle\cach
 MERGED from [androidx.appcompat:appcompat:1.7.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\c3f09e8abd8bb01c9314454bd06bb337\transformed\appcompat-1.7.1\AndroidManifest.xml:5:5-44
 MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\ef97883a45eaa5cc79115d450cce1dbe\transformed\coordinatorlayout-1.3.0\AndroidManifest.xml:5:5-44
 MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\ef97883a45eaa5cc79115d450cce1dbe\transformed\coordinatorlayout-1.3.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\1abeda55bbc177876076cad4cf446530\transformed\play-services-auth-api-phone-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\1abeda55bbc177876076cad4cf446530\transformed\play-services-auth-api-phone-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\3e7221b7b637ceb095d8637f6565cad6\transformed\play-services-auth-base-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\3e7221b7b637ceb095d8637f6565cad6\transformed\play-services-auth-base-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\253dbe78197334688566857b17b7df2e\transformed\play-services-tasks-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-tasks:17.0.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\253dbe78197334688566857b17b7df2e\transformed\play-services-tasks-17.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:20:5-44
 MERGED from [androidx.fragment:fragment:1.8.9] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\754c4f1b691d2a1223e4f8f413992fee\transformed\fragment-1.8.9\AndroidManifest.xml:5:5-44
 MERGED from [androidx.fragment:fragment:1.8.9] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\754c4f1b691d2a1223e4f8f413992fee\transformed\fragment-1.8.9\AndroidManifest.xml:5:5-44
 MERGED from [androidx.activity:activity:1.11.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\4ce00e85fb17003296e7add5523825c1\transformed\activity-1.11.0\AndroidManifest.xml:20:5-44
@@ -208,6 +246,48 @@ MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\ShShohruz\.gradle\cache
 		INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
 	android:minSdkVersion
 		INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-76
+uses-permission#android.permission.USE_CREDENTIALS
+ADDED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-74
+	android:name
+		ADDED from [:codetrix-studio-capacitor-google-auth] D:\ChatmeLast\frontend\node_modules\@codetrix-studio\capacitor-google-auth\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-71
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:18.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\298f23562d34114ce8ed5285dd6ba132\transformed\play-services-auth-18.1.0\AndroidManifest.xml:34:13-89
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:23:9-26:75
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:25:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:26:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:17.1.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\488731cca69f53c9be995fe4412bb6f6\transformed\play-services-base-17.1.0\AndroidManifest.xml:24:13-79
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:23:9-25:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:25:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:17.1.1] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\157f9d495e393379de53fa837b78baa2\transformed\play-services-basement-17.1.1\AndroidManifest.xml:24:13-58
 provider#androidx.startup.InitializationProvider
 ADDED from [androidx.emoji2:emoji2:1.3.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\353d69426d62513a7e19e841051a3a44\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
 MERGED from [androidx.lifecycle:lifecycle-process:2.6.2] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\14a3b51da1167f75215e7e32d2231e74\transformed\lifecycle-process-2.6.2\AndroidManifest.xml:24:9-32:20
@@ -236,7 +316,7 @@ ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\
 		ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
 	android:name
 		ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
-permission#com.chatme.frontend.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+permission#com.shohruz.chatme.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
 		ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
@@ -246,7 +326,7 @@ uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
-uses-permission#com.chatme.frontend.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission#com.shohruz.chatme.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.17.0] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\11094a199bb7945826b161d8a9c17beb\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
