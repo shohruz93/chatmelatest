@@ -84,7 +84,8 @@ export class LanguageService {
                 'MALE': 'Male',
                 'FEMALE': 'Female',
                 'ANY_LOCATION': 'Any Location',
-                'ANY_LANGUAGE': 'Any Language'
+                'ANY_LANGUAGE': 'Any Language',
+                'NO_RANDOM_USER': 'No users found to connect with! Try again later.'
             },
 
             'NAV': {
@@ -239,7 +240,8 @@ export class LanguageService {
                 'MALE': 'Мужской',
                 'FEMALE': 'Женский',
                 'ANY_LOCATION': 'Любое место',
-                'ANY_LANGUAGE': 'Любой язык'
+                'ANY_LANGUAGE': 'Любой язык',
+                'NO_RANDOM_USER': 'Не найдено пользователей для связи! Попробуйте позже.'
             },
             'NAV': {
                 'DASHBOARD': 'Панель',
@@ -393,7 +395,8 @@ export class LanguageService {
                 'MALE': 'Мард',
                 'FEMALE': 'Зан',
                 'ANY_LOCATION': 'Ҳар ҷо',
-                'ANY_LANGUAGE': 'Ҳар гуна'
+                'ANY_LANGUAGE': 'Ҳар гуна',
+                'NO_RANDOM_USER': 'Барои пайвастшавӣ корбар ёфт нашуд! Баъдтар кӯшиш кунед.'
             },
             'NAV': {
                 'DASHBOARD': 'Панел',
@@ -551,7 +554,8 @@ export class LanguageService {
                 'MALE': 'Masculino',
                 'FEMALE': 'Femenino',
                 'ANY_LOCATION': 'Cualquier Ubicación',
-                'ANY_LANGUAGE': 'Cualquier Idioma'
+                'ANY_LANGUAGE': 'Cualquier Idioma',
+                'NO_RANDOM_USER': '¡No se encontraron usuarios para conectar! Inténtalo de nuevo más tarde.'
             },
             'NAV': {
                 'DASHBOARD': 'Panel',
@@ -709,7 +713,8 @@ export class LanguageService {
                 'MALE': 'ذكر',
                 'FEMALE': 'أنثى',
                 'ANY_LOCATION': 'أي موقع',
-                'ANY_LANGUAGE': 'أي لغة'
+                'ANY_LANGUAGE': 'أي لغة',
+                'NO_RANDOM_USER': 'لم يتم العثور على مستخدمين للتواصل معهم! حاول مرة أخرى لاحقًا.'
             },
             'NAV': {
                 'DASHBOARD': 'لوحة التحكم',
@@ -867,7 +872,8 @@ export class LanguageService {
                 'MALE': 'Homme',
                 'FEMALE': 'Femme',
                 'ANY_LOCATION': 'Toute Localisation',
-                'ANY_LANGUAGE': 'Toute Langue'
+                'ANY_LANGUAGE': 'Toute Langue',
+                'NO_RANDOM_USER': 'Aucun utilisateur trouvé pour se connecter ! Réessayez plus tard.'
             },
             'NAV': {
                 'DASHBOARD': 'Tableau de bord',
