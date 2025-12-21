@@ -18,7 +18,7 @@
             </div>
             }
         </div>
-        <button class="btn-login" routerLink="/login" title="Login">👤</button>
+        <button class="btn-login" routerLink="/login" [title]="'NAV.LOGIN' | translate">👤</button>
         <button class="theme-toggle" (click)="toggleTheme()">{{ isDarkMode() ? '☀️' : '🌙' }}</button>
     </div>
 </header>

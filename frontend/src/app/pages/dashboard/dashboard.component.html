@@ -22,7 +22,7 @@
             <!-- Messages Link -->
             <a routerLink="conversations" routerLinkActive="active" class="btn-messages">
                 <span class="btn-icon">💬</span>
-                <span>Messages</span>
+                <span>{{ 'NAV.MESSAGES' | translate }}</span>
                 @if (unreadCount > 0) {
                 <span class="badge">{{ unreadCount }}</span>
                 }
@@ -31,13 +31,13 @@
             <!-- Explore Link -->
             <a routerLink="explore" routerLinkActive="active" class="btn-messages">
                 <span class="btn-icon">🔍</span>
-                <span>Explore</span>
+                <span>{{ 'NAV.EXPLORE' | translate }}</span>
             </a>
 
             <!-- Guests Link -->
             <a routerLink="guests" routerLinkActive="active" class="btn-messages">
                 <span class="btn-icon">👥</span>
-                <span>Guests</span>
+                <span>{{ 'NAV.GUESTS' | translate }}</span>
                 @if (newGuestsCount > 0) {
                 <span class="badge">{{ newGuestsCount }}</span>
                 }
@@ -47,14 +47,14 @@
             @if (currentUser?.is_admin) {
             <a routerLink="/admin" routerLinkActive="active" class="btn-messages admin-link">
                 <span class="btn-icon">🛡️</span>
-                <span>Admin Panel</span>
+                <span>{{ 'NAV.ADMIN_PANEL' | translate }}</span>
             </a>
             }
 
             <!-- Contact Admin -->
             <button (click)="contactAdmin()" class="btn-messages">
                 <span class="btn-icon">🎧</span>
-                <span>Contact Admin</span>
+                <span>{{ 'NAV.CONTACT_ADMIN' | translate }}</span>
             </button>
 
             <!-- Language Selector -->
@@ -81,7 +81,7 @@
             <!-- Theme Toggle -->
             <button class="btn-theme-sidebar" (click)="toggleTheme()">
                 <span class="btn-icon">{{ isDarkMode() ? '☀️' : '🌙' }}</span>
-                <span>{{ isDarkMode() ? 'Light Mode' : 'Dark Mode' }}</span>
+                <span>{{ isDarkMode() ? ('NAV.LIGHT_MODE' | translate) : ('NAV.DARK_MODE' | translate) }}</span>
             </button>
         </div>
     </aside>

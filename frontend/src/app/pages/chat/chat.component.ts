@@ -11,11 +11,12 @@ import { Subscription, lastValueFrom } from 'rxjs';
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, UserProfileModalComponent],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, UserProfileModalComponent, TranslatePipe],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css']
 })
@@ -58,7 +59,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     stickers = [
         '😀', '😂', '😍', '😎', '😭', '😡', '👍', '👎', '🎉', '❤️', '🔥', '💩',
-        '👻', '👽', '🤖', '🎃', '🎄', '🎁', '🎈', '💪', '🙏', '🤝', '👋', '💋'
+        '👻', '👽', '🤖', '🎃', '🎄', '🎁', '🎈', '💪', '🙏', '🤝', '👋', '💋',
+        '💯', '💢', '💥', '💫', '💦', '💤', '💭', '🥳', '🥺', '🤯', '🥴', '🥰',
+        '🤩', '🤪', '🤫', '🤬', '🤭', '🤮', '🤧', '🥶', '🥵', '🤑', '🤠', '🤡',
+        '😈', '👿', '👹', '👺', '💀', '☠️', '😼', '😽', '🙀', '😿', '😾', '🙈',
+        '🙉', '🙊', '🐵', '🐶', '🐺', '🐱', '🦁', '🐯', '🦒', '🦊', '🦝', '🐮',
+        '🐷', '🐗', '🐭', '🐹', '🐰', '🐻', '🐨', '🐼', '🐸', '🦓', '🐴', '🦄'
     ];
 
     isDarkMode = signal(document.documentElement.getAttribute('data-theme') === 'dark');
@@ -88,9 +94,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     filterOnlineOnly: boolean = false;
 
     genderOptions = [
-        { value: 'any', label: 'Any Gender' },
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' }
+        { value: 'any', label: 'CHAT.ANY_GENDER' },
+        { value: 'male', label: 'CHAT.MALE' },
+        { value: 'female', label: 'CHAT.FEMALE' }
     ];
 
     locationOptions: any[] = [];

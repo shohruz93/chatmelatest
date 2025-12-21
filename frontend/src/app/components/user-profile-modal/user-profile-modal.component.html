@@ -52,14 +52,14 @@
         <div class="profile-body">
             @if (user.bio) {
             <div class="section">
-                <h3 class="section-title">About</h3>
+                <h3 class="section-title">{{ 'PROFILE.ABOUT' | translate }}</h3>
                 <p class="bio-text">{{ user.bio }}</p>
             </div>
             }
 
             @if (user.native_language || user.learning_language) {
             <div class="section">
-                <h3 class="section-title">Languages</h3>
+                <h3 class="section-title">{{ 'PROFILE.LANGUAGES' | translate }}</h3>
                 <div class="languages-grid">
                     @if (user.native_language) {
                     @for (lang of getLanguageArray(user.native_language); track lang) {
@@ -73,7 +73,7 @@
                                 d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                             </path>
                         </svg>
-                        <span class="lang-type">Native</span>
+                        <span class="lang-type">{{ 'PROFILE.NATIVE' | translate }}</span>
                         <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
                             (error)="$event.target.style.display='none'" />
                         {{ getLanguageLabel(lang) }}
@@ -89,7 +89,7 @@
                             <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                             <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                         </svg>
-                        <span class="lang-type">Learning</span>
+                        <span class="lang-type">{{ 'PROFILE.LEARNING' | translate }}</span>
                         <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
                             (error)="$event.target.style.display='none'" />
                         {{ getLanguageLabel(lang) }}
@@ -102,7 +102,7 @@
 
             @if (user.interests && user.interests.length > 0) {
             <div class="section">
-                <h3 class="section-title">Interests</h3>
+                <h3 class="section-title">{{ 'PROFILE.INTERESTS' | translate }}</h3>
                 <div class="interests-grid">
                     @for (interest of user.interests; track interest.id) {
                     <div class="interest-chip">
@@ -116,29 +116,32 @@
             <!-- Comments & Ratings Section -->
             @if (currentUser && currentUser.id !== user.id) {
             <div class="comments-section">
-                <h3 class="section-title">Comments & Ratings</h3>
+                <h3 class="section-title">{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
 
                 <!-- Rating Form (only if user hasn't rated yet) -->
                 @if (!hasRated) {
                 <div class="add-rating-form">
-                    <h4>Rate this user</h4>
+                    <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
                     <div class="rating-stars">
                         @for (star of [1,2,3,4,5]; track star) {
                         <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
                         }
                     </div>
-                    <textarea [(ngModel)]="newComment" placeholder="Write a comment (optional)..." rows="3"></textarea>
-                    <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit
-                        Rating</button>
+                    <textarea [(ngModel)]="newComment" [placeholder]="'PROFILE.WRITE_COMMENT_OPTIONAL' | translate"
+                        rows="3"></textarea>
+                    <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{
+                        'PROFILE.SUBMIT_RATING' | translate }}</button>
                 </div>
                 }
 
                 <!-- Comment-only Form (if user has already rated) -->
                 @if (hasRated) {
                 <div class="add-comment-form">
-                    <h4>Add a comment</h4>
-                    <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
-                    <button class="btn-submit-comment" (click)="submitComment()">Add Comment</button>
+                    <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
+                    <textarea [(ngModel)]="newComment" [placeholder]="'PROFILE.WRITE_COMMENT' | translate"
+                        rows="3"></textarea>
+                    <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' |
+                        translate }}</button>
                 </div>
                 }
 
@@ -173,16 +176,18 @@
                                 👎 {{ comment.dislikes || 0 }}
                             </button>
                             <button class="btn-action" (click)="toggleReply(comment.id, $event)">
-                                {{ showReplyInput[comment.id] ? 'Cancel' : 'Reply' }}
+                                {{ showReplyInput[comment.id] ? ('COMMON.CANCEL' | translate) : ('PROFILE.REPLY' |
+                                translate) }}
                             </button>
                         </div>
 
                         @if (showReplyInput[comment.id]) {
                         <div class="reply-input">
-                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply..."
+                            <input type="text" [(ngModel)]="replyContent[comment.id]"
+                                [placeholder]="'PROFILE.WRITE_COMMENT' | translate"
                                 (keyup.enter)="submitReply(comment.id)">
-                            <button (click)="submitReply(comment.id)"
-                                [disabled]="!replyContent[comment.id]?.trim()">Send</button>
+                            <button (click)="submitReply(comment.id)" [disabled]="!replyContent[comment.id]?.trim()">{{
+                                'PROFILE.SEND' | translate }}</button>
                         </div>
                         }
 
@@ -193,8 +198,10 @@
                                 stroke-linejoin="round" [class.rotated]="showReplies[comment.id]">
                                 <polyline points="6 9 12 15 18 9"></polyline>
                             </svg>
-                            {{ showReplies[comment.id] ? 'Hide' : 'Show' }} {{ comment.replies.length }} {{
-                            comment.replies.length === 1 ? 'reply' : 'replies' }}
+                            {{ showReplies[comment.id] ? ('PROFILE.HIDE' | translate) : ('PROFILE.SHOW' | translate) }}
+                            {{ comment.replies.length }} {{
+                            comment.replies.length === 1 ? ('PROFILE.REPLY_SINGULAR' | translate) : ('PROFILE.REPLIES' |
+                            translate) }}
                         </button>
 
                         @if (showReplies[comment.id]) {
@@ -213,7 +220,7 @@
                         }
                     </div>
                     } @empty {
-                    <p class="no-comments">No comments yet.</p>
+                    <p class="no-comments">{{ 'PROFILE.NO_COMMENTS' | translate }}</p>
                     }
                 </div>
             </div>
@@ -227,7 +234,7 @@
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
-                Send Message
+                {{ 'PROFILE.SEND_MESSAGE' | translate }}
             </button>
         </div>
     </div>

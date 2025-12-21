@@ -8,8 +8,9 @@
                 <span class="status-indicator" [class.online]="isPartnerOnline"></span>
             </div>
             <div class="user-details">
-                <h2 class="user-name">{{ partnerName || 'Chat Partner' }}</h2>
-                <span class="user-status">{{ isPartnerOnline ? 'Online' : 'Offline' }}</span>
+                <h2 class="user-name">{{ partnerName || ('CHAT.CHAT_PARTNER' | translate) }}</h2>
+                <span class="user-status">{{ isPartnerOnline ? ('CHAT.ONLINE' | translate) : ('CHAT.OFFLINE' |
+                    translate) }}</span>
             </div>
         </div>
         } @else {
@@ -18,8 +19,8 @@
                 <span class="icon">💬</span>
             </div>
             <div class="user-details">
-                <h2 class="user-name">Select a Conversation</h2>
-                <span class="user-status">Start chatting now</span>
+                <h2 class="user-name">{{ 'CHAT.SELECT_CONVERSATION' | translate }}</h2>
+                <span class="user-status">{{ 'CHAT.START_NOW' | translate }}</span>
             </div>
         </div>
         }
@@ -31,8 +32,8 @@
             @if (!partnerId) {
             <div class="empty-state">
                 <div class="empty-icon">👋</div>
-                <h3>Welcome to Chatme</h3>
-                <p>Select a conversation or find a new match to start chatting.</p>
+                <h3>{{ 'CHAT.EMPTY_STATE_TITLE' | translate }}</h3>
+                <p>{{ 'CHAT.EMPTY_STATE_DESC' | translate }}</p>
             </div>
             }
 
@@ -141,7 +142,7 @@
             <!-- Text Input -->
             <div class="text-input-container">
                 <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" (input)="onTyping()"
-                    placeholder="Type a message..." class="message-input">
+                    [placeholder]="'CHAT.TYPE_MESSAGE' | translate" class="message-input">
                 <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim() && !selectedImage">
                     <span class="icon">➤</span>
                 </button>
@@ -168,22 +169,24 @@
     <div class="modal-overlay" (click)="skipRating()">
         <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Rate Experience</h3>
+                <h3>{{ 'CHAT.RATING_TITLE' | translate }}</h3>
                 <button class="modal-close" (click)="skipRating()">✕</button>
             </div>
             <div class="modal-body">
-                <p>How was your conversation?</p>
+                <p>{{ 'CHAT.RATING_Question' | translate }}</p>
                 <div class="star-rating">
                     @for (star of [1,2,3,4,5]; track star) {
                     <button class="star-btn" [class.active]="star <= selectedRating" (click)="setRating(star)">
                         {{ star <= selectedRating ? '★' : '☆' }} </button>
                             }
                 </div>
-                <textarea [(ngModel)]="ratingComment" placeholder="Any comments?" class="rating-input"></textarea>
+                <textarea [(ngModel)]="ratingComment" [placeholder]="'CHAT.RATING_COMMENT_PLACEHOLDER' | translate"
+                    class="rating-input"></textarea>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" (click)="skipRating()">Skip</button>
-                <button class="btn-primary" (click)="submitRating()" [disabled]="!selectedRating">Submit</button>
+                <button class="btn-secondary" (click)="skipRating()">{{ 'CHAT.SKIP' | translate }}</button>
+                <button class="btn-primary" (click)="submitRating()" [disabled]="!selectedRating">{{ 'CHAT.SUBMIT' |
+                    translate }}</button>
             </div>
         </div>
     </div>
@@ -193,18 +196,18 @@
     <div class="modal-overlay">
         <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>New Chat Request</h3>
+                <h3>{{ 'CHAT.REQUEST_TITLE' | translate }}</h3>
             </div>
             <div class="modal-body center-content">
                 <div class="avatar-large">
                     <img [src]="incomingRequest.avatar || 'default-avatar.png'" alt="User">
                 </div>
                 <h3>{{ incomingRequest.name || 'Anonymous' }}</h3>
-                <p>wants to chat with you!</p>
+                <p>{{ 'CHAT.REQUEST_DESC' | translate }}</p>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" (click)="rejectRequest()">Decline</button>
-                <button class="btn-primary" (click)="acceptRequest()">Accept</button>
+                <button class="btn-secondary" (click)="rejectRequest()">{{ 'CHAT.DECLINE' | translate }}</button>
+                <button class="btn-primary" (click)="acceptRequest()">{{ 'CHAT.ACCEPT' | translate }}</button>
             </div>
         </div>
     </div>
@@ -214,32 +217,33 @@
     <div class="modal-overlay" (click)="closeFilterModal()">
         <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h3>Find Match</h3>
+                <h3>{{ 'CHAT.FIND_MATCH_TITLE' | translate }}</h3>
                 <button class="modal-close" (click)="closeFilterModal()">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Gender</label>
+                    <label>{{ 'CHAT.GENDER' | translate }}</label>
                     <select [(ngModel)]="filterGender" class="form-select">
                         @for (opt of genderOptions; track opt.value) {
-                        <option [value]="opt.value">{{ opt.label }}</option>
+                        <option [value]="opt.value">{{ opt.label | translate }}</option>
                         }
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
-                    <app-country-select [(ngModel)]="filterLocation" [showAny]="true" [label]="'Any Location'">
+                    <label>{{ 'CHAT.LOCATION' | translate }}</label>
+                    <app-country-select [(ngModel)]="filterLocation" [showAny]="true"
+                        [label]="'CHAT.ANY_LOCATION' | translate">
                     </app-country-select>
                 </div>
                 <div class="form-group checkbox">
                     <label>
-                        <input type="checkbox" [(ngModel)]="filterOnlineOnly"> Online Only
+                        <input type="checkbox" [(ngModel)]="filterOnlineOnly"> {{ 'CHAT.ONLINE_ONLY' | translate }}
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" (click)="closeFilterModal()">Cancel</button>
-                <button class="btn-primary" (click)="startSearch()">Search</button>
+                <button class="btn-secondary" (click)="closeFilterModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+                <button class="btn-primary" (click)="startSearch()">{{ 'CHAT.SEARCH' | translate }}</button>
             </div>
         </div>
     </div>

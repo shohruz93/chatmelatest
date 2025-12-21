@@ -2,11 +2,12 @@ import { Component, Input, Output, EventEmitter, forwardRef, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { CountryService } from '../../services/country.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-country-select',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './country-select.component.html',
     styleUrls: ['./country-select.component.css'],
     providers: [
@@ -35,10 +36,17 @@ export class CountrySelectComponent implements ControlValueAccessor {
     private onTouched: () => void = () => { };
 
     get options() {
+        let opts: any[];
         if (this.type === 'language') {
-            return this.countryService.getLanguageOptions(this.showAny);
+            opts = this.countryService.getLanguageOptions(this.showAny);
+        } else {
+            opts = this.countryService.getCountryOptions(this.showAny);
         }
-        return this.countryService.getCountryOptions(this.showAny);
+
+        if (this.showAny && this.label && opts.length > 0 && opts[0].value === 'any') {
+            opts[0].label = this.label;
+        }
+        return opts;
     }
 
     get filteredOptions() {

@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, HostListener } from '@angular/core';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -35,6 +35,11 @@ export class HeaderComponent {
             this.currentRoute = event.urlAfterRedirects;
             this.checkUnread();
         });
+    }
+
+    @HostListener('document:click')
+    closeMenu() {
+        this.showLangMenu = false;
     }
 
     checkUnread() {

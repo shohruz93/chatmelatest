@@ -16,8 +16,8 @@
         <!-- Search Input -->
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
-            <input type="text" class="search-input" [(ngModel)]="searchTerm" placeholder="Search..."
-                (click)="$event.stopPropagation()" />
+            <input type="text" class="search-input" [(ngModel)]="searchTerm"
+                [placeholder]="'COMMON.SEARCH_PLACEHOLDER' | translate" (click)="$event.stopPropagation()" />
         </div>
 
         <!-- Options List -->
@@ -36,7 +36,7 @@
             </div>
             }
             @if (filteredOptions.length === 0) {
-            <div class="no-results">No results found</div>
+            <div class="no-results">{{ 'COMMON.NO_RESULTS' | translate }}</div>
             }
         </div>
     </div>
