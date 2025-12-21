@@ -22,41 +22,35 @@ class User {
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
-            // Update existing user with latest name information
+            // User exists: Return ID without updating personal info
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $row['id'];
-            
-            // Update name fields if provided by Google
-            $updateQuery = "UPDATE " . $this->table_name . " 
-                           SET name = :name, 
-                               first_name = :first_name, 
-                               family_name = :family_name 
-                           WHERE id = :id";
-            $updateStmt = $this->conn->prepare($updateQuery);
-            $updateStmt->bindParam(":name", $googleUser['name']);
-            $updateStmt->bindParam(":first_name", $googleUser['given_name']);
-            $updateStmt->bindParam(":family_name", $googleUser['family_name']);
-            $updateStmt->bindParam(":id", $this->id);
-            $updateStmt->execute();
-            
             return $this->id;
         } else {
             // Create new user
             $query = "INSERT INTO " . $this->table_name . " 
-                    SET google_id=:google_id, email=:email, name=:name, 
+                    SET google_id=:google_id, email=:email, name='New User', 
                         first_name=:first_name, family_name=:family_name, avatar=:avatar";
             
             $stmt = $this->conn->prepare($query);
 
             $stmt->bindParam(":google_id", $googleUser['sub']);
             $stmt->bindParam(":email", $googleUser['email']);
-            $stmt->bindParam(":name", $googleUser['name']);
             $stmt->bindParam(":first_name", $googleUser['given_name']);
             $stmt->bindParam(":family_name", $googleUser['family_name']);
             $stmt->bindParam(":avatar", $googleUser['picture']);
 
             if ($stmt->execute()) {
                 $this->id = $this->conn->lastInsertId();
+                
+                // Update name to "User {id}"
+                $updateNameQuery = "UPDATE " . $this->table_name . " SET name = :name WHERE id = :id";
+                $updateNameStmt = $this->conn->prepare($updateNameQuery);
+                $newName = "User " . $this->id;
+                $updateNameStmt->bindParam(":name", $newName);
+                $updateNameStmt->bindParam(":id", $this->id);
+                $updateNameStmt->execute();
+
                 return $this->id;
             }
         }
@@ -123,6 +117,58 @@ class User {
         }
 
         return $users;
+    }
+
+    public function getSmartMatch($currentUserId) {
+        // 1. Get current user's interests
+        $query = "SELECT interest_id FROM user_interests WHERE user_id = :user_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":user_id", $currentUserId);
+        $stmt->execute();
+        $myInterests = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($myInterests)) {
+            // No interests? Just return a random user
+            return $this->getRandomUsers($currentUserId, [], 1)[0] ?? null;
+        }
+
+        // 2. Find other users with overlapping interests
+        $inQuery = implode(',', array_fill(0, count($myInterests), '?'));
+        
+        $sql = "
+            SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language,
+                   COUNT(ui.interest_id) as shared_count
+            FROM users u
+            JOIN user_interests ui ON u.id = ui.user_id
+            WHERE u.id != ? 
+            AND ui.interest_id IN ($inQuery)
+            GROUP BY u.id
+            ORDER BY shared_count DESC, RAND()
+            LIMIT 1
+        ";
+
+        $stmt = $this->conn->prepare($sql);
+        
+        // Bind parameters: currentUserId first, then the interest IDs
+        $params = array_merge([$currentUserId], $myInterests);
+        $stmt->execute($params);
+        
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+             // Fetch interests for this user
+             $query = "SELECT i.id, i.name FROM interests i 
+             JOIN user_interests ui ON i.id = ui.interest_id 
+             WHERE ui.user_id = :user_id";
+             $stmt = $this->conn->prepare($query);
+             $stmt->bindParam(":user_id", $user['id']);
+             $stmt->execute();
+             $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+             return $user;
+        }
+
+        // 3. Fallback to random if no smart match
+        return $this->getRandomUsers($currentUserId, [], 1)[0] ?? null;
     }
 
     public function getAdminUser() {

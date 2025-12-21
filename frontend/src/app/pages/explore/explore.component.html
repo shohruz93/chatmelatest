@@ -7,35 +7,35 @@
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
         </svg>
-        Filters
+        {{ 'EXPLORE_PAGE.FILTERS' | translate }}
       </h2>
-      <button class="reset-btn" (click)="resetFilters()">Reset</button>
+      <button class="reset-btn" (click)="resetFilters()">{{ 'EXPLORE_PAGE.RESET' | translate }}</button>
     </div>
 
     <div class="filter-section">
-      <label>Status</label>
+      <label>{{ 'EXPLORE_PAGE.STATUS' | translate }}</label>
       <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
         @for (option of statusOptions; track option.value) {
         <option [value]="option.value">
-          {{ option.label }}
+          {{ option.label | translate }}
         </option>
         }
       </select>
     </div>
 
     <div class="filter-section">
-      <label>Gender</label>
+      <label>{{ 'EXPLORE_PAGE.GENDER' | translate }}</label>
       <select [(ngModel)]="filterGender" (change)="onFilterChange()" class="filter-select">
         @for (option of genderOptions; track option.value) {
         <option [value]="option.value">
-          {{ option.label }}
+          {{ option.label | translate }}
         </option>
         }
       </select>
     </div>
 
     <div class="filter-section">
-      <label>Location</label>
+      <label>{{ 'EXPLORE_PAGE.LOCATION' | translate }}</label>
       <div class="custom-select-container">
         <div class="custom-select" (click)="toggleLocationDropdown()">
           @if (filterLocation !== 'any') {
@@ -61,7 +61,7 @@
     </div>
 
     <div class="filter-section">
-      <label>Native Language</label>
+      <label>{{ 'EXPLORE_PAGE.NATIVE_LANGUAGE' | translate }}</label>
       <div class="custom-select-container">
         <div class="custom-select" (click)="toggleNativeLanguageDropdown()">
           @if (filterNativeLanguage !== 'any') {
@@ -87,7 +87,7 @@
     </div>
 
     <div class="filter-section">
-      <label>Learning Language</label>
+      <label>{{ 'EXPLORE_PAGE.LEARNING_LANGUAGE' | translate }}</label>
       <div class="custom-select-container">
         <div class="custom-select" (click)="toggleLearningLanguageDropdown()">
           @if (filterLearningLanguage !== 'any') {
@@ -116,15 +116,24 @@
   <!-- Main Content -->
   <main class="explore-content">
     <div class="explore-header">
-      <h1>Explore Users</h1>
-      <p class="user-count">{{ filteredUsers.length }} {{ filteredUsers.length === 1 ? 'user' : 'users' }} found</p>
+      <div class="header-content">
+        <h1>Explore Users</h1>
+        <p class="user-count">{{ filteredUsers.length }} {{ filteredUsers.length === 1 ? 'user' : 'users' }} found</p>
+      </div>
+      <button class="connect-random-btn" (click)="connectRandomly()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l-5 5M4 4l5 5" />
+        </svg>
+        <span>Connect Randomly</span>
+      </button>
     </div>
 
     <!-- Loading State -->
     @if (isLoading()) {
     <div class="loading-state">
       <div class="spinner"></div>
-      <p>Loading users...</p>
+      <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
     </div>
     }
 
@@ -137,9 +146,9 @@
         <circle cx="9" cy="7" r="4"></circle>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
       </svg>
-      <h3>No users found</h3>
-      <p>Try adjusting your filters to see more results</p>
-      <button class="reset-btn-large" (click)="resetFilters()">Reset Filters</button>
+      <h3>{{ 'EXPLORE_PAGE.NO_USERS' | translate }}</h3>
+      <p>{{ 'EXPLORE_PAGE.NO_USERS_DESC' | translate }}</p>
+      <button class="reset-btn-large" (click)="resetFilters()">{{ 'EXPLORE_PAGE.RESET_FILTERS' | translate }}</button>
     </div>
     }
 
@@ -151,7 +160,7 @@
         <!-- Online Status Badge -->
         <div class="status-badge" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
           <span class="status-dot"></span>
-          {{ user.isOnline ? 'Online' : 'Offline' }}
+          {{ (user.isOnline ? 'EXPLORE_PAGE.ONLINE' : 'EXPLORE_PAGE.OFFLINE') | translate }}
         </div>
 
         <!-- Avatar -->
@@ -222,7 +231,7 @@
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                   </path>
                 </svg>
-                Native
+                {{ 'EXPLORE_PAGE.NATIVE_LANGUAGE' | translate }}
               </span>
               <div class="language-list">
                 @for (lang of getLanguagesArray(user.native_language); track lang) {
@@ -243,7 +252,7 @@
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
-                Learning
+                {{ 'EXPLORE_PAGE.LEARNING_LANGUAGE' | translate }}
               </span>
               <div class="language-list">
                 @for (lang of getLanguagesArray(user.learning_language); track lang) {
@@ -267,7 +276,7 @@
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
-          Send Message
+          {{ 'EXPLORE_PAGE.SEND_MESSAGE' | translate }}
         </button>
       </div>
       }

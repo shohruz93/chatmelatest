@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 interface UserProfile {
     id: number;
@@ -26,7 +27,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, UserProfileModalComponent],
+    imports: [CommonModule, FormsModule, UserProfileModalComponent, TranslatePipe],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css']
 })
@@ -51,15 +52,15 @@ export class ExploreComponent implements OnInit, OnDestroy {
     filterLearningLanguage: string = 'any';
 
     statusOptions = [
-        { value: 'any', label: 'Any Status' },
-        { value: 'online', label: 'Online Only' },
-        { value: 'offline', label: 'Offline' }
+        { value: 'any', label: 'EXPLORE_PAGE.ANY_STATUS' },
+        { value: 'online', label: 'EXPLORE_PAGE.ONLINE_ONLY' },
+        { value: 'offline', label: 'EXPLORE_PAGE.OFFLINE' }
     ];
 
     genderOptions = [
-        { value: 'any', label: 'Any Gender' },
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' }
+        { value: 'any', label: 'EXPLORE_PAGE.ANY_GENDER' },
+        { value: 'male', label: 'EXPLORE_PAGE.MALE' },
+        { value: 'female', label: 'EXPLORE_PAGE.FEMALE' }
     ];
 
     // Use CountryService for location options
@@ -275,6 +276,23 @@ export class ExploreComponent implements OnInit, OnDestroy {
         return this.countryService.getFlagUrl(location);
     }
 
+    async connectRandomly() {
+        this.isLoading.set(true);
+        try {
+            const match = await lastValueFrom(this.api.get('/users/smart-match', { userId: this.currentUser?.id || 0 }));
+            if (match && match.id) {
+                this.router.navigate(['/dashboard/chat', match.id]);
+            } else {
+                alert('No users found to connect with! Try again later.');
+            }
+        } catch (error) {
+            console.error('Error connecting randomly:', error);
+            // alert('Failed to connect randomly. Please try again.');
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
     sendMessage(user: UserProfile, event?: Event) {
         if (event) {
             event.stopPropagation();
@@ -286,6 +304,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     openProfile(user: UserProfile) {
         this.selectedUser = user;
     }
+
 
     closeProfile() {
         this.selectedUser = null;

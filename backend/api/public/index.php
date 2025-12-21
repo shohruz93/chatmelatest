@@ -176,6 +176,15 @@ $router->add('GET', '/users/random', function() use ($db) {
     echo json_encode($users);
 });
 
+$router->add('GET', '/users/smart-match', function() use ($db) {
+    require_once __DIR__ . '/../src/User.php';
+    $user = new User($db);
+    $currentUserId = $_GET['userId'] ?? 0;
+    
+    $match = $user->getSmartMatch($currentUserId);
+    echo json_encode($match);
+});
+
 // Advanced Matching Routes
 $router->add('GET', '/match/compatible', function() use ($advancedMatch) {
     $userId = $_GET['userId'] ?? 0;
