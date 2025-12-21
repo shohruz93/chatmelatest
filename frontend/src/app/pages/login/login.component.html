@@ -12,8 +12,8 @@
                 <div class="icon-wrapper">
                     <span class="chat-icon">💬</span>
                 </div>
-                <h1 class="title">Welcome to Chatme</h1>
-                <p class="subtitle">Connect with people who share your vibe</p>
+                <h1 class="title">{{ 'AUTH.WELCOME' | translate }}</h1>
+                <p class="subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
             </div>
 
             <div class="card-body">
@@ -33,7 +33,7 @@
                     @if (isLoading()) {
                     <div class="loader"></div>
                     }
-                    <span>{{ isLoading() ? 'Signing in...' : 'Continue with Google' }}</span>
+                    <span>{{ (isLoading() ? 'AUTH.SIGNING_IN' : 'AUTH.CONTINUE_GOOGLE') | translate }}</span>
                 </button>
 
                 @if (error()) {
@@ -43,30 +43,30 @@
                 }
 
                 <div class="divider">
-                    <span>or</span>
+                    <span>{{ 'AUTH.OR' | translate }}</span>
                 </div>
 
                 <div class="features-preview">
                     <div class="feature-item">
                         <span class="feature-icon">🌍</span>
-                        <span class="feature-text">Real-time translation</span>
+                        <span class="feature-text">{{ 'AUTH.REAL_TIME_TRANS' | translate }}</span>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">🎯</span>
-                        <span class="feature-text">Smart matching</span>
+                        <span class="feature-text">{{ 'AUTH.SMART_MATCHING' | translate }}</span>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">🔒</span>
-                        <span class="feature-text">Privacy first</span>
+                        <span class="feature-text">{{ 'AUTH.PRIVACY_FIRST' | translate }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="card-footer">
                 <p class="terms">
-                    By signing in, you agree to our
-                    <a href="#" class="link">Terms</a> and
-                    <a href="#" class="link">Privacy Policy</a>
+                    {{ 'AUTH.TERMS_AGREE' | translate }}
+                    <a href="#" class="link">{{ 'AUTH.TERMS' | translate }}</a> {{ 'AUTH.AND' | translate }}
+                    <a href="#" class="link">{{ 'AUTH.PRIVACY' | translate }}</a>
                 </p>
             </div>
         </div>
