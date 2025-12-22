@@ -1,11 +1,11 @@
 <div class="profile-page">
     <header class="page-header">
-        <h2>{{ isOwnProfile ? 'My Profile' : profileUser?.name + "'s Profile" }}</h2>
+        <h2>{{ isOwnProfile ? ('NAV.PROFILE' | translate) : (profileUser?.name + "'s " + ('NAV.PROFILE' | translate)) }}</h2>
         <div class="header-actions">
             @if (isOwnProfile) {
-            <button class="btn-logout" (click)="logout()" title="Logout">
+            <button class="btn-logout" (click)="logout()" title="{{ 'NAV.LOGOUT' | translate }}">
                 <span class="logout-icon">🚪</span>
-                <span class="logout-text">Logout</span>
+                <span class="logout-text">{{ 'NAV.LOGOUT' | translate }}</span>
             </button>
             }
             <button class="theme-toggle" (click)="toggleTheme()">
@@ -18,13 +18,13 @@
         @if (loading && !isEditing) {
         <div class="loading-state">
             <div class="loader-large"></div>
-            <p>Loading profile...</p>
+            <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
         </div>
         } @else {
         <div class="profile-card">
             <div class="avatar-section">
                 <div class="avatar-wrapper">
-                    <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'" alt="Profile Avatar">
+                    <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'" alt="{{ 'NAV.PROFILE' | translate }}">
 
                     @if (isEditing) {
                     <label class="avatar-upload-btn" title="Upload photo">
@@ -49,7 +49,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Gender</label>
+                        <label>{{ 'EXPLORE_PAGE.GENDER' | translate }}</label>
                         <select [(ngModel)]="gender" class="form-select">
                             @for (option of genderOptions; track option.value) {
                             <option [value]="option.value" [selected]="gender === option.value">{{ option.label }}
@@ -59,14 +59,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Location</label>
+                        <label>{{ 'EXPLORE_PAGE.LOCATION' | translate }}</label>
                         <app-country-select [(ngModel)]="location" [showAny]="false" placeholder="Select your location">
                         </app-country-select>
                     </div>
 
                     <div class="language-row">
                         <div class="form-group">
-                            <label>Native Language</label>
+                            <label>{{ 'PROFILE.NATIVE' | translate }}</label>
                             <div class="language-input-group">
                                 <app-country-select type="language" [showAny]="false"
                                     placeholder="Add native language..."
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Learning Language</label>
+                            <label>{{ 'PROFILE.LEARNING' | translate }}</label>
                             <div class="language-input-group">
                                 <app-country-select type="language" [showAny]="false"
                                     placeholder="Add learning language..."
@@ -109,7 +109,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Interests</label>
+                        <label>{{ 'PROFILE.INTERESTS' | translate }}</label>
                         <div class="interests-input-group">
                             <input type="text" [(ngModel)]="newInterest" (keyup.enter)="addInterest()"
                                 placeholder="Add an interest (e.g. Coding, Music)">
@@ -127,9 +127,9 @@
                     </div>
 
                     <div class="edit-actions">
-                        <button class="btn-cancel" (click)="toggleEdit()">Cancel</button>
+                        <button class="btn-cancel" (click)="toggleEdit()">{{ 'COMMON.CANCEL' | translate }}</button>
                         <button class="btn-save" (click)="saveProfile()" [disabled]="loading">
-                            {{ loading ? 'Saving...' : 'Save Changes' }}
+                            {{ 'COMMON.SAVE' | translate }}
                         </button>
                     </div>
                 </div>
@@ -146,7 +146,7 @@
 
                     @if (bio) {
                     <div class="bio-section">
-                        <h3>About</h3>
+                        <h3>{{ 'PROFILE.ABOUT' | translate }}</h3>
                         <p class="bio-text">{{ bio }}</p>
                     </div>
                     }
@@ -154,16 +154,16 @@
                     <div class="details-section">
                         <h3>Details</h3>
                         @if (gender) {
-                        <p><strong>Gender:</strong> {{ gender | titlecase }} {{ getGenderIcon(gender) }}</p>
+                        <p><strong>{{ 'EXPLORE_PAGE.GENDER' | translate }}:</strong> {{ gender | titlecase }} {{ getGenderIcon(gender) }}</p>
                         }
                         @if (location) {
-                        <p><strong>Location:</strong> <span class="location-inline">{{ location }} <img
+                        <p><strong>{{ 'EXPLORE_PAGE.LOCATION' | translate }}:</strong> <span class="location-inline">{{ location }} <img
                                     *ngIf="getCountryFlagUrl(location)" [src]="getCountryFlagUrl(location)"
                                     [alt]="location + ' flag'" class="country-flag-icon"></span></p>
                         }
 
                         <div class="language-display">
-                            <p><strong>Native:</strong>
+                            <p><strong>{{ 'PROFILE.NATIVE' | translate }}:</strong>
                                 @if (nativeLanguages.length) {
                                 <span class="language-tags-view">
                                     @for (code of nativeLanguages; track code) {
@@ -176,7 +176,7 @@
                                 <span class="text-muted">Not specified</span>
                                 }
                             </p>
-                            <p><strong>Learning:</strong>
+                            <p><strong>{{ 'PROFILE.LEARNING' | translate }}:</strong>
                                 @if (learningLanguages.length) {
                                 <span class="language-tags-view">
                                     @for (code of learningLanguages; track code) {
@@ -193,7 +193,7 @@
                     </div>
 
                     <div class="interests-section">
-                        <h3>Interests</h3>
+                        <h3>{{ 'PROFILE.INTERESTS' | translate }}</h3>
                         @if (interests.length) {
                         <div class="interests-list">
                             @for (interest of interests; track interest) {
@@ -209,7 +209,7 @@
                     <button class="btn-edit" (click)="toggleEdit()">Edit Profile</button>
                     } @else {
                     <button class="btn-message" (click)="sendMessage()">
-                        <span class="message-icon">✉️</span> Send Message
+                        <span class="message-icon">✉️</span> {{ 'PROFILE.SEND_MESSAGE' | translate }}
                     </button>
                     }
                 </div>
@@ -219,28 +219,27 @@
 
         <!-- Comments & Ratings Section -->
         <div class="comments-section">
-            <h3>Comments & Ratings</h3>
+            <h3>{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
 
             @if (!isOwnProfile && currentUser) {
             <!-- Rating form (only if user hasn't rated yet) -->
-            @if (!hasRated) {
+                @if (!hasRated) {
             <div class="add-rating-form">
-                <h4>Rate this user</h4>
+                <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
                 <div class="rating-stars">
                     @for (star of [1,2,3,4,5]; track star) {
                     <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
                     }
                 </div>
-                <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
-                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">Submit
-                    Rating</button>
+                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}" rows="3"></textarea>
+                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{ 'PROFILE.SUBMIT_RATING' | translate }}</button>
             </div>
             } @else {
             <!-- Comment-only form (if user has already rated) -->
             <div class="add-comment-form">
-                <h4>Add a comment</h4>
-                <textarea [(ngModel)]="newComment" placeholder="Write a comment..." rows="3"></textarea>
-                <button class="btn-submit-comment" (click)="submitComment()">Add Comment</button>
+                <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
+                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}" rows="3"></textarea>
+                <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate }}</button>
             </div>
             }
             }

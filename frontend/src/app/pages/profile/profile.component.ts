@@ -7,11 +7,12 @@ import { AuthService } from '../../services/auth.service';
 import { CountryService } from '../../services/country.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent],
+    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })

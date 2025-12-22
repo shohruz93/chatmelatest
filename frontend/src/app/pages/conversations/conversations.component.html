@@ -1,6 +1,6 @@
 <div class="conversations-page">
     <header class="page-header">
-        <h2>Messages</h2>
+        <h2>{{ 'NAV.MESSAGES' | translate }}</h2>
         <button class="theme-toggle" (click)="toggleTheme()">
             {{ isDarkMode() ? '☀️' : '🌙' }}
         </button>
@@ -10,7 +10,7 @@
         @if (loading) {
         <div class="loading-state">
             <div class="loader-large"></div>
-            <p>Loading conversations...</p>
+            <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
         </div>
         } @else if (error) {
         <div class="error-state">
@@ -52,7 +52,7 @@
                 <div class="empty-icon">📭</div>
                 <h3>No messages yet</h3>
                 <p>Find a match to start chatting!</p>
-                <a routerLink="/chat" class="btn-start-chat">Find Match</a>
+                <a routerLink="/chat" class="btn-start-chat">{{ 'DASHBOARD.FIND_MATCH' | translate }}</a>
             </div>
             }
         </div>

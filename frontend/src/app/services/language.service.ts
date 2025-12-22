@@ -104,6 +104,8 @@ export class LanguageService {
                 'DARK_MODE': 'Dark Mode'
             },
             'PROFILE': {
+                'COMPLETE_PROFILE': 'Complete your profile',
+                'COMPLETE_PROFILE_DESC': 'Tell us about yourself to find better matches.',
                 'ABOUT': 'About',
                 'LANGUAGES': 'Languages',
                 'NATIVE': 'Native',
@@ -157,6 +159,12 @@ export class LanguageService {
                 'ANY_LOCATION': 'Any Location',
                 'ONLINE_ONLY': 'Online Only',
                 'SEARCH': 'Search'
+            },
+            'DASHBOARD': {
+                'ONLINE': 'Online',
+                'PROFILE': 'Profile',
+                'FIND_MATCH': 'Find Match',
+                'STATUS_ONLINE': 'Online'
             },
             'COMMON': {
                 'SAVE': 'Save',
@@ -313,6 +321,12 @@ export class LanguageService {
                 'ONLINE_ONLY': 'Только онлайн',
                 'SEARCH': 'Поиск'
             },
+            'DASHBOARD': {
+                'ONLINE': 'В сети',
+                'PROFILE': 'Профиль',
+                'FIND_MATCH': 'Найти пару',
+                'STATUS_ONLINE': 'В сети'
+            },
             'COMMON': {
                 'SAVE': 'Сохранить',
                 'CANCEL': 'Отмена',
@@ -467,6 +481,12 @@ export class LanguageService {
                 'ANY_LOCATION': 'Ҳар ҷо',
                 'ONLINE_ONLY': 'Танҳо онлайн',
                 'SEARCH': 'Ҷустуҷӯ'
+            },
+            'DASHBOARD': {
+                'ONLINE': 'Дар шабака',
+                'PROFILE': 'Профил',
+                'FIND_MATCH': 'Пайдо кардани ҳам‌صحبت',
+                'STATUS_ONLINE': 'Дар шабака'
             },
             'COMMON': {
                 'SAVE': 'Захира кардан',
@@ -627,6 +647,12 @@ export class LanguageService {
                 'MALE': 'Masculino',
                 'FEMALE': 'Femenino'
             },
+            'DASHBOARD': {
+                'ONLINE': 'En línea',
+                'PROFILE': 'Perfil',
+                'FIND_MATCH': 'Encontrar Compañero',
+                'STATUS_ONLINE': 'En línea'
+            },
             'COMMON': {
                 'SAVE': 'Guardar',
                 'CANCEL': 'Cancelar',
@@ -785,6 +811,12 @@ export class LanguageService {
                 'ANY_GENDER': 'أي جنس',
                 'MALE': 'ذكر',
                 'FEMALE': 'أنثى'
+            },
+            'DASHBOARD': {
+                'ONLINE': 'متصل',
+                'PROFILE': 'الملف الشخصي',
+                'FIND_MATCH': 'البحث عن شريك',
+                'STATUS_ONLINE': 'متصل'
             },
             'COMMON': {
                 'SAVE': 'حفظ',
@@ -945,6 +977,12 @@ export class LanguageService {
                 'MALE': 'Homme',
                 'FEMALE': 'Femme'
             },
+            'DASHBOARD': {
+                'ONLINE': 'En ligne',
+                'PROFILE': 'Profil',
+                'FIND_MATCH': 'Trouver un match',
+                'STATUS_ONLINE': 'En ligne'
+            },
             'COMMON': {
                 'SAVE': 'Sauvegarder',
                 'CANCEL': 'Annuler',
@@ -1075,6 +1113,12 @@ export class LanguageService {
                 'ANY_GENDER': 'Jedes Geschlecht',
                 'MALE': 'Männlich',
                 'FEMALE': 'Weiblich'
+            },
+            'DASHBOARD': {
+                'ONLINE': 'Online',
+                'PROFILE': 'Profil',
+                'FIND_MATCH': 'Partner finden',
+                'STATUS_ONLINE': 'Online'
             },
             'COMMON': {
                 'SAVE': 'Speichern',
@@ -1207,6 +1251,12 @@ export class LanguageService {
                 'MALE': '男',
                 'FEMALE': '女'
             },
+            'DASHBOARD': {
+                'ONLINE': '在线',
+                'PROFILE': '个人资料',
+                'FIND_MATCH': '寻找匹配',
+                'STATUS_ONLINE': '在线'
+            },
             'COMMON': {
                 'SAVE': '保存',
                 'CANCEL': '取消',
@@ -1338,6 +1388,12 @@ export class LanguageService {
                 'MALE': 'पुरुष',
                 'FEMALE': 'महिला'
             },
+            'DASHBOARD': {
+                'ONLINE': 'ऑनलाइन',
+                'PROFILE': 'प्रोफ़ाइल',
+                'FIND_MATCH': 'मैच खोजें',
+                'STATUS_ONLINE': 'ऑनलाइन'
+            },
             'COMMON': {
                 'SAVE': 'सहेजें',
                 'CANCEL': 'रद्द करें',
@@ -1468,6 +1524,12 @@ export class LanguageService {
                 'ANY_GENDER': 'هر جنسیتی',
                 'MALE': 'مرد',
                 'FEMALE': 'زن'
+            },
+            'DASHBOARD': {
+                'ONLINE': 'آنلاین',
+                'PROFILE': 'پروفایل',
+                'FIND_MATCH': 'یافتن هم‌صحبت',
+                'STATUS_ONLINE': 'آنلاین'
             },
             'COMMON': {
                 'SAVE': 'ذخیره',

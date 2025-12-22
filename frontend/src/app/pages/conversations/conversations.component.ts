@@ -4,11 +4,12 @@ import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-conversations',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, TranslatePipe],
     templateUrl: './conversations.component.html',
     styleUrl: './conversations.component.css'
 })

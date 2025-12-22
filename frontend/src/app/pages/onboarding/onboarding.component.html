@@ -1,9 +1,9 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
     <div class="card max-w-2xl w-full space-y-8 animate-fade-in-up">
         <div class="text-center">
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">Complete your profile</h2>
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">{{ 'PROFILE.COMPLETE_PROFILE' | translate }}</h2>
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Tell us about yourself to find better matches.
+                {{ 'PROFILE.COMPLETE_PROFILE_DESC' | translate }}
             </p>
         </div>
 
@@ -37,7 +37,7 @@
             <div>
                 <button (click)="saveProfile()"
                     class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    Start Chatting
+                    {{ 'HOME.START_CHATTING' | translate }}
                 </button>
             </div>
         </div>

@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-onboarding',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './onboarding.component.html',
     styleUrl: './onboarding.component.css'
 })
