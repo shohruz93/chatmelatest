@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SocketService } from './services/socket.service';
+import { PushService } from './services/push.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
@@ -17,6 +18,7 @@ import { App as NativeApp } from '@capacitor/app';
 export class App implements OnInit, OnDestroy {
   private socketService = inject(SocketService);
   private router = inject(Router);
+  private pushService = inject(PushService);
 
   showIncomingRequestModal = false;
   showExitModal = false;
@@ -24,6 +26,8 @@ export class App implements OnInit, OnDestroy {
   private chatRequestSub!: Subscription;
 
   ngOnInit() {
+    this.pushService.init();
+    
     // Global listener for incoming chat requests
     this.chatRequestSub = this.socketService.onChatRequestReceived().subscribe(request => {
       // Always show modal in App component
@@ -36,7 +40,8 @@ export class App implements OnInit, OnDestroy {
       console.log('Network status changed', status);
       if (!status.connected) {
         this.handleNoInternet();
-      } else {
+      }
+      else {
         this.handleInternetRestored();
       }
     });

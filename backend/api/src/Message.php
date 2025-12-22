@@ -1,10 +1,17 @@
 <?php
 
+require_once 'Notification.php';
+require_once 'User.php';
+
 class Message {
     private $db;
+    private $notification;
+    private $user;
 
     public function __construct($db) {
         $this->db = $db;
+        $this->notification = new Notification($db);
+        $this->user = new User($db);
     }
 
     public function getHistory($userId, $otherUserId) {
@@ -53,7 +60,22 @@ class Message {
         $stmt->bindParam(":lang", $data['originalLang']);
 
         if ($stmt->execute()) {
-            echo json_encode(["message" => "Message saved", "id" => $this->db->lastInsertId()]);
+            $lastInsertId = $this->db->lastInsertId();
+            
+            // Send push notification
+            if (!empty($data['receiverId'])) {
+                $senderName = $this->user->getNameById($data['senderId']);
+                $title = "New message from " . ($senderName ?: 'Someone');
+                $body = $data['content'];
+                $payload = [
+                    'type' => 'message',
+                    'roomId' => $data['roomId'],
+                    'senderId' => $data['senderId']
+                ];
+                $this->notification->send($data['receiverId'], $title, $body, $payload);
+            }
+
+            echo json_encode(["message" => "Message saved", "id" => $lastInsertId]);
         } else {
             http_response_code(500);
             echo json_encode(["message" => "Failed to save message"]);

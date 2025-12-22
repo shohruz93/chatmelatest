@@ -3,10 +3,28 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const fetch = require('node-fetch');
+const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+
+// Internal endpoint for PHP to send notifications
+app.post('/internal/notify', (req, res) => {
+    const { userId, type, data } = req.body;
+    console.log(`Received notification for userId: ${userId}, type: ${type}`);
+
+    const targetSocketId = onlineUsers.get(parseInt(userId));
+    if (targetSocketId) {
+        io.to(targetSocketId).emit('notification', { type, data });
+        console.log(`Notification sent to socket ${targetSocketId}`);
+        res.status(200).send({ status: 'success', message: 'Notification sent' });
+    } else {
+        console.log(`User ${userId} is not online, notification not sent.`);
+        res.status(404).send({ status: 'error', message: 'User not found or offline' });
+    }
+});
 
 const server = http.createServer(app);
 const io = new Server(server, {

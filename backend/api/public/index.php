@@ -17,6 +17,7 @@ require_once __DIR__ . '/../src/Friendship.php';
 require_once __DIR__ . '/../src/Message.php';
 require_once __DIR__ . '/../src/Conversation.php';
 require_once __DIR__ . '/../src/AdminController.php';
+require_once __DIR__ . '/../src/Push.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -34,13 +35,22 @@ $matchController = new MatchController($db);
 $advancedMatch = new AdvancedMatchController($db);
 $friendship = new Friendship($db);
 $message = new Message($db);
-$message = new Message($db);
 $conversation = new Conversation($db);
 $adminController = new AdminController($db);
+$push = new Push($db);
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
     $auth->login();
+});
+
+// Push Notification Routes
+$router->add('POST', '/push/subscribe', function() use ($push) {
+    $push->subscribe();
+});
+
+$router->add('POST', '/push/unsubscribe', function() use ($push) {
+    $push->unsubscribe();
 });
 
 // Profile Routes

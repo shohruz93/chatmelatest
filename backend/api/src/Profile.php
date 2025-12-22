@@ -1,14 +1,17 @@
 <?php
 
 require_once 'User.php';
+require_once 'Notification.php';
 
 class Profile {
     private $db;
     private $user;
+    private $notification;
 
     public function __construct($db) {
         $this->db = $db;
         $this->user = new User($db);
+        $this->notification = new Notification($db);
     }
 
     public function get($userId) {
@@ -226,6 +229,16 @@ class Profile {
         $stmt->bindParam(":viewer_id", $viewerId);
         $stmt->bindParam(":viewed_id", $viewedId);
         $stmt->execute();
+
+        // Send push notification
+        $viewerName = $this->user->getNameById($viewerId);
+        $title = 'You have a new guest';
+        $body = ($viewerName ?: 'Someone') . ' visited your profile.';
+        $payload = [
+            'type' => 'guest',
+            'viewerId' => $viewerId
+        ];
+        $this->notification->send($viewedId, $title, $body, $payload);
     }
 
     public function getGuests($userId) {
