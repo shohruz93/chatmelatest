@@ -63,9 +63,13 @@ export class DashboardComponent implements OnInit {
     ];
 
     ngOnInit() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        this.isDarkMode.set(savedTheme === 'dark');
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        let theme = localStorage.getItem('theme');
+        if (!theme) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+        }
+        this.isDarkMode.set(theme === 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
 
         if (this.currentUser) {
             // Get avatar - database avatar takes priority over Google photoURL

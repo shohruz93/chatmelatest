@@ -90,7 +90,12 @@
     <main class="main-content">
         <!-- Mobile Header -->
         <header class="mobile-header">
-            <button class="sidebar-toggle" (click)="ui.toggleSidebar()">☰</button>
+            <button class="sidebar-toggle" (click)="ui.toggleSidebar()">
+                ☰
+                @if (unreadCount + newGuestsCount > 0) {
+                <span class="toggle-badge">{{ unreadCount + newGuestsCount }}</span>
+                }
+            </button>
             <div class="logo-mobile">Chatme</div>
         </header>
 

@@ -4,7 +4,45 @@ import { Injectable, signal } from '@angular/core';
     providedIn: 'root'
 })
 export class LanguageService {
-    private currentLang = signal(localStorage.getItem('lang') || 'en');
+    private languageMap: { [key: string]: string } = {
+        'en': 'en', 'en-us': 'en', 'en-gb': 'en', 'en-au': 'en', 'en-ca': 'en', 'en-nz': 'en', 'en-ie': 'en', 'en-za': 'en',
+        'ru': 'ru', 'ru-ru': 'ru', 'ru-by': 'ru', 'ru-kz': 'ru',
+        'tj': 'tj', 'tg': 'tj', 'tg-tj': 'tj', 'tg-cyrl': 'tj', 'tg-cyrl-tj': 'tj',
+        'es': 'es', 'es-es': 'es', 'es-mx': 'es', 'es-ar': 'es', 'es-co': 'es', 'es-pe': 'es', 'es-cl': 'es', 'es-ve': 'es',
+        'ar': 'ar', 'ar-sa': 'ar', 'ar-ae': 'ar', 'ar-eg': 'ar', 'ar-dz': 'ar', 'ar-ma': 'ar', 'ar-tn': 'ar', 'ar-sy': 'ar', 'ar-jo': 'ar', 'ar-lb': 'ar', 'ar-kw': 'ar', 'ar-bh': 'ar', 'ar-qa': 'ar', 'ar-om': 'ar', 'ar-ye': 'ar', 'ar-ps': 'ar', 'ar-iq': 'ar',
+        'fr': 'fr', 'fr-fr': 'fr', 'fr-ca': 'fr', 'fr-be': 'fr', 'fr-ch': 'fr', 'fr-lu': 'fr', 'fr-ht': 'fr',
+        'de': 'de', 'de-de': 'de', 'de-at': 'de', 'de-ch': 'de', 'de-li': 'de', 'de-lu': 'de',
+        'zh': 'zh', 'zh-cn': 'zh', 'zh-hans': 'zh', 'zh-hans-cn': 'zh', 'zh-sg': 'zh', 'zh-tw': 'zh', 'zh-hant': 'zh', 'zh-hant-tw': 'zh', 'zh-hk': 'zh', 'zh-mo': 'zh',
+        'hi': 'hi', 'hi-in': 'hi', 'hi-latn': 'hi', 'hi-latn-in': 'hi',
+        'fa': 'fa', 'fa-ir': 'fa', 'fa-fatn': 'fa', 'fa-fatn-ir': 'fa',
+    };
+
+    private currentLang = signal(this.getInitialLanguage());
+
+    private getInitialLanguage(): string {
+        const savedLang = localStorage.getItem('lang');
+        const supportedCodes = ['en', 'ru', 'tj', 'es', 'ar', 'fr', 'de', 'zh', 'hi', 'fa'];
+        
+        if (savedLang && supportedCodes.includes(savedLang)) {
+            return savedLang;
+        }
+
+        const systemLang = navigator.language.toLowerCase();
+        const mappedLang = this.languageMap[systemLang];
+        
+        if (mappedLang && supportedCodes.includes(mappedLang)) {
+            return mappedLang;
+        }
+
+        const baseLang = systemLang.split('-')[0];
+        const mappedBaseLang = this.languageMap[baseLang];
+        
+        if (mappedBaseLang && supportedCodes.includes(mappedBaseLang)) {
+            return mappedBaseLang;
+        }
+
+        return 'en';
+    }
 
     private translations: any = {
         'en': {
