@@ -467,7 +467,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                         content: msg.content,
                         timestamp: msg.created_at,
                         messageType: this.detectMessageType(msg.content, msg.type),
-                        read: msg.read || false
+                        // Backend stores read flag as `is_read` — normalize here
+                        read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false)
                     }));
 
                     this.messages = [...newMessages, ...this.messages];
@@ -499,8 +500,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     content: msg.content,
                     timestamp: msg.created_at,
                     messageType: this.detectMessageType(msg.content, msg.type),
-                    read: msg.read || false,
-                    status: (msg.read) ? 'read' : 'sent' // Initialize status
+                    // Normalize backend `is_read` to `read`
+                    read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
+                    status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent') // Initialize status
                 }));
 
                 // Mark messages as read

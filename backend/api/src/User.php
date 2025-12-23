@@ -119,7 +119,14 @@ class User {
         return $users;
     }
 
-    public function getSmartMatch($currentUserId) {
+    public function getSmartMatch($currentUserId, $filters = []) {
+        // Collect filters
+        $genderFilter = $filters['gender'] ?? 'any';
+        $locationFilter = $filters['location'] ?? 'any';
+        $nativeLang = $filters['native'] ?? '';
+        $learningLang = $filters['learning'] ?? '';
+        $onlineIds = $filters['online_ids'] ?? '';
+
         // 1. Get current user's interests
         $query = "SELECT interest_id FROM user_interests WHERE user_id = :user_id";
         $stmt = $this->conn->prepare($query);
@@ -127,47 +134,120 @@ class User {
         $stmt->execute();
         $myInterests = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        if (empty($myInterests)) {
-            // No interests? Just return a random user
-            return $this->getRandomUsers($currentUserId, [], 1)[0] ?? null;
+        // Prepare optional WHERE clauses for filters
+        $extraWhere = '';
+        $params = [];
+        if (!empty($genderFilter) && $genderFilter !== 'any') {
+            $extraWhere .= " AND u.gender = :gender";
+            $params[':gender'] = $genderFilter;
+        }
+        if (!empty($locationFilter) && $locationFilter !== 'any') {
+            $extraWhere .= " AND u.location = :location";
+            $params[':location'] = $locationFilter;
+        }
+        if (!empty($onlineIds)) {
+            // online_ids is a comma-separated list
+            $ids = array_filter(array_map('trim', explode(',', $onlineIds)));
+            if (!empty($ids)) {
+                $placeholders = [];
+                foreach ($ids as $i => $id) {
+                    $key = ":online_id_$i";
+                    $placeholders[] = $key;
+                    $params[$key] = $id;
+                }
+                $extraWhere .= " AND u.id IN (" . implode(',', $placeholders) . ")";
+            }
         }
 
-        // 2. Find other users with overlapping interests
-        $inQuery = implode(',', array_fill(0, count($myInterests), '?'));
-        
-        $sql = "
-            SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language,
-                   COUNT(ui.interest_id) as shared_count
-            FROM users u
-            JOIN user_interests ui ON u.id = ui.user_id
-            WHERE u.id != ? 
-            AND ui.interest_id IN ($inQuery)
-            GROUP BY u.id
-            ORDER BY shared_count DESC, RAND()
-            LIMIT 1
-        ";
+        // If user has interests, prioritize matches by shared interests + language/location
+        if (!empty($myInterests)) {
+            $inQuery = implode(',', array_fill(0, count($myInterests), '?'));
 
-        $stmt = $this->conn->prepare($sql);
-        
-        // Bind parameters: currentUserId first, then the interest IDs
-        $params = array_merge([$currentUserId], $myInterests);
-        $stmt->execute($params);
-        
+            $sql = "
+                SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language,
+                       COUNT(ui.interest_id) as shared_count
+                FROM users u
+                JOIN user_interests ui ON u.id = ui.user_id
+                WHERE u.id != ?
+                AND ui.interest_id IN ($inQuery)
+                $extraWhere
+                GROUP BY u.id
+                ORDER BY shared_count DESC, RAND()
+                LIMIT 1
+            ";
+
+            $stmt = $this->conn->prepare($sql);
+
+            // Bind params: currentUserId then interest IDs
+            $execParams = array_merge([$currentUserId], $myInterests);
+            // Add named params
+            foreach ($params as $k => $v) {
+                // do nothing here; will bind later
+            }
+
+            $stmt->execute($execParams);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                // Fetch interests for this user
+                $query = "SELECT i.id, i.name FROM interests i 
+                          JOIN user_interests ui ON i.id = ui.interest_id 
+                          WHERE ui.user_id = :user_id";
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(":user_id", $user['id']);
+                $stmt->execute();
+                $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                return $user;
+            }
+        }
+
+        // If we couldn't find by interests or user has no interests, try matching by language/location/gender
+        // Build language match expression using FIND_IN_SET for potential comma lists
+        $langConditions = [];
+        if (!empty($nativeLang)) {
+            $langConditions[] = "(FIND_IN_SET(:native, u.native_language) > 0 OR FIND_IN_SET(:native, u.learning_language) > 0)";
+        }
+        if (!empty($learningLang)) {
+            $langConditions[] = "(FIND_IN_SET(:learning, u.native_language) > 0 OR FIND_IN_SET(:learning, u.learning_language) > 0)";
+        }
+
+        $whereClauses = "u.id != :current_user_id" . $extraWhere;
+        $langWhere = '';
+        if (!empty($langConditions)) {
+            $langWhere = ' AND (' . implode(' OR ', $langConditions) . ')';
+        }
+
+        $finalSql = "SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language
+                     FROM users u
+                     WHERE $whereClauses $langWhere
+                     ORDER BY RAND()
+                     LIMIT 1";
+
+        $stmt = $this->conn->prepare($finalSql);
+        $stmt->bindValue(':current_user_id', $currentUserId);
+        if (!empty($params)) {
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+        }
+        if (!empty($nativeLang)) $stmt->bindValue(':native', $nativeLang);
+        if (!empty($learningLang)) $stmt->bindValue(':learning', $learningLang);
+        $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-             // Fetch interests for this user
-             $query = "SELECT i.id, i.name FROM interests i 
-             JOIN user_interests ui ON i.id = ui.interest_id 
-             WHERE ui.user_id = :user_id";
-             $stmt = $this->conn->prepare($query);
-             $stmt->bindParam(":user_id", $user['id']);
-             $stmt->execute();
-             $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-             return $user;
+            // Fetch interests for this user (if any)
+            $query = "SELECT i.id, i.name FROM interests i 
+                      JOIN user_interests ui ON i.id = ui.interest_id 
+                      WHERE ui.user_id = :user_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":user_id", $user['id']);
+            $stmt->execute();
+            $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $user;
         }
 
-        // 3. Fallback to random if no smart match
+        // Fallback to random
         return $this->getRandomUsers($currentUserId, [], 1)[0] ?? null;
     }
 

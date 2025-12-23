@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-30:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-36:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\298f23562d34114ce8ed5285dd6ba132\\transformed\\play-services-auth-18.1.0\\res\\values-watch-v20\\values.xml",

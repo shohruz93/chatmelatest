@@ -530,11 +530,21 @@ io.on('connection', (socket) => {
             if (response.ok) {
                 console.log(`Marked messages from ${senderId} as read for user ${userId}`);
 
-                // Notify the sender that their messages have been read
-                socket.to(roomId).emit('message_read', {
-                    roomId: roomId,
-                    readBy: userId
-                });
+                // Notify the sender that their messages have been read.
+                // Prefer sending directly to the sender's socket (they may not be joined to the room).
+                const senderSocketId = onlineUsers.get(senderId);
+                if (senderSocketId) {
+                    io.to(senderSocketId).emit('message_read', {
+                        roomId: roomId,
+                        readBy: userId
+                    });
+                } else {
+                    // Fallback: broadcast to the room (excludes the current socket)
+                    socket.to(roomId).emit('message_read', {
+                        roomId: roomId,
+                        readBy: userId
+                    });
+                }
             } else {
                 console.error('Failed to mark messages as read:', await response.text());
             }

@@ -979,6 +979,7 @@ layout support_simple_spinner_dropdown_item
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
+raw firebase_common_keep
 string abc_action_bar_home_description
 string abc_action_bar_up_description
 string abc_action_menu_overflow_description
@@ -1035,6 +1036,7 @@ string common_signin_button_text
 string common_signin_button_text_long
 string custom_url_scheme
 string default_web_client_id
+string fcm_fallback_notification_channel_label
 string firebase_database_url
 string gcm_defaultSenderId
 string google_api_key

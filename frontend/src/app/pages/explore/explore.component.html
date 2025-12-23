@@ -1,5 +1,6 @@
 <div class="explore-container">
-  <!-- Filter Sidebar -->
+  <!-- Filter Sidebar (hidden by default) -->
+  @if (showFilters()) {
   <aside class="filter-sidebar">
     <div class="filter-header">
       <h2>
@@ -9,7 +10,7 @@
         </svg>
         {{ 'EXPLORE_PAGE.FILTERS' | translate }}
       </h2>
-      <button class="reset-btn" (click)="resetFilters()">{{ 'EXPLORE_PAGE.RESET' | translate }}</button>
+      <button class="reset-btn" (click)="toggleFilterPanel()">Close</button>
     </div>
 
     <div class="filter-section">
@@ -112,6 +113,7 @@
       </div>
     </div>
   </aside>
+  }
 
   <!-- Main Content -->
   <main class="explore-content">
@@ -127,6 +129,8 @@
         </svg>
         <span>{{ 'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate }}</span>
       </button>
+      <!-- Toggle Filters Button -->
+      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' | translate }}</button>
     </div>
 
     <!-- Loading State -->

@@ -190,8 +190,16 @@ $router->add('GET', '/users/smart-match', function() use ($db) {
     require_once __DIR__ . '/../src/User.php';
     $user = new User($db);
     $currentUserId = $_GET['userId'] ?? 0;
-    
-    $match = $user->getSmartMatch($currentUserId);
+    // Collect optional filters from query params
+    $filters = [
+        'gender' => $_GET['gender'] ?? 'any',
+        'location' => $_GET['location'] ?? 'any',
+        'native' => $_GET['native'] ?? '',
+        'learning' => $_GET['learning'] ?? '',
+        'online_ids' => $_GET['online_ids'] ?? ''
+    ];
+
+    $match = $user->getSmartMatch($currentUserId, $filters);
     echo json_encode($match);
 });
 

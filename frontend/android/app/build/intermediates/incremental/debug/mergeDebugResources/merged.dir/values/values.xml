@@ -358,6 +358,7 @@
     <string name="common_signin_button_text_long">Sign in with Google</string>
     <string name="custom_url_scheme">com.shohruz.chatme</string>
     <string name="default_web_client_id" translatable="false">1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com</string>
+    <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
     <string name="firebase_database_url" translatable="false">https://chatme-f1d8a-default-rtdb.firebaseio.com</string>
     <string name="gcm_defaultSenderId" translatable="false">1021066705022</string>
     <string name="google_api_key" translatable="false">AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE</string>

@@ -78,6 +78,9 @@ export class ExploreComponent implements OnInit, OnDestroy {
     showNativeLanguageDropdown = false;
     showLearningLanguageDropdown = false;
 
+    // Filter panel visibility (default hidden) - use signal for reactivity
+    showFilters = signal(false);
+
     // Dropdown toggle methods
     toggleLocationDropdown() {
         this.showLocationDropdown = !this.showLocationDropdown;
@@ -263,6 +266,13 @@ export class ExploreComponent implements OnInit, OnDestroy {
         this.applyFilters();
     }
 
+    toggleFilterPanel() {
+        // Toggle using signal API
+        const next = !this.showFilters();
+        this.showFilters.set(next);
+        console.log('showFilters toggled ->', next);
+    }
+
     resetFilters() {
         this.filterStatus = 'any';
         this.filterGender = 'any';
@@ -279,7 +289,23 @@ export class ExploreComponent implements OnInit, OnDestroy {
     async connectRandomly() {
         this.isLoading.set(true);
         try {
-            const match = await lastValueFrom(this.api.get('/users/smart-match', { userId: this.currentUser?.id || 0 }));
+            // Build filter params to send to smart-match endpoint
+            const onlineSet = this.socketService.onlineUsers();
+            // Exclude current user from online ids
+            const onlineIds = Array.from(onlineSet).filter(id => Number(id) !== Number(this.currentUser?.id));
+
+            const params: any = {
+                userId: this.currentUser?.id || 0,
+                gender: this.filterGender || 'any',
+                location: this.filterLocation || 'any',
+                native: this.filterNativeLanguage || '',
+                learning: this.filterLearningLanguage || ''
+            };
+            if (onlineIds.length > 0) {
+                params.online_ids = onlineIds.join(',');
+            }
+
+            const match = await lastValueFrom(this.api.get('/users/smart-match', params));
             if (match && match.id) {
                 this.router.navigate(['/dashboard/chat', match.id]);
             } else {
