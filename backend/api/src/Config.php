@@ -35,3 +35,30 @@ class Config {
 
 // Load the config on inclusion
 Config::load();
+
+// If certain mail env vars are not set (or you prefer hardcoding), set them here.
+// WARNING: Hardcoding secrets in code is not recommended for production.
+if (!getenv('SMTP_HOST')) {
+    putenv('MAIL_FROM=no-reply@chatme.tj');
+    putenv('MAIL_FROM_NAME=Chatme');
+    putenv('SMTP_HOST=mail.chatme.tj');
+    putenv('SMTP_PORT=587');
+    putenv('SMTP_USER=no-reply@chatme.tj');
+    putenv('SMTP_PASS=A900434231z');
+    putenv('SMTP_SECURE=tls');
+    // Also populate $_ENV and $_SERVER for consistency
+    $_ENV['MAIL_FROM'] = 'no-reply@chatme.tj';
+    $_ENV['MAIL_FROM_NAME'] = 'Chatme';
+    $_ENV['SMTP_HOST'] = 'mail.chatme.tj';
+    $_ENV['SMTP_PORT'] = '587';
+    $_ENV['SMTP_USER'] = 'no-reply@chatme.tj';
+    $_ENV['SMTP_PASS'] = 'A900434231z';
+    $_ENV['SMTP_SECURE'] = 'tls';
+    $_SERVER['MAIL_FROM'] = 'no-reply@chatme.tj';
+    $_SERVER['MAIL_FROM_NAME'] = 'Chatme';
+    $_SERVER['SMTP_HOST'] = 'mail.chatme.tj';
+    $_SERVER['SMTP_PORT'] = '587';
+    $_SERVER['SMTP_USER'] = 'no-reply@chatme.tj';
+    $_SERVER['SMTP_PASS'] = 'A900434231z';
+    $_SERVER['SMTP_SECURE'] = 'tls';
+}

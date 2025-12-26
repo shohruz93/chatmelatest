@@ -15,6 +15,10 @@ export class LoginComponent {
     isDarkMode = signal(document.documentElement.getAttribute('data-theme') === 'dark');
     isLoading = signal(false);
     error = signal<string | null>(null);
+    emailFormOpen = signal(false);
+    email = signal('');
+    code = signal('');
+    codeSent = signal(false);
 
     constructor(private auth: AuthService) { }
 
@@ -34,6 +38,40 @@ export class LoginComponent {
         } catch (error: any) {
             console.error('Login failed:', error);
             this.error.set(error.message || 'Failed to sign in. Please try again.');
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    toggleEmailForm() {
+        this.error.set(null);
+        this.emailFormOpen.set(!this.emailFormOpen());
+    }
+
+    async sendCode() {
+        this.isLoading.set(true);
+        this.error.set(null);
+
+        try {
+            await this.auth.requestEmailCode(this.email());
+            this.codeSent.set(true);
+        } catch (error: any) {
+            console.error('Send code failed:', error);
+            this.error.set(error.message || 'Failed to send verification code.');
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    async verifyCode() {
+        this.isLoading.set(true);
+        this.error.set(null);
+
+        try {
+            await this.auth.verifyEmailCode(this.email(), this.code());
+        } catch (error: any) {
+            console.error('Verify code failed:', error);
+            this.error.set(error.message || 'Failed to verify code.');
         } finally {
             this.isLoading.set(false);
         }

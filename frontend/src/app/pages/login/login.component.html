@@ -36,13 +36,33 @@
                     <span>{{ (isLoading() ? 'AUTH.SIGNING_IN' : 'AUTH.CONTINUE_GOOGLE') | translate }}</span>
                 </button>
 
+                <button (click)="toggleEmailForm()" class="btn-email-toggle btn-facebook" [disabled]="isLoading()">
+                    <span>{{ 'AUTH.CONTINUE_EMAIL' | translate }}</span>
+                </button>
+
+                @if (emailFormOpen()) {
+                <div class="email-form">
+                    <input type="email" class="input-email" placeholder="{{ 'AUTH.EMAIL_PLACEHOLDER' | translate }}" [value]="email()" (input)="email.set($any($event.target).value)" />
+                    <div class="email-actions">
+                        <button (click)="sendCode()" class="btn-send-code btn-facebook" [disabled]="isLoading() || !email() || codeSent()">{{ (codeSent() ? 'AUTH.EMAIL_CODE_SENT' : 'AUTH.SEND_CODE') | translate }}</button>
+                    </div>
+
+                    @if (codeSent()) {
+                    <input type="text" class="input-code" placeholder="{{ 'AUTH.CODE_PLACEHOLDER' | translate }}" [value]="code()" (input)="code.set($any($event.target).value)" />
+                    <div class="email-actions">
+                        <button (click)="verifyCode()" class="btn-verify btn-google" [disabled]="isLoading() || !code()">{{ 'AUTH.VERIFY_CODE' | translate }}</button>
+                    </div>
+                    }
+                </div>
+                }
+
                 @if (error()) {
                 <div class="error-message">
                     {{ error() }}
                 </div>
                 }
 
-                <div class="divider">
+                <!-- <div class="divider">
                     <span>{{ 'AUTH.OR' | translate }}</span>
                 </div>
 
@@ -59,7 +79,7 @@
                         <span class="feature-icon">🔒</span>
                         <span class="feature-text">{{ 'AUTH.PRIVACY_FIRST' | translate }}</span>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="card-footer">

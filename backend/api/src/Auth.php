@@ -1,6 +1,7 @@
 <?php
 
 require_once 'User.php';
+require_once 'Config.php';
 // In a real app, use firebase/php-jwt
 // For this demo, we'll do a simple implementation or mock
 
@@ -126,5 +127,166 @@ class Auth {
             http_response_code(401);
             echo json_encode(["message" => "Invalid token payload"]);
         }
+    }
+
+    // Send verification code to email
+    public function sendCode() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $email = $data['email'] ?? null;
+
+        if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo json_encode(["message" => "Valid email required"]);
+            return;
+        }
+
+        $code = rand(100000, 999999);
+        $expires = time() + (10 * 60); // 10 minutes
+
+        $storeFile = __DIR__ . '/../data/email_codes.json';
+        if (!is_dir(dirname($storeFile))) {
+            @mkdir(dirname($storeFile), 0755, true);
+        }
+
+        $codes = [];
+        if (file_exists($storeFile)) {
+            $raw = file_get_contents($storeFile);
+            $codes = $raw ? json_decode($raw, true) : [];
+        }
+
+        $codes[$email] = [
+            'code' => (string)$code,
+            'expires' => $expires
+        ];
+
+        file_put_contents($storeFile, json_encode($codes));
+
+        // Log to debug file (do not expose code in production)
+        $logFile = __DIR__ . '/../public/debug_auth.log';
+        $logData = date('Y-m-d H:i:s') . " - SendCode to {$email}: {$code}\n";
+        file_put_contents($logFile, $logData, FILE_APPEND);
+
+        // Try sending email via PHPMailer using SMTP settings from .env (best-effort)
+        try {
+            require_once __DIR__ . '/../vendor/autoload.php';
+
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = Config::get('SMTP_HOST', '');
+            $mail->SMTPAuth = true;
+            $mail->Username = Config::get('SMTP_USER', '');
+            $mail->Password = Config::get('SMTP_PASS', '');
+            $secure = Config::get('SMTP_SECURE', 'tls');
+            if (strtolower($secure) === 'ssl') {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            } else {
+                $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            }
+            $mail->Port = (int)Config::get('SMTP_PORT', 587);
+
+            $from = Config::get('MAIL_FROM', 'no-reply@chatme.tj');
+            $fromName = Config::get('MAIL_FROM_NAME', 'Chatme');
+            $mail->setFrom($from, $fromName);
+            $mail->addAddress($email);
+
+            $mail->isHTML(false);
+            $mail->Subject = 'Your Chatme verification code';
+            $mail->Body = "Your verification code is: {$code}. It expires in 10 minutes.";
+
+            $mail->send();
+        } catch (\Throwable $e) {
+            // Log error but continue (code is stored and usable)
+            $logFile = __DIR__ . '/../public/debug_auth.log';
+            file_put_contents($logFile, date('c') . ' - Mailer error: ' . $e->getMessage() . "\n", FILE_APPEND);
+        }
+
+        echo json_encode(["message" => "code_sent"]);
+    }
+
+    // Verify code and create session
+    public function verifyCode() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $email = $data['email'] ?? null;
+        $code = isset($data['code']) ? (string)$data['code'] : null;
+
+        if (!$email || !$code) {
+            http_response_code(400);
+            echo json_encode(["message" => "Email and code required"]);
+            return;
+        }
+
+        $storeFile = __DIR__ . '/../data/email_codes.json';
+        $codes = [];
+        if (file_exists($storeFile)) {
+            $raw = file_get_contents($storeFile);
+            $codes = $raw ? json_decode($raw, true) : [];
+        }
+
+        if (!isset($codes[$email])) {
+            http_response_code(400);
+            echo json_encode(["message" => "No code found for this email"]);
+            return;
+        }
+
+        $entry = $codes[$email];
+        // Trim received code and log for debugging
+        $receivedCode = trim($code);
+        $logFile = __DIR__ . '/../public/debug_auth.log';
+        file_put_contents($logFile, date('Y-m-d H:i:s') . " - Verify attempt for {$email}: provided={$receivedCode}, expected={$entry['code']}\n", FILE_APPEND);
+
+        if (time() > $entry['expires']) {
+            unset($codes[$email]);
+            file_put_contents($storeFile, json_encode($codes));
+            http_response_code(400);
+            echo json_encode(["message" => "Code expired"]);
+            return;
+        }
+        if ($entry['code'] !== $receivedCode) {
+            http_response_code(400);
+            echo json_encode(["message" => "Invalid code"]);
+            return;
+        }
+
+        // Code valid — create or get user by email
+        $userId = $this->user->createOrGetByEmail($email);
+        if (!$userId) {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to create user"]);
+            return;
+        }
+
+        // Remove used code
+        unset($codes[$email]);
+        file_put_contents($storeFile, json_encode($codes));
+
+        // Fetch user profile
+        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id", $userId);
+        $stmt->execute();
+        $userProfile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $sessionToken = base64_encode(json_encode([
+            "id" => $userId,
+            "email" => $email,
+            "exp" => time() + (24 * 60 * 60)
+        ]));
+
+        echo json_encode([
+            "message" => "Login successful",
+            "token" => $sessionToken,
+            "user" => [
+                "id" => $userId,
+                "name" => $userProfile['name'],
+                "first_name" => $userProfile['first_name'] ?? '',
+                "family_name" => $userProfile['family_name'] ?? '',
+                "email" => $userProfile['email'],
+                "avatar" => $userProfile['avatar'] ?? null,
+                "bio" => $userProfile['bio'] ?? null,
+                "gender" => $userProfile['gender'] ?? null,
+                "location" => $userProfile['location'] ?? null,
+                "is_admin" => $userProfile['is_admin'] ?? 0
+            ]
+        ]);
     }
 }

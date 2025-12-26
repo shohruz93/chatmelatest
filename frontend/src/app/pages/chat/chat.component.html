@@ -42,17 +42,35 @@
                 [ngClass]="{'message-sent': msg.type === 'sent', 'message-received': msg.type !== 'sent'}">
 
                 <div class="message-bubble glass-panel">
+                    @if (msg.replyTo) {
+                    <div class="reply-preview">
+                        <strong>{{ msg.replyTo.senderName }}:</strong> {{ msg.replyTo.content }}
+                    </div>
+                    }
+
                     <!-- Text Message -->
                     @if (msg.messageType === 'text') {
                     <div class="message-text-group">
                         <p class="message-text">{{ msg.content }}</p>
-                        @if (msg.type !== 'sent') {
-                        <button class="btn-translate" (click)="translateMessage(msg)"
-                            [class.active]="msg.showTranslation"
-                            [title]="msg.showTranslation ? 'Hide translation' : 'Translate'">
-                            <span class="icon" [class.spinning]="msg.isTranslating">🌐</span>
-                        </button>
-                        }
+                        <div class="message-actions-group">
+                            @if (msg.type === 'sent') {
+                            <button class="btn-action" (click)="editMessage(msg)" title="Edit">
+                                <span class="icon">✏️</span>
+                            </button>
+                            <button class="btn-action" (click)="deleteMessage(msg)" title="Delete">
+                                <span class="icon">🗑️</span>
+                            </button>
+                            } @else {
+                            <button class="btn-action" (click)="replyToMessage(msg)" title="Reply">
+                                <span class="icon">↩️</span>
+                            </button>
+                            <button class="btn-translate" (click)="translateMessage(msg)"
+                                [class.active]="msg.showTranslation"
+                                [title]="msg.showTranslation ? 'Hide translation' : 'Translate'">
+                                <span class="icon" [class.spinning]="msg.isTranslating">🌐</span>
+                            </button>
+                            }
+                        </div>
                     </div>
                     @if (msg.showTranslation && msg.translatedContent) {
                     <p class="message-translation">
@@ -118,6 +136,17 @@
     <!-- Input Area -->
     @if (partnerId) {
     <footer class="chat-input-area glass-panel">
+        @if (editingMessage || replyingToMessage) {
+        <div class="input-preview-bar">
+            <div class="preview-content">
+                <span class="preview-label">
+                    {{ editingMessage ? 'Editing message' : 'Replying to ' + replyingToMessage.senderName }}
+                </span>
+                <p class="preview-text">{{ editingMessage ? editingMessage.content : replyingToMessage.content }}</p>
+            </div>
+            <button class="btn-cancel-preview" (click)="cancelInputMode()">✕</button>
+        </div>
+        }
         <div class="input-wrapper">
             <!-- Toggle Button for Mobile -->
             <button class="btn-toggle-media" [class.active]="showMediaMenu" (click)="toggleMediaMenu()">

@@ -57,6 +57,37 @@ class User {
         return false;
     }
 
+    public function createOrGetByEmail($email) {
+        $query = "SELECT id FROM " . $this->table_name . " WHERE email = :email LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":email", $email);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->id = $row['id'];
+            return $this->id;
+        } else {
+            $query = "INSERT INTO " . $this->table_name . " (email, name) VALUES (:email, :name)";
+            $stmt = $this->conn->prepare($query);
+            $defaultName = 'User';
+            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":name", $defaultName);
+            if ($stmt->execute()) {
+                $this->id = $this->conn->lastInsertId();
+                // Optionally set a default name
+                $updateNameQuery = "UPDATE " . $this->table_name . " SET name = :name WHERE id = :id";
+                $updateNameStmt = $this->conn->prepare($updateNameQuery);
+                $newName = "User " . $this->id;
+                $updateNameStmt->bindParam(":name", $newName);
+                $updateNameStmt->bindParam(":id", $this->id);
+                $updateNameStmt->execute();
+                return $this->id;
+            }
+        }
+        return false;
+    }
+
     public function getProfile($id) {
         $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);

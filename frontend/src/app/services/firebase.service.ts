@@ -19,6 +19,7 @@ import { Capacitor } from '@capacitor/core';
 export class FirebaseService {
     private auth: Auth;
     private googleProvider: GoogleAuthProvider;
+    
 
     constructor() {
         // Initialize Firebase

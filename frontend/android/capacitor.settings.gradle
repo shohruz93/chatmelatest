@@ -9,7 +9,7 @@ include ':capacitor-network'
 project(':capacitor-network').projectDir = new File('../node_modules/@capacitor/network/android')
 
 include ':capacitor-push-notifications'
-project(':capacitor-push-notifications').projectDir = new File('../../node_modules/@capacitor/push-notifications/android')
+project(':capacitor-push-notifications').projectDir = new File('../node_modules/@capacitor/push-notifications/android')
 
 include ':codetrix-studio-capacitor-google-auth'
 project(':codetrix-studio-capacitor-google-auth').projectDir = new File('../node_modules/@codetrix-studio/capacitor-google-auth/android')

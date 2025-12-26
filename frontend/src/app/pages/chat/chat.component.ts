@@ -86,6 +86,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private roomDetailsSub!: Subscription;
     private statusSub!: Subscription;
     private requestSub!: Subscription;
+    private editSub!: Subscription;
+    private deleteSub!: Subscription;
 
     // Filter modal
     showFilterModal = false;
@@ -108,6 +110,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Incoming Request Modal
     incomingRequest: any = null;
+
+    // Edit/Reply state
+    editingMessage: any = null;
+    replyingToMessage: any = null;
 
     // Advanced matching features
     queuePosition: number = 0;
@@ -348,6 +354,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 message.isTranslating = false;
             }
         });
+
+        // Listen for message edits
+        this.editSub = this.socketService.on('message_edited').subscribe((data: any) => {
+            const message = this.messages.find(m => m.id === data.messageId);
+            if (message) {
+                message.content = data.content;
+                // Reset translation if it was edited
+                message.translatedContent = null;
+                message.showTranslation = false;
+            }
+        });
+
+        // Listen for message deletions
+        this.deleteSub = this.socketService.on('message_deleted').subscribe((data: any) => {
+            this.messages = this.messages.filter(m => m.id !== data.messageId);
+        });
     }
 
     sendRequest() {
@@ -406,6 +428,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.roomDetailsSub) this.roomDetailsSub.unsubscribe();
         if (this.statusSub) this.statusSub.unsubscribe();
         if (this.requestSub) this.requestSub.unsubscribe();
+        if (this.editSub) this.editSub.unsubscribe();
+        if (this.deleteSub) this.deleteSub.unsubscribe();
 
         if (this.roomId) {
             this.socketService.emitTyping(this.roomId, false);
@@ -416,6 +440,161 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // Removed aggressive auto-scroll
     }
 
+    private mapMessage(msg: any): any {
+        return {
+            id: msg.id,
+            type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
+            content: msg.content,
+            timestamp: msg.created_at,
+            messageType: this.detectMessageType(msg.content, msg.type),
+            read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
+            status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
+            replyTo: msg.replyTo,
+            originalLang: msg.original_lang,
+            senderName: msg.senderName
+        };
+    }
+
+    loadMessageHistory() {
+        if (!this.roomId) return;
+
+        this.socketService.loadMessages(this.roomId, 50, 0);
+
+        const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
+            if (data.roomId === this.roomId && !this.isLoadingMore) { // Only handle initial load here
+                this.messages = data.messages.map((msg: any) => this.mapMessage(msg));
+
+                // Mark messages as read
+                this.markMessagesAsRead();
+
+                // Scroll to bottom on initial load
+                this.scrollToBottom('auto');
+                sub.unsubscribe(); // Unsubscribe after initial load
+            }
+        });
+    }
+
+    loadMoreMessages() {
+        if (!this.roomId || this.isLoadingMore) return;
+
+        this.isLoadingMore = true;
+        const currentScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+        const offset = this.messages.length;
+
+        this.socketService.loadMessages(this.roomId, 50, offset);
+
+        // We need a one-time subscription for this specific load
+        const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
+            if (data.roomId === this.roomId) {
+                if (data.messages.length === 0) {
+                    this.allMessagesLoaded = true;
+                } else {
+                    const newMessages = data.messages.map((msg: any) => this.mapMessage(msg));
+
+                    this.messages = [...newMessages, ...this.messages];
+
+                    // Restore scroll position
+                    setTimeout(() => {
+                        if (this.scrollContainer) {
+                            const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+                            this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
+                        }
+                    }, 0);
+                }
+            }
+            this.isLoadingMore = false;
+            sub.unsubscribe();
+        });
+    }
+    
+    sendMessage() {
+        if (!this.newMessage.trim()) {
+            return;
+        }
+
+        if (!this.roomId && !this.waitingForResponse) {
+            return;
+        }
+
+        const content = this.newMessage;
+
+        if (this.editingMessage) {
+            // Handle edit
+            this.socketService.emit('edit_message', {
+                roomId: this.roomId,
+                messageId: this.editingMessage.id,
+                content: content
+            });
+            // Instantly update UI
+            const msgToEdit = this.messages.find(m => m.id === this.editingMessage.id);
+            if (msgToEdit) {
+                msgToEdit.content = content;
+                msgToEdit.translatedContent = null;
+                msgToEdit.showTranslation = false;
+            }
+            this.cancelInputMode();
+            this.newMessage = '';
+            return;
+        }
+
+        const replyTo = this.replyingToMessage ? {
+            id: this.replyingToMessage.id,
+            content: this.replyingToMessage.content,
+            senderName: this.replyingToMessage.senderName || 'Partner'
+        } : null;
+
+        if (this.roomId) {
+            this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo);
+        } else if (this.waitingForResponse) {
+            this.pendingMessages.push(content);
+        }
+
+        const messageObj: any = {
+            id: Date.now(), // Temporary ID
+            type: 'sent',
+            content: content,
+            timestamp: new Date(),
+            messageType: 'text',
+            read: false,
+            status: 'sending', // Initial status
+            replyTo: replyTo,
+            senderName: this.currentUser.name
+        };
+
+        this.messages.push(messageObj);
+
+        this.newMessage = '';
+        this.cancelInputMode();
+
+        if (this.roomId) {
+            this.socketService.emitTyping(this.roomId, false);
+        }
+        if (this.typingTimeout) {
+            clearTimeout(this.typingTimeout);
+        }
+
+        this.scrollToBottom();
+
+        // Simulate 'sent' status after a short delay (or when socket emits)
+        // In a real app, you'd wait for a confirmation from the server.
+        setTimeout(() => {
+            const tempMessage = this.messages.find(m => m.id === messageObj.id);
+            if (tempMessage) {
+                tempMessage.status = 'sent';
+            }
+        }, 500);
+    }
+    
+    
+    replyToMessage(msg: any) {
+        this.replyingToMessage = {
+            id: msg.id,
+            content: msg.content,
+            senderName: msg.senderName || this.partnerName || 'Partner'
+        };
+        this.editingMessage = null;
+    }
+    
     private isUserNearBottom(): boolean {
         if (!this.scrollContainer) return false;
         const element = this.scrollContainer.nativeElement;
@@ -439,81 +618,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }, 100);
     }
-
+    
+    
     onScroll(event: any) {
         const element = event.target;
         if (element.scrollTop === 0 && !this.isLoadingMore && !this.allMessagesLoaded) {
             this.loadMoreMessages();
         }
     }
-
-    loadMoreMessages() {
-        if (!this.roomId || this.isLoadingMore) return;
-
-        this.isLoadingMore = true;
-        const currentScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
-        const offset = this.messages.length;
-
-        this.socketService.loadMessages(this.roomId, 50, offset);
-
-        // We need a one-time subscription for this specific load
-        const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
-            if (data.roomId === this.roomId) {
-                if (data.messages.length === 0) {
-                    this.allMessagesLoaded = true;
-                } else {
-                    const newMessages = data.messages.map((msg: any) => ({
-                        type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
-                        content: msg.content,
-                        timestamp: msg.created_at,
-                        messageType: this.detectMessageType(msg.content, msg.type),
-                        // Backend stores read flag as `is_read` — normalize here
-                        read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false)
-                    }));
-
-                    this.messages = [...newMessages, ...this.messages];
-
-                    // Restore scroll position
-                    setTimeout(() => {
-                        if (this.scrollContainer) {
-                            const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
-                            this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
-                        }
-                    }, 0);
-                }
-            }
-            this.isLoadingMore = false;
-            sub.unsubscribe();
-        });
-    }
-
-    loadMessageHistory() {
-        if (!this.roomId) return;
-
-        this.socketService.loadMessages(this.roomId, 50, 0);
-
-        this.socketService.onMessagesLoaded().subscribe((data: any) => {
-            if (data.roomId === this.roomId && !this.isLoadingMore) { // Only handle initial load here
-                this.messages = data.messages.map((msg: any) => ({
-                    // Use string comparison to avoid type mismatch
-                    type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
-                    content: msg.content,
-                    timestamp: msg.created_at,
-                    messageType: this.detectMessageType(msg.content, msg.type),
-                    // Normalize backend `is_read` to `read`
-                    read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
-                    status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent') // Initialize status
-                }));
-
-                // Mark messages as read
-                this.markMessagesAsRead();
-
-                // Scroll to bottom on initial load
-                this.scrollToBottom('auto');
-            }
-        });
-    }
-
+    
     markMessagesAsRead() {
         if (this.roomId && this.partner) {
             this.socketService.emit('mark_as_read', {
@@ -534,7 +647,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }
     }
-
+    
     onInputChange() {
         if (!this.roomId) return;
 
@@ -548,52 +661,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.socketService.emitTyping(this.roomId!, false);
         }, 2000);
     }
-
-    sendMessage() {
-        if (!this.newMessage.trim()) {
-            return;
-        }
-
-        if (!this.roomId && !this.waitingForResponse) {
-            return;
-        }
-
-        const content = this.newMessage;
-
-        if (this.roomId) {
-            this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text');
-        } else if (this.waitingForResponse) {
-            this.pendingMessages.push(content);
-        }
-
-        const messageObj: any = {
-            type: 'sent',
-            content: content,
-            timestamp: new Date(),
-            messageType: 'text',
-            read: false,
-            status: 'sending' // Initial status
-        };
-
-        this.messages.push(messageObj);
-
-        this.newMessage = '';
-
-        if (this.roomId) {
-            this.socketService.emitTyping(this.roomId, false);
-        }
-        if (this.typingTimeout) {
-            clearTimeout(this.typingTimeout);
-        }
-
-        this.scrollToBottom();
-
-        // Simulate 'sent' status after a short delay (or when socket emits)
-        setTimeout(() => {
-            messageObj.status = 'sent';
-        }, 500);
+    
+    editMessage(msg: any) {
+        this.editingMessage = msg;
+        this.replyingToMessage = null;
+        this.newMessage = msg.content;
+        // Focus input
+        // this.messageInput.nativeElement.focus();
     }
-
+    
+    deleteMessage(msg: any) {
+        if (confirm('Are you sure you want to delete this message?')) {
+            this.socketService.emit('delete_message', {
+                roomId: this.roomId,
+                messageId: msg.id
+            });
+            // Instantly remove from UI
+            this.messages = this.messages.filter(m => m.id !== msg.id);
+        }
+    }
+    
+    cancelInputMode() {
+        if (this.editingMessage) {
+            this.newMessage = '';
+        }
+        this.editingMessage = null;
+        this.replyingToMessage = null;
+    }
+    
     translateMessage(msg: any) {
         if (msg.translatedContent) {
             msg.showTranslation = !msg.showTranslation;
@@ -608,11 +703,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         msg.isTranslating = true;
 
-        // Determine target language from user location using CountryService
-        let targetLang = 'en'; // Default
-        if (this.currentUser && this.currentUser.location) {
-            targetLang = this.countryService.getLanguageFromCountry(this.currentUser.location);
-        }
+        // Determine target language from SocketService selectedLanguage
+        const targetLang = this.socketService.selectedLanguage();
 
         // Request translation from socket server
         this.socketService.emit('translate_message', {

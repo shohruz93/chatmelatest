@@ -1,0 +1,78 @@
+{
+  "PROFILE": {
+    "DISPLAY_NAME": "Display Name",
+    "BIO": "Bio",
+    "ABOUT": "About",
+    "NATIVE": "Native",
+    "LEARNING": "Learning",
+    "INTERESTS": "Interests",
+    "NO_INTERESTS": "No interests added yet.",
+    "EDIT_PROFILE": "Edit Profile",
+    "COMMENTS_RATINGS": "Comments & Ratings",
+    "RATE_USER": "Rate user",
+    "SUBMIT_RATING": "Submit rating",
+    "ADD_COMMENT": "Add a comment",
+    "ADD_COMMENT_BTN": "Add Comment"
+  },
+  "COMMON": {
+    "NOT_SPECIFIED": "Not specified",
+    "CANCEL": "Cancel"
+  },
+  "GUESTS": {
+    "TITLE": "Profile Guests",
+    "SUBTITLE": "See who's been checking you out!",
+    "LOADING": "Loading guests...",
+    "NO_GUESTS_TITLE": "No guests yet",
+    "NO_GUESTS_DESC": "When people visit your profile, they'll appear here."
+  },
+  "FEATURES": {
+    "PAGE_TITLE": "Powerful Features",
+    "PAGE_SUBTITLE": "Everything you need for meaningful connections",
+    "REAL_TIME_TRANSLATION": "Real-Time Translation",
+    "SMART_MATCHING": "Smart Matching",
+    "INSTANT_CONNECTION": "Instant Connection",
+    "PRIVACY_FIRST": "Privacy First",
+    "INTEREST_TAGS": "Interest Tags",
+    "THEME": "Dark/Light Mode",
+    "READY_TITLE": "Ready to start chatting?",
+    "GET_STARTED": "Get Started",
+    "COPYRIGHT": "© 2025 Chatme. All rights reserved."
+  },
+  "ABOUT": {
+    "PAGE_TITLE": "About Chatme",
+    "PAGE_SUBTITLE": "Breaking barriers, building connections",
+    "OUR_MISSION": "Our Mission",
+    "WHAT_WE_DO": "What We Do",
+    "JOIN_COMMUNITY": "Join Our Community",
+    "START_JOURNEY": "Start Your Journey"
+  },
+  "EXPLORE_PAGE": {
+    "TITLE": "Explore Users",
+    "LOADING": "Loading...",
+    "NO_USERS": "No users found",
+    "NO_USERS_DESC": "No users match your filters.",
+    "RESET_FILTERS": "Reset Filters",
+    "CONNECT_RANDOMLY": "Connect randomly"
+  },
+  "CONVERSATIONS": {
+    "ERROR_TITLE": "Oops! Something went wrong",
+    "RETRY": "Retry",
+    "NO_MESSAGES_TITLE": "No messages yet",
+    "NO_MESSAGES_DESC": "Find a match to start chatting!",
+    "START_CHAT": "Start chatting"
+  },
+  "CHAT": {
+    "SEND": "Send",
+    "CHAT_PARTNER": "Chat Partner",
+    "SELECT_CONVERSATION": "Select a conversation",
+    "EMPTY_STATE_TITLE": "No conversation selected",
+    "EMPTY_STATE_DESC": "Choose a conversation to start messaging."
+  },
+  "NOT_FOUND": {
+    "GO_HOME": "Go back home →",
+    "CODE_404": "404"
+  },
+  "GUESTS_PANEL": {
+    "VISITED_AT": "Visited"
+  }
+}

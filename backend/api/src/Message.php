@@ -30,9 +30,17 @@ class Message {
     }
 
     public function getByRoom($roomId, $limit = 50, $offset = 0) {
-        $query = "SELECT * FROM messages 
-                  WHERE room_id = :room 
-                  ORDER BY created_at DESC 
+        $query = "SELECT
+                    m.*,
+                    u.name as senderName,
+                    replied.content AS reply_content,
+                    reply_sender.name AS reply_sender_name
+                  FROM messages m
+                  JOIN users u ON u.id = m.sender_id
+                  LEFT JOIN messages replied ON m.reply_to_message_id = replied.id
+                  LEFT JOIN users reply_sender ON replied.sender_id = reply_sender.id
+                  WHERE m.room_id = :room 
+                  ORDER BY m.created_at DESC 
                   LIMIT :limit OFFSET :offset";
         
         $stmt = $this->db->prepare($query);
@@ -42,14 +50,27 @@ class Message {
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo json_encode($messages);
+        $result = [];
+        foreach ($messages as $msg) {
+            $msg['replyTo'] = null;
+            if ($msg['reply_to_message_id']) {
+                $msg['replyTo'] = [
+                    'content' => $msg['reply_content'],
+                    'senderName' => $msg['reply_sender_name']
+                ];
+            }
+            unset($msg['reply_content'], $msg['reply_sender_name']);
+            $result[] = $msg;
+        }
+
+        echo json_encode($result);
     }
 
     public function save() {
         $data = json_decode(file_get_contents("php://input"), true);
         
-        $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, original_lang) 
-                  VALUES (:sid, :rid, :room, :content, :lang)";
+        $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, original_lang, reply_to_message_id) 
+                  VALUES (:sid, :rid, :room, :content, :lang, :reply_to)";
         
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":sid", $data['senderId']);
@@ -58,6 +79,7 @@ class Message {
         $stmt->bindParam(":room", $data['roomId']);
         $stmt->bindParam(":content", $data['content']);
         $stmt->bindParam(":lang", $data['originalLang']);
+        $stmt->bindParam(":reply_to", $data['replyToMessageId']);
 
         if ($stmt->execute()) {
             $lastInsertId = $this->db->lastInsertId();
@@ -79,6 +101,47 @@ class Message {
         } else {
             http_response_code(500);
             echo json_encode(["message" => "Failed to save message"]);
+        }
+    }
+
+    public function update() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!isset($data['id']) || !isset($data['content'])) {
+            http_response_code(400);
+            echo json_encode(["message" => "Invalid data"]);
+            return;
+        }
+
+        $query = "UPDATE messages SET content = :content WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":content", $data['content']);
+        $stmt->bindParam(":id", $data['id']);
+
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Message updated"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to update message"]);
+        }
+    }
+
+    public function delete() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!isset($data['id'])) {
+            http_response_code(400);
+            echo json_encode(["message" => "Invalid data"]);
+            return;
+        }
+
+        $query = "DELETE FROM messages WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id", $data['id']);
+
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Message deleted"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to delete message"]);
         }
     }
 }

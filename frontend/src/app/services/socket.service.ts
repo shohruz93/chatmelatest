@@ -68,8 +68,8 @@ export class SocketService {
         this.socket.emit('send_chat_request', { targetUserId, myProfile });
     }
 
-    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text') {
-        this.socket.emit('private_message', { roomId, content, originalLang, type });
+    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null) {
+        this.socket.emit('private_message', { roomId, content, originalLang, type, replyTo });
     }
 
     isUserOnline(userId: number): boolean {

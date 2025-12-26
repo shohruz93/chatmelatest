@@ -65,6 +65,43 @@ export class AuthService {
         }
     }
 
+    async requestEmailCode(email: string) {
+        try {
+            return await firstValueFrom(this.api.post('/auth/send-code', { email }));
+        } catch (error: any) {
+            console.error('Request Email Code Error:', error);
+            throw error;
+        }
+    }
+
+    async verifyEmailCode(email: string, code: string) {
+        try {
+            const request$ = this.api.post('/auth/verify-code', { email, code }).pipe(
+                tap((response: any) => {
+                    if (response.token) {
+                        localStorage.setItem('token', response.token);
+                        localStorage.setItem('user', JSON.stringify(response.user));
+                        this.userSubject.next(response.user);
+
+                        if (response.user.needsOnboarding) {
+                            this.router.navigate(['/onboarding']);
+                        } else {
+                            this.router.navigate(['/dashboard/profile']);
+                        }
+                    }
+                })
+            );
+
+            return await firstValueFrom(request$);
+        } catch (error: any) {
+            console.error('Verify Email Code Error:', error);
+            if (Capacitor.isNativePlatform()) {
+                alert('Auth Error: ' + (error.message || JSON.stringify(error)));
+            }
+            throw error;
+        }
+    }
+
     async logout() {
         await this.firebaseService.signOut();
         localStorage.removeItem('token');

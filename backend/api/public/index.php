@@ -44,6 +44,14 @@ $router->add('POST', '/auth/google', function() use ($auth) {
     $auth->login();
 });
 
+$router->add('POST', '/auth/send-code', function() use ($auth) {
+    $auth->sendCode();
+});
+
+$router->add('POST', '/auth/verify-code', function() use ($auth) {
+    $auth->verifyCode();
+});
+
 // Push Notification Routes
 $router->add('POST', '/push/subscribe', function() use ($push) {
     $push->subscribe();
@@ -146,6 +154,14 @@ $router->add('GET', '/messages/room', function() use ($message) {
 
 $router->add('POST', '/messages', function() use ($message) {
     $message->save();
+});
+
+$router->add('PUT', '/messages', function() use ($message) {
+    $message->update();
+});
+
+$router->add('DELETE', '/messages', function() use ($message) {
+    $message->delete();
 });
 
 // Conversation Routes

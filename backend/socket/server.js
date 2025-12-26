@@ -386,7 +386,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('private_message', async ({ roomId, content, originalLang, type }) => {
+    socket.on('private_message', async ({ roomId, content, originalLang, type, replyTo }) => {
         const senderId = userSocketMap.get(socket.id);
         if (!senderId) return;
 
@@ -410,6 +410,7 @@ io.on('connection', (socket) => {
         }
 
         console.log(`Final receiverId: ${receiverId}`);
+        const replyToMessageId = replyTo ? replyTo.id : null;
 
         const messageData = {
             senderId: senderId,
@@ -418,7 +419,8 @@ io.on('connection', (socket) => {
             content,
             originalLang,
             type: type || 'text', // Ensure type is passed
-            timestamp: new Date()
+            timestamp: new Date(),
+            replyTo: replyTo
         };
 
         // Save message via PHP API
@@ -432,7 +434,8 @@ io.on('connection', (socket) => {
                     roomId: roomId,
                     content: content,
                     originalLang: originalLang,
-                    type: type || 'text'
+                    type: type || 'text',
+                    replyToMessageId: replyToMessageId
                 })
             });
             const result = await response.json();
@@ -449,6 +452,38 @@ io.on('connection', (socket) => {
         socket.to(roomId).emit('message', messageData);
 
         console.log('[MESSAGE_SENT] Broadcasting to room:', roomId, messageData);
+    });
+
+    socket.on('edit_message', async ({ roomId, messageId, content }) => {
+        console.log(`[EDIT_MESSAGE] Message ${messageId} in room ${roomId}: ${content}`);
+        try {
+            const response = await fetch('https://shphbjeio23.chatme.tj/messages', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: messageId, content })
+            });
+            if (response.ok) {
+                socket.to(roomId).emit('message_edited', { messageId, content });
+            }
+        } catch (err) {
+            console.error('Error editing message:', err);
+        }
+    });
+
+    socket.on('delete_message', async ({ roomId, messageId }) => {
+        console.log(`[DELETE_MESSAGE] Message ${messageId} in room ${roomId}`);
+        try {
+            const response = await fetch('https://shphbjeio23.chatme.tj/messages', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: messageId })
+            });
+            if (response.ok) {
+                socket.to(roomId).emit('message_deleted', { messageId });
+            }
+        } catch (err) {
+            console.error('Error deleting message:', err);
+        }
     });
 
     socket.on('load_messages', async ({ roomId, limit = 50, offset = 0 }) => {
