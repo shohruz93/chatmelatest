@@ -21,6 +21,7 @@ interface UserProfile {
     native_language: string | string[];
     learning_language: string | string[];
     isOnline?: boolean;
+    last_active?: string;
     interests?: { id: number; name: string }[];
 }
 
@@ -424,5 +425,28 @@ export class ExploreComponent implements OnInit, OnDestroy {
             .slice(0, 2)
             .join('')
             .toUpperCase();
+    }
+
+    formatLastActive(lastActive: string | undefined): string {
+        if (!lastActive) return '';
+
+        const lastActiveDate = new Date(lastActive);
+        const now = new Date();
+        const diffMs = now.getTime() - lastActiveDate.getTime();
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffMins < 1) {
+            return 'Just now';
+        } else if (diffMins < 60) {
+            return `${diffMins}m ago`;
+        } else if (diffHours < 24) {
+            return `${diffHours}h ago`;
+        } else if (diffDays < 7) {
+            return `${diffDays}d ago`;
+        } else {
+            return lastActiveDate.toLocaleDateString();
+        }
     }
 }

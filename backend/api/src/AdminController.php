@@ -56,7 +56,7 @@ class AdminController {
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $status = isset($_GET['status']) ? $_GET['status'] : 'all'; // all, banned, admin
 
-        $query = "SELECT id, name, email, is_admin, status, gender, avatar, created_at, last_active FROM users";
+        $query = "SELECT id, name, first_name, family_name, email, is_admin, status, gender, avatar, created_at, last_active FROM users";
         $countQuery = "SELECT COUNT(*) as count FROM users";
         
         $conditions = [];

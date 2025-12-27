@@ -271,7 +271,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     created_at: message.timestamp || new Date(),
                     messageType: this.detectMessageType(message.content, message.type),
                     read: false,
-                    originalLang: message.originalLang
+                    originalLang: message.originalLang,
+                    replyTo: message.replyTo,
+                    senderName: message.senderName || this.partnerName
                 });
 
                 if (shouldScroll) {

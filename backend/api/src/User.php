@@ -42,6 +42,9 @@ class User {
             
             $updateStmt->execute();
 
+            // Update last_active on login
+            $this->updateLastActive($this->id);
+
             return $this->id;
         } else {
             // Create new user
@@ -122,7 +125,7 @@ class User {
     }
 
     public function getRandomUsers($currentUserId, $filters = [], $limit = 10, $includeIds = []) {
-        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language FROM " . $this->table_name . " WHERE id != :current_user_id";
+        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active FROM " . $this->table_name . " WHERE id != :current_user_id";
         
         $params = [':current_user_id' => $currentUserId];
         
@@ -321,5 +324,12 @@ class User {
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $result['name'] : null;
+    }
+
+    public function updateLastActive($userId) {
+        $query = "UPDATE " . $this->table_name . " SET last_active = NOW() WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $userId);
+        return $stmt->execute();
     }
 }

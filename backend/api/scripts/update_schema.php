@@ -98,6 +98,18 @@ try {
     }
 
 
+    // Add last_active to users table
+    $check = $db->query("SHOW COLUMNS FROM users LIKE 'last_active'");
+    if ($check->rowCount() == 0) {
+        $db->exec("ALTER TABLE users ADD COLUMN last_active TIMESTAMP NULL DEFAULT NULL");
+        echo "Added last_active column to users table.\n";
+        // Initialize last_active for existing users based on their created_at
+        $db->exec("UPDATE users SET last_active = created_at WHERE last_active IS NULL");
+        echo "Initialized last_active for existing users.\n";
+    } else {
+        echo "last_active column already exists in users table.\n";
+    }
+
     echo "\nSchema update completed successfully!\n";
 } catch (PDOException $e) {
     echo "Error updating schema: " . $e->getMessage() . "\n";

@@ -181,7 +181,11 @@
         <!-- Online Status Badge -->
         <div class="status-badge" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
           <span class="status-dot"></span>
-          {{ (user.isOnline ? 'EXPLORE_PAGE.ONLINE' : 'EXPLORE_PAGE.OFFLINE') | translate }}
+          @if (user.isOnline) {
+          {{ 'EXPLORE_PAGE.ONLINE' | translate }}
+          } @else {
+          {{ formatLastActive(user.last_active) || ('EXPLORE_PAGE.OFFLINE' | translate) }}
+          }
         </div>
 
         <!-- Avatar -->

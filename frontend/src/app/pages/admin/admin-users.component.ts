@@ -42,9 +42,11 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
                 <thead>
                    <tr class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-sm">
                       <th class="px-6 py-4 font-semibold">User</th>
+                      <th class="px-6 py-4 font-semibold">Real Name</th>
                       <th class="px-6 py-4 font-semibold">Status</th>
                       <th class="px-6 py-4 font-semibold">Role</th>
                       <th class="px-6 py-4 font-semibold">Joined</th>
+                      <th class="px-6 py-4 font-semibold">Last Active</th>
                       <th class="px-6 py-4 font-semibold text-right">Actions</th>
                    </tr>
                 </thead>
@@ -62,6 +64,11 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
                                <div class="font-bold text-gray-800 dark:text-white">{{ user.name }}</div>
                                <div class="text-sm text-gray-500">{{ user.email }}</div>
                             </div>
+                         </div>
+                      </td>
+                      <td class="px-6 py-4">
+                         <div class="text-sm text-gray-900 dark:text-gray-200">
+                            {{ getRealName(user) }}
                          </div>
                       </td>
                       <td class="px-6 py-4">
@@ -83,6 +90,9 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
                          {{ user.created_at | date:'mediumDate' }}
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500">
+                         {{ user.last_active ? (user.last_active | date:'short') : '-' }}
                       </td>
                       <td class="px-6 py-4 text-right" (click)="$event.stopPropagation()">
                          <div class="flex items-center justify-end gap-2 text-gray-500">
@@ -335,5 +345,12 @@ export class AdminUsersComponent implements OnInit {
             }
          });
       }
+   }
+
+   getRealName(user: any): string {
+      const firstName = user.first_name || '';
+      const familyName = user.family_name || '';
+      const fullName = `${firstName} ${familyName}`.trim();
+      return fullName || '-';
    }
 }
