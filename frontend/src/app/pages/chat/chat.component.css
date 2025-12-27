@@ -80,6 +80,17 @@
     color: var(--text-secondary);
 }
 
+.loader-small {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(139, 92, 246, 0.1);
+    border-top: 3px solid #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 1rem;
+}
+
+
 
 .header-actions {
     display: flex;
@@ -903,4 +914,39 @@
 .sticker-item:hover {
     transform: scale(1.2);
     background: var(--bg-tertiary);
+}
+
+/* Date Separator */
+.date-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0;
+    position: relative;
+    width: 100%;
+}
+
+.date-separator::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.date-separator span {
+    background: var(--bg-primary);
+    padding: 0.25rem 1.25rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }

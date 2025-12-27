@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS user_activity (
 ALTER TABLE messages 
 ADD COLUMN IF NOT EXISTS room_id VARCHAR(100),
 ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS `type` VARCHAR(20) NOT NULL DEFAULT 'text',
 ADD INDEX IF NOT EXISTS idx_room_id (room_id),
 ADD INDEX IF NOT EXISTS idx_receiver_unread (receiver_id, is_read);
 

@@ -68,27 +68,46 @@ class Message {
 
     public function save() {
         $data = json_decode(file_get_contents("php://input"), true);
-        
-        $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, original_lang, reply_to_message_id) 
-                  VALUES (:sid, :rid, :room, :content, :lang, :reply_to)";
+
+        // --- Validation ---
+        // 1. Sanitize content for security
+        $content = htmlspecialchars($data['content'] ?? '', ENT_QUOTES, 'UTF-8');
+
+        // 2. Check for empty message
+        if (trim($content) === '') {
+            http_response_code(400);
+            echo json_encode(["message" => "Message content cannot be empty."]);
+            return;
+        }
+
+        // 3. Check message length
+        if (mb_strlen($content) > 5000) {
+            http_response_code(400);
+            echo json_encode(["message" => "Message is too long. Maximum 5000 characters."]);
+            return;
+        }
+
+        $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, type, original_lang, reply_to_message_id) 
+                  VALUES (:sid, :rid, :room, :content, :type, :lang, :reply_to)";
         
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":sid", $data['senderId']);
-        // receiverId may be null
         $stmt->bindParam(":rid", $data['receiverId']);
         $stmt->bindParam(":room", $data['roomId']);
-        $stmt->bindParam(":content", $data['content']);
+        $stmt->bindParam(":content", $content); // Use sanitized content
+        $type = isset($data['type']) ? $data['type'] : 'text';
+        $stmt->bindParam(":type", $type);
         $stmt->bindParam(":lang", $data['originalLang']);
-        $stmt->bindParam(":reply_to", $data['replyToMessageId']);
+        $replyTo = isset($data['replyToMessageId']) ? $data['replyToMessageId'] : null;
+        $stmt->bindParam(":reply_to", $replyTo);
 
         if ($stmt->execute()) {
             $lastInsertId = $this->db->lastInsertId();
             
-            // Send push notification
             if (!empty($data['receiverId'])) {
                 $senderName = $this->user->getNameById($data['senderId']);
                 $title = "New message from " . ($senderName ?: 'Someone');
-                $body = $data['content'];
+                $body = ($type === 'text') ? $content : '[' . ucfirst($type) . ']';
                 $payload = [
                     'type' => 'message',
                     'roomId' => $data['roomId'],
@@ -97,7 +116,7 @@ class Message {
                 $this->notification->send($data['receiverId'], $title, $body, $payload);
             }
 
-            echo json_encode(["message" => "Message saved", "id" => $lastInsertId]);
+            echo json_encode(["message" => "Message saved", "id" => $lastInsertId, "type" => $type]);
         } else {
             http_response_code(500);
             echo json_encode(["message" => "Failed to save message"]);

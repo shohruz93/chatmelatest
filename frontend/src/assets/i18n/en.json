@@ -66,7 +66,9 @@
     "CHAT_PARTNER": "Chat Partner",
     "SELECT_CONVERSATION": "Select a conversation",
     "EMPTY_STATE_TITLE": "No conversation selected",
-    "EMPTY_STATE_DESC": "Choose a conversation to start messaging."
+    "EMPTY_STATE_DESC": "Choose a conversation to start messaging.",
+    "SEARCHING_PARTNER": "Searching for a partner...",
+    "PLEASE_WAIT": "Please wait a moment."
   },
   "NOT_FOUND": {
     "GO_HOME": "Go back home →",

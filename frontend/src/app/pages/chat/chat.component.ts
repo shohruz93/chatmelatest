@@ -11,12 +11,13 @@ import { Subscription, lastValueFrom } from 'rxjs';
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
+import { ImageModalComponent } from '../../components/image-modal/image-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, UserProfileModalComponent, TranslatePipe],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, TranslatePipe],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css']
 })
@@ -47,6 +48,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     selectedRating: number = 0;
     ratingComment: string = '';
     showPartnerProfileModal = false;
+    showImageModal = false;
+    selectedImageUrl = '';
 
     // Media & Stickers
     showMediaMenu = false;
@@ -265,7 +268,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     id: message.id || Date.now(),
                     type: 'received',
                     content: message.content,
-                    timestamp: message.timestamp,
+                    created_at: message.timestamp || new Date(),
                     messageType: this.detectMessageType(message.content, message.type),
                     read: false,
                     originalLang: message.originalLang
@@ -445,7 +448,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             id: msg.id,
             type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
             content: msg.content,
-            timestamp: msg.created_at,
+            created_at: msg.created_at || msg.timestamp,
             messageType: this.detectMessageType(msg.content, msg.type),
             read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
             status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
@@ -455,10 +458,41 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         };
     }
 
+    get groupedMessages() {
+        if (!this.messages || this.messages.length === 0) return [];
+
+        const sortedMessages = [...this.messages].sort((a, b) => {
+            const dateA = new Date(a.created_at).getTime();
+            const dateB = new Date(b.created_at).getTime();
+            return dateA - dateB;
+        });
+
+        const groups: { date: string, messages: any[] }[] = [];
+        let lastDate: string | null = null;
+
+        sortedMessages.forEach(msg => {
+            const date = new Date(msg.created_at);
+            const dateStr = date.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            if (dateStr !== lastDate) {
+                groups.push({ date: dateStr, messages: [msg] });
+                lastDate = dateStr;
+            } else {
+                groups[groups.length - 1].messages.push(msg);
+            }
+        });
+
+        return groups;
+    }
+
     loadMessageHistory() {
         if (!this.roomId) return;
 
-        this.socketService.loadMessages(this.roomId, 50, 0);
+        this.socketService.loadMessages(this.roomId, 30, 0);
 
         const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
             if (data.roomId === this.roomId && !this.isLoadingMore) { // Only handle initial load here
@@ -481,7 +515,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         const currentScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
         const offset = this.messages.length;
 
-        this.socketService.loadMessages(this.roomId, 50, offset);
+        this.socketService.loadMessages(this.roomId, 30, offset);
 
         // We need a one-time subscription for this specific load
         const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
@@ -506,7 +540,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             sub.unsubscribe();
         });
     }
-    
+
     sendMessage() {
         if (!this.newMessage.trim()) {
             return;
@@ -542,7 +576,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         } : null;
 
         const tempMessageId = Date.now();
-        
+
         if (this.roomId) {
             this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo);
         } else if (this.waitingForResponse) {
@@ -582,8 +616,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }, 800);
     }
-    
-    
+
+
     replyToMessage(msg: any) {
         this.replyingToMessage = {
             id: msg.id,
@@ -592,7 +626,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         };
         this.editingMessage = null;
     }
-    
+
     private isUserNearBottom(): boolean {
         if (!this.scrollContainer) return false;
         const element = this.scrollContainer.nativeElement;
@@ -616,15 +650,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }, 100);
     }
-    
-    
+
+
     onScroll(event: any) {
         const element = event.target;
         if (element.scrollTop === 0 && !this.isLoadingMore && !this.allMessagesLoaded) {
             this.loadMoreMessages();
         }
     }
-    
+
     markMessagesAsRead() {
         if (this.roomId && this.partner) {
             this.socketService.emit('mark_as_read', {
@@ -645,7 +679,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }
     }
-    
+
     onInputChange() {
         if (!this.roomId) return;
 
@@ -659,7 +693,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.socketService.emitTyping(this.roomId!, false);
         }, 2000);
     }
-    
+
     editMessage(msg: any) {
         this.editingMessage = msg;
         this.replyingToMessage = null;
@@ -667,7 +701,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // Focus input
         // this.messageInput.nativeElement.focus();
     }
-    
+
     deleteMessage(msg: any) {
         if (confirm('Are you sure you want to delete this message?')) {
             this.socketService.emit('delete_message', {
@@ -678,7 +712,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.messages = this.messages.filter(m => m.id !== msg.id);
         }
     }
-    
+
     cancelInputMode() {
         if (this.editingMessage) {
             this.newMessage = '';
@@ -686,7 +720,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.editingMessage = null;
         this.replyingToMessage = null;
     }
-    
+
     translateMessage(msg: any) {
         if (msg.translatedContent) {
             msg.showTranslation = !msg.showTranslation;
@@ -736,10 +770,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.partner) {
             this.showPartnerProfileModal = true;
         }
-    }
-
-    closePartnerProfile() {
-        this.showPartnerProfileModal = false;
     }
 
     // Rating methods
@@ -820,7 +850,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     triggerFileInput() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = 'image/*';
+        fileInput.accept = 'image/png, image/jpeg, image/gif';
         fileInput.onchange = (e: any) => this.onImageSelected(e);
         fileInput.click();
     }
@@ -828,6 +858,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     onImageSelected(event: any) {
         const file = event.target.files[0];
         if (file) {
+            const fileType = file.type;
+            if (fileType !== 'image/png' && fileType !== 'image/jpeg' && fileType !== 'image/gif') {
+                console.error('Invalid file type. Please select a PNG, JPG, or GIF file.');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (e: any) => {
                 const imageData = e.target.result;
@@ -939,12 +974,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }, 800);
         }
     }
-    viewImage(imageUrl: string) {
-        window.open(imageUrl, '_blank');
-    }
 
     openImageModal(imageUrl: string) {
-        this.viewImage(imageUrl);
+        if (imageUrl) {
+            this.selectedImageUrl = imageUrl;
+            this.showImageModal = true;
+        }
     }
 
     detectMessageType(content: string, providedType: string): string {

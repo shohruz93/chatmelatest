@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
     content TEXT NOT NULL,
+    type VARCHAR(20) NOT NULL DEFAULT 'text',
     original_language VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,

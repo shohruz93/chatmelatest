@@ -14,6 +14,15 @@
             </div>
         </div>
         } @else {
+        @if (socketService.isSearching()) {
+        <div class="header-user-info">
+            <div class="loader-small"></div>
+            <div class="user-details">
+                <h2 class="user-name">{{ 'CHAT.SEARCHING_PARTNER' | translate }}</h2>
+                <span class="user-status">{{ 'CHAT.PLEASE_WAIT' | translate }}</span>
+            </div>
+        </div>
+        } @else {
         <div class="header-user-info">
             <div class="avatar-container placeholder">
                 <span class="icon">💬</span>
@@ -23,6 +32,7 @@
                 <span class="user-status">{{ 'CHAT.START_NOW' | translate }}</span>
             </div>
         </div>
+        }
         }
     </header>
 
@@ -37,7 +47,12 @@
             </div>
             }
 
-            @for (msg of messages; track msg.id || $index) {
+            @for (group of groupedMessages; track group.date) {
+            <div class="date-separator">
+                <span>{{ group.date }}</span>
+            </div>
+
+            @for (msg of group.messages; track msg.id || $index) {
             <div class="message-wrapper"
                 [ngClass]="{'message-sent': msg.type === 'sent', 'message-received': msg.type !== 'sent'}">
 
@@ -125,6 +140,7 @@
                     </div>
                 </div>
             </div>
+            }
             }
 
             @if (isPartnerTyping) {
@@ -284,10 +300,11 @@
     </div>
     }
 
-    @if (showPartnerProfileModal && partner) {
-    <app-user-profile-modal [user]="partner" (closeEvent)="closePartnerProfile()">
-    </app-user-profile-modal>
+    @if (showImageModal) {
+    <app-image-modal [imageUrl]="selectedImageUrl" (closeEvent)="showImageModal = false">
+    </app-image-modal>
     }
 
-    <input type="file" #fileInput accept="image/*" style="display: none;" (change)="onImageSelected($event)">
+    <input type="file" #fileInput accept="image/png, image/jpeg, image/gif" style="display: none;"
+        (change)="onImageSelected($event)">
 </div>

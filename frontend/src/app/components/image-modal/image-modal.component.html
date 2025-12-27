@@ -1,0 +1,6 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <img [src]="imageUrl" alt="Full screen image" class="modal-image">
+    <button class="modal-close" (click)="close()">✕</button>
+  </div>
+</div>
