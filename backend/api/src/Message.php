@@ -104,6 +104,9 @@ class Message {
         if ($stmt->execute()) {
             $lastInsertId = $this->db->lastInsertId();
             
+            // Update sender's last active timestamp
+            $this->user->updateLastActive($data['senderId']);
+            
             if (!empty($data['receiverId'])) {
                 $senderName = $this->user->getNameById($data['senderId']);
                 $title = "New message from " . ($senderName ?: 'Someone');

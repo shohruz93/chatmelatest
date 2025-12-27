@@ -3,6 +3,7 @@ import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SocketService } from './services/socket.service';
 import { PushService } from './services/push.service';
+import { HeartbeatService } from './services/heartbeat.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
@@ -19,6 +20,7 @@ export class App implements OnInit, OnDestroy {
   private socketService = inject(SocketService);
   private router = inject(Router);
   private pushService = inject(PushService);
+  private heartbeatService = inject(HeartbeatService);
 
   showIncomingRequestModal = false;
   showExitModal = false;
@@ -27,7 +29,7 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.pushService.init();
-    
+
     // Global listener for incoming chat requests
     this.chatRequestSub = this.socketService.onChatRequestReceived().subscribe(request => {
       // Always show modal in App component

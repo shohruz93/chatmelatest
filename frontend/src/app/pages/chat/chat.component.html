@@ -9,8 +9,10 @@
             </div>
             <div class="user-details">
                 <h2 class="user-name">{{ partnerName || ('CHAT.CHAT_PARTNER' | translate) }}</h2>
-                <span class="user-status">{{ isPartnerOnline ? ('CHAT.ONLINE' | translate) : ('CHAT.OFFLINE' |
-                    translate) }}</span>
+                <span class="user-status">
+                    {{ isPartnerOnline ? ('CHAT.ONLINE' | translate) : (formatLastActive(partner?.last_active) ||
+                    ('CHAT.OFFLINE' | translate)) }}
+                </span>
             </div>
         </div>
         } @else {

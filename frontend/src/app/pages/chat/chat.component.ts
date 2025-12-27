@@ -13,6 +13,7 @@ import { CountrySelectComponent } from '../../components/country-select/country-
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ImageModalComponent } from '../../components/image-modal/image-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-chat',
@@ -150,6 +151,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.statusSub = this.socketService.onUserStatusChanged().subscribe(data => {
             if (this.partner && Number(data.userId) === Number(this.partner.id)) {
                 this.partnerStatus = data.status as 'online' | 'offline';
+                if (data.status === 'offline' && data.lastSeen) {
+                    this.partner.last_active = data.lastSeen;
+                }
             }
         });
 
@@ -1008,5 +1012,28 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     getLocationLabel(location: string): string {
         return this.countryService.getCountryName(location);
+    }
+
+    formatLastActive(lastActive: string | undefined): string {
+        if (!lastActive) return '';
+
+        const lastActiveDate = new Date(lastActive);
+        const now = new Date();
+        const diffMs = now.getTime() - lastActiveDate.getTime();
+        const diffMins = Math.floor(diffMs / (1000 * 60));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        if (diffMins < 1) {
+            return 'Just now';
+        } else if (diffMins < 60) {
+            return `${diffMins}m ago`;
+        } else if (diffHours < 24) {
+            return `${diffHours}h ago`;
+        } else if (diffDays < 7) {
+            return `${diffDays}d ago`;
+        } else {
+            return lastActiveDate.toLocaleDateString();
+        }
     }
 }

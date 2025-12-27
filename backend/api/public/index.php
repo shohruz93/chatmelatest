@@ -314,6 +314,22 @@ $router->add('GET', '/support/admin-contact', function() use ($db) {
     }
 });
 
+// Heartbeat - Update user's last_active timestamp
+$router->add('POST', '/heartbeat', function() use ($db) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $userId = $data['userId'] ?? 0;
+    
+    if ($userId) {
+        require_once __DIR__ . '/../src/User.php';
+        $user = new User($db);
+        $user->updateLastActive($userId);
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+    }
+});
+
 // Test Route
 $router->add('GET', '/', function() {
     echo json_encode(["message" => "Welcome to Chatme API"]);
