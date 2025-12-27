@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-36:/values-gu/values-gu.xml",
+            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-32:/values-gu/values-gu.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\c3f09e8abd8bb01c9314454bd06bb337\\transformed\\appcompat-1.7.1\\res\\values-gu\\values-gu.xml",
@@ -21,24 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\4aef5d6dbfa2eab3e0cf75d9b9b7eb7a\\transformed\\play-services-base-18.1.0\\res\\values-gu\\values.xml",
-                    "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "193,297,459,580,688,822,940,1047,1143,1287,1391,1551,1672,1811,1957,2014,2076",
-                        "endColumns": "103,161,120,107,133,117,106,95,143,103,159,120,138,145,56,61,77",
-                        "endOffsets": "296,458,579,687,821,939,1046,1142,1286,1390,1550,1671,1810,1956,2013,2075,2153"
-                    },
-                    "to": {
-                        "startLines": "36,37,38,39,40,41,42,43,45,46,47,48,49,50,51,52,53",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "3510,3618,3784,3909,4021,4159,4281,4392,4639,4787,4895,5059,5184,5327,5477,5538,5604",
-                        "endColumns": "107,165,124,111,137,121,110,99,147,107,163,124,142,149,60,65,81",
-                        "endOffsets": "3613,3779,3904,4016,4154,4276,4387,4487,4782,4890,5054,5179,5322,5472,5533,5599,5681"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\114baedee36b8bdac268f5386a7e6897\\transformed\\play-services-basement-18.3.0\\res\\values-gu\\values.xml",
+                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\7f2505e3010de7df824517cfed968b98\\transformed\\play-services-basement-18.1.0\\res\\values-gu\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -52,6 +35,23 @@
                         "startOffsets": "4492",
                         "endColumns": "146",
                         "endOffsets": "4634"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\d6875487bafce1953eb23daa69f32b4c\\transformed\\play-services-base-18.0.1\\res\\values-gu\\values.xml",
+                    "from": {
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "193,297,459,580,688,822,940,1047,1143,1287,1391,1551,1672,1811,1957,2014,2076",
+                        "endColumns": "103,161,120,107,133,117,106,95,143,103,159,120,138,145,56,61,77",
+                        "endOffsets": "296,458,579,687,821,939,1046,1142,1286,1390,1550,1671,1810,1956,2013,2075,2153"
+                    },
+                    "to": {
+                        "startLines": "36,37,38,39,40,41,42,43,45,46,47,48,49,50,51,52,53",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "3510,3618,3784,3909,4021,4159,4281,4392,4639,4787,4895,5059,5184,5327,5477,5538,5604",
+                        "endColumns": "107,165,124,111,137,121,110,99,147,107,163,124,142,149,60,65,81",
+                        "endOffsets": "3613,3779,3904,4016,4154,4276,4387,4487,4782,4890,5054,5179,5322,5472,5533,5599,5681"
                     }
                 },
                 {

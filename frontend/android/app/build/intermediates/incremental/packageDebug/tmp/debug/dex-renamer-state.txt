@@ -1,7 +1,6 @@
-#Tue Dec 23 10:40:52 TJT 2025
+#Sat Dec 27 16:47:45 TJT 2025
 base.0=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\2\\classes.dex
-base.10=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
 base.2=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\3\\classes.dex
 base.3=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\4\\classes.dex
 base.4=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\5\\classes.dex
@@ -12,7 +11,6 @@ base.8=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug
 base.9=D\:\\ChatmeLast\\frontend\\android\\app\\build\\intermediates\\dex\\debug\\mergeLibDexDebug\\9\\classes.dex
 path.0=classes.dex
 path.1=2/classes.dex
-path.10=classes2.dex
 path.2=3/classes.dex
 path.3=4/classes.dex
 path.4=5/classes.dex
@@ -23,7 +21,6 @@ path.8=7/classes.dex
 path.9=9/classes.dex
 renamed.0=classes.dex
 renamed.1=classes2.dex
-renamed.10=classes11.dex
 renamed.2=classes3.dex
 renamed.3=classes4.dex
 renamed.4=classes5.dex
