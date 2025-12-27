@@ -53,14 +53,9 @@ export class App implements OnInit, OnDestroy {
 
     // Back button listener for Android
     if (Capacitor.getPlatform() === 'android') {
-      NativeApp.addListener('backButton', ({ canGoBack }) => {
-        if (!canGoBack) {
-          this.showExitModal = true;
-        } else {
-          // If there's a history, let the router handle it or just do nothing
-          // Capacitor usually handles router history automatically
-          window.history.back();
-        }
+      NativeApp.addListener('backButton', () => {
+        // Instead of going back, show the exit modal
+        this.showExitModal = true;
       });
     }
   }
