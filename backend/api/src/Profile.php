@@ -242,6 +242,12 @@ class Profile {
     }
 
     public function getGuests($userId) {
+        // Cleanup old guests (older than 1 month) for this user
+        $cleanupQuery = "DELETE FROM profile_views WHERE viewed_id = :user_id AND viewed_at < DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+        $cleanupStmt = $this->db->prepare($cleanupQuery);
+        $cleanupStmt->bindParam(":user_id", $userId);
+        $cleanupStmt->execute();
+
         $query = "SELECT u.id, u.name, u.avatar, u.bio, pv.viewed_at 
                   FROM profile_views pv 
                   JOIN users u ON pv.viewer_id = u.id 
