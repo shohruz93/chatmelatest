@@ -519,13 +519,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         const content = this.newMessage;
 
         if (this.editingMessage) {
-            // Handle edit
             this.socketService.emit('edit_message', {
                 roomId: this.roomId,
                 messageId: this.editingMessage.id,
                 content: content
             });
-            // Instantly update UI
             const msgToEdit = this.messages.find(m => m.id === this.editingMessage.id);
             if (msgToEdit) {
                 msgToEdit.content = content;
@@ -543,6 +541,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             senderName: this.replyingToMessage.senderName || 'Partner'
         } : null;
 
+        const tempMessageId = Date.now();
+        
         if (this.roomId) {
             this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo);
         } else if (this.waitingForResponse) {
@@ -550,13 +550,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         const messageObj: any = {
-            id: Date.now(), // Temporary ID
+            id: tempMessageId,
             type: 'sent',
             content: content,
-            timestamp: new Date(),
+            created_at: new Date(),
             messageType: 'text',
             read: false,
-            status: 'sending', // Initial status
+            status: 'sending',
             replyTo: replyTo,
             senderName: this.currentUser.name
         };
@@ -575,14 +575,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         this.scrollToBottom();
 
-        // Simulate 'sent' status after a short delay (or when socket emits)
-        // In a real app, you'd wait for a confirmation from the server.
         setTimeout(() => {
-            const tempMessage = this.messages.find(m => m.id === messageObj.id);
+            const tempMessage = this.messages.find(m => m.id === tempMessageId);
             if (tempMessage) {
                 tempMessage.status = 'sent';
             }
-        }, 500);
+        }, 800);
     }
     
     
@@ -915,17 +913,30 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     sendMediaMessage(content: string, type: string) {
         if (this.roomId) {
+            const tempMessageId = Date.now();
             this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), type);
 
-            this.messages.push({
+            const messageObj: any = {
+                id: tempMessageId,
                 type: 'sent',
                 content: content,
-                timestamp: new Date(),
+                created_at: new Date(),
                 messageType: type,
-                read: false
-            });
+                read: false,
+                status: 'sending',
+                senderName: this.currentUser.name
+            };
+
+            this.messages.push(messageObj);
 
             this.scrollToBottom();
+
+            setTimeout(() => {
+                const tempMessage = this.messages.find(m => m.id === tempMessageId);
+                if (tempMessage) {
+                    tempMessage.status = 'sent';
+                }
+            }, 800);
         }
     }
     viewImage(imageUrl: string) {
