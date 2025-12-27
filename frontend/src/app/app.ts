@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { SocketService } from './services/socket.service';
 import { PushService } from './services/push.service';
 import { HeartbeatService } from './services/heartbeat.service';
@@ -19,6 +19,7 @@ import { App as NativeApp } from '@capacitor/app';
 export class App implements OnInit, OnDestroy {
   private socketService = inject(SocketService);
   private router = inject(Router);
+  private location = inject(Location);
   private pushService = inject(PushService);
   private heartbeatService = inject(HeartbeatService);
 
@@ -54,8 +55,14 @@ export class App implements OnInit, OnDestroy {
     // Back button listener for Android
     if (Capacitor.getPlatform() === 'android') {
       NativeApp.addListener('backButton', () => {
-        // Instead of going back, show the exit modal
-        this.showExitModal = true;
+        const url = this.router.url || '';
+        // If user is on the Explore page, show exit confirmation
+        if (url.includes('/explore')) {
+          this.showExitModal = true;
+        } else {
+          // Otherwise navigate back to the previous page
+          this.location.back();
+        }
       });
     }
   }
