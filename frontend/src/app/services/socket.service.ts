@@ -1,7 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { LanguageService } from './language.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -10,8 +11,9 @@ import { environment } from '../../environments/environment';
 export class SocketService {
     private socket: Socket;
     private url = environment.nodeBaseUrl;
+    private languageService = inject(LanguageService);
     public isSearching = signal(false);
-    public selectedLanguage = signal('en');
+    public selectedLanguage = this.languageService.currentLang;
     public onlineUsers = signal<Set<number>>(new Set());
 
     constructor(private auth: AuthService) {
@@ -61,7 +63,8 @@ export class SocketService {
     }
 
     findMatch(interests: any[], language: string, filters: any = {}, myProfile: any = {}) {
-        this.socket.emit('find_match', { interests, language, filters, myProfile });
+        const normalizedLang = language === 'tj' ? 'tg' : language;
+        this.socket.emit('find_match', { interests, language: normalizedLang, filters, myProfile });
     }
 
     sendChatRequest(targetUserId: number, myProfile: any) {
@@ -69,7 +72,8 @@ export class SocketService {
     }
 
     sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null) {
-        this.socket.emit('private_message', { roomId, content, originalLang, type, replyTo });
+        const normalizedLang = originalLang === 'tj' ? 'tg' : originalLang;
+        this.socket.emit('private_message', { roomId, content, originalLang: normalizedLang, type, replyTo });
     }
 
     isUserOnline(userId: number): boolean {

@@ -210,10 +210,6 @@ export class DashboardComponent implements OnInit {
         }, 30000);
     }
 
-    onLanguageChange(event: any) {
-        this.socketService.selectedLanguage.set(event.target.value);
-    }
-
     setLanguage(lang: string) {
         this.languageService.setLanguage(lang);
     }

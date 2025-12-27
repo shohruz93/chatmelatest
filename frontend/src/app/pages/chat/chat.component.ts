@@ -736,7 +736,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         msg.isTranslating = true;
 
         // Determine target language from SocketService selectedLanguage
-        const targetLang = this.socketService.selectedLanguage();
+        let targetLang = this.socketService.selectedLanguage();
+        if (targetLang === 'tj') targetLang = 'tg';
 
         // Request translation from socket server
         this.socketService.emit('translate_message', {

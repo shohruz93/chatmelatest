@@ -22,9 +22,22 @@ class User {
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
-            // User exists: Return ID without updating personal info
+            // User exists: Check if names need updating
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $row['id'];
+            
+            // Update names if they are empty
+            $query = "UPDATE " . $this->table_name . " 
+                      SET first_name = COALESCE(NULLIF(first_name, ''), :first_name),
+                          family_name = COALESCE(NULLIF(family_name, ''), :family_name)
+                      WHERE id = :id AND (first_name IS NULL OR first_name = '' OR family_name IS NULL OR family_name = '')";
+            
+            $updateStmt = $this->conn->prepare($query);
+            $updateStmt->bindParam(":first_name", $googleUser['given_name']);
+            $updateStmt->bindParam(":family_name", $googleUser['family_name']);
+            $updateStmt->bindParam(":id", $this->id);
+            $updateStmt->execute();
+
             return $this->id;
         } else {
             // Create new user

@@ -7,16 +7,35 @@ import { Observable, map, catchError, of } from 'rxjs';
 })
 export class TranslationService {
     private http = inject(HttpClient);
-    private apiUrl = 'https://ftapi.pythonanywhere.com/translate';
+    private primaryApiUrl = 'https://ftapi.pythonanywhere.com/translate';
+    private fallbackApiUrl = 'https://translate.googleapis.com/translate_a/single';
 
     translate(text: string, targetLang: string, sourceLang: string = 'auto'): Observable<string> {
-        const url = `${this.apiUrl}?sl=${sourceLang}&dl=${targetLang}&text=${encodeURIComponent(text)}`;
+        // Normalize 'tj' to 'tg' for better compatibility with translation APIs
+        const dl = targetLang === 'tj' ? 'tg' : targetLang;
+        const sl = sourceLang === 'tj' ? 'tg' : sourceLang;
 
-        return this.http.get<any>(url).pipe(
-            map(response => response['destination-text']),
-            catchError(error => {
-                console.error('Translation error:', error);
-                return of(text); // Return original text on error
+        const primaryUrl = `${this.primaryApiUrl}?sl=${sl}&dl=${dl}&text=${encodeURIComponent(text)}`;
+
+        return this.http.get<any>(primaryUrl).pipe(
+            map(response => {
+                const translated = response?.['destination-text'] || response?.['translatedText'];
+                if (translated) return translated;
+                throw new Error('Invalid response structure');
+            }),
+            catchError(() => {
+                // Fallback to Google Translate Unofficial API
+                const fallbackUrl = `${this.fallbackApiUrl}?client=gtx&sl=${sl}&tl=${dl}&dt=t&q=${encodeURIComponent(text)}`;
+
+                return this.http.get<any>(fallbackUrl).pipe(
+                    map(data => {
+                        if (data && data[0] && data[0][0] && data[0][0][0]) {
+                            return data[0][0][0];
+                        }
+                        return text;
+                    }),
+                    catchError(() => of(text))
+                );
             })
         );
     }

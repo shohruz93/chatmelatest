@@ -591,24 +591,49 @@ io.on('connection', (socket) => {
     // Handle translation requests
     socket.on('translate_message', async ({ messageId, text, targetLang }) => {
         console.log(`[TRANSLATE] Request for message ${messageId} to ${targetLang}`);
+
+        // Normalize language codes (e.g., 'tj' -> 'tg' for better compatibility)
+        let dl = targetLang;
+        if (targetLang === 'tj') dl = 'tg';
+
         try {
-            // New Custom API
-            const url = `https://ftapi.pythonanywhere.com/translate?sl=auto&dl=${targetLang}&text=${encodeURIComponent(text)}`;
-            console.log('[TRANSLATE] Fetching URL:', url);
-
-            const response = await fetch(url);
-            const data = await response.json();
-
-            console.log('[TRANSLATE] API Response:', JSON.stringify(data));
-
-            // Check for various response formats
             let translatedText = null;
-            if (data['destination-text']) {
-                translatedText = data['destination-text'];
-            } else if (data.translatedText) {
-                translatedText = data.translatedText;
-            } else if (data.responseData && data.responseData.translatedText) {
-                translatedText = data.responseData.translatedText;
+
+            // Attempt 1: Custom API (ftapi.pythonanywhere.com)
+            try {
+                const primaryUrl = `https://ftapi.pythonanywhere.com/translate?sl=auto&dl=${dl}&text=${encodeURIComponent(text)}`;
+                console.log('[TRANSLATE] Attempting Primary API:', primaryUrl);
+
+                const response = await fetch(primaryUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data['destination-text']) {
+                        translatedText = data['destination-text'];
+                    } else if (data && data.translatedText) {
+                        translatedText = data.translatedText;
+                    }
+                }
+            } catch (err) {
+                console.warn('[TRANSLATE] Primary API failed:', err.message);
+            }
+
+            // Attempt 2: Fallback to Google Translate Unofficial API (Stable & Free)
+            if (!translatedText) {
+                try {
+                    const fallbackUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${dl}&dt=t&q=${encodeURIComponent(text)}`;
+                    console.log('[TRANSLATE] Attempting Fallback API:', fallbackUrl);
+
+                    const response = await fetch(fallbackUrl);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Google Translate response is a nested array: [[["translated", "orig", ...]]]
+                        if (data && data[0] && data[0][0] && data[0][0][0]) {
+                            translatedText = data[0][0][0];
+                        }
+                    }
+                } catch (err) {
+                    console.error('[TRANSLATE] Fallback API failed:', err.message);
+                }
             }
 
             if (translatedText) {
@@ -618,18 +643,14 @@ io.on('connection', (socket) => {
                     translatedText: translatedText
                 });
             } else {
-                socket.emit('translation_result', {
-                    messageId: messageId,
-                    success: false,
-                    error: 'Structure mismatch: ' + JSON.stringify(data)
-                });
+                throw new Error('All translation services failed or returned invalid response.');
             }
         } catch (error) {
-            console.error('[TRANSLATE] Error:', error);
+            console.error('[TRANSLATE] Fatal Error:', error);
             socket.emit('translation_result', {
                 messageId: messageId,
                 success: false,
-                error: 'Translation service unavailable: ' + error.message
+                error: 'Translation error: ' + (error.message || 'Service unavailable')
             });
         }
     });

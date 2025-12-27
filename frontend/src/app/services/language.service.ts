@@ -17,26 +17,26 @@ export class LanguageService {
         'fa': 'fa', 'fa-ir': 'fa', 'fa-fatn': 'fa', 'fa-fatn-ir': 'fa',
     };
 
-    private currentLang = signal(this.getInitialLanguage());
+    public currentLang = signal(this.getInitialLanguage());
 
     private getInitialLanguage(): string {
         const savedLang = localStorage.getItem('lang');
         const supportedCodes = ['en', 'ru', 'tj', 'es', 'ar', 'fr', 'de', 'zh', 'hi', 'fa'];
-        
+
         if (savedLang && supportedCodes.includes(savedLang)) {
             return savedLang;
         }
 
         const systemLang = navigator.language.toLowerCase();
         const mappedLang = this.languageMap[systemLang];
-        
+
         if (mappedLang && supportedCodes.includes(mappedLang)) {
             return mappedLang;
         }
 
         const baseLang = systemLang.split('-')[0];
         const mappedBaseLang = this.languageMap[baseLang];
-        
+
         if (mappedBaseLang && supportedCodes.includes(mappedBaseLang)) {
             return mappedBaseLang;
         }
