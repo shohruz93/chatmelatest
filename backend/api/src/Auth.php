@@ -92,15 +92,19 @@ class Auth {
             $userId = $this->user->createOrUpdate($userData);
             
             if ($userId) {
-                // Fetch full user profile from database to get avatar and other fields
-                $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
-                $stmt = $this->db->prepare($query);
-                $stmt->bindParam(":id", $userId);
-                $stmt->execute();
-                $userProfile = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Fetch full user profile from database
+                $userProfile = $this->user->getProfile($userId);
                 
+                // Fetch interests
+                $query = "SELECT i.id, i.name FROM interests i 
+                          JOIN user_interests ui ON i.id = ui.interest_id 
+                          WHERE ui.user_id = :user_id";
+                $stmt = $this->db->prepare($query);
+                $stmt->bindParam(":user_id", $userId);
+                $stmt->execute();
+                $interests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
                 // Generate Session Token (Simple implementation)
-                // In production, use a proper JWT library
                 $sessionToken = base64_encode(json_encode([
                     "id" => $userId,
                     "email" => $userData['email'],
@@ -116,11 +120,14 @@ class Auth {
                         "first_name" => $userProfile['first_name'] ?: $userData['given_name'],
                         "family_name" => $userProfile['family_name'] ?: $userData['family_name'],
                         "email" => $userProfile['email'] ?: $userData['email'],
-                        "avatar" => $userProfile['avatar'], // Database avatar takes priority
-                        "photoURL" => $userData['picture'], // Keep Google picture as fallback
+                        "avatar" => $userProfile['avatar'], 
+                        "photoURL" => $userData['picture'], 
                         "bio" => $userProfile['bio'],
                         "gender" => $userProfile['gender'],
                         "location" => $userProfile['location'],
+                        "native_language" => $userProfile['native_language'],
+                        "learning_language" => $userProfile['learning_language'],
+                        "interests" => $interests,
                         "is_admin" => $userProfile['is_admin']
                     ]
                 ]);

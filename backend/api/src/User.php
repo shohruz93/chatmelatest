@@ -15,11 +15,6 @@ class User {
         $this->conn = $db;
     }
     public function createOrUpdate($googleUser) {
-        // Debug logging for User model
-        $logFile = __DIR__ . '/../public/debug_user.log';
-        $logData = date('Y-m-d H:i:s') . " - Processing Google User: " . (isset($googleUser['email']) ? $googleUser['email'] : 'no email') . "\n";
-        $logData .= "Google Data: " . json_encode($googleUser) . "\n";
-
         $query = "SELECT id, first_name, family_name FROM " . $this->table_name . " WHERE google_id = :google_id LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":google_id", $googleUser['sub']);
@@ -30,8 +25,6 @@ class User {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $row['id'];
             
-            $logData .= "Existing user found ID: " . $this->id . ". current first_name: " . ($row['first_name'] ?? 'NULL') . ", family_name: " . ($row['family_name'] ?? 'NULL') . "\n";
-
             // Update names if they are empty
             $query = "UPDATE " . $this->table_name . " 
                       SET first_name = :first_name,
@@ -47,16 +40,10 @@ class User {
             $updateStmt->bindParam(":family_name", $familyName);
             $updateStmt->bindParam(":id", $this->id);
             
-            if ($updateStmt->execute()) {
-                $logData .= "Update query executed. Rows affected: " . $updateStmt->rowCount() . "\n";
-            } else {
-                $logData .= "Update query FAILED.\n";
-            }
+            $updateStmt->execute();
 
-            file_put_contents($logFile, $logData . "------------------\n", FILE_APPEND);
             return $this->id;
         } else {
-            $logData .= "New user. Creating...\n";
             // Create new user
             $fullName = trim(($googleUser['given_name'] ?? '') . ' ' . ($googleUser['family_name'] ?? ''));
             if (empty($fullName)) {
@@ -75,10 +62,8 @@ class User {
             $stmt->bindParam(":first_name", $googleUser['given_name']);
             $stmt->bindParam(":family_name", $googleUser['family_name']);
             $stmt->bindParam(":avatar", $googleUser['picture']);
-
             if ($stmt->execute()) {
                 $this->id = $this->conn->lastInsertId();
-                $logData .= "New user created ID: " . $this->id . " with name: " . $fullName . "\n";
                 
                 // If name was 'New User', update it to 'User {id}' as fallback 
                 // but if we actually got a name, keep it.
@@ -91,11 +76,9 @@ class User {
                     $updateNameStmt->execute();
                 }
 
-                file_put_contents($logFile, $logData . "------------------\n", FILE_APPEND);
                 return $this->id;
             }
         }
-        file_put_contents($logFile, $logData . "FAILED TO CREATE OR UPDATE\n------------------\n", FILE_APPEND);
         return false;
     }
 

@@ -130,8 +130,25 @@
         <span>{{ 'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate }}</span>
       </button>
       <!-- Toggle Filters Button -->
-      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' | translate }}</button>
+      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' |
+        translate }}</button>
     </div>
+
+    @if (showValidationMessage()) {
+    <div class="validation-alert">
+      <div class="alert-content">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ 'EXPLORE_PAGE.VALIDATION_MESSAGE' | translate }}</span>
+      </div>
+      <button class="btn-primary-sm" routerLink="/dashboard/profile">{{ 'EXPLORE_PAGE.COMPLETE_PROFILE' | translate
+        }}</button>
+    </div>
+    }
 
     <!-- Loading State -->
     @if (isLoading()) {

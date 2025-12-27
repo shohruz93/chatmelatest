@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
@@ -27,7 +27,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, UserProfileModalComponent, TranslatePipe],
+    imports: [CommonModule, FormsModule, UserProfileModalComponent, TranslatePipe, RouterLink],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css']
 })
@@ -152,6 +152,8 @@ export class ExploreComponent implements OnInit, OnDestroy {
     // Expose Array to template
     Array = Array;
 
+    showValidationMessage = signal(false);
+
     constructor() {
         // React to online users changes
         effect(() => {
@@ -167,10 +169,20 @@ export class ExploreComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         const userStr = localStorage.getItem('user');
         if (userStr) {
-            this.currentUser = JSON.parse(userStr);
+            try {
+                this.currentUser = JSON.parse(userStr);
+                // Fetch latest profile to ensure we have current languages/interests
+                const latestProfile = await lastValueFrom(this.api.get(`/profile?userId=${this.currentUser.id}`));
+                if (latestProfile) {
+                    this.currentUser = { ...this.currentUser, ...latestProfile };
+                    this.auth.updateUser(this.currentUser);
+                }
+            } catch (e) {
+                console.error('Failed to sync profile:', e);
+            }
         }
 
         this.loadUsers();
@@ -287,6 +299,28 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     async connectRandomly() {
+        // Validation: Check if native_language, learning_language and interests exist
+        const user = this.currentUser;
+
+        const hasNative = !!user?.native_language && user.native_language !== '' && user.native_language !== 'any';
+        const hasLearning = !!user?.learning_language && user.learning_language !== '' && user.learning_language !== 'any';
+        const hasInterests = user?.interests && Array.isArray(user.interests) && user.interests.length > 0;
+
+        console.log('Random Connect Validation:', { hasNative, hasLearning, hasInterests, user });
+
+        if (!hasNative || !hasLearning || !hasInterests) {
+            this.showValidationMessage.set(true);
+
+            // Scroll to the top of the explore content where the message is
+            const content = document.querySelector('.explore-content');
+            if (content) {
+                content.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            setTimeout(() => this.showValidationMessage.set(false), 8000);
+            return;
+        }
+
         this.isLoading.set(true);
         try {
             // Build filter params to send to smart-match endpoint

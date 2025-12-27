@@ -129,7 +129,9 @@ export class LanguageService {
                 'FEMALE': 'Female',
                 'ANY_LOCATION': 'Any Location',
                 'ANY_LANGUAGE': 'Any Language',
-                'NO_RANDOM_USER': 'No users found to connect with! Try again later.'
+                'NO_RANDOM_USER': 'No users found to connect with! Try again later.',
+                'VALIDATION_MESSAGE': 'Please complete your profile information (languages and interests) first to use this feature.',
+                'COMPLETE_PROFILE': 'Complete Profile'
             },
 
             'NAV': {
@@ -293,7 +295,9 @@ export class LanguageService {
                 'FEMALE': 'Женский',
                 'ANY_LOCATION': 'Любое место',
                 'ANY_LANGUAGE': 'Любой язык',
-                'NO_RANDOM_USER': 'Не найдено пользователей для связи! Попробуйте позже.'
+                'NO_RANDOM_USER': 'Не найдено пользователей для связи! Попробуйте позже.',
+                'VALIDATION_MESSAGE': 'Пожалуйста, заполните информацию профиля (языки и интересы) перед использованием этой функции.',
+                'COMPLETE_PROFILE': 'Заполнить профиль'
             },
             'NAV': {
                 'DASHBOARD': 'Панель',
@@ -454,7 +458,9 @@ export class LanguageService {
                 'FEMALE': 'Зан',
                 'ANY_LOCATION': 'Ҳар ҷо',
                 'ANY_LANGUAGE': 'Ҳар гуна',
-                'NO_RANDOM_USER': 'Барои пайвастшавӣ корбар ёфт нашуд! Баъдтар кӯшиш кунед.'
+                'NO_RANDOM_USER': 'Барои пайвастшавӣ корбар ёфт нашуд! Баъдтар кӯшиш кунед.',
+                'VALIDATION_MESSAGE': 'Лутфан аввал маълумоти профили худро (забонҳо ва манфиатҳо) пур кунед, то ин хусусиятро истифода баред.',
+                'COMPLETE_PROFILE': 'Профилро пур кунед'
             },
             'NAV': {
                 'DASHBOARD': 'Панел',
@@ -619,7 +625,9 @@ export class LanguageService {
                 'FEMALE': 'Femenino',
                 'ANY_LOCATION': 'Cualquier Ubicación',
                 'ANY_LANGUAGE': 'Cualquier Idioma',
-                'NO_RANDOM_USER': '¡No se encontraron usuarios para conectar! Inténtalo de nuevo más tarde.'
+                'NO_RANDOM_USER': '¡No se encontraron usuarios para conectar! Inténtalo de nuevo más tarde.',
+                'VALIDATION_MESSAGE': 'Por favor, completa tu información de perfil (idiomas e intereses) primero para usar esta función.',
+                'COMPLETE_PROFILE': 'Completar perfil'
             },
             'NAV': {
                 'DASHBOARD': 'Panel',
@@ -784,7 +792,9 @@ export class LanguageService {
                 'FEMALE': 'أنثى',
                 'ANY_LOCATION': 'أي موقع',
                 'ANY_LANGUAGE': 'أي لغة',
-                'NO_RANDOM_USER': 'لم يتم العثور على مستخدمين للتواصل معهم! حاول مرة أخرى لاحقًا.'
+                'NO_RANDOM_USER': 'لم يتم العثور على مستخدمين للتواصل معهم! حاول مرة أخرى لاحقًا.',
+                'VALIDATION_MESSAGE': 'يرجى إكمال معلومات ملفك الشخصي (اللغات والاهتمامات) أولاً لاستخدام هذه الميزة.',
+                'COMPLETE_PROFILE': 'إكمال الملف الشخصي'
             },
             'NAV': {
                 'DASHBOARD': 'لوحة التحكم',
@@ -949,7 +959,9 @@ export class LanguageService {
                 'FEMALE': 'Femme',
                 'ANY_LOCATION': 'Toute Localisation',
                 'ANY_LANGUAGE': 'Toute Langue',
-                'NO_RANDOM_USER': 'Aucun utilisateur trouvé pour se connecter ! Réessayez plus tard.'
+                'NO_RANDOM_USER': 'Aucun utilisateur trouvé pour se connecter ! Réessayez plus tard.',
+                'VALIDATION_MESSAGE': 'Veuillez d\'abord compléter vos informations de profil (langues et intérêts) pour utiliser cette fonctionnalité.',
+                'COMPLETE_PROFILE': 'Compléter le profil'
             },
             'NAV': {
                 'DASHBOARD': 'Tableau de bord',
@@ -1156,7 +1168,9 @@ export class LanguageService {
                 'SEARCH': 'Suchen',
                 'ANY_GENDER': 'Jedes Geschlecht',
                 'MALE': 'Männlich',
-                'FEMALE': 'Weiblich'
+                'FEMALE': 'Weiblich',
+                'VALIDATION_MESSAGE': 'Bitte vervollständigen Sie zuerst Ihre Profilinformationen (Sprachen und Interessen), um diese Funktion nutzen zu können.',
+                'COMPLETE_PROFILE': 'Profil vervollständigen'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -1293,7 +1307,9 @@ export class LanguageService {
                 'SEARCH': '搜索',
                 'ANY_GENDER': '任意性别',
                 'MALE': '男',
-                'FEMALE': '女'
+                'FEMALE': '女',
+                'VALIDATION_MESSAGE': '请先完善您的个人资料（语言和兴趣）以使用此功能。',
+                'COMPLETE_PROFILE': '完善个人资料'
             },
             'DASHBOARD': {
                 'ONLINE': '在线',
@@ -1430,7 +1446,9 @@ export class LanguageService {
                 'SEARCH': 'खोजें',
                 'ANY_GENDER': 'कोई भी लिंग',
                 'MALE': 'पुरुष',
-                'FEMALE': 'महिला'
+                'FEMALE': 'महिला',
+                'VALIDATION_MESSAGE': 'इस सुविधा का उपयोग करने के लिए कृपया पहले अपनी प्रोफ़ाइल जानकारी (भाषाएं और रुचियां) पूरी करें।',
+                'COMPLETE_PROFILE': 'प्रोफ़ाइल पूरी करें'
             },
             'DASHBOARD': {
                 'ONLINE': 'ऑनलाइन',
@@ -1567,7 +1585,9 @@ export class LanguageService {
                 'SEARCH': 'جستجو',
                 'ANY_GENDER': 'هر جنسیتی',
                 'MALE': 'مرد',
-                'FEMALE': 'زن'
+                'FEMALE': 'زن',
+                'VALIDATION_MESSAGE': 'لطفاً ابتدا اطلاعات پروفایل خود (زبان‌ها و علایق) را تکمیل کنید تا بتوانید از این ویژگی استفاده کنید.',
+                'COMPLETE_PROFILE': 'تکمیل پروفایل'
             },
             'DASHBOARD': {
                 'ONLINE': 'آنلاین',

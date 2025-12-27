@@ -330,3 +330,22 @@ Response Body: {
 }
 
 ------------------
+2025-12-27 08:06:45 - Token: eyJhbGciOi...
+Response Code: 200
+Curl Error: 
+Response Body: {
+  "iss": "accounts.google.com",
+  "azp": "1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com",
+  "aud": "1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com",
+  "sub": "118442107605971421530",
+  "email": "shukurovshohruz@gmail.com",
+  "email_verified": "true",
+  "at_hash": "hobM7PWXawB1dliRoz0pAA",
+  "iat": "1766819202",
+  "exp": "1766822802",
+  "alg": "RS256",
+  "kid": "496d008e8c7be1cae4209e0d5c21b050a61e960f",
+  "typ": "JWT"
+}
+
+------------------
