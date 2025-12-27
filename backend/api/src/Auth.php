@@ -63,6 +63,11 @@ class Auth {
         }
 
         $payload = json_decode($response, true);
+        
+        // Merge with profile data passed from frontend (if any)
+        if (isset($data['profile'])) {
+            $payload = array_merge($data['profile'], $payload);
+        }
 
         // Check if token is expired (Google checks this, but good to be sure)
         if (isset($payload['exp']) && $payload['exp'] < time()) {

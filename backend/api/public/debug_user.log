@@ -1,0 +1,10 @@
+2025-12-27 07:51:58 - Processing Google User: shukurovshohruz@gmail.com
+Google Data: {"sub":"118442107605971421530","email":"shukurovshohruz@gmail.com","name":"User","given_name":"","family_name":"","picture":""}
+Existing user found ID: 2. current first_name: , family_name: 
+Update query executed. Rows affected: 0
+------------------
+2025-12-27 07:56:44 - Processing Google User: shukurovshohruz@gmail.com
+Google Data: {"sub":"118442107605971421530","email":"shukurovshohruz@gmail.com","name":"Shohruz Shukurov","given_name":"Shohruz","family_name":"Shukurov","picture":"https:\/\/lh3.googleusercontent.com\/a\/ACg8ocIErT2EJNjD69OQveF3ZZZXRb9k7V_AacF5yXHa0Jk3YVdQaBQ=s96-c"}
+Existing user found ID: 2. current first_name: , family_name: 
+Update query executed. Rows affected: 1
+------------------

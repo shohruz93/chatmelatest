@@ -6,7 +6,8 @@ import {
     GoogleAuthProvider,
     Auth,
     User,
-    onAuthStateChanged
+    onAuthStateChanged,
+    getAdditionalUserInfo
 } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
@@ -19,7 +20,7 @@ import { Capacitor } from '@capacitor/core';
 export class FirebaseService {
     private auth: Auth;
     private googleProvider: GoogleAuthProvider;
-    
+
 
     constructor() {
         // Initialize Firebase
@@ -51,18 +52,37 @@ export class FirebaseService {
     }
 
     // Sign in with Google
-    async signInWithGoogle(): Promise<string | null> {
+    async signInWithGoogle(): Promise<{ idToken: string | null, profile?: any }> {
         try {
             if (Capacitor.isNativePlatform()) {
                 // Ensure initialization before sign-in
                 await this.initializeNativeGoogleAuth();
                 const result = await GoogleAuth.signIn();
-                return result.authentication.idToken;
+                return {
+                    idToken: result.authentication.idToken,
+                    profile: {
+                        given_name: (result as any).givenName,
+                        family_name: (result as any).familyName,
+                        name: (result as any).displayName,
+                        picture: (result as any).imageUrl
+                    }
+                };
             }
 
             const result = await signInWithPopup(this.auth, this.googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
-            return credential?.idToken || null;
+            const additionalInfo = getAdditionalUserInfo(result);
+
+            return {
+                idToken: credential?.idToken || null,
+                profile: {
+                    name: (result.user as any).displayName,
+                    picture: (result.user as any).photoURL,
+                    email: result.user.email,
+                    given_name: (additionalInfo?.profile as any)?.given_name,
+                    family_name: (additionalInfo?.profile as any)?.family_name
+                }
+            };
         } catch (error: any) {
             console.error('Error signing in with Google:', error);
             // Alert for mobile debugging

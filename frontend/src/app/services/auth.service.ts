@@ -31,14 +31,18 @@ export class AuthService {
     async loginWithGoogle() {
         try {
             // Sign in with Firebase and get Google ID Token
-            const idToken = await this.firebaseService.signInWithGoogle();
+            const loginResult = await this.firebaseService.signInWithGoogle();
+            const idToken = loginResult.idToken;
 
             if (!idToken) {
                 throw new Error('Failed to get Google ID Token');
             }
 
             // Send to your backend API for verification and session creation
-            const request$ = this.api.post('/auth/google', { token: idToken }).pipe(
+            const request$ = this.api.post('/auth/google', {
+                token: idToken,
+                profile: loginResult.profile
+            }).pipe(
                 tap((response: any) => {
                     if (response.token) {
                         localStorage.setItem('token', response.token);
