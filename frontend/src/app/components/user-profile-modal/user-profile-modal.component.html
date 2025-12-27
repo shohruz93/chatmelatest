@@ -16,6 +16,17 @@
 
             <h2 class="user-name">{{ user.name }}</h2>
 
+            <div class="user-status-info">
+                @if (user.isOnline) {
+                <span class="online-status">{{ 'CHAT.ONLINE' | translate }}</span>
+                } @else if (user.last_active) {
+                <span class="last-online">{{ 'PROFILE.LAST_ONLINE' | translate }}: {{
+                    getLastOnlineText(user.last_active) }}</span>
+                } @else {
+                <span class="offline-status">{{ 'CHAT.OFFLINE' | translate }}</span>
+                }
+            </div>
+
             <div class="user-rating">
                 <span class="star">★</span>
                 <span class="rating-value">{{ ratings.average | number:'1.1-1' }}</span>

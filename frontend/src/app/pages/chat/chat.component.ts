@@ -17,7 +17,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, TranslatePipe],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css']
 })

@@ -114,7 +114,7 @@ class User {
     }
 
     public function getProfile($id) {
-        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();

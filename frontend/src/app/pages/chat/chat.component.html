@@ -307,4 +307,9 @@
 
     <input type="file" #fileInput accept="image/png, image/jpeg, image/gif" style="display: none;"
         (change)="onImageSelected($event)">
+
+    @if (showPartnerProfileModal && partner) {
+    <app-user-profile-modal [user]="partner" (closeEvent)="showPartnerProfileModal = false">
+    </app-user-profile-modal>
+    }
 </div>

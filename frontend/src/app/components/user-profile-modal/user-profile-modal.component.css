@@ -112,6 +112,53 @@
     color: white;
 }
 
+/* User Status Info */
+.user-status-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 5px 0 10px;
+    font-size: 0.9rem;
+}
+
+.online-status {
+    color: #4caf50;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.online-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #4caf50;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.offline-status {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.last-online {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
 /* User Rating Display */
 .user-rating {
     display: flex;
