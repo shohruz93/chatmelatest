@@ -11,10 +11,10 @@ INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:28
 	android:name
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:29:13-62
 manifest
-ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
-INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-42:12
+ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-44:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-44:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-44:12
+INJECTED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:1:1-44:12
 MERGED from [:capacitor-app] D:\ChatmeLast\frontend\node_modules\@capacitor\app\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
 MERGED from [:capacitor-network] D:\ChatmeLast\frontend\node_modules\@capacitor\network\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
 MERGED from [:capacitor-push-notifications] D:\ChatmeLast\frontend\node_modules\@capacitor\push-notifications\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-17:12
@@ -190,6 +190,10 @@ MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.8] C:\Us
 MERGED from [com.google.android.datatransport:transport-backend-cct:3.1.8] C:\Users\ShShohruz\.gradle\caches\8.14.3\transforms\91cab33f7cebd26cffb6abbb3512dae5\transformed\transport-backend-cct-3.1.8\AndroidManifest.xml:25:5-67
 	android:name
 		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:41:22-64
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:43:5-71
+	android:name
+		ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:43:22-68
 meta-data#android.support.FILE_PROVIDER_PATHS
 ADDED from D:\ChatmeLast\frontend\android\app\src\main\AndroidManifest.xml:33:13-35:64
 	android:resource

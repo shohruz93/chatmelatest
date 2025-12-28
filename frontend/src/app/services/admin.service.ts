@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -12,7 +13,7 @@ export interface User {
   gender?: string;
   status?: string;
   created_at: string;
-  last_active: string;
+  last_active: number | string | null;
 }
 
 export interface GetUsersResponse {
@@ -37,7 +38,24 @@ export class AdminService {
         search,
         status
       }
-    });
+    }).pipe(
+      map((resp: GetUsersResponse) => {
+        if (resp && resp.users && Array.isArray(resp.users)) {
+          resp.users = resp.users.map((u: any) => {
+            if (u.last_active !== undefined && u.last_active !== null) {
+              // If server returns seconds, convert to milliseconds for Angular date pipe
+              if (typeof u.last_active === 'number') {
+                u.last_active = u.last_active * 1000;
+              } else if (/^\d+$/.test(String(u.last_active))) {
+                u.last_active = Number(u.last_active) * 1000;
+              }
+            }
+            return u;
+          });
+        }
+        return resp;
+      })
+    );
   }
 
   banUser(userId: number): Observable<any> {

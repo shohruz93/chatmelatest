@@ -427,10 +427,21 @@ export class ExploreComponent implements OnInit, OnDestroy {
             .toUpperCase();
     }
 
-    formatLastActive(lastActive: string | undefined): string {
+    formatLastActive(lastActive: string | number | undefined): string {
         if (!lastActive) return '';
 
-        const lastActiveDate = new Date(lastActive);
+        let ts: number;
+        if (typeof lastActive === 'number') {
+            // assume seconds
+            ts = lastActive * 1000;
+        } else if (/^\d+$/.test(String(lastActive))) {
+            // numeric string -> seconds
+            ts = parseInt(String(lastActive), 10) * 1000;
+        } else {
+            ts = new Date(String(lastActive)).getTime();
+        }
+
+        const lastActiveDate = new Date(ts);
         const now = new Date();
         const diffMs = now.getTime() - lastActiveDate.getTime();
         const diffMins = Math.floor(diffMs / (1000 * 60));

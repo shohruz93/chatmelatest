@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     bio TEXT,
     gender VARCHAR(50) NULL,
     location VARCHAR(255) NULL,
+    last_active INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -936,6 +936,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     // Stop all tracks
                     stream.getTracks().forEach(track => track.stop());
                 });
+            })
+            .catch(err => {
+                console.error('Microphone access error', err);
+                // DOMException commonly contains permission or device errors
+                const name = err && err.name ? err.name : '';
+                if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
+                    alert('Microphone permission was denied. Please enable microphone access for this app in the device settings.');
+                } else {
+                    alert('Unable to access microphone: ' + (err && err.message ? err.message : err));
+                }
             });
     }
 
@@ -1014,10 +1024,19 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         return this.countryService.getCountryName(location);
     }
 
-    formatLastActive(lastActive: string | undefined): string {
+    formatLastActive(lastActive: string | number | undefined): string {
         if (!lastActive) return '';
 
-        const lastActiveDate = new Date(lastActive);
+        let ts: number;
+        if (typeof lastActive === 'number') {
+            ts = lastActive * 1000;
+        } else if (/^\d+$/.test(String(lastActive))) {
+            ts = parseInt(String(lastActive), 10) * 1000;
+        } else {
+            ts = new Date(String(lastActive)).getTime();
+        }
+
+        const lastActiveDate = new Date(ts);
         const now = new Date();
         const diffMs = now.getTime() - lastActiveDate.getTime();
         const diffMins = Math.floor(diffMs / (1000 * 60));

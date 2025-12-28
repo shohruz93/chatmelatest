@@ -327,7 +327,8 @@ class User {
     }
 
     public function updateLastActive($userId) {
-        $query = "UPDATE " . $this->table_name . " SET last_active = NOW() WHERE id = :id";
+        // Store last_active as UNIX timestamp (seconds)
+        $query = "UPDATE " . $this->table_name . " SET last_active = UNIX_TIMESTAMP() WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $userId);
         return $stmt->execute();
