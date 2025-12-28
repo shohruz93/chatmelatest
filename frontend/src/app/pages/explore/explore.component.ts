@@ -1,3 +1,4 @@
+
 import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +10,9 @@ import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AppVersionService } from '../../services/app-version.service';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 
 interface UserProfile {
     id: number;
@@ -38,12 +42,14 @@ export class ExploreComponent implements OnInit, OnDestroy {
     private auth = inject(AuthService);
     private api = inject(ApiService);
     private countryService = inject(CountryService);
+    private appVersionService = inject(AppVersionService);
 
     users: UserProfile[] = [];
     filteredUsers: UserProfile[] = [];
     currentUser: any;
     isLoading = signal(false);
     selectedUser: UserProfile | null = null;
+    updateAvailable = signal<any>(null);
 
     // Filters
     filterStatus: string = 'any';
@@ -196,6 +202,31 @@ export class ExploreComponent implements OnInit, OnDestroy {
                 this.applyFilters();
             }
         });
+
+        this.checkForUpdates();
+    }
+
+    async checkForUpdates() {
+        const platform = Capacitor.getPlatform();
+        if (platform === 'ios' || platform === 'android') {
+            try {
+                const info = await App.getInfo();
+                const currentBuild = parseInt(info.build);
+
+                this.appVersionService.checkLatestVersion(platform as 'android' | 'ios').subscribe({
+                    next: (res) => {
+                        if (res.update_available && res.latest_version) {
+                            const latestBuild = parseInt(res.latest_version.version_code);
+                            if (latestBuild > currentBuild) {
+                                this.updateAvailable.set(res.latest_version);
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Error checking for updates', e);
+            }
+        }
     }
 
     ngOnDestroy() {

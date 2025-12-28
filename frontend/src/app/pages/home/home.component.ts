@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Capacitor } from '@capacitor/core';
+import { AppVersionService } from '../../services/app-version.service';
 
 @Component({
     selector: 'app-home',
@@ -15,7 +16,9 @@ export class HomeComponent implements OnInit {
     isWeb = true;
     downloadUrls: { android: string | null; ios: string | null } = { android: null, ios: null };
 
-    async ngOnInit() {
+    constructor(private appVersionService: AppVersionService) { }
+
+    ngOnInit() {
         try {
             // show only on web (not inside Capacitor native apps)
             this.isWeb = !Capacitor.isNativePlatform();
@@ -24,22 +27,21 @@ export class HomeComponent implements OnInit {
         }
 
         if (this.isWeb) {
-            this.downloadUrls.android = await this.buildHashedUrl('android', 'apk');
-            this.downloadUrls.ios = await this.buildHashedUrl('ios', 'ipa');
+            this.appVersionService.checkLatestVersion('android').subscribe({
+                next: (res) => {
+                    if (res && res.latest_version) {
+                        this.downloadUrls.android = res.latest_version.file_path;
+                    }
+                }
+            });
+
+            this.appVersionService.checkLatestVersion('ios').subscribe({
+                next: (res) => {
+                    if (res && res.latest_version) {
+                        this.downloadUrls.ios = res.latest_version.file_path;
+                    }
+                }
+            });
         }
-    }
-
-    private async buildHashedUrl(platform: string, ext: string) {
-        const filename = `${platform}.${ext}`;
-        const hash = await this.sha256Hex(filename);
-        return `https://chatme.tj/downloads/${hash}.${ext}`;
-    }
-
-    private async sha256Hex(message: string) {
-        const enc = new TextEncoder();
-        const msgUint8 = enc.encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 }

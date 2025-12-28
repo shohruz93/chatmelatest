@@ -3,10 +3,13 @@
 class AdminController {
     private $db;
     private $user;
+    private $appVersion;
 
     public function __construct($db) {
         $this->db = $db;
         $this->user = new User($db);
+        require_once __DIR__ . '/AppVersion.php';
+        $this->appVersion = new AppVersion($db);
     }
 
     private function isAdmin($userId) {
@@ -281,6 +284,67 @@ class AdminController {
         $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($conversations);
+    }
+    public function uploadApp() {
+        if (!isset($_FILES['file']) && !isset($_POST['file_url'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No file uploaded or URL provided']);
+            return;
+        }
+
+        $platform = $_POST['platform'] ?? '';
+        $version = $_POST['version'] ?? '';
+        $versionCode = $_POST['version_code'] ?? 0;
+        $releaseNotes = $_POST['release_notes'] ?? '';
+        
+        if (empty($platform) || empty($version) || empty($versionCode)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            return;
+        }
+
+        $filePath = '';
+
+        // Handle File Upload
+        if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../public/uploads/apps/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileName = $platform . '_' . $version . '_' . time() . '.' . pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+            $targetFile = $uploadDir . $fileName;
+
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+                // Determine public URL
+                $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+                $domain = $_SERVER['HTTP_HOST'];
+                // Assuming standard setup, adjust as needed
+                $filePath = "$protocol://$domain/api/public/uploads/apps/$fileName";
+            } else {
+                http_response_code(500);
+                echo json_encode(['error' => 'Failed to move uploaded file']);
+                return;
+            }
+        } elseif (isset($_POST['file_url'])) {
+             $filePath = $_POST['file_url'];
+        } else {
+             http_response_code(400);
+             echo json_encode(['error' => 'File upload error']);
+             return;
+        }
+
+        if ($this->appVersion->create($platform, $version, $versionCode, $filePath, $releaseNotes)) {
+            echo json_encode(['success' => true, 'message' => 'App version uploaded successfully', 'file_path' => $filePath]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Database insertion failed']);
+        }
+    }
+
+    public function getAppVersions() {
+        $versions = $this->appVersion->getAllVersions();
+        echo json_encode($versions);
     }
 }
 

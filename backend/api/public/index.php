@@ -18,6 +18,7 @@ require_once __DIR__ . '/../src/Message.php';
 require_once __DIR__ . '/../src/Conversation.php';
 require_once __DIR__ . '/../src/AdminController.php';
 require_once __DIR__ . '/../src/Push.php';
+require_once __DIR__ . '/../src/AppVersion.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -38,6 +39,7 @@ $message = new Message($db);
 $conversation = new Conversation($db);
 $adminController = new AdminController($db);
 $push = new Push($db);
+$appVersion = new AppVersion($db);
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -298,6 +300,35 @@ $router->add('GET', '/admin/users/details', function() use ($adminController) {
 
 $router->add('POST', '/admin/support/conversations', function() use ($adminController) {
     $adminController->getSupportConversations();
+});
+
+$router->add('POST', '/admin/apps/upload', function() use ($adminController) {
+    // Ideally check admin auth here, but assuming it's done via middleware or in controller if specific
+    $adminController->uploadApp();
+});
+
+$router->add('GET', '/admin/apps', function() use ($adminController) {
+    $adminController->getAppVersions();
+});
+
+// App Version Check (Public)
+$router->add('GET', '/app/version', function() use ($appVersion) {
+    $platform = $_GET['platform'] ?? '';
+    // $currentVersion = $_GET['current_version'] ?? '';
+    
+    if (empty($platform)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Platform required (android/ios)']);
+        return;
+    }
+    
+    $latest = $appVersion->getLatestVersion($platform);
+    
+    if ($latest) {
+        echo json_encode(['update_available' => true, 'latest_version' => $latest]);
+    } else {
+        echo json_encode(['update_available' => false, 'message' => 'No versions found']);
+    }
 });
 
 $router->add('GET', '/support/admin-contact', function() use ($db) {

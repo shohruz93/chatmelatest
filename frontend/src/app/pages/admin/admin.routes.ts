@@ -14,6 +14,10 @@ export const ADMIN_ROUTES: Routes = [
             {
                 path: 'support',
                 loadComponent: () => import('./support-chat/support-chat.component').then(m => m.SupportChatComponent)
+            },
+            {
+                path: 'apps',
+                loadComponent: () => import('./app-versions/app-versions.component').then(m => m.AppVersionsComponent)
             }
         ]
     }

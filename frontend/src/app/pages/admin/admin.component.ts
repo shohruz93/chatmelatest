@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AdminService, GetUsersResponse } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
+import { AppVersionService } from '../../services/app-version.service';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
@@ -15,7 +17,13 @@ export class AdminComponent implements OnInit {
   public usersResponse$!: Observable<GetUsersResponse>;
   public isAdmin = false;
 
-  constructor(private adminService: AdminService, private authService: AuthService) { }
+  // App Upload Form
+
+
+  constructor(
+    private adminService: AdminService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
@@ -31,4 +39,6 @@ export class AdminComponent implements OnInit {
       this.usersResponse$ = this.adminService.getUsers();
     });
   }
+
+
 }

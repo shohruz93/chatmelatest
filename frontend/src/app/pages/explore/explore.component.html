@@ -134,6 +134,22 @@
         translate }}</button>
     </div>
 
+    @if (updateAvailable()) {
+    <div class="p-4 mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700" style="margin-bottom: 20px;">
+      <div class="flex justify-between items-center">
+        <div>
+          <p class="font-bold">Update Available!</p>
+          <p>Version {{ updateAvailable().version }} is ready to install.</p>
+          <p class="text-sm mt-1" *ngIf="updateAvailable().release_notes">{{ updateAvailable().release_notes }}</p>
+        </div>
+        <a [href]="updateAvailable().file_path" target="_blank"
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Update Now
+        </a>
+      </div>
+    </div>
+    }
+
     @if (showValidationMessage()) {
     <div class="validation-alert">
       <div class="alert-content">
