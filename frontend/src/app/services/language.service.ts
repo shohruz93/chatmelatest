@@ -81,7 +81,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Countries',
                 'STATS_CONVERSATIONS': 'Conversations',
                 'STATS_LANGUAGES': 'Languages',
-                'FOOTER_RIGHTS': '© 2025 Chatme. All rights reserved.'
+                'DOWNLOAD_TITLE': 'Get the Chatme app',
+                'DOWNLOAD_SUB': 'Stay connected on the go — download our Android or iOS app for the best experience.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Tip: Scan the QR code (coming soon) to install directly.',
             },
             'AUTH': {
                 'WELCOME': 'Welcome to Chatme',
@@ -253,6 +257,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Страны',
                 'STATS_CONVERSATIONS': 'Разговоров',
                 'STATS_LANGUAGES': 'Языков',
+                'DOWNLOAD_TITLE': 'Получите приложение Chatme',
+                'DOWNLOAD_SUB': 'Оставайтесь на связи — скачайте наше приложение для Android или iOS.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Совет: отсканируйте QR-код (скоро) для быстрой установки.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. Все права защищены.'
             },
             'AUTH': {
@@ -416,6 +425,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Кишварҳо',
                 'STATS_CONVERSATIONS': 'Сӯҳбатҳо',
                 'STATS_LANGUAGES': 'Забонҳо',
+                'DOWNLOAD_TITLE': 'Барномаи Chatme-ро гиред',
+                'DOWNLOAD_SUB': 'Дар ҳаракат нигоҳ доред — барномаи мо барои Android ё iOS-ро зеркашӣ кунед.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Маслиҳат: QR-кодро скан кунед (ба наздикӣ) барои насби фаврӣ.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. Ҳама ҳуқуқ маҳфуз аст.'
             },
             'AUTH': {
@@ -583,6 +597,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Países',
                 'STATS_CONVERSATIONS': 'Conversaciones',
                 'STATS_LANGUAGES': 'Idiomas',
+                'DOWNLOAD_TITLE': 'Obtén la aplicación Chatme',
+                'DOWNLOAD_SUB': 'Mantente conectado en movimiento — descarga nuestra app para Android o iOS.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Consejo: Escanea el código QR (próximamente) para instalar directamente.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. Todos los derechos reservados.'
             },
             'AUTH': {
@@ -750,6 +769,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'بلدان',
                 'STATS_CONVERSATIONS': 'محادثات',
                 'STATS_LANGUAGES': 'لغات',
+                'DOWNLOAD_TITLE': 'احصل على تطبيق Chatme',
+                'DOWNLOAD_SUB': 'ابقَ على تواصل أثناء التنقل — حمّل تطبيقنا على Android أو iOS.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'نصيحة: امسح رمز الاستجابة السريعة (QR) لتثبيت مباشر قريبا.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. جميع الحقوق محفوظة.'
             },
             'AUTH': {
@@ -917,6 +941,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Pays',
                 'STATS_CONVERSATIONS': 'Conversations',
                 'STATS_LANGUAGES': 'Langues',
+                'DOWNLOAD_TITLE': 'Obtenez l\'application Chatme',
+                'DOWNLOAD_SUB': 'Restez connecté en déplacement — téléchargez notre application Android ou iOS.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Astuce : scannez le code QR (bientôt) pour installer directement.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. Tous droits réservés.'
             },
             'AUTH': {
@@ -1084,6 +1113,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'Länder',
                 'STATS_CONVERSATIONS': 'Unterhaltungen',
                 'STATS_LANGUAGES': 'Sprachen',
+                'DOWNLOAD_TITLE': 'Hol dir die Chatme-App',
+                'DOWNLOAD_SUB': 'Bleib unterwegs verbunden — lade unsere Android- oder iOS-App herunter.',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'Tipp: Scanne den QR-Code (kommt bald), um direkt zu installieren.',
                 'FOOTER_RIGHTS': '© 2025 Chatme. Alle Rechte vorbehalten.'
             },
             'AUTH': {
@@ -1223,6 +1257,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': '国家',
                 'STATS_CONVERSATIONS': '对话',
                 'STATS_LANGUAGES': '语言',
+                'DOWNLOAD_TITLE': '获取 Chatme 应用',
+                'DOWNLOAD_SUB': '随时随地保持连接 — 下载我们的 Android 或 iOS 应用。',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': '提示：扫描二维码（即将推出）以直接安装。',
                 'FOOTER_RIGHTS': '© 2025 Chatme. 保留所有权利。'
             },
             'AUTH': {
@@ -1362,6 +1401,11 @@ export class LanguageService {
                 'STATS_COUNTRIES': 'देश',
                 'STATS_CONVERSATIONS': 'बातचीत',
                 'STATS_LANGUAGES': 'भाषाएं',
+                'DOWNLOAD_TITLE': 'Chatme ऐप प्राप्त करें',
+                'DOWNLOAD_SUB': 'चलते-फिरते जुड़े रहें — हमारे Android या iOS ऐप को डाउनलोड करें।',
+                'DOWNLOAD_ANDROID': 'Android',
+                'DOWNLOAD_IPHONE': 'iPhone',
+                'DOWNLOAD_NOTE': 'सलाह: सीधे इंस्टॉल करने के लिए QR कोड स्कैन करें (शिग्घ्र)।',
                 'FOOTER_RIGHTS': '© 2025 Chatme. सर्वाधिकार सुरक्षित।'
             },
             'AUTH': {
