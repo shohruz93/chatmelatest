@@ -45,6 +45,16 @@ export class SocketService {
             const numericIds = new Set(userIds.map(id => Number(id)));
             this.onlineUsers.set(numericIds);
         });
+
+        // Ensure we send register on low-level connect (covers cases where emit happens before manual connect)
+        this.socket.on('connect', () => {
+            const current = this.auth.currentUserValue;
+            if (current && current.id) {
+                this.socket.emit('register', current.id);
+                this.socket.emit('get_online_users');
+                console.log('Socket connected, auto-registered user', current.id);
+            }
+        });
     }
 
     connect(userId: number) {
@@ -99,6 +109,12 @@ export class SocketService {
     onMessage(): Observable<any> {
         return new Observable(observer => {
             this.socket.on('message', (data) => observer.next(data));
+        });
+    }
+
+    onMessageSent(): Observable<any> {
+        return new Observable(observer => {
+            this.socket.on('message_sent', (data) => observer.next(data));
         });
     }
 
@@ -212,7 +228,20 @@ export class SocketService {
 
     // Generic methods for raw access
     emit(eventName: string, data: any) {
-        this.socket.emit(eventName, data);
+        if (this.socket.connected) {
+            this.socket.emit(eventName, data);
+            return;
+        }
+
+        // Ensure connection and registration, then emit once connected
+        this.socket.connect();
+        this.socket.once('connect', () => {
+            const current = this.auth.currentUserValue;
+            if (current && current.id) {
+                this.socket.emit('register', current.id);
+            }
+            this.socket.emit(eventName, data);
+        });
     }
 
     on(eventName: string): Observable<any> {

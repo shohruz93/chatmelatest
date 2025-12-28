@@ -348,7 +348,7 @@ io.on('connection', (socket) => {
 
     // Join chat (for resuming conversations)
     socket.on('join_chat', ({ roomId }) => {
-        const userId = userSocketMap.get(socket.id);
+        const userId = userSocketMap.get(socket.id) || 'unknown';
         socket.join(roomId);
         console.log(`User ${userId} joined chat ${roomId}`);
 
@@ -451,7 +451,14 @@ io.on('connection', (socket) => {
         // Broadcast to the room (to receiver only, sender already has it)
         socket.to(roomId).emit('message', messageData);
 
-        console.log('[MESSAGE_SENT] Broadcasting to room:', roomId, messageData);
+        // Acknowledge sender with saved message data (id assigned by PHP API)
+        try {
+            io.to(socket.id).emit('message_sent', messageData);
+        } catch (err) {
+            console.error('Error emitting message_sent to sender:', err);
+        }
+
+        console.log('[MESSAGE_SENT] Broadcasting to room and acking sender:', roomId, messageData);
     });
 
     socket.on('edit_message', async ({ roomId, messageId, content }) => {

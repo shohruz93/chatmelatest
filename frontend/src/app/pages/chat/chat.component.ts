@@ -289,6 +289,19 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         });
 
+        // Listen for server ack that message was saved (sent)
+        this.socketService.onMessageSent().subscribe((messageData: any) => {
+            if (messageData.roomId !== this.roomId) return;
+
+            // Find the first sending message with same content and update it
+            const pending = this.messages.find(m => m.type === 'sent' && m.status === 'sending' && m.content === messageData.content);
+            if (pending) {
+                pending.status = 'sent';
+                if (messageData.id) pending.id = messageData.id;
+                if (messageData.timestamp) pending.created_at = messageData.timestamp;
+            }
+        });
+
         this.typingSub = this.socketService.onUserTyping().subscribe((data: any) => {
             this.partnerTyping = data.isTyping;
 
@@ -425,6 +438,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Infinite Scroll
     isLoadingMore = false;
+    isLoadingHistory = false;
     allMessagesLoaded = false;
     private scrollOffset = 0;
 
@@ -497,7 +511,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     loadMessageHistory() {
         if (!this.roomId) return;
-
+        this.isLoadingHistory = true;
         this.socketService.loadMessages(this.roomId, 30, 0);
 
         const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
@@ -509,8 +523,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 // Scroll to bottom on initial load
                 this.scrollToBottom('auto');
+                this.isLoadingHistory = false;
                 sub.unsubscribe(); // Unsubscribe after initial load
             }
+        }, (err) => {
+            this.isLoadingHistory = false;
+            sub.unsubscribe();
         });
     }
 
@@ -614,13 +632,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         this.scrollToBottom();
-
-        setTimeout(() => {
-            const tempMessage = this.messages.find(m => m.id === tempMessageId);
-            if (tempMessage) {
-                tempMessage.status = 'sent';
-            }
-        }, 800);
+        // status will be updated when server acknowledges via 'message_sent'
     }
 
 
@@ -983,12 +995,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
             this.scrollToBottom();
 
-            setTimeout(() => {
-                const tempMessage = this.messages.find(m => m.id === tempMessageId);
-                if (tempMessage) {
-                    tempMessage.status = 'sent';
-                }
-            }, 800);
+            // status will be updated when server acknowledges via 'message_sent'
         }
     }
 

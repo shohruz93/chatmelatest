@@ -41,6 +41,11 @@
     <!-- Messages Area -->
     <main class="messages-container" #messagesContainer (scroll)="onScroll($event)">
         <div class="messages-content">
+            @if (isLoadingHistory) {
+            <div class="history-loading-bar">
+                <div class="history-progress"></div>
+            </div>
+            }
             @if (!partnerId) {
             <div class="empty-state">
                 <div class="empty-icon">👋</div>

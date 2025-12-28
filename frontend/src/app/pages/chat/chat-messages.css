@@ -388,6 +388,32 @@
     }
 }
 
+/* Loading bar for message history */
+.history-loading-bar {
+    height: 6px;
+    width: 100%;
+    background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    margin: 8px 12px;
+}
+.history-loading-bar .history-progress {
+    position: absolute;
+    left: -40%;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    animation: historyProgress 1.2s linear infinite;
+}
+
+@keyframes historyProgress {
+    0% { left: -40%; }
+    50% { left: 60%; }
+    100% { left: 120%; }
+}
+
 .message-bubble[data-status="sending"] {
     position: relative;
     border: 1px solid var(--primary-color);
