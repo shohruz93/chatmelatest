@@ -5,6 +5,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Capacitor } from '@capacitor/core';
 import { AppVersionService } from '../../services/app-version.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-home',
@@ -30,7 +31,7 @@ export class HomeComponent implements OnInit {
             this.appVersionService.checkLatestVersion('android').subscribe({
                 next: (res) => {
                     if (res && res.latest_version) {
-                        this.downloadUrls.android = res.latest_version.file_path;
+                        this.downloadUrls.android = `${environment.phpBaseUrl}/app/download?platform=android`;
                     }
                 }
             });
@@ -38,7 +39,7 @@ export class HomeComponent implements OnInit {
             this.appVersionService.checkLatestVersion('ios').subscribe({
                 next: (res) => {
                     if (res && res.latest_version) {
-                        this.downloadUrls.ios = res.latest_version.file_path;
+                        this.downloadUrls.ios = `${environment.phpBaseUrl}/app/download?platform=ios`;
                     }
                 }
             });

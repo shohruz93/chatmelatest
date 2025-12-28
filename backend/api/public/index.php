@@ -331,6 +331,12 @@ $router->add('GET', '/app/version', function() use ($appVersion) {
     }
 });
 
+$router->add('GET', '/app/download', function() use ($db) {
+    require_once __DIR__ . '/../src/AppController.php';
+    $appController = new AppController($db);
+    $appController->download();
+});
+
 $router->add('GET', '/support/admin-contact', function() use ($db) {
     // Quick inline logic or move to controller
     $query = "SELECT id, name, avatar FROM users WHERE is_admin = 1 LIMIT 1";
