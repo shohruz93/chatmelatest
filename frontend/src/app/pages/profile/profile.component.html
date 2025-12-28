@@ -1,6 +1,7 @@
 <div class="profile-page">
     <header class="page-header">
-        <h2>{{ isOwnProfile ? ('NAV.PROFILE' | translate) : (profileUser?.name + "'s " + ('NAV.PROFILE' | translate)) }}</h2>
+        <h2>{{ isOwnProfile ? ('NAV.PROFILE' | translate) : (profileUser?.name + "'s " + ('NAV.PROFILE' | translate)) }}
+        </h2>
         <div class="header-actions">
             @if (isOwnProfile) {
             <button class="btn-logout" (click)="logout()" title="{{ 'NAV.LOGOUT' | translate }}">
@@ -24,7 +25,8 @@
         <div class="profile-card">
             <div class="avatar-section">
                 <div class="avatar-wrapper">
-                    <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'" alt="{{ 'NAV.PROFILE' | translate }}">
+                    <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'"
+                        alt="{{ 'NAV.PROFILE' | translate }}">
 
                     @if (isEditing) {
                     <label class="avatar-upload-btn" title="Upload photo">
@@ -154,11 +156,12 @@
                     <div class="details-section">
                         <h3>Details</h3>
                         @if (gender) {
-                        <p><strong>{{ 'EXPLORE_PAGE.GENDER' | translate }}:</strong> {{ gender | titlecase }} {{ getGenderIcon(gender) }}</p>
+                        <p><strong>{{ 'EXPLORE_PAGE.GENDER' | translate }}:</strong> {{ gender | titlecase }} {{
+                            getGenderIcon(gender) }}</p>
                         }
                         @if (location) {
-                        <p><strong>{{ 'EXPLORE_PAGE.LOCATION' | translate }}:</strong> <span class="location-inline">{{ location }} <img
-                                    *ngIf="getCountryFlagUrl(location)" [src]="getCountryFlagUrl(location)"
+                        <p><strong>{{ 'EXPLORE_PAGE.LOCATION' | translate }}:</strong> <span class="location-inline">{{
+                                location }} <img *ngIf="getCountryFlagUrl(location)" [src]="getCountryFlagUrl(location)"
                                     [alt]="location + ' flag'" class="country-flag-icon"></span></p>
                         }
 
@@ -212,6 +215,29 @@
                         <span class="message-icon">✉️</span> {{ 'PROFILE.SEND_MESSAGE' | translate }}
                     </button>
                     }
+
+                    @if (isWeb) {
+                    <div
+                        class="app-download-promo mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl text-center border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-bold mb-2 dark:text-white">Get the App</h3>
+                        <p class="text-sm mb-4 text-gray-600 dark:text-gray-400">Experience ChatMe on your mobile device
+                            for the best experience.</p>
+                        <div class="flex justify-center gap-4">
+                            @if (downloadUrls.android) {
+                            <a [href]="downloadUrls.android"
+                                class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow-md">
+                                <span class="text-xl">🤖</span> <span class="font-semibold">Android</span>
+                            </a>
+                            }
+                            @if (downloadUrls.ios) {
+                            <a [href]="downloadUrls.ios"
+                                class="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition shadow-md">
+                                <span class="text-xl">🍎</span> <span class="font-semibold">iOS</span>
+                            </a>
+                            }
+                        </div>
+                    </div>
+                    }
                 </div>
                 }
             </div>
@@ -223,7 +249,7 @@
 
             @if (!isOwnProfile && currentUser) {
             <!-- Rating form (only if user hasn't rated yet) -->
-                @if (!hasRated) {
+            @if (!hasRated) {
             <div class="add-rating-form">
                 <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
                 <div class="rating-stars">
@@ -231,15 +257,19 @@
                     <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
                     }
                 </div>
-                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}" rows="3"></textarea>
-                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{ 'PROFILE.SUBMIT_RATING' | translate }}</button>
+                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
+                    rows="3"></textarea>
+                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{
+                    'PROFILE.SUBMIT_RATING' | translate }}</button>
             </div>
             } @else {
             <!-- Comment-only form (if user has already rated) -->
             <div class="add-comment-form">
                 <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
-                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}" rows="3"></textarea>
-                <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate }}</button>
+                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
+                    rows="3"></textarea>
+                <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate
+                    }}</button>
             </div>
             }
             }

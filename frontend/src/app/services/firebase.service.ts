@@ -69,6 +69,7 @@ export class FirebaseService {
                 };
             }
 
+
             const result = await signInWithPopup(this.auth, this.googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const additionalInfo = getAdditionalUserInfo(result);
@@ -87,7 +88,9 @@ export class FirebaseService {
             console.error('Error signing in with Google:', error);
             // Alert for mobile debugging
             if (Capacitor.isNativePlatform()) {
-                alert('Sign-In Error: ' + (error.message || JSON.stringify(error)));
+                const errorMessage = error.message || JSON.stringify(error);
+                alert('Sign-In Error: ' + errorMessage);
+                console.error('Detailed Auth Error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
             }
             throw error;
         }

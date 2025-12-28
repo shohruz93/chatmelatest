@@ -1,11 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Capacitor } from '@capacitor/core';
+import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { CountryService } from '../../services/country.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
+import { AppVersionService } from '../../services/app-version.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -22,6 +25,11 @@ export class ProfileComponent implements OnInit {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private countryService = inject(CountryService);
+
+    private appVersionService = inject(AppVersionService);
+
+    isWeb = false;
+    downloadUrls: { android: string | null; ios: string | null } = { android: null, ios: null };
 
     currentUser: any; // The logged-in user
     profileUser: any; // The user whose profile is being viewed
@@ -73,7 +81,24 @@ export class ProfileComponent implements OnInit {
         const savedTheme = localStorage.getItem('theme') || 'light';
         this.isDarkMode.set(savedTheme === 'dark');
 
-        this.currentUser = this.auth.currentUserValue;
+        try {
+            this.isWeb = !Capacitor.isNativePlatform();
+        } catch (e) {
+            this.isWeb = true;
+        }
+
+        if (this.isWeb) {
+            this.appVersionService.checkLatestVersion('android').subscribe(res => {
+                if (res && res.latest_version) {
+                    this.downloadUrls.android = `${environment.phpBaseUrl}/app/download?platform=android`;
+                }
+            });
+            this.appVersionService.checkLatestVersion('ios').subscribe(res => {
+                if (res && res.latest_version) {
+                    this.downloadUrls.ios = `${environment.phpBaseUrl}/app/download?platform=ios`;
+                }
+            });
+        }
 
         this.currentUser = this.auth.currentUserValue;
 
