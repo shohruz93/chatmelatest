@@ -333,4 +333,26 @@ class User {
         $stmt->bindParam(":id", $userId);
         return $stmt->execute();
     }
+
+    public function isOnline($userId) {
+        $query = "SELECT last_active FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $userId);
+        $stmt->execute();
+        
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $lastActive = $row['last_active'];
+            
+            // If last_active is null, user has never been active
+            if (!$lastActive) {
+                return false;
+            }
+            
+            // Check if active in last 5 minutes (300 seconds)
+            return (time() - $lastActive) <= 300;
+        }
+        
+        return false;
+    }
 }

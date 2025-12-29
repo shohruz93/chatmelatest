@@ -108,15 +108,20 @@ class Message {
             $this->user->updateLastActive($data['senderId']);
             
             if (!empty($data['receiverId'])) {
-                $senderName = $this->user->getNameById($data['senderId']);
-                $title = "New message from " . ($senderName ?: 'Someone');
-                $body = ($type === 'text') ? $content : '[' . ucfirst($type) . ']';
-                $payload = [
-                    'type' => 'message',
-                    'roomId' => $data['roomId'],
-                    'senderId' => $data['senderId']
-                ];
-                $this->notification->send($data['receiverId'], $title, $body, $payload);
+                // Check if receiver is online
+                $isOnline = $this->user->isOnline($data['receiverId']);
+
+                if (!$isOnline) {
+                    $senderName = $this->user->getNameById($data['senderId']);
+                    $title = "New message from " . ($senderName ?: 'Someone');
+                    $body = ($type === 'text') ? $content : '[' . ucfirst($type) . ']';
+                    $payload = [
+                        'type' => 'message',
+                        'roomId' => $data['roomId'],
+                        'senderId' => $data['senderId']
+                    ];
+                    $this->notification->send($data['receiverId'], $title, $body, $payload);
+                }
             }
 
             echo json_encode(["message" => "Message saved", "id" => $lastInsertId, "type" => $type]);

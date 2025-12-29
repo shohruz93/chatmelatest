@@ -294,6 +294,47 @@ class AdminController {
         $logEntry .= "Content-Length: " . $_SERVER['CONTENT_LENGTH'] . "\n";
         file_put_contents($debugFile, $logEntry, FILE_APPEND);
 
+        if (empty($_FILES) && empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+            $maxPostSize = ini_get('post_max_size');
+            http_response_code(413); // Payload Too Large
+            echo json_encode(['error' => "The uploaded file exceeds the post_max_size directive in php.ini ($maxPostSize)."]);
+            return;
+        }
+
+        if (isset($_FILES['file']) && $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+             $errorCode = $_FILES['file']['error'];
+             $errorMessage = 'File upload error';
+             $maxUploadSize = ini_get('upload_max_filesize');
+             
+             switch ($errorCode) {
+                 case UPLOAD_ERR_INI_SIZE:
+                     $errorMessage = "The uploaded file exceeds the upload_max_filesize directive in php.ini ($maxUploadSize).";
+                     break;
+                 case UPLOAD_ERR_FORM_SIZE:
+                     $errorMessage = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.";
+                     break;
+                 case UPLOAD_ERR_PARTIAL:
+                     $errorMessage = "The uploaded file was only partially uploaded.";
+                     break;
+                 case UPLOAD_ERR_NO_FILE:
+                     $errorMessage = "No file was uploaded.";
+                     break;
+                 case UPLOAD_ERR_NO_TMP_DIR:
+                     $errorMessage = "Missing a temporary folder.";
+                     break;
+                 case UPLOAD_ERR_CANT_WRITE:
+                     $errorMessage = "Failed to write file to disk.";
+                     break;
+                 case UPLOAD_ERR_EXTENSION:
+                     $errorMessage = "A PHP extension stopped the file upload.";
+                     break;
+             }
+             
+             http_response_code(400);
+             echo json_encode(['error' => $errorMessage]);
+             return;
+        }
+
         if (!isset($_FILES['file']) && !isset($_POST['file_url'])) {
             http_response_code(400);
             echo json_encode(['error' => 'No file uploaded or URL provided']);

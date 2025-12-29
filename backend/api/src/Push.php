@@ -21,7 +21,7 @@ class Push {
 
         $query = "INSERT INTO push_subscriptions (user_id, token, platform) 
                   VALUES (:user_id, :token, :platform)
-                  ON DUPLICATE KEY UPDATE token = :token, platform = :platform";
+                  ON DUPLICATE KEY UPDATE user_id = :user_id, platform = :platform";
         
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":user_id", $userId);
