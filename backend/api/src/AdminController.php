@@ -286,6 +286,14 @@ class AdminController {
         echo json_encode($conversations);
     }
     public function uploadApp() {
+        // Debug logging
+        $debugFile = __DIR__ . '/../debug_upload.log';
+        $logEntry = date('Y-m-d H:i:s') . "\n";
+        $logEntry .= "POST: " . print_r($_POST, true) . "\n";
+        $logEntry .= "FILES: " . print_r($_FILES, true) . "\n";
+        $logEntry .= "Content-Length: " . $_SERVER['CONTENT_LENGTH'] . "\n";
+        file_put_contents($debugFile, $logEntry, FILE_APPEND);
+
         if (!isset($_FILES['file']) && !isset($_POST['file_url'])) {
             http_response_code(400);
             echo json_encode(['error' => 'No file uploaded or URL provided']);
