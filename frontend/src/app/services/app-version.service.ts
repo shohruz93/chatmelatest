@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -15,8 +15,11 @@ export class AppVersionService {
         return this.http.get(`${this.apiUrl}/app/version?platform=${platform}`);
     }
 
-    uploadAppVersion(formData: FormData): Observable<any> {
-        return this.http.post(`${this.apiUrl}/admin/apps/upload`, formData);
+    uploadAppVersion(formData: FormData): Observable<HttpEvent<any>> {
+        return this.http.post(`${this.apiUrl}/admin/apps/upload`, formData, {
+            reportProgress: true,
+            observe: 'events'
+        });
     }
 
     getAppVersions(): Observable<any> {

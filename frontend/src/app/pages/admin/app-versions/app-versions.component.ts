@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppVersionService } from '../../../services/app-version.service';
 import { Observable } from 'rxjs';
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
     selector: 'app-app-versions',
@@ -26,6 +27,7 @@ export class AppVersionsComponent implements OnInit {
     releaseNotes = '';
     fileUrl = '';
     uploadMessage = '';
+    uploadProgress = 0;
 
     ngOnInit() {
         this.loadVersions();
@@ -60,19 +62,30 @@ export class AppVersionsComponent implements OnInit {
             return;
         }
 
+        this.uploadProgress = 0;
+        this.uploadMessage = '';
+
         this.appVersionService.uploadAppVersion(formData).subscribe({
-            next: (res) => {
-                this.uploadMessage = 'Upload successful!';
-                // Reset form
-                this.version = '';
-                this.versionCode = 0;
-                this.releaseNotes = '';
-                this.selectedFile = null;
-                this.fileUrl = '';
-                // Refresh list
-                this.loadVersions();
+            next: (event) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    if (event.total) {
+                        this.uploadProgress = Math.round((100 * event.loaded) / event.total);
+                    }
+                } else if (event.type === HttpEventType.Response) {
+                    this.uploadMessage = 'Upload successful!';
+                    this.uploadProgress = 0;
+                    // Reset form
+                    this.version = '';
+                    this.versionCode = 0;
+                    this.releaseNotes = '';
+                    this.selectedFile = null;
+                    this.fileUrl = '';
+                    // Refresh list
+                    this.loadVersions();
+                }
             },
             error: (err) => {
+                this.uploadProgress = 0;
                 this.uploadMessage = 'Upload failed: ' + (err.error?.error || err.message);
             }
         });
