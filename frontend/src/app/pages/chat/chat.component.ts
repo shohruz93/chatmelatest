@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { Subscription, lastValueFrom } from 'rxjs';
+import { VoiceRecorder, RecordingData } from '@capacitor-community/voice-recorder';
 
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
@@ -919,53 +920,40 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
     }
 
-    startRecording() {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                this.mediaRecorder = new MediaRecorder(stream);
-                this.mediaRecorder.start();
+    async startRecording() {
+        try {
+            const permission = await VoiceRecorder.requestAudioRecordingPermission();
+            if (permission.value) {
+                await VoiceRecorder.startRecording();
                 this.isRecording = true;
                 this.recordingDuration = 0;
-                this.audioChunks = [];
 
                 this.recordingTimer = setInterval(() => {
                     this.recordingDuration++;
                 }, 1000);
-
-                this.mediaRecorder.addEventListener("dataavailable", event => {
-                    this.audioChunks.push(event.data);
-                });
-
-                this.mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
-                    const reader = new FileReader();
-                    reader.onload = (e: any) => {
-                        const audioData = e.target.result;
-                        this.sendMediaMessage(audioData, 'voice');
-                    };
-                    reader.readAsDataURL(audioBlob);
-
-                    // Stop all tracks
-                    stream.getTracks().forEach(track => track.stop());
-                });
-            })
-            .catch(err => {
-                console.error('Microphone access error', err);
-                // DOMException commonly contains permission or device errors
-                const name = err && err.name ? err.name : '';
-                if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
-                    alert('Microphone permission was denied. Please enable microphone access for this app in the device settings.');
-                } else {
-                    alert('Unable to access microphone: ' + (err && err.message ? err.message : err));
-                }
-            });
+            } else {
+                alert('Microphone permission was denied. Please enable microphone access for this app in the device settings.');
+            }
+        } catch (error) {
+            console.error('Microphone access error', error);
+            alert('Unable to access microphone: ' + error);
+        }
     }
 
-    stopRecording() {
-        if (this.mediaRecorder && this.isRecording) {
-            this.mediaRecorder.stop();
-            this.isRecording = false;
-            clearInterval(this.recordingTimer);
+    async stopRecording() {
+        if (this.isRecording) {
+            try {
+                const result: RecordingData = await VoiceRecorder.stopRecording();
+                if (result.value && result.value.recordDataBase64) {
+                    const audioData = `data:${result.value.mimeType};base64,${result.value.recordDataBase64}`;
+                    this.sendMediaMessage(audioData, 'voice');
+                }
+            } catch (error) {
+                console.error('Error stopping recording', error);
+            } finally {
+                this.isRecording = false;
+                clearInterval(this.recordingTimer);
+            }
         }
     }
 

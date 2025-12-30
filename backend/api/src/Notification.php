@@ -5,13 +5,10 @@ require_once __DIR__ . '/Config.php';
 class Notification {
     private $db;
     private $serviceAccountPath;
-    private $logFilePath;
 
     public function __construct($db) {
         $this->db = $db;
         $this->serviceAccountPath = __DIR__ . '/../chatme-f1d8a-firebase-adminsdk-fbsvc-60b105834e.json';
-        $this->logFilePath = __DIR__ . '/../fcm_debug.log';
-        $this->logFcm("Notification class initialized.");
     }
 
     private function logFcm($message) {
@@ -20,29 +17,21 @@ class Notification {
     }
 
     public function send($userId, $title, $body, $data = []) {
-        $this->logFcm("--------------------------------------------------");
-        $this->logFcm("Starting send process for user_id: $userId");
-        $this->logFcm("Title: $title, Body: $body, Data: " . json_encode($data));
-
+       
         $tokens = $this->getTokensForUser($userId);
 
         if (empty($tokens)) {
-            $this->logFcm("No FCM tokens found for user_id: $userId. Aborting.");
             return;
         }
-        $this->logFcm("Found " . count($tokens) . " token(s) for user_id: $userId.");
 
         $accessToken = $this->getAccessToken();
         if (!$accessToken) {
-            $this->logFcm("FCM: Failed to get access token. Aborting send process.");
             return;
         }
-        $this->logFcm("Successfully obtained FCM access token.");
 
         $serviceAccount = json_decode(file_get_contents($this->serviceAccountPath), true);
         $projectId = $serviceAccount['project_id'];
         $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
-        $this->logFcm("FCM endpoint: $url");
 
         $headers = [
             'Authorization: Bearer ' . $accessToken,
@@ -50,7 +39,6 @@ class Notification {
         ];
 
         foreach ($tokens as $token) {
-            $this->logFcm("Processing token: $token");
 
             $payload = [
                 'message' => [
@@ -62,7 +50,6 @@ class Notification {
                     'data' => array_map('strval', $data)
                 ]
             ];
-            $this->logFcm("Payload: " . json_encode($payload));
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -77,7 +64,6 @@ class Notification {
             $curlError = curl_error($ch);
             curl_close($ch);
 
-            $this->logFcm("FCM response for token $token: HTTP $httpCode - $result");
             if ($curlError) {
                 $this->logFcm("cURL Error for token $token: " . $curlError);
             }
@@ -87,12 +73,9 @@ class Notification {
                 $this->deleteToken($token);
             }
         }
-        $this->logFcm("Finished send process for user_id: $userId.");
-        $this->logFcm("--------------------------------------------------");
     }
 
     private function getAccessToken() {
-        $this->logFcm("Attempting to get access token...");
         if (!file_exists($this->serviceAccountPath)) {
             $this->logFcm("FCM: Service account file not found at " . $this->serviceAccountPath);
             return null;
