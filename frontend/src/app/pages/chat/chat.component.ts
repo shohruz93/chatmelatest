@@ -7,7 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { Subscription, lastValueFrom } from 'rxjs';
-import { VoiceRecorder, RecordingData } from '@capacitor-community/voice-recorder';
+import { VoiceRecorder, RecordingData } from '@independo/capacitor-voice-recorder';
 
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
