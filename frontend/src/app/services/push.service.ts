@@ -56,7 +56,7 @@ export class PushService {
       const data = notification.notification.data;
       console.log('Push action performed: ' + JSON.stringify(notification));
       if (data.type === 'message') {
-        this.router.navigate(['/chat', data.roomId]);
+        this.router.navigate(['/dashboard/chat', data.senderId]);
       } else if (data.type === 'guest') {
         this.router.navigate(['/guests']);
       }

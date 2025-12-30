@@ -4,79 +4,160 @@ require_once __DIR__ . '/Config.php';
 
 class Notification {
     private $db;
-    private $fcmServerKey;
+    private $serviceAccountPath;
+    private $logFilePath;
 
     public function __construct($db) {
         $this->db = $db;
-        $this->fcmServerKey = Config::get('FCM_SERVER_KEY', '');
+        $this->serviceAccountPath = __DIR__ . '/../chatme-f1d8a-firebase-adminsdk-fbsvc-60b105834e.json';
+        $this->logFilePath = __DIR__ . '/../fcm_debug.log';
+        $this->logFcm("Notification class initialized.");
+    }
+
+    private function logFcm($message) {
+        $timestamp = date('Y-m-d H:i:s');
+        file_put_contents($this->logFilePath, "[$timestamp] " . $message . PHP_EOL, FILE_APPEND);
     }
 
     public function send($userId, $title, $body, $data = []) {
-        if (empty($this->fcmServerKey)) {
-            error_log("FCM_SERVER_KEY is not set. Cannot send push notifications.");
-            return;
-        }
+        $this->logFcm("--------------------------------------------------");
+        $this->logFcm("Starting send process for user_id: $userId");
+        $this->logFcm("Title: $title, Body: $body, Data: " . json_encode($data));
 
         $tokens = $this->getTokensForUser($userId);
 
         if (empty($tokens)) {
+            $this->logFcm("No FCM tokens found for user_id: $userId. Aborting.");
             return;
         }
+        $this->logFcm("Found " . count($tokens) . " token(s) for user_id: $userId.");
 
-        $url = 'https://fcm.googleapis.com/fcm/send';
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) {
+            $this->logFcm("FCM: Failed to get access token. Aborting send process.");
+            return;
+        }
+        $this->logFcm("Successfully obtained FCM access token.");
 
-        $notification = [
-            'title' => $title,
-            'body' => $body,
-            'sound' => 'default'
-        ];
-        
-        $payload = [
-            'notification' => $notification,
-            'data' => $data,
-            'registration_ids' => $tokens
-        ];
-        
+        $serviceAccount = json_decode(file_get_contents($this->serviceAccountPath), true);
+        $projectId = $serviceAccount['project_id'];
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+        $this->logFcm("FCM endpoint: $url");
+
         $headers = [
-            'Authorization: key=' . $this->fcmServerKey,
+            'Authorization: Bearer ' . $accessToken,
             'Content-Type: application/json'
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        foreach ($tokens as $token) {
+            $this->logFcm("Processing token: $token");
 
-        $result = curl_exec($ch);
-        curl_close($ch);
+            $payload = [
+                'message' => [
+                    'token' => $token,
+                    'notification' => [
+                        'title' => $title,
+                        'body' => $body
+                    ],
+                    'data' => array_map('strval', $data)
+                ]
+            ];
+            $this->logFcm("Payload: " . json_encode($payload));
 
-        // Handle FCM response
-        $this->handleFcmResponse($result, $tokens);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
-        // Optional: log the result from FCM
-        error_log("FCM result: " . $result);
-    }
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
 
-    private function handleFcmResponse($result, $tokens) {
-        $response = json_decode($result, true);
+            $this->logFcm("FCM response for token $token: HTTP $httpCode - $result");
+            if ($curlError) {
+                $this->logFcm("cURL Error for token $token: " . $curlError);
+            }
 
-        if (!$response || !isset($response['results'])) {
-            return;
-        }
-
-        foreach ($response['results'] as $i => $result) {
-            if (isset($result['error'])) {
-                $error = $result['error'];
-                if ($error === 'NotRegistered' || $error === 'InvalidRegistration') {
-                    $tokenToDelete = $tokens[$i];
-                    $this->deleteToken($tokenToDelete);
-                }
+            if ($httpCode === 404 || $httpCode === 410) {
+                $this->logFcm("Token $token is invalid. Deleting from database.");
+                $this->deleteToken($token);
             }
         }
+        $this->logFcm("Finished send process for user_id: $userId.");
+        $this->logFcm("--------------------------------------------------");
+    }
+
+    private function getAccessToken() {
+        $this->logFcm("Attempting to get access token...");
+        if (!file_exists($this->serviceAccountPath)) {
+            $this->logFcm("FCM: Service account file not found at " . $this->serviceAccountPath);
+            return null;
+        }
+        $this->logFcm("Service account file found.");
+
+        $key = json_decode(file_get_contents($this->serviceAccountPath), true);
+        if (!$key) {
+            $this->logFcm("Failed to parse service account JSON.");
+            return null;
+        }
+        
+        $header = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $now = time();
+        $payload = json_encode([
+            'iss' => $key['client_email'],
+            'scope' => 'https://www.googleapis.com/auth/firebase.messaging',
+            'aud' => 'https://oauth2.googleapis.com/token',
+            'iat' => $now,
+            'exp' => $now + 3600
+        ]);
+
+        $base64UrlHeader = $this->base64UrlEncode($header);
+        $base64UrlPayload = $this->base64UrlEncode($payload);
+
+        $signature = '';
+        if (!openssl_sign($base64UrlHeader . "." . $base64UrlPayload, $signature, $key['private_key'], OPENSSL_ALGO_SHA256)) {
+            $this->logFcm("openssl_sign() failed. OpenSSL error: " . openssl_error_string());
+            return null;
+        }
+        $base64UrlSignature = $this->base64UrlEncode($signature);
+
+        $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+        $this->logFcm("JWT generated successfully.");
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://oauth2.googleapis.com/token');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt
+        ]));
+        
+        $result = curl_exec($ch);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError) {
+            $this->logFcm("cURL error while getting access token: " . $curlError);
+        }
+
+        $data = json_decode($result, true);
+        
+        if (isset($data['access_token'])) {
+            $this->logFcm("Access token received.");
+            return $data['access_token'];
+        }
+        
+        $this->logFcm("Failed to obtain access token. Response: " . $result);
+        return null;
+    }
+
+    private function base64UrlEncode($data) {
+        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($data));
     }
 
     private function getTokensForUser($userId) {
@@ -84,7 +165,9 @@ class Notification {
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":user_id", $userId);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $tokens = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $this->logFcm("SQL query for tokens: '$query' with user_id: $userId. Found: " . count($tokens));
+        return $tokens;
     }
 
     private function deleteToken($token) {
@@ -92,6 +175,6 @@ class Notification {
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":token", $token);
         $stmt->execute();
-        error_log("Deleted invalid FCM token: " . $token);
+        $this->logFcm("Executed SQL to delete token: '$query'");
     }
 }
