@@ -142,7 +142,7 @@
           <p>Version {{ updateAvailable().version }} is ready to install.</p>
           <p class="text-sm mt-1" *ngIf="updateAvailable().release_notes">{{ updateAvailable().release_notes }}</p>
         </div>
-        <a [href]="updateAvailable().file_path" target="_blank"
+        <a href="#" (click)="downloadUpdate($event)"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Update Now
         </a>

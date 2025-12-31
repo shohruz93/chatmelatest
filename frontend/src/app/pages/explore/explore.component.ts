@@ -218,7 +218,10 @@ export class ExploreComponent implements OnInit, OnDestroy {
                         if (res.update_available && res.latest_version) {
                             const latestBuild = parseInt(res.latest_version.version_code);
                             if (latestBuild > currentBuild) {
-                                this.updateAvailable.set(res.latest_version);
+                                this.updateAvailable.set({
+                                    ...res.latest_version,
+                                    download_url: `${this.api.phpBaseUrl}/app/download?platform=${platform}`
+                                });
                             }
                         }
                     }
@@ -391,6 +394,14 @@ export class ExploreComponent implements OnInit, OnDestroy {
         }
         // Navigate to chat with this user
         this.router.navigate(['/dashboard/chat', user.id]);
+    }
+
+    downloadUpdate(event: Event) {
+        event.preventDefault();
+        const url = this.updateAvailable()?.download_url;
+        if (url) {
+            window.open(url, '_system');
+        }
     }
 
     openProfile(user: UserProfile) {
