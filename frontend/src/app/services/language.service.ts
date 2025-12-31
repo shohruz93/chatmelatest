@@ -208,7 +208,8 @@ export class LanguageService {
                 'LOCATION': 'Location',
                 'ANY_LOCATION': 'Any Location',
                 'ONLINE_ONLY': 'Online Only',
-                'SEARCH': 'Search'
+                'SEARCH': 'Search',
+                'RECORDING': 'Recording...'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -376,7 +377,8 @@ export class LanguageService {
                 'LOCATION': 'Местоположение',
                 'ANY_LOCATION': 'Любое местоположение',
                 'ONLINE_ONLY': 'Только онлайн',
-                'SEARCH': 'Поиск'
+                'SEARCH': 'Поиск',
+                'RECORDING': 'Запись...'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -544,7 +546,8 @@ export class LanguageService {
                 'LOCATION': 'Макон',
                 'ANY_LOCATION': 'Ҳар ҷо',
                 'ONLINE_ONLY': 'Танҳо онлайн',
-                'SEARCH': 'Ҷустуҷӯ'
+                'SEARCH': 'Ҷустуҷӯ',
+                'RECORDING': 'Сабт...'
             },
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',

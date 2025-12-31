@@ -31,7 +31,8 @@ const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    }
+    },
+    maxHttpBufferSize: 1e7 // 10MB
 });
 
 // Store active users: socketId -> userId

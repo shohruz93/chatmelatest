@@ -2,7 +2,7 @@ package com.shohruz.chatme;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
-import com.getcapacitor.community.voicerecorder.VoiceRecorder;
+import com.independo.capacitor.voicerecorder.VoiceRecorder;
 
 public class MainActivity extends BridgeActivity {
   @Override

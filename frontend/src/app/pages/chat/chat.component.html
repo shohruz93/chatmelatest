@@ -112,7 +112,7 @@
                     <!-- Voice Message -->
                     @if (msg.messageType === 'voice') {
                     <div class="message-voice">
-                        <audio [src]="msg.content" controls></audio>
+                        <audio [src]="msg.content" controls preload="metadata"></audio>
                     </div>
                     }
 
@@ -176,6 +176,20 @@
             <button class="btn-cancel-preview" (click)="cancelInputMode()">✕</button>
         </div>
         }
+
+        <!-- Recording Timer -->
+        @if (showRecordingTimer) {
+        <div class="recording-timer-bar">
+            <div class="recording-indicator">
+                <span class="recording-dot"></span>
+                <span class="recording-text">{{ 'CHAT.RECORDING' | translate }}</span>
+            </div>
+            <div class="recording-duration">
+                {{ formatDuration(recordingDuration) }}
+            </div>
+        </div>
+        }
+
         <div class="input-wrapper">
             <!-- Toggle Button for Mobile -->
             <button class="btn-toggle-media" [class.active]="showMediaMenu" (click)="toggleMediaMenu()">

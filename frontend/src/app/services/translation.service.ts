@@ -11,6 +11,7 @@ export class TranslationService {
     private fallbackApiUrl = 'https://translate.googleapis.com/translate_a/single';
 
     translate(text: string, targetLang: string, sourceLang: string = 'auto'): Observable<string> {
+        if (text === 'Recording...') return of('Recording...');
         // Normalize 'tj' to 'tg' for better compatibility with translation APIs
         const dl = targetLang === 'tj' ? 'tg' : targetLang;
         const sl = sourceLang === 'tj' ? 'tg' : sourceLang;

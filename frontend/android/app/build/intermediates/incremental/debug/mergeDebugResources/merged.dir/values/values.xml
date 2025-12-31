@@ -3378,7 +3378,4 @@
         <attr name="android:inflatedId"/>
         <attr name="android:id"/>
     </declare-styleable>
-    <declare-styleable name="bridge_fragment">
-    <attr format="string" name="start_dir"/>
-  </declare-styleable>
 </resources>

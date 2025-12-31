@@ -1,10 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-32:/values-am/values-am.xml",
+            "outputFile": "com.shohruz.chatme.app-mergeDebugResources-40:/values-am/values-am.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\d6875487bafce1953eb23daa69f32b4c\\transformed\\play-services-base-18.0.1\\res\\values-am\\values.xml",
+                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\114baedee36b8bdac268f5386a7e6897\\transformed\\play-services-basement-18.3.0\\res\\values-am\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "127",
+                        "endOffsets": "322"
+                    },
+                    "to": {
+                        "startLines": "44",
+                        "startColumns": "4",
+                        "startOffsets": "4335",
+                        "endColumns": "131",
+                        "endOffsets": "4462"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\4aef5d6dbfa2eab3e0cf75d9b9b7eb7a\\transformed\\play-services-base-18.1.0\\res\\values-am\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -35,23 +52,6 @@
                         "startOffsets": "105,203,301,407,493,596,713,791,867,958,1051,1143,1237,1337,1430,1525,1618,1709,1800,1880,1980,2080,2176,2278,2378,2477,2627,5416",
                         "endColumns": "97,97,105,85,102,116,77,75,90,92,91,93,99,92,94,92,90,90,79,99,99,95,101,99,98,149,95,79",
                         "endOffsets": "198,296,402,488,591,708,786,862,953,1046,1138,1232,1332,1425,1520,1613,1704,1795,1875,1975,2075,2171,2273,2373,2472,2622,2718,5491"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\ShShohruz\\.gradle\\caches\\8.14.3\\transforms\\7f2505e3010de7df824517cfed968b98\\transformed\\play-services-basement-18.1.0\\res\\values-am\\values.xml",
-                    "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "127",
-                        "endOffsets": "322"
-                    },
-                    "to": {
-                        "startLines": "44",
-                        "startColumns": "4",
-                        "startOffsets": "4335",
-                        "endColumns": "131",
-                        "endOffsets": "4462"
                     }
                 },
                 {

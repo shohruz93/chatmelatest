@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
-    content TEXT NOT NULL,
+    content LONGTEXT NOT NULL,
     type VARCHAR(20) NOT NULL DEFAULT 'text',
     original_language VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

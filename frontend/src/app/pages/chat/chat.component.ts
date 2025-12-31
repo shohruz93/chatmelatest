@@ -57,10 +57,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     showMediaMenu = false;
     showStickerPicker = false;
     isRecording = false;
+    showRecordingTimer = false;
     mediaRecorder: MediaRecorder | null = null;
     audioChunks: any[] = [];
     recordingDuration = 0;
     recordingTimer: any;
+    timerShowDelay: any;
 
     stickers = [
         '😀', '😂', '😍', '😎', '😭', '😡', '👍', '👎', '🎉', '❤️', '🔥', '💩',
@@ -921,22 +923,36 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     async startRecording() {
+        this.isRecording = true;
+        this.showRecordingTimer = true;
+        this.recordingDuration = 0;
+
+        // Start timer immediately for UI responsiveness
+        this.recordingTimer = setInterval(() => {
+            this.recordingDuration++;
+        }, 1000);
+
         try {
             const permission = await VoiceRecorder.requestAudioRecordingPermission();
             if (permission.value) {
                 await VoiceRecorder.startRecording();
-                this.isRecording = true;
-                this.recordingDuration = 0;
-
-                this.recordingTimer = setInterval(() => {
-                    this.recordingDuration++;
-                }, 1000);
             } else {
+                this.cleanupRecording();
                 alert('Microphone permission was denied. Please enable microphone access for this app in the device settings.');
             }
         } catch (error) {
+            this.cleanupRecording();
             console.error('Microphone access error', error);
             alert('Unable to access microphone: ' + error);
+        }
+    }
+
+    private cleanupRecording() {
+        this.isRecording = false;
+        this.showRecordingTimer = false;
+        if (this.recordingTimer) {
+            clearInterval(this.recordingTimer);
+            this.recordingTimer = null;
         }
     }
 
@@ -945,14 +961,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             try {
                 const result: RecordingData = await VoiceRecorder.stopRecording();
                 if (result.value && result.value.recordDataBase64) {
-                    const audioData = `data:${result.value.mimeType};base64,${result.value.recordDataBase64}`;
+                    const mimeType = result.value.mimeType || 'audio/aac';
+                    const audioData = `data:${mimeType};base64,${result.value.recordDataBase64}`;
                     this.sendMediaMessage(audioData, 'voice');
                 }
             } catch (error) {
                 console.error('Error stopping recording', error);
             } finally {
-                this.isRecording = false;
-                clearInterval(this.recordingTimer);
+                this.cleanupRecording();
             }
         }
     }
@@ -1000,7 +1016,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         if (content && typeof content === 'string') {
-            if (content.startsWith('data:audio') || content.endsWith('.webm') || content.endsWith('.mp3') || content.endsWith('.wav')) {
+            if (content.startsWith('data:audio') || content.startsWith('data:video') || 
+                content.endsWith('.webm') || content.endsWith('.mp3') || 
+                content.endsWith('.wav') || content.endsWith('.aac') || content.endsWith('.m4a')) {
                 return 'voice';
             }
             if (content.startsWith('data:image') || content.match(/\.(jpeg|jpg|gif|png)$/) != null) {
