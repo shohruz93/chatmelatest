@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "1021066705022-r0ot1hvsauq3u0kuad7hssmm4buua80e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shohruz.chatme",
+            "certificate_hash": "e85b1a704b5c0171a728f0e43dd4524f06ba3cc4"
+          }
+        },
+        {
           "client_id": "1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com",
           "client_type": 3
         }
