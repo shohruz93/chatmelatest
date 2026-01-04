@@ -2,6 +2,7 @@
 
 require_once 'Notification.php';
 require_once 'User.php';
+require_once 'TimestampHelper.php';
 
 class Message {
     private $db;
@@ -26,6 +27,7 @@ class Message {
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        TimestampHelper::convertRowsToUnix($messages, ['created_at']);
         echo json_encode($messages);
     }
 
@@ -52,6 +54,7 @@ class Message {
 
         $result = [];
         foreach ($messages as $msg) {
+            TimestampHelper::convertRowToUnix($msg, ['created_at']);
             $msg['replyTo'] = null;
             if ($msg['reply_to_message_id']) {
                 $msg['replyTo'] = [

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 @Component({
     selector: 'app-guests',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, UnixDatePipe],
     templateUrl: './guests.component.html',
     styleUrls: ['./guests.component.css']
 })

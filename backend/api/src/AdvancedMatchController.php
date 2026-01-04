@@ -1,5 +1,7 @@
 <?php
 
+require_once 'TimestampHelper.php';
+
 class AdvancedMatchController {
     private $db;
 

@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
         io.emit('user_status_changed', {
             userId: userId,
             status: 'online',
-            timestamp: new Date()
+            timestamp: Math.floor(Date.now() / 1000)
         });
     });
 
@@ -419,8 +419,8 @@ io.on('connection', (socket) => {
             roomId: roomId,
             content,
             originalLang,
-            type: type || 'text', // Ensure type is passed
-            timestamp: new Date(),
+            type: type || 'text',
+            timestamp: Math.floor(Date.now() / 1000),
             replyTo: replyTo
         };
 
@@ -675,7 +675,7 @@ io.on('connection', (socket) => {
                     io.emit('user_status_changed', {
                         userId: userId,
                         status: 'offline',
-                        lastSeen: new Date()
+                        lastSeen: Math.floor(Date.now() / 1000)
                     });
                 }
             }, 5000);

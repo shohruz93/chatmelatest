@@ -25,7 +25,7 @@
                             <span class="star-display" [class.filled]="star <= comment.rating">★</span>
                             }
                         </span>
-                        <span class="comment-date">{{ comment.created_at | date }}</span>
+                        <span class="comment-date">{{ comment.created_at | unixDate:'short' }}</span>
                     </div>
                 </div>
                 <div class="comment-body">

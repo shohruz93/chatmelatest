@@ -11,11 +11,12 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
 import { AppVersionService } from '../../services/app-version.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe],
+    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe, UnixDatePipe],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })

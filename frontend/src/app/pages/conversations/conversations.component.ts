@@ -5,11 +5,12 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 @Component({
     selector: 'app-conversations',
     standalone: true,
-    imports: [CommonModule, RouterModule, TranslatePipe],
+    imports: [CommonModule, RouterModule, TranslatePipe, UnixDatePipe],
     templateUrl: './conversations.component.html',
     styleUrl: './conversations.component.css'
 })

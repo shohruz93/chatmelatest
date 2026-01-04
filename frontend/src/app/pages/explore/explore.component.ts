@@ -161,6 +161,17 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
     showValidationMessage = signal(false);
 
+    hasIncompleteProfile() {
+        if (!this.currentUser) return false;
+        const hasNative = !!this.currentUser?.native_language && 
+                         this.currentUser.native_language !== '' && 
+                         this.currentUser.native_language !== 'any';
+        const hasLearning = !!this.currentUser?.learning_language && 
+                           this.currentUser.learning_language !== '' && 
+                           this.currentUser.learning_language !== 'any';
+        return !hasNative || !hasLearning;
+    }
+
     constructor() {
         // React to online users changes
         effect(() => {
@@ -190,6 +201,10 @@ export class ExploreComponent implements OnInit, OnDestroy {
             } catch (e) {
                 console.error('Failed to sync profile:', e);
             }
+        }
+
+        if (this.hasIncompleteProfile()) {
+            this.showValidationMessage.set(true);
         }
 
         this.loadUsers();

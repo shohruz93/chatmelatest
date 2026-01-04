@@ -20,7 +20,7 @@
                 </div>
                 <div class="guest-info">
                     <h3>{{ guest.name }}</h3>
-                    <p class="visit-time">Visited {{ guest.viewed_at | date:'medium' }}</p>
+                    <p class="visit-time">Visited {{ guest.viewed_at | unixDate:'relative' }}</p>
                 </div>
             </div>
             }

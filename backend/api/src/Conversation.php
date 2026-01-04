@@ -1,5 +1,7 @@
 <?php
 
+require_once 'TimestampHelper.php';
+
 class Conversation {
     private $db;
 
@@ -43,6 +45,7 @@ class Conversation {
             $stmt->bindParam(":user_id", $userId);
             $stmt->execute();
             $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            TimestampHelper::convertRowsToUnix($conversations, ['last_message_time']);
             echo json_encode($conversations);
         } catch (PDOException $e) {
             http_response_code(500);

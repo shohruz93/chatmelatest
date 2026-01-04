@@ -2,6 +2,7 @@
 
 require_once 'User.php';
 require_once 'Notification.php';
+require_once 'TimestampHelper.php';
 
 class Profile {
     private $db;
@@ -258,12 +259,7 @@ class Profile {
         $stmt->execute();
         $guests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Fix guest avatar URLs
-        foreach ($guests as &$guest) {
-            if ($guest['avatar']) {
-                $guest['avatar'] = $guest['avatar'];
-            }
-        }
+        TimestampHelper::convertRowsToUnix($guests, ['viewed_at']);
 
         echo json_encode($guests);
     }
@@ -280,6 +276,8 @@ class Profile {
         $stmt->bindParam(":user_id", $userId);
         $stmt->execute();
         $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        TimestampHelper::convertRowsToUnix($comments, ['created_at']);
 
         // For each comment, get replies and likes
         foreach ($comments as &$comment) {
@@ -298,6 +296,8 @@ class Profile {
             $stmt->bindParam(":rating_id", $comment['id']);
             $stmt->execute();
             $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            TimestampHelper::convertRowsToUnix($replies, ['created_at']);
 
             // Fix replier avatar URLs
             foreach ($replies as &$reply) {

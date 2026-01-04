@@ -33,7 +33,7 @@
                 <div class="conversation-info">
                     <div class="conversation-header">
                         <h3 class="partner-name">{{ conv.partner_name || 'Anonymous User' }}</h3>
-                        <span class="last-time">{{ conv.last_message_time | date:'short' }}</span>
+                        <span class="last-time">{{ conv.last_message_time | unixDate:'short' }}</span>
                     </div>
                     <div class="conversation-preview">
                         <p class="last-message" [class.unread]="conv.unread_count > 0">

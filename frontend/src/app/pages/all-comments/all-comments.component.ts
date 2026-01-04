@@ -4,11 +4,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 @Component({
     selector: 'app-all-comments',
     standalone: true,
-    imports: [CommonModule, RouterLink, FormsModule],
+    imports: [CommonModule, RouterLink, FormsModule, UnixDatePipe],
     templateUrl: './all-comments.component.html',
     styleUrl: './all-comments.component.css'
 })

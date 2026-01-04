@@ -26,3 +26,7 @@ Thumbs.db
 
 # Gemini temp files
 .gemini/
+
+# Gradle
+.gradle/
+build/

@@ -6,6 +6,7 @@ import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
+import { TimestampService } from '../../services/timestamp.service';
 import { Subscription, lastValueFrom } from 'rxjs';
 import { VoiceRecorder, RecordingData } from '@independo/capacitor-voice-recorder';
 
@@ -32,6 +33,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private translationService = inject(TranslationService);
     private api = inject(ApiService);
     private countryService = inject(CountryService);
+    private timestampService = inject(TimestampService);
 
     messages: any[] = [];
     newMessage: string = '';
@@ -1040,32 +1042,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     formatLastActive(lastActive: string | number | undefined): string {
         if (!lastActive) return '';
 
-        let ts: number;
+        let unixTimestamp: number;
         if (typeof lastActive === 'number') {
-            ts = lastActive * 1000;
+            unixTimestamp = lastActive;
         } else if (/^\d+$/.test(String(lastActive))) {
-            ts = parseInt(String(lastActive), 10) * 1000;
+            unixTimestamp = parseInt(String(lastActive), 10);
         } else {
-            ts = new Date(String(lastActive)).getTime();
+            return '';
         }
 
-        const lastActiveDate = new Date(ts);
-        const now = new Date();
-        const diffMs = now.getTime() - lastActiveDate.getTime();
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMins < 1) {
-            return 'Just now';
-        } else if (diffMins < 60) {
-            return `${diffMins}m ago`;
-        } else if (diffHours < 24) {
-            return `${diffHours}h ago`;
-        } else if (diffDays < 7) {
-            return `${diffDays}d ago`;
-        } else {
-            return lastActiveDate.toLocaleDateString();
-        }
+        return this.timestampService.formatRelativeTime(unixTimestamp);
     }
 }
