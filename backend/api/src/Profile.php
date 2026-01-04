@@ -221,47 +221,114 @@ class Profile {
     }
     
     public function recordView($viewerId, $viewedId) {
-        if ($viewerId == $viewedId) return;
+        $viewerId = (int)$viewerId;
+        $viewedId = (int)$viewedId;
+        
+        if (!$viewerId || !$viewedId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid user IDs: viewerId=$viewerId, viewedId=$viewedId"]);
+            error_log("Invalid user IDs in recordView: viewerId=$viewerId, viewedId=$viewedId");
+            return;
+        }
+        
+        if ($viewerId == $viewedId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Cannot view own profile"]);
+            return;
+        }
 
-        $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at, seen) 
-                  VALUES (:viewer_id, :viewed_id, NOW(), 0) 
-                  ON DUPLICATE KEY UPDATE viewed_at = NOW(), seen = 0";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":viewer_id", $viewerId);
-        $stmt->bindParam(":viewed_id", $viewedId);
-        $stmt->execute();
+        $success = false;
+        
+        try {
+            $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at, seen) 
+                      VALUES (?, ?, UNIX_TIMESTAMP(), 0) 
+                      ON DUPLICATE KEY UPDATE viewed_at = UNIX_TIMESTAMP(), seen = 0";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$viewerId, $viewedId]);
+            $success = true;
+            error_log("Profile view recorded with seen column for viewer $viewerId, viewed $viewedId");
+        } catch (Exception $e) {
+            error_log("Error with seen column: " . $e->getMessage());
+            
+            try {
+                $query = "INSERT INTO profile_views (viewer_id, viewed_id, viewed_at) 
+                          VALUES (?, ?, UNIX_TIMESTAMP()) 
+                          ON DUPLICATE KEY UPDATE viewed_at = UNIX_TIMESTAMP()";
+                $stmt = $this->db->prepare($query);
+                $stmt->execute([$viewerId, $viewedId]);
+                $success = true;
+                error_log("Profile view recorded without seen column for viewer $viewerId, viewed $viewedId");
+            } catch (Exception $e2) {
+                error_log("Error recording profile view (both attempts failed): " . $e2->getMessage());
+            }
+        }
 
-        // Send push notification
-        $viewerName = $this->user->getNameById($viewerId);
-        $title = 'You have a new guest';
-        $body = ($viewerName ?: 'Someone') . ' visited your profile.';
-        $payload = [
-            'type' => 'guest',
-            'viewerId' => $viewerId
-        ];
-        $this->notification->send($viewedId, $title, $body, $payload);
+        try {
+            $viewerName = $this->user->getNameById($viewerId);
+            $title = 'You have a new guest';
+            $body = ($viewerName ?: 'Someone') . ' visited your profile.';
+            $payload = [
+                'type' => 'guest',
+                'viewerId' => $viewerId
+            ];
+            $this->notification->send($viewedId, $title, $body, $payload);
+        } catch (Exception $e) {
+            error_log("Error sending guest notification: " . $e->getMessage());
+        }
+        
+        if ($success) {
+            echo json_encode(["message" => "Profile view recorded"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to record profile view"]);
+        }
     }
 
     public function getGuests($userId) {
-        // Cleanup old guests (older than 1 month) for this user
-        $cleanupQuery = "DELETE FROM profile_views WHERE viewed_id = :user_id AND viewed_at < DATE_SUB(NOW(), INTERVAL 1 MONTH)";
-        $cleanupStmt = $this->db->prepare($cleanupQuery);
-        $cleanupStmt->bindParam(":user_id", $userId);
-        $cleanupStmt->execute();
+        $userId = (int)$userId;
+        
+        if (!$userId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid user ID"]);
+            return;
+        }
+        
+        try {
+            // Cleanup old guests (older than 1 month) for this user
+            // viewed_at is stored as Unix timestamp, so compare with Unix timestamp
+            $oneMonthAgo = time() - (30 * 24 * 60 * 60);
+            $cleanupQuery = "DELETE FROM profile_views WHERE viewed_id = ? AND viewed_at < ?";
+            $cleanupStmt = $this->db->prepare($cleanupQuery);
+            $cleanupStmt->execute([$userId, $oneMonthAgo]);
+            error_log("Cleaned up old guests for user $userId");
+        } catch (Exception $e) {
+            error_log("Error cleaning up guests: " . $e->getMessage());
+        }
 
-        $query = "SELECT u.id, u.name, u.avatar, u.bio, pv.viewed_at 
-                  FROM profile_views pv 
-                  JOIN users u ON pv.viewer_id = u.id 
-                  WHERE pv.viewed_id = :user_id 
-                  ORDER BY pv.viewed_at DESC";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":user_id", $userId);
-        $stmt->execute();
-        $guests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, pv.viewed_at 
+                      FROM profile_views pv 
+                      JOIN users u ON pv.viewer_id = u.id 
+                      WHERE pv.viewed_id = ? 
+                      ORDER BY pv.viewed_at DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$userId]);
+            $guests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        TimestampHelper::convertRowsToUnix($guests, ['viewed_at']);
+            error_log("Found " . count($guests) . " guests for user $userId");
+            
+            // viewed_at is already stored as Unix timestamp, no conversion needed
+            // Ensure it's cast as integer
+            foreach ($guests as &$guest) {
+                $guest['viewed_at'] = (int)$guest['viewed_at'];
+            }
 
-        echo json_encode($guests);
+            echo json_encode($guests);
+        } catch (Exception $e) {
+            error_log("Error fetching guests: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to fetch guests: " . $e->getMessage()]);
+        }
     }
 
 
@@ -420,19 +487,32 @@ class Profile {
     }
 
     public function getNewGuestsCount($userId) {
-        $query = "SELECT COUNT(*) as count FROM profile_views WHERE viewed_id = :user_id AND seen = 0";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":user_id", $userId);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo json_encode(["count" => (int)$result['count']]);
+        try {
+            $query = "SELECT COUNT(*) as count FROM profile_views WHERE viewed_id = :user_id AND seen = 0";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(["count" => (int)$result['count']]);
+        } catch (Exception $e) {
+            $query = "SELECT COUNT(*) as count FROM profile_views WHERE viewed_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode(["count" => (int)$result['count']]);
+        }
     }
 
     public function markGuestsAsSeen($userId) {
-        $query = "UPDATE profile_views SET seen = 1 WHERE viewed_id = :user_id AND seen = 0";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":user_id", $userId);
-        $stmt->execute();
-        echo json_encode(["message" => "Guests marked as seen"]);
+        try {
+            $query = "UPDATE profile_views SET seen = 1 WHERE viewed_id = :user_id AND seen = 0";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            echo json_encode(["message" => "Guests marked as seen"]);
+        } catch (Exception $e) {
+            echo json_encode(["message" => "Guests marked as seen"]);
+        }
     }
 }

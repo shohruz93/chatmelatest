@@ -272,12 +272,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             if (messageRoomId === this.roomId) {
                 const shouldScroll = this.isUserNearBottom();
 
+                let timestamp = message.timestamp || new Date();
+                if (typeof timestamp === 'number' && timestamp < 10000000000) {
+                    timestamp *= 1000;
+                }
+
                 // Add message with proper ID
                 this.messages.push({
                     id: message.id || Date.now(),
                     type: 'received',
                     content: message.content,
-                    created_at: message.timestamp || new Date(),
+                    created_at: timestamp,
                     messageType: this.detectMessageType(message.content, message.type),
                     read: false,
                     originalLang: message.originalLang,
@@ -303,7 +308,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             if (pending) {
                 pending.status = 'sent';
                 if (messageData.id) pending.id = messageData.id;
-                if (messageData.timestamp) pending.created_at = messageData.timestamp;
+                if (messageData.timestamp) {
+                    let timestamp = messageData.timestamp;
+                    if (typeof timestamp === 'number' && timestamp < 10000000000) {
+                        timestamp *= 1000;
+                    }
+                    pending.created_at = timestamp;
+                }
             }
         });
 
@@ -469,11 +480,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     private mapMessage(msg: any): any {
+        let timestamp = msg.created_at || msg.timestamp;
+        if (typeof timestamp === 'number' && timestamp < 10000000000) {
+            timestamp *= 1000;
+        }
         return {
             id: msg.id,
             type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
             content: msg.content,
-            created_at: msg.created_at || msg.timestamp,
+            created_at: timestamp,
             messageType: this.detectMessageType(msg.content, msg.type),
             read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
             status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
