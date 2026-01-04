@@ -30,3 +30,11 @@ Thumbs.db
 # Gradle
 .gradle/
 build/
+
+# Secrets and credentials
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!angular.json
+.env
