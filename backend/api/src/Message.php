@@ -3,16 +3,19 @@
 require_once 'Notification.php';
 require_once 'User.php';
 require_once 'TimestampHelper.php';
+require_once 'Telegram.php';
 
 class Message {
     private $db;
     private $notification;
     private $user;
+    private $telegram;
 
     public function __construct($db) {
         $this->db = $db;
         $this->notification = new Notification($db);
         $this->user = new User($db);
+        $this->telegram = new Telegram($db);
     }
 
     public function getHistory($userId, $otherUserId) {
@@ -141,6 +144,9 @@ class Message {
                                 'senderId' => $data['senderId']
                             ];
                             $this->notification->send($data['receiverId'], $title, $body, $payload);
+
+                            $messagePreview = ($type === 'text') ? substr($content, 0, 100) : '[' . ucfirst($type) . ']';
+                            $this->telegram->notifyNewMessage($data['receiverId'], $senderName ?: 'Someone', $messagePreview);
                         } catch (Exception $e) {
                             // Ignore notification errors to not break message saving
                         }

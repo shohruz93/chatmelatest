@@ -13,6 +13,8 @@ import { CountrySelectComponent } from '../../components/country-select/country-
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
+import { TelegramService } from '../../services/telegram.service';
+
 @Component({
     selector: 'app-profile',
     standalone: true,
@@ -26,6 +28,7 @@ export class ProfileComponent implements OnInit {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private countryService = inject(CountryService);
+    private telegramService = inject(TelegramService);
 
     private appVersionService = inject(AppVersionService);
 
@@ -53,6 +56,16 @@ export class ProfileComponent implements OnInit {
     location: string = '';
     nativeLanguages: string[] = [];
     learningLanguages: string[] = [];
+
+    // Telegram Integration
+    telegramConnected: boolean = false;
+    telegramUsername: string = '';
+    telegramNotificationsEnabled: boolean = true;
+    telegramLoading: boolean = false;
+    telegramConnectionCode: string = '';
+    telegramDeepLink: string = '';
+    showTelegramConnect: boolean = false;
+    telegramBotName: string = '';
 
     // Rating & Comment Inputs
     newRating: number = 0;
@@ -112,6 +125,8 @@ export class ProfileComponent implements OnInit {
 
                 if (!this.isOwnProfile && this.currentUser) {
                     this.api.recordView(this.currentUser.id, userId).subscribe();
+                } else if (this.isOwnProfile) {
+                    this.checkTelegramStatus();
                 }
             }
         });
@@ -425,5 +440,98 @@ export class ProfileComponent implements OnInit {
         if (this.profileUser && this.profileUser.id) {
             this.router.navigate(['/dashboard', 'chat', this.profileUser.id]);
         }
+    }
+
+    copyCode(code: string) {
+        navigator.clipboard.writeText('/start ' + code).then(() => {
+            alert('Code copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy code', err);
+        });
+    }
+
+    // Telegram Methods
+    checkTelegramStatus() {
+        if (!this.currentUser?.id) return;
+
+        this.telegramLoading = true;
+        this.telegramService.getStatus(this.currentUser.id).subscribe({
+            next: (status) => {
+                this.telegramConnected = status.connected;
+                this.telegramUsername = status.telegramUsername || '';
+                this.telegramNotificationsEnabled = status.notificationsEnabled || false;
+                this.telegramLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to check Telegram status', err);
+                this.telegramLoading = false;
+            }
+        });
+    }
+
+    generateTelegramCode() {
+        this.telegramLoading = true;
+
+        this.telegramService.generateCode(this.currentUser.id).subscribe({
+            next: (res) => {
+                if (res.success) {
+                    this.telegramConnectionCode = res.code;
+                    this.telegramDeepLink = res.deepLink;
+                    this.telegramBotName = res.botUsername;
+                    this.showTelegramConnect = true;
+                }
+                this.telegramLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to generate code', err);
+                alert('Failed to generate connection code. Please try again.');
+                this.telegramLoading = false;
+            }
+        });
+    }
+
+    toggleTelegramConnectModal() {
+        if (this.showTelegramConnect) {
+            this.showTelegramConnect = false;
+            // Check status when closing modal in case they connected
+            this.checkTelegramStatus();
+        } else {
+            this.generateTelegramCode();
+        }
+    }
+
+    disconnectTelegram() {
+        if (!confirm('Are you sure you want to disconnect Telegram notifications?')) return;
+
+        this.telegramLoading = true;
+        this.telegramService.disconnect(this.currentUser.id).subscribe({
+            next: (res) => {
+                this.telegramConnected = false;
+                this.telegramUsername = '';
+                this.telegramNotificationsEnabled = false;
+                this.telegramLoading = false;
+                alert('Telegram disconnected successfully.');
+            },
+            error: (err) => {
+                console.error('Failed to disconnect Telegram', err);
+                alert('Failed to disconnect Telegram.');
+                this.telegramLoading = false;
+            }
+        });
+    }
+
+    toggleTelegramNotifications() {
+        // Optimistic update
+        const newState = !this.telegramNotificationsEnabled;
+        this.telegramNotificationsEnabled = newState;
+
+        this.telegramService.toggleNotifications(this.currentUser.id, newState).subscribe({
+            error: (err) => {
+                // Revert on error
+                this.telegramNotificationsEnabled = !newState;
+                console.error('Failed to toggle notifications', err);
+                alert('Failed to update notification settings.');
+            }
+        });
     }
 }

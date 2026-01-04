@@ -3,16 +3,19 @@
 require_once 'User.php';
 require_once 'Notification.php';
 require_once 'TimestampHelper.php';
+require_once 'Telegram.php';
 
 class Profile {
     private $db;
     private $user;
     private $notification;
+    private $telegram;
 
     public function __construct($db) {
         $this->db = $db;
         $this->user = new User($db);
         $this->notification = new Notification($db);
+        $this->telegram = new Telegram($db);
     }
 
     public function get($userId) {
@@ -272,6 +275,7 @@ class Profile {
                 'viewerId' => $viewerId
             ];
             $this->notification->send($viewedId, $title, $body, $payload);
+            $this->telegram->notifyNewGuest($viewedId, $viewerName ?: 'Someone');
         } catch (Exception $e) {
             error_log("Error sending guest notification: " . $e->getMessage());
         }
@@ -479,6 +483,13 @@ class Profile {
         $stmt->bindParam(":comment", $comment);
         
         if ($stmt->execute()) {
+            try {
+                $commenterName = $this->user->getNameById($userId);
+                $commentPreview = substr($comment, 0, 100);
+                $this->telegram->notifyNewComment($ratedId, $commenterName ?: 'Someone', $commentPreview);
+            } catch (Exception $e) {
+                error_log("Error sending comment notification: " . $e->getMessage());
+            }
             echo json_encode(["message" => "Comment added"]);
         } else {
             http_response_code(500);
