@@ -2,13 +2,24 @@
 
 class TimestampHelper {
     /**
-     * Convert PHP TIMESTAMP string to Unix timestamp
-     * @param string $timestamp MySQL TIMESTAMP format (YYYY-MM-DD HH:MM:SS)
+     * Convert PHP TIMESTAMP string or Unix timestamp to Unix timestamp
+     * @param string|int $timestamp MySQL TIMESTAMP format (YYYY-MM-DD HH:MM:SS) or Unix timestamp
      * @return int|null Unix timestamp in seconds, or null if invalid
      */
     public static function toUnix($timestamp) {
-        if (empty($timestamp) || $timestamp === null) {
+        if (empty($timestamp) && $timestamp !== 0 && $timestamp !== '0') {
             return null;
+        }
+        
+        if ($timestamp === null) {
+            return null;
+        }
+        
+        if (is_numeric($timestamp)) {
+            $numValue = (int)$timestamp;
+            if ($numValue > 0) {
+                return $numValue;
+            }
         }
         
         $result = strtotime($timestamp);
