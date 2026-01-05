@@ -9,10 +9,11 @@ try {
     $db = $database->getConnection();
     $telegram = new TelegramWebhook($db);
 
-    // The webhook URL should point to your production endpoint
-    $webhookUrl = 'https://shphbjeio23.chatme.tj/telegram/webhook';
+    $webhookUrl = getenv('TELEGRAM_WEBHOOK_URL');
+    if (!$webhookUrl) {
+        throw new Exception('TELEGRAM_WEBHOOK_URL not configured in .env');
+    }
     
-    // Set the webhook
     $result = $telegram->setWebhook($webhookUrl);
     
     echo json_encode([

@@ -4,11 +4,12 @@ require_once 'User.php';
 
 class Telegram {
     private $db;
-    private $botToken = '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
+    private $botToken;
     private $apiBaseUrl = 'https://api.telegram.org/bot';
 
     public function __construct($db) {
         $this->db = $db;
+        $this->botToken = getenv('TELEGRAM_BOT_TOKEN') ?: '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
     }
 
     public function generateConnectionCode() {

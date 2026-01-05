@@ -12,6 +12,9 @@ import { AppVersionService } from '../../services/app-version.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
+import { interval, Subscription, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { OnDestroy } from '@angular/core';
 
 import { TelegramService } from '../../services/telegram.service';
 
@@ -22,7 +25,7 @@ import { TelegramService } from '../../services/telegram.service';
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit, OnDestroy {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private router = inject(Router);
@@ -31,6 +34,9 @@ export class ProfileComponent implements OnInit {
     private telegramService = inject(TelegramService);
 
     private appVersionService = inject(AppVersionService);
+    
+    private destroy$ = new Subject<void>();
+    private telegramPollSubscription: Subscription | null = null;
 
     isWeb = false;
     downloadUrls: { android: string | null; ios: string | null } = { android: null, ios: null };
@@ -66,6 +72,7 @@ export class ProfileComponent implements OnInit {
     telegramDeepLink: string = '';
     showTelegramConnect: boolean = false;
     telegramBotName: string = '';
+    telegramPollingActive: boolean = false;
 
     // Rating & Comment Inputs
     newRating: number = 0;
@@ -479,6 +486,8 @@ export class ProfileComponent implements OnInit {
                     this.telegramDeepLink = res.deepLink;
                     this.telegramBotName = res.botUsername;
                     this.showTelegramConnect = true;
+                    
+                    this.startTelegramPolling();
                 }
                 this.telegramLoading = false;
             },
@@ -490,10 +499,52 @@ export class ProfileComponent implements OnInit {
         });
     }
 
+    private startTelegramPolling() {
+        if (this.telegramPollingActive) return;
+        
+        this.telegramPollingActive = true;
+        let pollCount = 0;
+        const maxPolls = 60;
+        
+        this.telegramPollSubscription = interval(2000)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => {
+                pollCount++;
+                
+                if (pollCount > maxPolls) {
+                    this.stopTelegramPolling();
+                    return;
+                }
+                
+                this.telegramService.getStatus(this.currentUser.id).subscribe({
+                    next: (status) => {
+                        if (status.connected) {
+                            this.telegramConnected = status.connected;
+                            this.telegramUsername = status.telegramUsername || '';
+                            this.telegramNotificationsEnabled = status.notificationsEnabled || false;
+                            this.showTelegramConnect = false;
+                            this.stopTelegramPolling();
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Error polling Telegram status', err);
+                    }
+                });
+            });
+    }
+
+    private stopTelegramPolling() {
+        if (this.telegramPollSubscription) {
+            this.telegramPollSubscription.unsubscribe();
+            this.telegramPollSubscription = null;
+        }
+        this.telegramPollingActive = false;
+    }
+
     toggleTelegramConnectModal() {
         if (this.showTelegramConnect) {
             this.showTelegramConnect = false;
-            // Check status when closing modal in case they connected
+            this.stopTelegramPolling();
             this.checkTelegramStatus();
         } else {
             this.generateTelegramCode();
@@ -533,5 +584,11 @@ export class ProfileComponent implements OnInit {
                 alert('Failed to update notification settings.');
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.stopTelegramPolling();
     }
 }

@@ -2,17 +2,22 @@
 
 class TelegramWebhook {
     private $db;
-    private $botToken = '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
+    private $botToken;
     private $apiBaseUrl = 'https://api.telegram.org/bot';
 
     public function __construct($db) {
         $this->db = $db;
+        $this->botToken = getenv('TELEGRAM_BOT_TOKEN') ?: '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
     }
 
     public function handleUpdate() {
-        $update = json_decode(file_get_contents('php://input'), true);
+        $rawInput = file_get_contents('php://input');
+        error_log("Telegram webhook received: " . $rawInput);
+        
+        $update = json_decode($rawInput, true);
 
         if (!$update) {
+            error_log("Failed to parse JSON from Telegram");
             http_response_code(400);
             echo json_encode(['error' => 'Invalid JSON']);
             return;
@@ -26,16 +31,23 @@ class TelegramWebhook {
     private function processUpdate($update) {
         if (isset($update['message'])) {
             $this->handleMessage($update['message']);
+        } else {
+            error_log("No message in Telegram update: " . json_encode($update));
         }
     }
 
     private function handleMessage($message) {
-        $chatId = $message['chat']['id'];
-        $userId = $message['from']['id'];
+        $chatId = $message['chat']['id'] ?? null;
+        $userId = $message['from']['id'] ?? null;
         $username = $message['from']['username'] ?? '';
         $text = $message['text'] ?? '';
 
-        error_log("Telegram message from user $userId: $text");
+        if (!$chatId || !$userId) {
+            error_log("Invalid Telegram message structure: " . json_encode($message));
+            return;
+        }
+
+        error_log("Telegram message from user $userId (chat: $chatId): $text");
 
         if (strpos($text, '/start') === 0) {
             $this->handleStartCommand($chatId, $userId, $username, $text);
@@ -46,7 +58,10 @@ class TelegramWebhook {
         $parts = explode(' ', $text);
         $code = $parts[1] ?? '';
 
+        error_log("Telegram /start command received with code: " . ($code ?: "NONE"));
+
         if (empty($code)) {
+            error_log("No connection code provided in /start command");
             $this->sendMessage($chatId, "Welcome to ChatMe!\n\nTo connect your account, please use the link from your ChatMe app profile settings.");
             return;
         }
@@ -59,12 +74,14 @@ class TelegramWebhook {
         $stmt->execute();
 
         if ($stmt->rowCount() === 0) {
+            error_log("Invalid or expired code: $code");
             $this->sendMessage($chatId, "Invalid or expired connection code. Please generate a new code in your ChatMe app.");
             return;
         }
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         $userId = $row['user_id'];
+        error_log("Code validation successful for user ID: $userId");
 
         $updateQuery = "INSERT INTO telegram_connections 
                        (user_id, telegram_user_id, telegram_chat_id, telegram_username, notifications_enabled) 
@@ -81,13 +98,18 @@ class TelegramWebhook {
         $updateStmt->bindParam(':tg_username', $username);
 
         if ($updateStmt->execute()) {
+            error_log("Telegram connection created for user ID: $userId, Telegram user: $telegramUserId");
+            
             $deleteQuery = "DELETE FROM telegram_pending_codes WHERE code = :code";
             $deleteStmt = $this->db->prepare($deleteQuery);
             $deleteStmt->bindParam(':code', $code);
             $deleteStmt->execute();
+            
+            error_log("Pending code deleted: $code");
 
             $this->sendMessage($chatId, "✅ Your ChatMe account has been successfully connected!\n\nYou will now receive notifications about new messages, guests, and comments here on Telegram.");
         } else {
+            error_log("Failed to create Telegram connection for user ID: $userId");
             $this->sendMessage($chatId, "Connection failed. Please try again.");
         }
     }
