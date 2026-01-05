@@ -37,18 +37,20 @@ export class TimestampService {
 
   /**
    * Format Unix timestamp to human-readable date string
-   * @param unixTimestamp Unix timestamp in seconds
+   * @param unixTimestamp Unix timestamp in seconds or milliseconds
    * @param format Format string (uses Intl.DateTimeFormat)
-   * @returns Formatted date string
+   * @returns Formatted date string or 'Invalid Date' if timestamp is invalid
    */
   formatDate(unixTimestamp: number | null | undefined, format: Intl.DateTimeFormatOptions = {}): string {
-    if (!unixTimestamp) {
+    if (unixTimestamp === null || unixTimestamp === undefined) {
       return '';
     }
-    const date = this.unixToDate(unixTimestamp);
+    
+    const date = this.toValidDate(unixTimestamp);
     if (!date) {
-      return '';
+      return 'Invalid Date';
     }
+
     const defaultFormat: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: 'short',
@@ -61,44 +63,147 @@ export class TimestampService {
   }
 
   /**
+   * Convert to a valid Date object, handling both seconds and milliseconds
+   * @param timestamp Unix timestamp (seconds or milliseconds)
+   * @returns Valid Date object or null if invalid
+   */
+  private toValidDate(timestamp: number | any): Date | null {
+    if (typeof timestamp !== 'number') {
+      if (timestamp instanceof Date) {
+        return isNaN(timestamp.getTime()) ? null : timestamp;
+      }
+      return null;
+    }
+
+    let date: Date;
+    if (timestamp < 10000000000) {
+      date = new Date(timestamp * 1000);
+    } else {
+      date = new Date(timestamp);
+    }
+
+    return isNaN(date.getTime()) ? null : date;
+  }
+
+  /**
+   * Safe format of timestamp for display - handles invalid dates
+   * @param timestamp Unix timestamp in seconds or milliseconds
+   * @param formatOptions Date format options
+   * @returns Formatted date string
+   */
+  safeFormatDate(timestamp: number | Date | null | undefined, formatOptions: Intl.DateTimeFormatOptions = {}): string {
+    if (timestamp === null || timestamp === undefined) {
+      return '';
+    }
+
+    const date = this.toValidDate(typeof timestamp === 'number' ? timestamp : timestamp instanceof Date ? timestamp.getTime() : null);
+    if (!date) {
+      return 'Invalid Date';
+    }
+
+    const defaultFormat: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+
+    try {
+      return date.toLocaleDateString(undefined, { ...defaultFormat, ...formatOptions });
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  }
+
+  /**
+   * Format timestamp as time only (HH:mm) - handles invalid dates
+   * @param timestamp Unix timestamp
+   * @returns Formatted time string
+   */
+  safeFormatTime(timestamp: number | Date | null | undefined): string {
+    if (timestamp === null || timestamp === undefined) {
+      return '';
+    }
+
+    const date = this.toValidDate(typeof timestamp === 'number' ? timestamp : timestamp instanceof Date ? timestamp.getTime() : null);
+    if (!date) {
+      return 'Invalid Date';
+    }
+
+    try {
+      return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  }
+
+  /**
+   * Format timestamp as date only - handles invalid dates
+   * @param timestamp Unix timestamp
+   * @returns Formatted date string
+   */
+  safeFormatDateOnly(timestamp: number | Date | null | undefined): string {
+    if (timestamp === null || timestamp === undefined) {
+      return '';
+    }
+
+    const date = this.toValidDate(typeof timestamp === 'number' ? timestamp : timestamp instanceof Date ? timestamp.getTime() : null);
+    if (!date) {
+      return 'Invalid Date';
+    }
+
+    try {
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  }
+
+  /**
    * Format Unix timestamp as relative time (e.g., "2 hours ago")
-   * @param unixTimestamp Unix timestamp in seconds
-   * @returns Relative time string
+   * @param unixTimestamp Unix timestamp in seconds or milliseconds
+   * @returns Relative time string or 'Invalid Date' if timestamp is invalid
    */
   formatRelativeTime(unixTimestamp: number | null | undefined): string {
     if (!unixTimestamp) {
       return '';
     }
 
-    const date = this.unixToDate(unixTimestamp);
+    const date = this.toValidDate(unixTimestamp);
     if (!date) {
-      return '';
+      return 'Invalid Date';
     }
 
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffSeconds = Math.floor(diffMs / 1000);
-    const diffMinutes = Math.floor(diffSeconds / 60);
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
+    try {
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffSeconds = Math.floor(diffMs / 1000);
+      const diffMinutes = Math.floor(diffSeconds / 60);
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
 
-    if (diffSeconds < 60) {
-      return 'just now';
-    } else if (diffMinutes < 60) {
-      return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    } else if (diffDays < 7) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    } else if (diffDays < 30) {
-      const weeks = Math.floor(diffDays / 7);
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-    } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      return `${months} month${months > 1 ? 's' : ''} ago`;
-    } else {
-      const years = Math.floor(diffDays / 365);
-      return `${years} year${years > 1 ? 's' : ''} ago`;
+      if (diffSeconds < 60) {
+        return 'just now';
+      } else if (diffMinutes < 60) {
+        return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+      } else if (diffHours < 24) {
+        return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      } else if (diffDays < 7) {
+        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+      } else if (diffDays < 30) {
+        const weeks = Math.floor(diffDays / 7);
+        return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+      } else if (diffDays < 365) {
+        const months = Math.floor(diffDays / 30);
+        return `${months} month${months > 1 ? 's' : ''} ago`;
+      } else {
+        const years = Math.floor(diffDays / 365);
+        return `${years} year${years > 1 ? 's' : ''} ago`;
+      }
+    } catch (e) {
+      return 'Invalid Date';
     }
   }
 

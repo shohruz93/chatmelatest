@@ -442,6 +442,10 @@ io.on('connection', (socket) => {
             const result = await response.json();
             if (response.ok) {
                 messageData.id = result.id;
+                // Use the timestamp from PHP API (database timestamp) instead of client time
+                if (result.timestamp) {
+                    messageData.timestamp = result.timestamp;
+                }
             } else {
                 console.error('PHP API error saving message:', result);
             }

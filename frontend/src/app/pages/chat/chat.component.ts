@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -22,7 +22,8 @@ import { DatePipe } from '@angular/common';
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe],
     templateUrl: './chat.component.html',
-    styleUrls: ['./chat.component.css', './chat-messages.css']
+    styleUrls: ['./chat.component.css', './chat-messages.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     @ViewChild('messagesContainer') private scrollContainer!: ElementRef;
@@ -502,8 +503,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (!this.messages || this.messages.length === 0) return [];
 
         const sortedMessages = [...this.messages].sort((a, b) => {
-            const dateA = new Date(a.created_at).getTime();
-            const dateB = new Date(b.created_at).getTime();
+            const dateA = this.getValidDate(a.created_at)?.getTime() || 0;
+            const dateB = this.getValidDate(b.created_at)?.getTime() || 0;
             return dateA - dateB;
         });
 
@@ -511,12 +512,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         let lastDate: string | null = null;
 
         sortedMessages.forEach(msg => {
-            const date = new Date(msg.created_at);
-            const dateStr = date.toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
+            const date = this.getValidDate(msg.created_at);
+            const dateStr = date 
+                ? date.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
+                : 'Invalid Date';
 
             if (dateStr !== lastDate) {
                 groups.push({ date: dateStr, messages: [msg] });
@@ -527,6 +530,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         });
 
         return groups;
+    }
+
+    private getValidDate(timestamp: any): Date | null {
+        if (typeof timestamp === 'number') {
+            let date: Date;
+            if (timestamp < 10000000000) {
+                date = new Date(timestamp * 1000);
+            } else {
+                date = new Date(timestamp);
+            }
+            return isNaN(date.getTime()) ? null : date;
+        }
+        if (timestamp instanceof Date) {
+            return isNaN(timestamp.getTime()) ? null : timestamp;
+        }
+        return null;
+    }
+
+    formatMessageTime(timestamp: any): string {
+        const date = this.getValidDate(timestamp);
+        if (!date) {
+            return 'Invalid Date';
+        }
+        try {
+            return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return 'Invalid Date';
+        }
     }
 
     loadMessageHistory() {

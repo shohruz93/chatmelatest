@@ -4,13 +4,18 @@ class TimestampHelper {
     /**
      * Convert PHP TIMESTAMP string to Unix timestamp
      * @param string $timestamp MySQL TIMESTAMP format (YYYY-MM-DD HH:MM:SS)
-     * @return int Unix timestamp in seconds
+     * @return int|null Unix timestamp in seconds, or null if invalid
      */
     public static function toUnix($timestamp) {
         if (empty($timestamp) || $timestamp === null) {
             return null;
         }
-        return (int)strtotime($timestamp);
+        
+        $result = strtotime($timestamp);
+        if ($result === false) {
+            return null;
+        }
+        return (int)$result;
     }
 
     /**

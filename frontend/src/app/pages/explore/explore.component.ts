@@ -1,5 +1,5 @@
 
-import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -34,7 +34,8 @@ interface UserProfile {
     standalone: true,
     imports: [CommonModule, FormsModule, UserProfileModalComponent, TranslatePipe, RouterLink],
     templateUrl: './explore.component.html',
-    styleUrls: ['./explore.component.css']
+    styleUrls: ['./explore.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExploreComponent implements OnInit, OnDestroy {
     private router = inject(Router);
@@ -484,37 +485,58 @@ export class ExploreComponent implements OnInit, OnDestroy {
             .toUpperCase();
     }
 
+    trackByUserId(index: number, user: UserProfile): number {
+        return user.id;
+    }
+
+    trackByInterestId(index: number, interest: any): number {
+        return interest.id;
+    }
+
+    trackByLanguage(index: number, lang: string): string {
+        return lang;
+    }
+
     formatLastActive(lastActive: string | number | undefined): string {
         if (!lastActive) return '';
 
-        let ts: number;
-        if (typeof lastActive === 'number') {
-            // assume seconds
-            ts = lastActive * 1000;
-        } else if (/^\d+$/.test(String(lastActive))) {
-            // numeric string -> seconds
-            ts = parseInt(String(lastActive), 10) * 1000;
-        } else {
-            ts = new Date(String(lastActive)).getTime();
-        }
+        try {
+            let ts: number;
+            if (typeof lastActive === 'number') {
+                // assume seconds
+                ts = lastActive < 10000000000 ? lastActive * 1000 : lastActive;
+            } else if (/^\d+$/.test(String(lastActive))) {
+                // numeric string -> seconds
+                const num = parseInt(String(lastActive), 10);
+                ts = num < 10000000000 ? num * 1000 : num;
+            } else {
+                ts = new Date(String(lastActive)).getTime();
+            }
 
-        const lastActiveDate = new Date(ts);
-        const now = new Date();
-        const diffMs = now.getTime() - lastActiveDate.getTime();
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const lastActiveDate = new Date(ts);
+            if (isNaN(lastActiveDate.getTime())) {
+                return 'Invalid Date';
+            }
 
-        if (diffMins < 1) {
-            return 'Just now';
-        } else if (diffMins < 60) {
-            return `${diffMins}m ago`;
-        } else if (diffHours < 24) {
-            return `${diffHours}h ago`;
-        } else if (diffDays < 7) {
-            return `${diffDays}d ago`;
-        } else {
-            return lastActiveDate.toLocaleDateString();
+            const now = new Date();
+            const diffMs = now.getTime() - lastActiveDate.getTime();
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffMins < 1) {
+                return 'Just now';
+            } else if (diffMins < 60) {
+                return `${diffMins}m ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours}h ago`;
+            } else if (diffDays < 7) {
+                return `${diffDays}d ago`;
+            } else {
+                return lastActiveDate.toLocaleDateString();
+            }
+        } catch (e) {
+            return 'Invalid Date';
         }
     }
 }

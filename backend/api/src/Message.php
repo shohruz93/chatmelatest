@@ -153,7 +153,24 @@ class Message {
                     }
                 }
 
-                echo json_encode(["message" => "Message saved", "id" => $lastInsertId, "type" => $type]);
+                // Fetch the created_at timestamp from database
+                $fetchQuery = "SELECT created_at FROM messages WHERE id = :id";
+                $fetchStmt = $this->db->prepare($fetchQuery);
+                $fetchStmt->bindParam(":id", $lastInsertId);
+                $fetchStmt->execute();
+                $messageRow = $fetchStmt->fetch(PDO::FETCH_ASSOC);
+                
+                $timestamp = null;
+                if ($messageRow && isset($messageRow['created_at'])) {
+                    $timestamp = TimestampHelper::toUnix($messageRow['created_at']);
+                }
+
+                echo json_encode([
+                    "message" => "Message saved", 
+                    "id" => $lastInsertId, 
+                    "type" => $type,
+                    "timestamp" => $timestamp
+                ]);
             } else {
                 http_response_code(500);
                 echo json_encode(["message" => "Failed to save message"]);

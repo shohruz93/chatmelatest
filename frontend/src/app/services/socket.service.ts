@@ -1,6 +1,7 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, OnDestroy } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { shareReplay, takeUntil } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { LanguageService } from './language.service';
 import { environment } from '../../environments/environment';
@@ -8,18 +9,54 @@ import { environment } from '../../environments/environment';
 @Injectable({
     providedIn: 'root'
 })
-export class SocketService {
+export class SocketService implements OnDestroy {
     private socket: Socket;
     private url = environment.nodeBaseUrl;
     private languageService = inject(LanguageService);
     public isSearching = signal(false);
     public selectedLanguage = this.languageService.currentLang;
     public onlineUsers = signal<Set<number>>(new Set());
+    
+    private destroy$ = new Subject<void>();
+    
+    private matchFoundSubject = new Subject<any>();
+    private messageSubject = new Subject<any>();
+    private messageSentSubject = new Subject<any>();
+    private userStatusChangedSubject = new Subject<any>();
+    private userTypingSubject = new Subject<any>();
+    private messagesLoadedSubject = new Subject<any>();
+    private randomUserFoundSubject = new Subject<any>();
+    private chatRequestReceivedSubject = new Subject<any>();
+    private chatRequestRejectedSubject = new Subject<any>();
+    private partnerLeftSubject = new Subject<any>();
+    private noMatchFoundSubject = new Subject<any>();
+    private waitingForMatchSubject = new Subject<any>();
+    private queueUpdateSubject = new Subject<any>();
+    private matchRetrySubject = new Subject<any>();
+    private translationResultSubject = new Subject<any>();
+    private messageReadSubject = new Subject<any>();
+    
+    public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
+    public message$ = this.messageSubject.asObservable().pipe(shareReplay(1));
+    public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
+    public userStatusChanged$ = this.userStatusChangedSubject.asObservable().pipe(shareReplay(1));
+    public userTyping$ = this.userTypingSubject.asObservable().pipe(shareReplay(1));
+    public messagesLoaded$ = this.messagesLoadedSubject.asObservable().pipe(shareReplay(1));
+    public randomUserFound$ = this.randomUserFoundSubject.asObservable().pipe(shareReplay(1));
+    public chatRequestReceived$ = this.chatRequestReceivedSubject.asObservable().pipe(shareReplay(1));
+    public chatRequestRejected$ = this.chatRequestRejectedSubject.asObservable().pipe(shareReplay(1));
+    public partnerLeft$ = this.partnerLeftSubject.asObservable().pipe(shareReplay(1));
+    public noMatchFound$ = this.noMatchFoundSubject.asObservable().pipe(shareReplay(1));
+    public waitingForMatch$ = this.waitingForMatchSubject.asObservable().pipe(shareReplay(1));
+    public queueUpdate$ = this.queueUpdateSubject.asObservable().pipe(shareReplay(1));
+    public matchRetry$ = this.matchRetrySubject.asObservable().pipe(shareReplay(1));
+    public translationResult$ = this.translationResultSubject.asObservable().pipe(shareReplay(1));
+    public messageRead$ = this.messageReadSubject.asObservable().pipe(shareReplay(1));
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
 
-        this.auth.user$.subscribe(user => {
+        this.auth.user$.pipe(takeUntil(this.destroy$)).subscribe(user => {
             if (user) {
                 this.connect(user.id);
             } else {
@@ -27,7 +64,6 @@ export class SocketService {
             }
         });
 
-        // Listen for user status changes
         this.socket.on('user_status_changed', (data: { userId: any, status: string }) => {
             const users = new Set(this.onlineUsers());
             const userId = Number(data.userId);
@@ -38,23 +74,45 @@ export class SocketService {
                 users.delete(userId);
             }
             this.onlineUsers.set(users);
+            this.userStatusChangedSubject.next(data);
         });
 
-        // Listen for online users list
         this.socket.on('online_users_list', (userIds: any[]) => {
             const numericIds = new Set(userIds.map(id => Number(id)));
             this.onlineUsers.set(numericIds);
         });
 
-        // Ensure we send register on low-level connect (covers cases where emit happens before manual connect)
+        this.socket.on('match_found', (data) => this.matchFoundSubject.next(data));
+        this.socket.on('message', (data) => this.messageSubject.next(data));
+        this.socket.on('message_sent', (data) => this.messageSentSubject.next(data));
+        this.socket.on('user_typing', (data) => this.userTypingSubject.next(data));
+        this.socket.on('messages_loaded', (data) => this.messagesLoadedSubject.next(data));
+        this.socket.on('random_user_found', (data) => this.randomUserFoundSubject.next(data));
+        this.socket.on('chat_request_received', (data) => this.chatRequestReceivedSubject.next(data));
+        this.socket.on('chat_request_rejected', () => this.chatRequestRejectedSubject.next({}));
+        this.socket.on('partner_left', (data) => this.partnerLeftSubject.next(data));
+        this.socket.on('no_match_found', (data) => this.noMatchFoundSubject.next(data));
+        this.socket.on('waiting_for_match', () => this.waitingForMatchSubject.next({}));
+        this.socket.on('queue_update', (data) => this.queueUpdateSubject.next(data));
+        this.socket.on('match_retry', (data) => this.matchRetrySubject.next(data));
+        this.socket.on('translation_result', (data) => this.translationResultSubject.next(data));
+        this.socket.on('message_read', (data) => this.messageReadSubject.next(data));
+
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
             if (current && current.id) {
                 this.socket.emit('register', current.id);
                 this.socket.emit('get_online_users');
-                console.log('Socket connected, auto-registered user', current.id);
             }
         });
+    }
+    
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        if (this.socket.connected) {
+            this.socket.disconnect();
+        }
     }
 
     connect(userId: number) {
@@ -101,27 +159,19 @@ export class SocketService {
     }
 
     onMatchFound(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('match_found', (data) => observer.next(data));
-        });
+        return this.matchFound$;
     }
 
     onMessage(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('message', (data) => observer.next(data));
-        });
+        return this.message$;
     }
 
     onMessageSent(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('message_sent', (data) => observer.next(data));
-        });
+        return this.messageSent$;
     }
 
     onUserStatusChanged(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('user_status_changed', (data) => observer.next(data));
-        });
+        return this.userStatusChanged$;
     }
 
     emitTyping(roomId: string, isTyping: boolean) {
@@ -133,9 +183,7 @@ export class SocketService {
     }
 
     onUserTyping(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('user_typing', (data) => observer.next(data));
-        });
+        return this.userTyping$;
     }
 
     loadMessages(roomId: string, limit: number = 50, offset: number = 0) {
@@ -143,9 +191,7 @@ export class SocketService {
     }
 
     onMessagesLoaded(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('messages_loaded', (data) => observer.next(data));
-        });
+        return this.messagesLoaded$;
     }
 
     // Chat Request Methods
@@ -162,52 +208,35 @@ export class SocketService {
     }
 
     onRandomUserFound(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('random_user_found', (data) => observer.next(data));
-        });
+        return this.randomUserFound$;
     }
 
     onChatRequestReceived(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('chat_request_received', (data) => observer.next(data));
-        });
+        return this.chatRequestReceived$;
     }
 
     onChatRequestRejected(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('chat_request_rejected', () => observer.next({}));
-        });
+        return this.chatRequestRejected$;
     }
 
     onPartnerLeft(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('partner_left', (data) => observer.next(data));
-        });
+        return this.partnerLeft$;
     }
 
     onNoMatchFound(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('no_match_found', (data) => observer.next(data));
-        });
+        return this.noMatchFound$;
     }
 
-
     onWaitingForMatch(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('waiting_for_match', () => observer.next({}));
-        });
+        return this.waitingForMatch$;
     }
 
     onQueueUpdate(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('queue_update', (data) => observer.next(data));
-        });
+        return this.queueUpdate$;
     }
 
     onMatchRetry(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('match_retry', (data) => observer.next(data));
-        });
+        return this.matchRetry$;
     }
 
     submitMatchFeedback(matchId: number, rating: number, feedback: string) {
@@ -215,15 +244,11 @@ export class SocketService {
     }
 
     onTranslationResult(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('translation_result', (data) => observer.next(data));
-        });
+        return this.translationResult$;
     }
 
     onMessageRead(): Observable<any> {
-        return new Observable(observer => {
-            this.socket.on('message_read', (data) => observer.next(data));
-        });
+        return this.messageRead$;
     }
 
     // Generic methods for raw access

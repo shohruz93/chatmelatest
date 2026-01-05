@@ -124,7 +124,7 @@
                     }
 
                     <div class="message-meta">
-                        <span class="message-time">{{ msg.created_at | date:'shortTime' }}</span>
+                        <span class="message-time">{{ formatMessageTime(msg.created_at) }}</span>
                         @if (msg.type === 'sent') {
                         <span class="message-status">
                             @if (msg.status === 'sending') {
