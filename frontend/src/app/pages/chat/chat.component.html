@@ -1,7 +1,7 @@
 <div class="chat-page">
     <!-- Header -->
     <header class="chat-header glass-panel">
-        @if (partnerId) {
+        @if (partnerId || roomId) {
         <div class="header-user-info" (click)="openPartnerProfile()" style="cursor: pointer;">
             <div class="avatar-container">
                 <img [src]="partnerAvatar || 'default-avatar.png'" alt="Partner Avatar" class="header-avatar">
@@ -46,7 +46,7 @@
                 <div class="history-progress"></div>
             </div>
             }
-            @if (!partnerId) {
+            @if (!partnerId && !roomId) {
             <div class="empty-state">
                 <div class="empty-icon">👋</div>
                 <h3>{{ 'CHAT.EMPTY_STATE_TITLE' | translate }}</h3>
@@ -163,7 +163,7 @@
     </main>
 
     <!-- Input Area -->
-    @if (partnerId) {
+    @if (partnerId || roomId) {
     <footer class="chat-input-area glass-panel">
         @if (editingMessage || replyingToMessage) {
         <div class="input-preview-bar">

@@ -17,11 +17,14 @@ import { takeUntil } from 'rxjs/operators';
 import { OnDestroy } from '@angular/core';
 
 import { TelegramService } from '../../services/telegram.service';
+import { GamificationService } from '../../services/gamification.service';
+import { WalletComponent } from '../../components/gamification/wallet/wallet.component';
+import { MissionsComponent } from '../../components/gamification/missions/missions.component';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe, UnixDatePipe],
+    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe, UnixDatePipe, WalletComponent, MissionsComponent],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -32,9 +35,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private countryService = inject(CountryService);
     private telegramService = inject(TelegramService);
+    private gameService = inject(GamificationService);
 
     private appVersionService = inject(AppVersionService);
-    
+
     private destroy$ = new Subject<void>();
     private telegramPollSubscription: Subscription | null = null;
 
@@ -168,6 +172,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
                 this.loadComments(userId);
                 this.loading = false;
+
+                if (this.isOwnProfile) {
+                    this.gameService.setWalletState(data.coins, data.xp);
+                }
             },
             error: (err) => {
                 console.error('Error loading profile', err);
@@ -486,7 +494,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     this.telegramDeepLink = res.deepLink;
                     this.telegramBotName = res.botUsername;
                     this.showTelegramConnect = true;
-                    
+
                     this.startTelegramPolling();
                 }
                 this.telegramLoading = false;
@@ -501,21 +509,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     private startTelegramPolling() {
         if (this.telegramPollingActive) return;
-        
+
         this.telegramPollingActive = true;
         let pollCount = 0;
         const maxPolls = 60;
-        
+
         this.telegramPollSubscription = interval(2000)
             .pipe(takeUntil(this.destroy$))
             .subscribe(() => {
                 pollCount++;
-                
+
                 if (pollCount > maxPolls) {
                     this.stopTelegramPolling();
                     return;
                 }
-                
+
                 this.telegramService.getStatus(this.currentUser.id).subscribe({
                     next: (status) => {
                         if (status.connected) {

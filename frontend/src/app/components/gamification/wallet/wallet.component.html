@@ -1,0 +1,19 @@
+<div class="wallet-container">
+    <div class="currency-card coins">
+        <div class="icon-wrapper spin-animation">🪙</div>
+        <div class="amount">
+            <span class="value">{{ gameService.userCoins() }}</span>
+            <span class="label">Coins</span>
+        </div>
+    </div>
+
+    <div class="currency-card xp">
+        <div class="xp-info">
+            <span class="level-badge">Lvl {{ level }}</span>
+            <span class="xp-text">{{ currentXpInLevel }} / {{ maxLevelXp }} XP</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="progressPercent"></div>
+        </div>
+    </div>
+</div>

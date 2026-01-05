@@ -21,6 +21,7 @@ require_once __DIR__ . '/../src/Push.php';
 require_once __DIR__ . '/../src/AppVersion.php';
 require_once __DIR__ . '/../src/Telegram.php';
 require_once __DIR__ . '/../src/TelegramWebhook.php';
+require_once __DIR__ . '/../src/GamificationController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -44,6 +45,7 @@ $push = new Push($db);
 $appVersion = new AppVersion($db);
 $telegram = new Telegram($db);
 $telegramWebhook = new TelegramWebhook($db);
+$gamificationController = new GamificationController();
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -145,6 +147,15 @@ $router->add('POST', '/profile/comment/reply', function() use ($profile) {
 
 $router->add('POST', '/profile/comment/like', function() use ($profile) {
     $profile->likeComment();
+});
+
+// Gamification Routes
+$router->add('GET', '/gamification/missions', function() use ($gamificationController) {
+    $gamificationController->getMissions();
+});
+
+$router->add('POST', '/gamification/claim', function() use ($gamificationController) {
+    $gamificationController->claimMission();
 });
 
 // Match Routes

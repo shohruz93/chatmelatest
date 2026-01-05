@@ -301,4 +301,18 @@ class Auth {
             ]
         ]);
     }
+    public static function validateToken($token) {
+        $json = base64_decode($token, true);
+        if (!$json) {
+            throw new Exception("Invalid token encoding");
+        }
+        $data = json_decode($json);
+        if (!$data || !isset($data->exp)) {
+            throw new Exception("Invalid token data");
+        }
+        if ($data->exp < time()) {
+            throw new Exception("Token expired");
+        }
+        return $data;
+    }
 }

@@ -1,0 +1,43 @@
+<div class="missions-container">
+    <h3 class="missions-title">Daily Missions</h3>
+    <div class="missions-list">
+        <div *ngFor="let mission of missions()" class="mission-card" [class.completed]="mission.status === 'completed'"
+            [class.claimed]="mission.status === 'claimed'">
+
+            <div class="mission-icon">
+                <span class="material-icons">{{mission.icon || 'star'}}</span>
+            </div>
+
+            <div class="mission-content">
+                <div class="mission-header">
+                    <span class="mission-title">{{mission.title}}</span>
+                    <span class="mission-rewards">
+                        <span class="reward-pill coin">+{{mission.reward_coins}} <span
+                                class="coin-icon">🪙</span></span>
+                        <span class="reward-pill xp">+{{mission.xp_reward}} XP</span>
+                    </span>
+                </div>
+                <p class="mission-desc">{{mission.description}}</p>
+
+                <div class="mission-progress" *ngIf="mission.status !== 'claimed'">
+                    <div class="progress-track">
+                        <div class="progress-bar" [style.width.%]="getProgressPercent(mission)"></div>
+                    </div>
+                    <span class="progress-text">{{mission.progress || 0}}/{{mission.condition_value}}</span>
+                </div>
+            </div>
+
+            <button class="action-btn" [class.claim-btn]="mission.status === 'completed'"
+                [class.active-btn]="mission.status === 'active'" [disabled]="mission.status !== 'completed'"
+                (click)="onClaim(mission)">
+                <span *ngIf="mission.status === 'active'">Active</span>
+                <span *ngIf="mission.status === 'completed'">Claim</span>
+                <span *ngIf="mission.status === 'claimed'">Done</span>
+            </button>
+        </div>
+
+        <div *ngIf="missions().length === 0" class="no-missions">
+            <p>No missions available right now.</p>
+        </div>
+    </div>
+</div>
