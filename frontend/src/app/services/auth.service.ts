@@ -19,7 +19,9 @@ export class AuthService {
     ) {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
-            this.userSubject.next(JSON.parse(savedUser));
+            const user = JSON.parse(savedUser);
+            this.userSubject.next(user);
+            this.refreshProfile(user.id);
         }
 
         // Listen to Firebase auth state changes
@@ -126,5 +128,15 @@ export class AuthService {
         const updatedUser = { ...this.userSubject.value, ...userData };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         this.userSubject.next(updatedUser);
+    }
+    refreshProfile(userId: number) {
+        this.api.get(`/profile?userId=${userId}`).subscribe({
+            next: (profile: any) => {
+                if (profile) {
+                    this.updateUser(profile);
+                }
+            },
+            error: (err) => console.error('Failed to refresh profile', err)
+        });
     }
 }

@@ -63,6 +63,13 @@ export class DashboardComponent implements OnInit {
     ];
 
     ngOnInit() {
+        this.auth.user$.subscribe(user => {
+            this.currentUser = user;
+            if (this.currentUser) {
+                this.updateUserInfo();
+            }
+        });
+
         let theme = localStorage.getItem('theme');
         if (!theme) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -71,22 +78,9 @@ export class DashboardComponent implements OnInit {
         this.isDarkMode.set(theme === 'dark');
         document.documentElement.setAttribute('data-theme', theme);
 
-        if (this.currentUser) {
-            // Get avatar - database avatar takes priority over Google photoURL
-            let avatar = this.currentUser.avatar || this.currentUser.photoURL || null;
-
-            // Normalize avatar URL if it's a relative path
-            if (avatar && !avatar.startsWith('http')) {
-                avatar = `${this.api.phpBaseUrl}${avatar}`;
-            }
-
-            this.userAvatar = avatar;
-            this.userDisplayName = this.currentUser.displayName || this.currentUser.name || 'User';
-            this.userEmail = this.currentUser.email || '';
-        }
-
         this.checkUnread();
         this.checkNewGuests();
+
 
         // Refresh unread/guests count on navigation
         this.router.events.subscribe(() => {
@@ -208,6 +202,22 @@ export class DashboardComponent implements OnInit {
         setTimeout(() => {
             this.socketService.isSearching.set(false);
         }, 30000);
+    }
+
+    updateUserInfo() {
+        if (this.currentUser) {
+            // Get avatar - database avatar takes priority over Google photoURL
+            let avatar = this.currentUser.avatar || this.currentUser.photoURL || null;
+
+            // Normalize avatar URL if it's a relative path
+            if (avatar && !avatar.startsWith('http')) {
+                avatar = `${this.api.phpBaseUrl}${avatar}`;
+            }
+
+            this.userAvatar = avatar;
+            this.userDisplayName = this.currentUser.displayName || this.currentUser.name || 'User';
+            this.userEmail = this.currentUser.email || '';
+        }
     }
 
     setLanguage(lang: string) {

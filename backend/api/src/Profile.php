@@ -21,6 +21,7 @@ class Profile {
     public function get($userId) {
         $profile = $this->user->getProfile($userId);
         if ($profile) {
+            $profile['is_admin'] = (int)($profile['is_admin'] ?? 0);
             // Get interests
             $query = "SELECT i.id, i.name FROM interests i 
                       JOIN user_interests ui ON i.id = ui.interest_id 

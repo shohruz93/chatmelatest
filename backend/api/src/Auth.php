@@ -128,7 +128,7 @@ class Auth {
                         "native_language" => $userProfile['native_language'],
                         "learning_language" => $userProfile['learning_language'],
                         "interests" => $interests,
-                        "is_admin" => $userProfile['is_admin']
+                        "is_admin" => (int)$userProfile['is_admin']
                     ]
                 ]);
             } else {
@@ -297,7 +297,7 @@ class Auth {
                 "bio" => $userProfile['bio'] ?? null,
                 "gender" => $userProfile['gender'] ?? null,
                 "location" => $userProfile['location'] ?? null,
-                "is_admin" => $userProfile['is_admin'] ?? 0
+                "is_admin" => (int)($userProfile['is_admin'] ?? 0)
             ]
         ]);
     }
