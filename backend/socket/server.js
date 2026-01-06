@@ -439,15 +439,25 @@ io.on('connection', (socket) => {
                     replyToMessageId: replyToMessageId
                 })
             });
-            const result = await response.json();
-            if (response.ok) {
+            
+            const responseText = await response.text();
+            let result = {};
+            
+            if (responseText) {
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseErr) {
+                    console.error('Failed to parse PHP API response:', responseText);
+                }
+            }
+            
+            if (response.ok && result.id) {
                 messageData.id = result.id;
-                // Use the timestamp from PHP API (database timestamp) instead of client time
                 if (result.timestamp) {
                     messageData.timestamp = result.timestamp;
                 }
             } else {
-                console.error('PHP API error saving message:', result);
+                console.error('PHP API error saving message:', result, 'Status:', response.status);
             }
         } catch (err) {
             console.error('Error calling PHP API to save message:', err);

@@ -42,11 +42,13 @@
     <main class="messages-container" #messagesContainer (scroll)="onScroll($event)">
         <div class="messages-content">
             @if (isLoadingHistory) {
-            <div class="history-loading-bar">
-                <div class="history-progress"></div>
+            <div class="loading-container">
+                <div class="beautiful-loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+                <p class="loading-text">{{ 'CHAT.LOADING_MESSAGES' | translate }}</p>
             </div>
-            }
-            @if (!partnerId && !roomId) {
+            } @else if (!partnerId && !roomId) {
             <div class="empty-state">
                 <div class="empty-icon">👋</div>
                 <h3>{{ 'CHAT.EMPTY_STATE_TITLE' | translate }}</h3>
@@ -54,12 +56,18 @@
             </div>
             }
 
-            @for (group of groupedMessages; track group.date) {
+            @for (group of groupedMessages; track trackByGroup($index, group)) {
             <div class="date-separator">
                 <span>{{ group.date }}</span>
             </div>
 
-            @for (msg of group.messages; track msg.id || $index) {
+            @for (msg of group.messages; track trackByMessageId($index, msg)) {
+
+            @if (msg.type === 'system') {
+            <div class="message-system">
+                <span class="system-message">{{ msg.content }}</span>
+            </div>
+            } @else {
             <div class="message-wrapper"
                 [ngClass]="{'message-sent': msg.type === 'sent', 'message-received': msg.type !== 'sent'}">
 
@@ -149,6 +157,7 @@
             </div>
             }
             }
+            }
 
             @if (isPartnerTyping) {
             <div class="typing-indicator-wrapper">
@@ -169,7 +178,8 @@
         <div class="input-preview-bar">
             <div class="preview-content">
                 <span class="preview-label">
-                    {{ editingMessage ? 'Editing message' : 'Replying to ' + replyingToMessage.senderName }}
+                    {{ editingMessage ? ('CHAT.EDITING_MESSAGE' | translate) : (('CHAT.REPLYING_TO' | translate) + ' ' +
+                    replyingToMessage.senderName) }}
                 </span>
                 <p class="preview-text">{{ editingMessage ? editingMessage.content : replyingToMessage.content }}</p>
             </div>
@@ -226,9 +236,7 @@
         <div class="sticker-picker glass-panel">
             <div class="sticker-grid">
                 @for (sticker of stickers; track $index) {
-                <button (click)="sendSticker(sticker)" class="sticker-item">
-                    {{ sticker }}
-                </button>
+                <button (click)="sendSticker(sticker)" class="sticker-item">{{ sticker }}</button>
                 }
             </div>
         </div>

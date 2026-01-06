@@ -209,7 +209,10 @@ export class LanguageService {
                 'ANY_LOCATION': 'Any Location',
                 'ONLINE_ONLY': 'Online Only',
                 'SEARCH': 'Search',
-                'RECORDING': 'Recording...'
+                'RECORDING': 'Recording...',
+                'EDITING_MESSAGE': 'Editing message',
+                'REPLYING_TO': 'Replying to',
+                'LOADING_MESSAGES': 'Loading messages...'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -378,7 +381,10 @@ export class LanguageService {
                 'ANY_LOCATION': 'Любое местоположение',
                 'ONLINE_ONLY': 'Только онлайн',
                 'SEARCH': 'Поиск',
-                'RECORDING': 'Запись...'
+                'RECORDING': 'Запись...',
+                'EDITING_MESSAGE': 'Редактирование',
+                'REPLYING_TO': 'В ответ на',
+                'LOADING_MESSAGES': 'Загрузка сообщений...'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',

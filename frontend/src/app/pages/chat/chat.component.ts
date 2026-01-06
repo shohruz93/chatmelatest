@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -15,7 +15,6 @@ import { CountrySelectComponent } from '../../components/country-select/country-
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ImageModalComponent } from '../../components/image-modal/image-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-chat',
@@ -35,6 +34,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private api = inject(ApiService);
     private countryService = inject(CountryService);
     private timestampService = inject(TimestampService);
+    private cdr = inject(ChangeDetectorRef);
 
     messages: any[] = [];
     newMessage: string = '';
@@ -219,7 +219,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             const matchMsg = this.compatibilityScore > 0
                 ? `Match found! Compatibility: ${this.compatibilityScore.toFixed(0)}%`
                 : 'Match found! Say hello.';
-            this.messages.push({ type: 'system', content: matchMsg });
+            this.messages = [...this.messages, { type: 'system', content: matchMsg }];
+            this.cdr.markForCheck();
 
             this.loadMessageHistory();
 
@@ -278,8 +279,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     timestamp *= 1000;
                 }
 
-                // Add message with proper ID
-                this.messages.push({
+                // Add message with proper ID (immutable update)
+                this.messages = [...this.messages, {
                     id: message.id || Date.now(),
                     type: 'received',
                     content: message.content,
@@ -289,7 +290,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     originalLang: message.originalLang,
                     replyTo: message.replyTo,
                     senderName: message.senderName || this.partnerName
-                });
+                }];
+                this.cdr.markForCheck();
 
                 if (shouldScroll) {
                     this.scrollToBottom();
@@ -304,23 +306,30 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.socketService.onMessageSent().subscribe((messageData: any) => {
             if (messageData.roomId !== this.roomId) return;
 
-            // Find the first sending message with same content and update it
-            const pending = this.messages.find(m => m.type === 'sent' && m.status === 'sending' && m.content === messageData.content);
-            if (pending) {
-                pending.status = 'sent';
-                if (messageData.id) pending.id = messageData.id;
+            // Find the first sending message with same content and update it (immutable)
+            const pendingIndex = this.messages.findIndex(m => m.type === 'sent' && m.status === 'sending' && m.content === messageData.content);
+            if (pendingIndex !== -1) {
+                const updatedMessage = { ...this.messages[pendingIndex], status: 'sent' };
+                if (messageData.id) updatedMessage.id = messageData.id;
                 if (messageData.timestamp) {
                     let timestamp = messageData.timestamp;
                     if (typeof timestamp === 'number' && timestamp < 10000000000) {
                         timestamp *= 1000;
                     }
-                    pending.created_at = timestamp;
+                    updatedMessage.created_at = timestamp;
                 }
+                this.messages = [
+                    ...this.messages.slice(0, pendingIndex),
+                    updatedMessage,
+                    ...this.messages.slice(pendingIndex + 1)
+                ];
+                this.cdr.markForCheck();
             }
         });
 
         this.typingSub = this.socketService.onUserTyping().subscribe((data: any) => {
             this.partnerTyping = data.isTyping;
+            this.cdr.markForCheck();
 
             if (this.partnerTyping && this.isUserNearBottom()) {
                 this.scrollToBottom();
@@ -329,6 +338,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             if (this.partnerTyping) {
                 setTimeout(() => {
                     this.partnerTyping = false;
+                    this.cdr.markForCheck();
                 }, 3000);
             }
         });
@@ -338,8 +348,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.showPartnerLeftBanner = true;
             this.showRatingModal = true;
             this.partnerIdToRate = data.userId;
-            this.messages.push({ type: 'system', content: 'Partner has left the chat.' });
+            this.messages = [...this.messages, { type: 'system', content: 'Partner has left the chat.' }];
             this.partnerStatus = 'offline';
+            this.cdr.markForCheck();
         });
 
         // Listen for random user found
@@ -459,6 +470,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     allMessagesLoaded = false;
     private scrollOffset = 0;
 
+    // Memoization for grouped messages
+    private cachedGroupedMessages: any[] = [];
+    private lastMessagesRef: any[] | null = null;
+
     ngOnDestroy() {
         if (this.matchSub) this.matchSub.unsubscribe();
         if (this.messageSub) this.messageSub.unsubscribe();
@@ -502,6 +517,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     get groupedMessages() {
         if (!this.messages || this.messages.length === 0) return [];
 
+        if (this.messages === this.lastMessagesRef && this.cachedGroupedMessages.length > 0) {
+            return this.cachedGroupedMessages;
+        }
+
         const sortedMessages = [...this.messages].sort((a, b) => {
             const dateA = this.getValidDate(a.created_at)?.getTime() || 0;
             const dateB = this.getValidDate(b.created_at)?.getTime() || 0;
@@ -513,12 +532,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         sortedMessages.forEach(msg => {
             const date = this.getValidDate(msg.created_at);
-            const dateStr = date 
+            const dateStr = date
                 ? date.toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                  })
+                })
                 : 'Invalid Date';
 
             if (dateStr !== lastDate) {
@@ -529,6 +548,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         });
 
+        this.lastMessagesRef = this.messages;
+        this.cachedGroupedMessages = groups;
         return groups;
     }
 
@@ -563,23 +584,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     loadMessageHistory() {
         if (!this.roomId) return;
         this.isLoadingHistory = true;
-        this.socketService.loadMessages(this.roomId, 30, 0);
+        this.messages = [];
+        this.cachedGroupedMessages = [];
+        this.lastMessagesRef = null;
+        this.cdr.markForCheck();
 
-        const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
-            if (data.roomId === this.roomId && !this.isLoadingMore) { // Only handle initial load here
-                this.messages = data.messages.map((msg: any) => this.mapMessage(msg));
+        this.socketService.loadMessages(this.roomId, 50, 0);
 
-                // Mark messages as read
-                this.markMessagesAsRead();
+        const sub = this.socketService.onMessagesLoaded().subscribe({
+            next: (data: any) => {
+                if (data.roomId === this.roomId && !this.isLoadingMore) {
+                    this.messages = data.messages.map((msg: any) => this.mapMessage(msg));
+                    this.cachedGroupedMessages = [];
+                    this.lastMessagesRef = null;
 
-                // Scroll to bottom on initial load
-                this.scrollToBottom('auto');
+                    this.markMessagesAsRead();
+                    setTimeout(() => {
+                        this.scrollToBottom('auto');
+                    }, 0);
+                    this.isLoadingHistory = false;
+                    this.cdr.markForCheck();
+                    sub.unsubscribe();
+                }
+            },
+            error: (err) => {
                 this.isLoadingHistory = false;
-                sub.unsubscribe(); // Unsubscribe after initial load
+                this.cdr.markForCheck();
+                sub.unsubscribe();
             }
-        }, (err) => {
-            this.isLoadingHistory = false;
-            sub.unsubscribe();
         });
     }
 
@@ -593,26 +625,33 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.socketService.loadMessages(this.roomId, 30, offset);
 
         // We need a one-time subscription for this specific load
-        const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
-            if (data.roomId === this.roomId) {
-                if (data.messages.length === 0) {
-                    this.allMessagesLoaded = true;
-                } else {
-                    const newMessages = data.messages.map((msg: any) => this.mapMessage(msg));
+        const sub = this.socketService.onMessagesLoaded().subscribe({
+            next: (data: any) => {
+                if (data.roomId === this.roomId) {
+                    if (data.messages.length === 0) {
+                        this.allMessagesLoaded = true;
+                    } else {
+                        const newMessages = data.messages.map((msg: any) => this.mapMessage(msg));
+                        this.messages = [...newMessages, ...this.messages];
 
-                    this.messages = [...newMessages, ...this.messages];
-
-                    // Restore scroll position
-                    setTimeout(() => {
-                        if (this.scrollContainer) {
-                            const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
-                            this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
-                        }
-                    }, 0);
+                        // Restore scroll position
+                        setTimeout(() => {
+                            if (this.scrollContainer) {
+                                const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+                                this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
+                            }
+                        }, 0);
+                    }
                 }
+                this.isLoadingMore = false;
+                this.cdr.markForCheck();
+                sub.unsubscribe();
+            },
+            error: (err) => {
+                this.isLoadingMore = false;
+                this.cdr.markForCheck();
+                sub.unsubscribe();
             }
-            this.isLoadingMore = false;
-            sub.unsubscribe();
         });
     }
 
@@ -633,11 +672,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 messageId: this.editingMessage.id,
                 content: content
             });
-            const msgToEdit = this.messages.find(m => m.id === this.editingMessage.id);
-            if (msgToEdit) {
-                msgToEdit.content = content;
-                msgToEdit.translatedContent = null;
-                msgToEdit.showTranslation = false;
+            // Immutable update for edited message
+            const editIndex = this.messages.findIndex(m => m.id === this.editingMessage.id);
+            if (editIndex !== -1) {
+                const updatedMsg = {
+                    ...this.messages[editIndex],
+                    content,
+                    translatedContent: null,
+                    showTranslation: false
+                };
+                this.messages = [
+                    ...this.messages.slice(0, editIndex),
+                    updatedMsg,
+                    ...this.messages.slice(editIndex + 1)
+                ];
+                this.cdr.markForCheck();
             }
             this.cancelInputMode();
             this.newMessage = '';
@@ -655,7 +704,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.roomId) {
             this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo);
         } else if (this.waitingForResponse) {
-            this.pendingMessages.push(content);
+            this.pendingMessages = [...this.pendingMessages, content];
         }
 
         const messageObj: any = {
@@ -670,7 +719,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             senderName: this.currentUser.name
         };
 
-        this.messages.push(messageObj);
+        this.messages = [...this.messages, messageObj];
+        this.cdr.markForCheck();
 
         this.newMessage = '';
         this.cancelInputMode();
@@ -957,9 +1007,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     onTyping() {
-        if (this.roomId) {
-            this.socketService.sendTyping(this.roomId);
-        }
+        // Delegate to onInputChange for proper debounced typing indicator
+        this.onInputChange();
     }
 
     toggleRecording() {
@@ -1064,8 +1113,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         if (content && typeof content === 'string') {
-            if (content.startsWith('data:audio') || content.startsWith('data:video') || 
-                content.endsWith('.webm') || content.endsWith('.mp3') || 
+            if (content.startsWith('data:audio') || content.startsWith('data:video') ||
+                content.endsWith('.webm') || content.endsWith('.mp3') ||
                 content.endsWith('.wav') || content.endsWith('.aac') || content.endsWith('.m4a')) {
                 return 'voice';
             }
@@ -1098,5 +1147,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
 
         return this.timestampService.formatRelativeTime(unixTimestamp);
+    }
+
+    trackByMessageId(index: number, msg: any): any {
+        return msg.id || index;
+    }
+
+    trackByGroup(index: number, group: any): any {
+        return group.date;
     }
 }
