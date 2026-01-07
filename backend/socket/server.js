@@ -439,10 +439,10 @@ io.on('connection', (socket) => {
                     replyToMessageId: replyToMessageId
                 })
             });
-            
+
             const responseText = await response.text();
             let result = {};
-            
+
             if (responseText) {
                 try {
                     result = JSON.parse(responseText);
@@ -450,7 +450,7 @@ io.on('connection', (socket) => {
                     console.error('Failed to parse PHP API response:', responseText);
                 }
             }
-            
+
             if (response.ok && result.id) {
                 messageData.id = result.id;
                 if (result.timestamp) {
@@ -664,6 +664,19 @@ io.on('connection', (socket) => {
                     success: true,
                     translatedText: translatedText
                 });
+
+                // Track Polyglot mission (translate_message)
+                const userId = userSocketMap.get(socket.id);
+                if (userId) {
+                    fetch('https://shphbjeio23.chatme.tj/gamification/track', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: userId,
+                            conditionKey: 'translate_message'
+                        })
+                    }).catch(err => console.error('Error tracking translation progress:', err));
+                }
             } else {
                 throw new Error('All translation services failed or returned invalid response.');
             }

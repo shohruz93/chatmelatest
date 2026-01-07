@@ -158,6 +158,10 @@ $router->add('POST', '/gamification/claim', function() use ($gamificationControl
     $gamificationController->claimMission();
 });
 
+$router->add('POST', '/gamification/track', function() use ($gamificationController) {
+    $gamificationController->trackProgress();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

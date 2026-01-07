@@ -52,6 +52,24 @@ class GamificationController {
 
         echo json_encode($missions);
     }
+    
+    // POST /gamification/track
+    public function trackProgress() {
+        // Internal tracking endpoint
+        // In a real app, this should be protected by an internal API key or similar
+        $data = json_decode(file_get_contents("php://input"));
+        
+        if (!isset($data->userId) || !isset($data->conditionKey)) {
+            http_response_code(400);
+            echo json_encode(["message" => "Missing userId or conditionKey"]);
+            return;
+        }
+
+        $amount = $data->amount ?? 1;
+        self::updateProgress($data->userId, $data->conditionKey, $amount);
+        
+        echo json_encode(["message" => "Progress tracked"]);
+    }
 
     // POST /gamification/claim
     public function claimMission() {

@@ -131,6 +131,25 @@ class Message {
                 
                 // Track gamification progress
                 GamificationController::updateProgress($data['senderId'], 'send_message');
+
+                // Track Social Butterfly (unique users today)
+                if (!empty($data['receiverId'])) {
+                    $checkQuery = "SELECT id FROM messages 
+                                   WHERE sender_id = :sid AND receiver_id = :rid 
+                                   AND DATE(created_at) = CURDATE() 
+                                   AND id != :current_id 
+                                   LIMIT 1";
+                    $checkStmt = $this->db->prepare($checkQuery);
+                    $checkStmt->execute([
+                        ':sid' => $data['senderId'],
+                        ':rid' => $data['receiverId'],
+                        ':current_id' => $lastInsertId
+                    ]);
+                    
+                    if ($checkStmt->rowCount() == 0) {
+                        GamificationController::updateProgress($data['senderId'], 'chat_unique_users');
+                    }
+                }
                 
                 if (!empty($data['receiverId'])) {
                     // Check if receiver is online

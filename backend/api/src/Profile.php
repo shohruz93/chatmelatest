@@ -4,6 +4,7 @@ require_once 'User.php';
 require_once 'Notification.php';
 require_once 'TimestampHelper.php';
 require_once 'Telegram.php';
+require_once 'GamificationController.php';
 
 class Profile {
     private $db;
@@ -19,6 +20,9 @@ class Profile {
     }
 
     public function get($userId) {
+        // Track gamification progress for login/activity
+        GamificationController::updateProgress($userId, 'login');
+
         $profile = $this->user->getProfile($userId);
         if ($profile) {
             $profile['is_admin'] = (int)($profile['is_admin'] ?? 0);
