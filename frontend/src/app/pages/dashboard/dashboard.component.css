@@ -138,22 +138,40 @@
     white-space: nowrap;
 }
 
-.profile-status {
-    font-size: 0.875rem;
-    color: #10b981;
+.profile-stats {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
 }
 
-.profile-status::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #10b981;
-    animation: pulse 2s ease-in-out infinite;
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
 }
+
+.stat-item.coins {
+    color: #f59e0b;
+    /* Amber 500 */
+}
+
+.stat-item.xp {
+    color: #8b5cf6;
+    /* Violet 500 */
+}
+
+.stat-icon {
+    font-size: 0.875rem;
+}
+
+.stat-value {
+    letter-spacing: -0.01em;
+}
+
+/* Tooltip style if needed, but let's keep it simple first */
 
 /* Messages Button */
 .btn-messages {

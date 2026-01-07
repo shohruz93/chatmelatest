@@ -15,7 +15,16 @@
                 </div>
                 <div class="profile-info">
                     <div class="profile-name">{{ userDisplayName }}</div>
-                    <div class="profile-status">Online</div>
+                    <div class="profile-stats">
+                        <span class="stat-item coins" title="Coins">
+                            <span class="stat-icon">🪙</span>
+                            <span class="stat-value">{{ gameService.userCoins() }}</span>
+                        </span>
+                        <span class="stat-item xp" title="XP">
+                            <span class="stat-icon">⚡</span>
+                            <span class="stat-value">{{ gameService.userXp() }}</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 

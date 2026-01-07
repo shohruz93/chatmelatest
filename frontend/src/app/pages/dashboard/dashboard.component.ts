@@ -8,6 +8,7 @@ import { ApiService } from '../../services/api.service';
 import { UiService } from '../../services/ui.service';
 import { LanguageService } from '../../services/language.service';
 import { FormsModule } from '@angular/forms';
+import { GamificationService } from '../../services/gamification.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -23,6 +24,7 @@ export class DashboardComponent implements OnInit {
     private router = inject(Router);
     public ui = inject(UiService);
     public languageService = inject(LanguageService);
+    public gameService = inject(GamificationService);
 
     currentUser = this.auth.currentUserValue;
     isDarkMode = signal(false);
@@ -217,6 +219,9 @@ export class DashboardComponent implements OnInit {
             this.userAvatar = avatar;
             this.userDisplayName = this.currentUser.displayName || this.currentUser.name || 'User';
             this.userEmail = this.currentUser.email || '';
+
+            // Update gamification state
+            this.gameService.setWalletState(this.currentUser.coins, this.currentUser.xp);
         }
     }
 
