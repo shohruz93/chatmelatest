@@ -169,6 +169,11 @@ class GamificationController {
     public static function updateProgress($userId, $conditionKey, $amount = 1) {
         $db = new Database();
         $conn = $db->getConnection();
+        
+        if (!$conn) {
+            error_log("GamificationController::updateProgress - Database connection failed");
+            return;
+        }
 
         // Find active missions matching this condition
         // For daily missions, ensure we only update today's instance
@@ -220,8 +225,10 @@ class GamificationController {
             
             try {
                 $decoded = Auth::validateToken($matches[1]);
-                return $decoded->data->id ?? $decoded->sub ?? null; // Adjust based on JWT payload
+                // Auth.php returns a flat object with 'id'
+                return $decoded->id ?? $decoded->sub ?? null;
             } catch (Exception $e) {
+                error_log("GamificationController::getUserIdFromToken - Error: " . $e->getMessage());
                 return null;
             }
         }

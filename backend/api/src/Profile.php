@@ -277,6 +277,9 @@ class Profile {
             ];
             $this->notification->send($viewedId, $title, $body, $payload);
             $this->telegram->notifyNewGuest($viewedId, $viewerName ?: 'Someone');
+            
+            // Track gamification progress for the viewer
+            GamificationController::updateProgress($viewerId, 'view_profile');
         } catch (Exception $e) {
             error_log("Error sending guest notification: " . $e->getMessage());
         }
@@ -434,6 +437,8 @@ class Profile {
         $stmt->bindParam(":type_update", $type);
         
         if ($stmt->execute()) {
+            // Track gamification progress
+            GamificationController::updateProgress($userId, 'like_comment');
             echo json_encode(["message" => "Action recorded"]);
         } else {
             http_response_code(500);
@@ -457,6 +462,8 @@ class Profile {
         $stmt->bindParam(":comment", $comment);
         
         if ($stmt->execute()) {
+            // Track gamification progress
+            GamificationController::updateProgress($raterId, 'add_rating');
             echo json_encode(["message" => "Rating added", "updated" => false]);
         } else {
             http_response_code(500);
@@ -488,6 +495,9 @@ class Profile {
                 $commenterName = $this->user->getNameById($userId);
                 $commentPreview = substr($comment, 0, 100);
                 $this->telegram->notifyNewComment($ratedId, $commenterName ?: 'Someone', $commentPreview);
+                
+                // Track gamification progress
+                GamificationController::updateProgress($userId, 'add_comment');
             } catch (Exception $e) {
                 error_log("Error sending comment notification: " . $e->getMessage());
             }

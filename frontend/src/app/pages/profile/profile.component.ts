@@ -138,6 +138,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     this.api.recordView(this.currentUser.id, userId).subscribe();
                 } else if (this.isOwnProfile) {
                     this.checkTelegramStatus();
+                    
+                    // Check for edit query parameter
+                    this.route.queryParams.subscribe(queryParams => {
+                        if (queryParams['edit'] === 'true') {
+                            this.isEditing = true;
+                        }
+                    });
                 }
             }
         });

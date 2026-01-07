@@ -161,7 +161,8 @@
         </svg>
         <span>{{ 'EXPLORE_PAGE.VALIDATION_MESSAGE' | translate }}</span>
       </div>
-      <button class="btn-primary-sm" routerLink="/dashboard/profile">{{ 'EXPLORE_PAGE.COMPLETE_PROFILE' | translate
+      <button class="btn-primary-sm" [routerLink]="['/dashboard/profile']" [queryParams]="{ edit: 'true' }">{{
+        'EXPLORE_PAGE.COMPLETE_PROFILE' | translate
         }}</button>
     </div>
     }

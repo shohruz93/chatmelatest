@@ -129,6 +129,9 @@ class Message {
                 // Update sender's last active timestamp
                 $this->user->updateLastActive($data['senderId']);
                 
+                // Track gamification progress
+                GamificationController::updateProgress($data['senderId'], 'send_message');
+                
                 if (!empty($data['receiverId'])) {
                     // Check if receiver is online
                     $isOnline = $this->user->isOnline($data['receiverId']);

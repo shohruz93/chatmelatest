@@ -4,7 +4,11 @@ class Config {
     private static $config = [];
 
     public static function load() {
-        $dotenvPath = __DIR__ . '/../../.env';
+        // Try looking in the parent directory (backend/api/) and root
+        $dotenvPath = __DIR__ . '/../.env';
+        if (!is_readable($dotenvPath)) {
+            $dotenvPath = __DIR__ . '/../../.env';
+        }
         if (is_readable($dotenvPath)) {
             $lines = file($dotenvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach ($lines as $line) {
