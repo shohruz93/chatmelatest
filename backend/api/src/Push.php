@@ -19,11 +19,24 @@ class Push {
             return;
         }
 
-        $query = "INSERT INTO push_subscriptions (user_id, token, platform) 
-                  VALUES (:user_id, :token, :platform)
-                  ON DUPLICATE KEY UPDATE user_id = :user_id, platform = :platform";
-        
-        $stmt = $this->db->prepare($query);
+        // Check if user already has a subscription
+        $checkQuery = "SELECT COUNT(*) FROM push_subscriptions WHERE user_id = :user_id";
+        $checkStmt = $this->db->prepare($checkQuery);
+        $checkStmt->bindParam(":user_id", $userId);
+        $checkStmt->execute();
+        $exists = $checkStmt->fetchColumn() > 0;
+
+        if ($exists) {
+            // Update existing: Delete all old tokens for this user first to ensure 1-to-1 mapping
+            $deleteQuery = "DELETE FROM push_subscriptions WHERE user_id = :user_id";
+            $deleteStmt = $this->db->prepare($deleteQuery);
+            $deleteStmt->bindParam(":user_id", $userId);
+            $deleteStmt->execute();
+        }
+
+        // Insert new token
+        $insertQuery = "INSERT INTO push_subscriptions (user_id, token, platform) VALUES (:user_id, :token, :platform)";
+        $stmt = $this->db->prepare($insertQuery);
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":token", $token);
         $stmt->bindParam(":platform", $platform);

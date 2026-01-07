@@ -5,10 +5,12 @@ require_once __DIR__ . '/Config.php';
 class Notification {
     private $db;
     private $serviceAccountPath;
+    private $logFilePath;
 
     public function __construct($db) {
         $this->db = $db;
         $this->serviceAccountPath = __DIR__ . '/../chatme-f1d8a-firebase-adminsdk-fbsvc-60b105834e.json';
+        $this->logFilePath = __DIR__ . '/../fcm.log';
     }
 
     private function logFcm($message) {
