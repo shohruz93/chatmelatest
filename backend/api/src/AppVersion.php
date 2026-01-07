@@ -11,7 +11,7 @@ class AppVersion {
     public function getLatestVersion($platform) {
         $query = "SELECT * FROM " . $this->table_name . " 
                   WHERE platform = :platform 
-                  ORDER BY version_code DESC 
+                  ORDER BY CAST(version_code AS UNSIGNED) DESC 
                   LIMIT 1";
 
         $stmt = $this->conn->prepare($query);
