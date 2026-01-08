@@ -216,7 +216,8 @@ export class LanguageService {
                 'LOADING_MESSAGES': 'Loading messages...',
                 'INVITE_GAME': 'Invite to Game',
                 'GAME_INVITATION': 'Game Invitation',
-                'INVITED_YOU_TO_GAME': '{{name}} invited you to play Checkers for {{amount}} 🪙'
+                'INVITED_YOU_TO_GAME': '{{name}} invited you to play Checkers for {{amount}} 🪙',
+                'USER_OFFLINE': 'User is offline'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -421,7 +422,8 @@ export class LanguageService {
                 'LOADING_MESSAGES': 'Загрузка сообщений...',
                 'INVITE_GAME': 'Пригласить в игру',
                 'GAME_INVITATION': 'Приглашение в игру',
-                'INVITED_YOU_TO_GAME': '{{name}} пригласил вас сыграть в шашки на {{amount}} 🪙'
+                'INVITED_YOU_TO_GAME': '{{name}} пригласил вас сыграть в шашки на {{amount}} 🪙',
+                'USER_OFFLINE': 'Пользователь не в сети'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -623,7 +625,8 @@ export class LanguageService {
                 'RECORDING': 'Сабт...',
                 'INVITE_GAME': 'Даъват ба бозӣ',
                 'GAME_INVITATION': 'Даъвати бозӣ',
-                'INVITED_YOU_TO_GAME': '{{name}} шуморо даъват кард ба бозии шашка барои {{amount}} 🪙'
+                'INVITED_YOU_TO_GAME': '{{name}} шуморо даъват кард ба бозии шашка барои {{amount}} 🪙',
+                'USER_OFFLINE': 'Корбар ғайрифаъол аст'
             },
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',

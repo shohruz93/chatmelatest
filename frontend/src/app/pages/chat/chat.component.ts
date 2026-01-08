@@ -920,6 +920,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     sendGameInvite() {
         if (!this.partnerId) return;
+        if (!this.isPartnerOnline) {
+            alert(this.getTranslation('CHAT.USER_OFFLINE'));
+            return;
+        }
         // Default bet amount 50
         this.socketService.sendCheckersInvite(this.partnerId, 50);
         // Optionally show 'Waiting for partner to accept game...'

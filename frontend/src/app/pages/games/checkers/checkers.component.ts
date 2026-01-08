@@ -282,6 +282,12 @@ export class CheckersComponent implements OnInit, OnDestroy {
             this.socket.playNotificationSound();
         });
 
+        // Check for active game
+        const activeGame = this.socket.activeCheckersGame();
+        if (activeGame) {
+            this.initGame(activeGame);
+        }
+
         this.socket.checkersStart$.subscribe(data => {
             this.initGame(data);
         });
@@ -325,6 +331,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
         if (this.roomId()) {
             this.socket.leaveChat(this.roomId());
         }
+        this.socket.clearCheckersGame();
     }
 
     sendInvite(userId: number) {
@@ -424,6 +431,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
             this.phaserGame.destroy(true);
             this.phaserGame = undefined;
         }
+        this.socket.clearCheckersGame();
     }
 
     leaveGame() {
@@ -434,6 +442,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
                 this.phaserGame = undefined;
             }
             this.socket.leaveChat(this.roomId());
+            this.socket.clearCheckersGame();
         }
     }
 

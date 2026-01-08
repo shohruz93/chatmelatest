@@ -16,6 +16,7 @@ export class SocketService implements OnDestroy {
     public isSearching = signal(false);
     public selectedLanguage = this.languageService.currentLang;
     public onlineUsers = signal<Set<number>>(new Set());
+    public activeCheckersGame = signal<any>(null);
 
     private destroy$ = new Subject<void>();
 
@@ -51,7 +52,7 @@ export class SocketService implements OnDestroy {
     public messagesLoaded$ = this.messagesLoadedSubject.asObservable().pipe(shareReplay(1));
     public randomUserFound$ = this.randomUserFoundSubject.asObservable().pipe(shareReplay(1));
     public chatRequestReceived$ = this.chatRequestReceivedSubject.asObservable().pipe(shareReplay(1));
-    public chatRequestRejected$ = this.chatRequestRejectedSubject.asObservable().pipe(shareReplay(1));
+    public chatRequestRejected$ = this.chatRequestRejectedSubject.asObservable();
     public partnerLeft$ = this.partnerLeftSubject.asObservable().pipe(shareReplay(1));
     public noMatchFound$ = this.noMatchFoundSubject.asObservable().pipe(shareReplay(1));
     public waitingForMatch$ = this.waitingForMatchSubject.asObservable().pipe(shareReplay(1));
@@ -59,13 +60,13 @@ export class SocketService implements OnDestroy {
     public matchRetry$ = this.matchRetrySubject.asObservable().pipe(shareReplay(1));
     public translationResult$ = this.translationResultSubject.asObservable().pipe(shareReplay(1));
     public messageRead$ = this.messageReadSubject.asObservable().pipe(shareReplay(1));
-    public checkersInvite$ = this.checkersInviteSubject.asObservable().pipe(shareReplay(1));
-    public checkersStart$ = this.checkersStartSubject.asObservable().pipe(shareReplay(1));
-    public checkersMove$ = this.checkersMoveSubject.asObservable().pipe(shareReplay(1));
-    public checkersChat$ = this.checkersChatSubject.asObservable().pipe(shareReplay(1));
-    public checkersGameOver$ = this.checkersGameOverSubject.asObservable().pipe(shareReplay(1));
-    public checkersError$ = this.checkersErrorSubject.asObservable().pipe(shareReplay(1));
-    public checkersRejected$ = this.checkersRejectedSubject.asObservable().pipe(shareReplay(1));
+    public checkersInvite$ = this.checkersInviteSubject.asObservable();
+    public checkersStart$ = this.checkersStartSubject.asObservable();
+    public checkersMove$ = this.checkersMoveSubject.asObservable();
+    public checkersChat$ = this.checkersChatSubject.asObservable();
+    public checkersGameOver$ = this.checkersGameOverSubject.asObservable();
+    public checkersError$ = this.checkersErrorSubject.asObservable();
+    public checkersRejected$ = this.checkersRejectedSubject.asObservable();
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -112,7 +113,10 @@ export class SocketService implements OnDestroy {
         this.socket.on('translation_result', (data) => this.translationResultSubject.next(data));
         this.socket.on('message_read', (data) => this.messageReadSubject.next(data));
         this.socket.on('checkers_invite_received', (data) => this.checkersInviteSubject.next(data));
-        this.socket.on('checkers_start', (data) => this.checkersStartSubject.next(data));
+        this.socket.on('checkers_start', (data) => {
+            this.activeCheckersGame.set(data);
+            this.checkersStartSubject.next(data);
+        });
         this.socket.on('checkers_move', (data) => this.checkersMoveSubject.next(data));
         this.socket.on('checkers_chat', (data) => this.checkersChatSubject.next(data));
         this.socket.on('checkers_game_over', (data) => this.checkersGameOverSubject.next(data));
@@ -149,6 +153,11 @@ export class SocketService implements OnDestroy {
         if (this.socket.connected) {
             this.socket.disconnect();
         }
+        this.clearCheckersGame();
+    }
+
+    clearCheckersGame() {
+        this.activeCheckersGame.set(null);
     }
 
     findMatch(interests: any[], language: string, filters: any = {}, myProfile: any = {}) {
