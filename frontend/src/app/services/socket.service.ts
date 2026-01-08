@@ -41,6 +41,7 @@ export class SocketService implements OnDestroy {
     private checkersChatSubject = new Subject<any>();
     private checkersGameOverSubject = new Subject<any>();
     private checkersErrorSubject = new Subject<any>();
+    private checkersRejectedSubject = new Subject<any>();
 
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public message$ = this.messageSubject.asObservable().pipe(shareReplay(1));
@@ -64,6 +65,7 @@ export class SocketService implements OnDestroy {
     public checkersChat$ = this.checkersChatSubject.asObservable().pipe(shareReplay(1));
     public checkersGameOver$ = this.checkersGameOverSubject.asObservable().pipe(shareReplay(1));
     public checkersError$ = this.checkersErrorSubject.asObservable().pipe(shareReplay(1));
+    public checkersRejected$ = this.checkersRejectedSubject.asObservable().pipe(shareReplay(1));
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -115,6 +117,7 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_chat', (data) => this.checkersChatSubject.next(data));
         this.socket.on('checkers_game_over', (data) => this.checkersGameOverSubject.next(data));
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
+        this.socket.on('checkers_rejected', (data) => this.checkersRejectedSubject.next(data));
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
@@ -276,6 +279,10 @@ export class SocketService implements OnDestroy {
 
     acceptCheckersInvite(requesterSocketId: string, amount: number) {
         this.socket.emit('checkers_accept', { requesterSocketId, amount });
+    }
+
+    rejectCheckersInvite(requesterSocketId: string) {
+        this.socket.emit('checkers_reject', { requesterSocketId });
     }
 
     sendCheckersMove(roomId: string, move: any) {

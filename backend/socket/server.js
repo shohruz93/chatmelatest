@@ -706,6 +706,12 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('checkers_reject', ({ requesterSocketId }) => {
+        io.to(requesterSocketId).emit('checkers_rejected', {
+            byUserId: userSocketMap.get(socket.id)
+        });
+    });
+
     socket.on('checkers_accept', ({ requesterSocketId, amount }) => {
         const userId1 = userSocketMap.get(socket.id);
         const userId2 = userSocketMap.get(requesterSocketId);

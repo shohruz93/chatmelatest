@@ -193,7 +193,7 @@ export class LanguageService {
                 'SEND_STICKER': 'Send Sticker',
                 'VOICE_MESSAGE': 'Voice Message',
                 'RATING_TITLE': 'Rate Experience',
-                'RATING_Question': 'How was your conversation?',
+                'RATING_QUESTION': 'How was your conversation?',
                 'RATING_COMMENT_PLACEHOLDER': 'Any comments?',
                 'SKIP': 'Skip',
                 'SUBMIT': 'Submit',
@@ -255,7 +255,8 @@ export class LanguageService {
                 'LEAVE': 'Leave Game',
                 'TYPE_MESSAGE': 'Type a message...',
                 'VICTORY': 'VICTORY! You won',
-                'LOSE': 'LOSE! Better luck next time.'
+                'LOSE': 'LOSE! Better luck next time.',
+                'WAITING_ACCEPT': 'Waiting accept'
             }
         },
         'ru': {
@@ -295,7 +296,7 @@ export class LanguageService {
                 'DOWNLOAD_ANDROID': 'Android',
                 'DOWNLOAD_IPHONE': 'iPhone',
                 'DOWNLOAD_NOTE': 'Совет: отсканируйте QR-код (скоро) для быстрой установки.',
-                'FOOTER_RIGHTS': '© 2025 Chatme. Все права защищены.'
+                'FOOTER_RIGHTS': '© 2026 Chatme. Все права защищены.'
             },
             'AUTH': {
                 'WELCOME': 'Добро пожаловать в Chatme',
@@ -394,7 +395,7 @@ export class LanguageService {
                 'SEND_STICKER': 'Отправить стикер',
                 'VOICE_MESSAGE': 'Голосовое сообщение',
                 'RATING_TITLE': 'Оцените опыт',
-                'RATING_Question': 'Как прошел ваш разговор?',
+                'RATING_QUESTION': 'Как прошел ваш разговор?',
                 'RATING_COMMENT_PLACEHOLDER': 'Комментарии?',
                 'SKIP': 'Пропустить',
                 'SUBMIT': 'Отправить',
@@ -456,7 +457,8 @@ export class LanguageService {
                 'LEAVE': 'Выйти из игры',
                 'TYPE_MESSAGE': 'Введите сообщение...',
                 'VICTORY': 'ПОБЕДА! Вы выиграли',
-                'LOSE': 'ПРОИГРЫШ! Повезет в следующий раз.'
+                'LOSE': 'ПРОИГРЫШ! Повезет в следующий раз.',
+                'WAITING_ACCEPT': 'Ожидание принятия'
             }
         },
         'tj': {
@@ -496,7 +498,7 @@ export class LanguageService {
                 'DOWNLOAD_ANDROID': 'Android',
                 'DOWNLOAD_IPHONE': 'iPhone',
                 'DOWNLOAD_NOTE': 'Маслиҳат: QR-кодро скан кунед (ба наздикӣ) барои насби фаврӣ.',
-                'FOOTER_RIGHTS': '© 2025 Chatme. Ҳама ҳуқуқ маҳфуз аст.'
+                'FOOTER_RIGHTS': '© 2026 Chatme. Ҳама ҳуқуқ маҳфуз аст.'
             },
             'AUTH': {
                 'WELCOME': 'Хуш омадед ба Chatme',
@@ -595,7 +597,7 @@ export class LanguageService {
                 'SEND_STICKER': 'Равон кардани стикер',
                 'VOICE_MESSAGE': 'Паёми овозӣ',
                 'RATING_TITLE': 'Баҳо диҳед',
-                'RATING_Question': 'Сӯҳбат чӣ гуна гузашт?',
+                'RATING_QUESTION': 'Сӯҳбат чӣ гуна гузашт?',
                 'RATING_COMMENT_PLACEHOLDER': 'Шарҳҳо?',
                 'SKIP': 'Гузаштан',
                 'SUBMIT': 'Равон кардан',
@@ -654,7 +656,8 @@ export class LanguageService {
                 'LEAVE': 'Баромадан аз бозӣ',
                 'TYPE_MESSAGE': 'Паём нависед...',
                 'VICTORY': 'ҒАЛАБА! Шумо бурд кардед',
-                'LOSE': 'БОХТ! Дафъаи оянда барори кор.'
+                'LOSE': 'БОХТ! Дафъاи оянда барори кор.',
+                'WAITING_ACCEPT': 'Интизори қабул'
             }
         },
         'es': {
@@ -698,7 +701,7 @@ export class LanguageService {
                 'DOWNLOAD_ANDROID': 'Android',
                 'DOWNLOAD_IPHONE': 'iPhone',
                 'DOWNLOAD_NOTE': 'Consejo: Escanea el código QR (próximamente) para instalar directamente.',
-                'FOOTER_RIGHTS': '© 2025 Chatme. Todos los derechos reservados.'
+                'FOOTER_RIGHTS': '© 2026 Chatme. Todos los derechos reservados.'
             },
             'AUTH': {
                 'WELCOME': 'Bienvenido a Chatme',
@@ -797,7 +800,7 @@ export class LanguageService {
                 'SEND_STICKER': 'Enviar Sticker',
                 'VOICE_MESSAGE': 'Mensaje de Voz',
                 'RATING_TITLE': 'Calificar Experiencia',
-                'RATING_Question': '¿Cómo fue tu conversación?',
+                'RATING_QUESTION': '¿Cómo fue tu conversación?',
                 'RATING_COMMENT_PLACEHOLDER': '¿Algún comentario?',
                 'SKIP': 'Omitir',
                 'SUBMIT': 'Enviar',
@@ -855,7 +858,8 @@ export class LanguageService {
                 'LEAVE': 'Salir del Juego',
                 'TYPE_MESSAGE': 'Escribe un mensaje...',
                 'VICTORY': '¡VICTORIA! Ganaste',
-                'LOSE': '¡PERDISTE! Mejor suerte la próxima vez.'
+                'LOSE': '¡PERDISTE! Mejor suerte la próxima vez.',
+                'WAITING_ACCEPT': 'Esperando aceptación'
             }
         },
         'ar': {

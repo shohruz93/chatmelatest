@@ -40,7 +40,14 @@ import * as Phaser from 'phaser';
                     @if (userId !== currentUserId) {
                         <div class="user-row">
                             <span>Player #{{ userId }}</span>
-                            <button class="invite-btn" (click)="sendInvite(userId)">{{ 'CHECKERS.INVITE' | translate }}</button>
+                            @if (waitingForInviteTo() === userId) {
+                                <div class="waiting-accept">
+                                    <span>{{ 'CHECKERS.WAITING_ACCEPT' | translate }}</span>
+                                    <div class="dots"><span>.</span><span>.</span><span>.</span></div>
+                                </div>
+                            } @else {
+                                <button class="invite-btn" (click)="sendInvite(userId)">{{ 'CHECKERS.INVITE' | translate }}</button>
+                            }
                         </div>
                     }
                 } @empty {
@@ -53,13 +60,15 @@ import * as Phaser from 'phaser';
 
       <!-- Game UI -->
       <div class="game-area" [class.hidden]="!gameStarted()">
-        <div id="checkers-container" #gameContainer></div>
+        <div class="canvas-wrapper">
+          <div id="checkers-container" #gameContainer></div>
+        </div>
         
         <div class="game-sidebar">
           <div class="game-info">
             <div class="player-info">
-              <div class="p-red" [class.active]="currentTurn === redPlayerId">{{ 'CHECKERS.RED' | translate }} (Player {{ redPlayerId }})</div>
-              <div class="p-black" [class.active]="currentTurn === blackPlayerId">{{ 'CHECKERS.BLACK' | translate }} (Player {{ blackPlayerId }})</div>
+              <div class="p-red" [class.active]="currentTurn() === redPlayerId()">{{ 'CHECKERS.RED' | translate }} (Player {{ redPlayerId() }})</div>
+              <div class="p-black" [class.active]="currentTurn() === blackPlayerId()">{{ 'CHECKERS.BLACK' | translate }} (Player {{ blackPlayerId() }})</div>
             </div>
             <div class="turn-indicator" [class.my-turn]="isMyTurn()">
               {{ isMyTurn() ? ('CHECKERS.YOUR_TURN' | translate) : ('CHECKERS.WAITING' | translate) }}
@@ -71,7 +80,12 @@ import * as Phaser from 'phaser';
               @for (msg of chatMessages(); track $index) {
                 <div class="chat-msg" [class.own]="msg.senderId === currentUserId">
                   <span class="sender">#{{ msg.senderId }}:</span>
-                  <span class="text">{{ msg.message }}</span>
+                  <span class="text">{{ msg.translatedText || msg.message }}</span>
+                  @if (!msg.translatedText && msg.senderId !== currentUserId) {
+                    <button class="translate-btn" (click)="translateMessage(msg)">
+                      <i class="translate-icon">🌐</i>
+                    </button>
+                  }
                 </div>
               }
             </div>
@@ -115,9 +129,28 @@ import * as Phaser from 'phaser';
     .reject-btn { background: #ef4444; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; }
     .invitation-card { background: #374151; padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #6366f1; }
 
-    .game-area { display: flex; gap: 20px; }
+    .game-area { display: flex; gap: 20px; max-width: 1000px; width: 100%; }
+    .canvas-wrapper {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 0;
+    }
     .hidden { display: none; }
-    #checkers-container { background: #000; border-radius: 10px; overflow: hidden; border: 4px solid #333; }
+    #checkers-container { 
+        background: #000; 
+        border-radius: 10px; 
+        overflow: hidden; 
+        border: 4px solid #333;
+        width: 100%;
+        max-width: 600px;
+        aspect-ratio: 1 / 1;
+    }
+    #checkers-container canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
     
     .game-sidebar { width: 300px; display: flex; flex-direction: column; gap: 20px; }
     .game-info { background: #2a2a2a; padding: 15px; border-radius: 10px; }
@@ -127,21 +160,76 @@ import * as Phaser from 'phaser';
     .turn-indicator { text-align: center; font-weight: bold; padding: 10px; border-radius: 5px; background: #333; }
     .my-turn { background: #059669; color: white; animation: pulse 1.5s infinite; }
 
-    .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 400px; }
+    .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 350px; }
     .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .chat-msg { background: #374151; padding: 8px; border-radius: 8px; max-width: 90%; align-self: flex-start; }
-    .chat-msg.own { background: #6366f1; align-self: flex-end; }
+    .chat-msg { background: #374151; padding: 8px 30px 8px 8px; border-radius: 8px; max-width: 90%; align-self: flex-start; position: relative; }
+    .chat-msg.own { background: #6366f1; align-self: flex-end; padding-right: 8px; }
     .sender { font-size: 0.7rem; display: block; opacity: 0.7; }
+    .translate-btn {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 0.8rem;
+        padding: 2px;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+    .translate-btn:hover { color: white; background: rgba(255,255,255,0.1); }
     .chat-input { display: flex; padding: 10px; gap: 5px; }
     .chat-input input { flex-grow: 1; background: #333; border: none; color: white; padding: 8px; border-radius: 5px; }
     .chat-input button { background: #6366f1; border: none; color: white; padding: 0 15px; border-radius: 5px; cursor: pointer; }
 
     .leave-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
+    @media (max-width: 950px) {
+        .game-area { flex-direction: column; align-items: center; }
+        .game-sidebar { width: 100%; max-width: 600px; }
+        .checkers-wrapper { height: auto; padding-top: 80px; }
+        .game-chat { height: 300px; }
+    }
+
+    @media (max-width: 500px) {
+        .lobby-container { width: 100%; }
+        .online-users { max-height: 300px; overflow-y: auto; }
+    }
+
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.02); }
       100% { transform: scale(1); }
+    }
+
+    .waiting-accept {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #6366f1;
+      font-weight: 600;
+      font-size: 0.9rem;
+      animation: pulse-soft 2s infinite ease-in-out;
+    }
+
+    .dots span {
+      animation: blink 1.4s infinite both;
+      font-size: 1.2rem;
+    }
+
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      20% { opacity: 1; }
+      100% { opacity: 0.2; }
+    }
+
+    @keyframes pulse-soft {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.98); }
     }
   `]
 })
@@ -161,6 +249,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
     gameStarted = signal(false);
     invitation = signal<any>(null);
     onlinePlayers = signal<number[]>([]);
+    waitingForInviteTo = signal<number | null>(null);
 
     chatMessages = signal<any[]>([]);
     newMessage = '';
@@ -170,10 +259,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
     private gameScene?: CheckersScene;
 
     // Simple game state
-    roomId = '';
-    redPlayerId = 0;
-    blackPlayerId = 0;
-    currentTurn = 0;
+    roomId = signal('');
+    redPlayerId = signal(0);
+    blackPlayerId = signal(0);
+    currentTurn = signal(0);
 
     ngOnInit() {
         const user = this.auth.currentUserValue;
@@ -190,6 +279,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
         // Listen for checkers events
         this.socket.checkersInvite$.subscribe(invite => {
             this.invitation.set(invite);
+            this.socket.playNotificationSound();
         });
 
         this.socket.checkersStart$.subscribe(data => {
@@ -199,13 +289,19 @@ export class CheckersComponent implements OnInit, OnDestroy {
         this.socket.checkersMove$.subscribe(data => {
             if (this.gameScene) {
                 this.gameScene.handleOpponentMove(data.move);
-                this.currentTurn = this.currentTurn === this.redPlayerId ? this.blackPlayerId : this.redPlayerId;
             }
+            this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
         });
 
         this.socket.checkersChat$.subscribe(data => {
-            this.chatMessages.update(msgs => [...msgs, data]);
+            this.chatMessages.update(msgs => [...msgs, { ...data, id: 'checkers_' + Date.now() }]);
             setTimeout(() => this.scrollToBottom(), 100);
+        });
+
+        this.socket.translationResult$.subscribe(data => {
+            this.chatMessages.update(msgs => msgs.map(m =>
+                m.id === data.messageId ? { ...m, translatedText: data.translatedText } : m
+            ));
         });
 
         this.socket.checkersGameOver$.subscribe(data => {
@@ -214,6 +310,11 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
         this.socket.checkersError$.subscribe(err => {
             alert(err.message);
+            this.waitingForInviteTo.set(null);
+        });
+
+        this.socket.checkersRejected$.subscribe(() => {
+            this.waitingForInviteTo.set(null);
         });
     }
 
@@ -221,8 +322,8 @@ export class CheckersComponent implements OnInit, OnDestroy {
         if (this.phaserGame) {
             this.phaserGame.destroy(true);
         }
-        if (this.roomId) {
-            this.socket.leaveChat(this.roomId);
+        if (this.roomId()) {
+            this.socket.leaveChat(this.roomId());
         }
     }
 
@@ -231,6 +332,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
             alert("Not enough coins!");
             return;
         }
+        this.waitingForInviteTo.set(userId);
         this.socket.sendCheckersInvite(userId, this.betAmount);
     }
 
@@ -248,28 +350,36 @@ export class CheckersComponent implements OnInit, OnDestroy {
     }
 
     rejectInvite() {
+        const invite = this.invitation();
+        if (invite) {
+            this.socket.rejectCheckersInvite(invite.socketId);
+        }
         this.invitation.set(null);
     }
 
     initGame(data: any) {
-        this.roomId = data.roomId;
+        this.roomId.set(data.roomId);
         this.betAmount = data.amount;
-        this.redPlayerId = data.players[0];
-        this.blackPlayerId = data.players[1];
-        this.currentTurn = data.turn;
+        this.redPlayerId.set(Number(data.players[0]));
+        this.blackPlayerId.set(Number(data.players[1]));
+        this.currentTurn.set(Number(data.turn));
 
         // Deduct coins
         this.gamification.bet(this.betAmount, 'checkers').subscribe();
-
+        this.waitingForInviteTo.set(null);
         this.gameStarted.set(true);
 
         // Initialize Phaser with delay to ensure container is ready
         setTimeout(() => {
             const config: Phaser.Types.Core.GameConfig = {
                 type: Phaser.AUTO,
-                width: 600,
-                height: 600,
                 parent: 'checkers-container',
+                scale: {
+                    mode: Phaser.Scale.FIT,
+                    autoCenter: Phaser.Scale.CENTER_BOTH,
+                    width: 600,
+                    height: 600
+                },
                 scene: [new CheckersScene(this)],
                 backgroundColor: '#000000'
             };
@@ -278,17 +388,25 @@ export class CheckersComponent implements OnInit, OnDestroy {
     }
 
     isMyTurn() {
-        return this.currentTurn === this.currentUserId;
+        return this.currentTurn() === this.currentUserId;
+    }
+
+    translateMessage(msg: any) {
+        this.socket.emit('translate_message', {
+            messageId: msg.id,
+            text: msg.message,
+            targetLang: this.lang.currentLang()
+        });
     }
 
     sendMove(move: any) {
-        this.socket.sendCheckersMove(this.roomId, move);
-        this.currentTurn = this.currentTurn === this.redPlayerId ? this.blackPlayerId : this.redPlayerId;
+        this.socket.sendCheckersMove(this.roomId(), move);
+        this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
     }
 
     sendChat() {
         if (!this.newMessage.trim()) return;
-        this.socket.sendCheckersChat(this.roomId, this.newMessage);
+        this.socket.sendCheckersChat(this.roomId(), this.newMessage);
         this.newMessage = '';
     }
 
@@ -315,7 +433,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
                 this.phaserGame.destroy(true);
                 this.phaserGame = undefined;
             }
-            this.socket.leaveChat(this.roomId);
+            this.socket.leaveChat(this.roomId());
         }
     }
 
@@ -331,6 +449,7 @@ class CheckersScene extends Phaser.Scene {
     private component: CheckersComponent;
     private board: number[][] = []; // 0: empty, 1: red, 2: black, 11: red-king, 22: black-king
     private pieces: Map<string, Phaser.GameObjects.Arc> = new Map();
+    private kingLabels: Phaser.GameObjects.Text[] = [];
     private graphics?: Phaser.GameObjects.Graphics;
 
     private selectedPiece?: { r: number, c: number };
@@ -342,6 +461,7 @@ class CheckersScene extends Phaser.Scene {
     }
 
     create() {
+        (this.component as any).gameScene = this; // Store reference in component
         this.graphics = this.add.graphics();
         this.initBoard();
         this.drawBoard();
@@ -374,7 +494,8 @@ class CheckersScene extends Phaser.Scene {
     }
 
     drawBoard() {
-        this.graphics!.clear();
+        if (!this.graphics) return;
+        this.graphics.clear();
 
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
@@ -387,6 +508,8 @@ class CheckersScene extends Phaser.Scene {
         // Draw pieces
         this.pieces.forEach(p => p.destroy());
         this.pieces.clear();
+        this.kingLabels.forEach(l => l.destroy());
+        this.kingLabels = [];
 
         for (let r = 0; r < 8; r++) {
             for (let c = 0; c < 8; c++) {
@@ -397,7 +520,8 @@ class CheckersScene extends Phaser.Scene {
                     piece.setStrokeStyle(4, 0xffffff, 0.5);
 
                     if (val > 10) { // King
-                        this.add.text(c * this.tileSize + this.tileSize / 2 - 10, r * this.tileSize + this.tileSize / 2 - 15, 'K', { fontSize: '24px', fontStyle: 'bold' });
+                        const label = this.add.text(c * this.tileSize + this.tileSize / 2 - 10, r * this.tileSize + this.tileSize / 2 - 15, 'K', { fontSize: '24px', fontStyle: 'bold' });
+                        this.kingLabels.push(label);
                     }
 
                     if (this.selectedPiece && this.selectedPiece.r === r && this.selectedPiece.c === c) {
@@ -417,7 +541,7 @@ class CheckersScene extends Phaser.Scene {
         const r = Math.floor(pointer.y / this.tileSize);
 
         const val = this.board[r][c];
-        const myType = this.component.currentUserId === this.component.redPlayerId ? 1 : 2;
+        const myType = this.component.currentUserId === this.component.redPlayerId() ? 1 : 2;
 
         if (val !== 0 && (val === myType || val === myType * 11)) {
             // Selection
@@ -433,7 +557,7 @@ class CheckersScene extends Phaser.Scene {
 
                 // Win check
                 if (this.checkWin()) {
-                    this.component.socket.sendCheckersGameOver(this.component.roomId, this.component.currentUserId);
+                    this.component.socket.sendCheckersGameOver(this.component.roomId(), this.component.currentUserId);
                 }
             }
         }
@@ -500,7 +624,7 @@ class CheckersScene extends Phaser.Scene {
     checkWin(): boolean {
         // Very simple: check if opponent has pieces left
         const myId = this.component.currentUserId;
-        const enemyType = myId === this.component.redPlayerId ? 2 : 1;
+        const enemyType = myId === this.component.redPlayerId() ? 2 : 1;
 
         let enemyCount = 0;
         for (let r = 0; r < 8; r++) {

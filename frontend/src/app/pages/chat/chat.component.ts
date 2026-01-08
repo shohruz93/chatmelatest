@@ -47,11 +47,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Modal states
     showPartnerLeftBanner = false;
-    showRatingModal = false;
     partnerStatus: 'online' | 'offline' = 'online';
-    partnerIdToRate: number | null = null;
-    selectedRating: number = 0;
-    ratingComment: string = '';
     showPartnerProfileModal = false;
     showImageModal = false;
     selectedImageUrl = '';
@@ -198,10 +194,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 // Load messages and partner details
                 this.loadMessageHistory();
+                // Set partner initial status correctly
                 this.socketService.emit('get_room_details', { roomId: this.roomId });
-
-                // Set partner ID for rating
-                this.partnerIdToRate = pId;
             }
         }
 
@@ -257,7 +251,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     this.partner = partnerProfile;
                     // Set partner initial status correctly
                     this.partnerStatus = this.socketService.isUserOnline(partnerProfile.id) ? 'online' : 'offline';
-                    this.partnerIdToRate = partnerProfile.id;
                 }
             }
         });
@@ -346,8 +339,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // Listen for partner leaving
         this.partnerLeftSub = this.socketService.onPartnerLeft().subscribe((data) => {
             this.showPartnerLeftBanner = true;
-            this.showRatingModal = true;
-            this.partnerIdToRate = data.userId;
             this.messages = [...this.messages, { type: 'system', content: 'Partner has left the chat.' }];
             this.partnerStatus = 'offline';
             this.cdr.markForCheck();
@@ -890,42 +881,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.partner) {
             this.showPartnerProfileModal = true;
         }
-    }
-
-    // Rating methods
-    setRating(rating: number) {
-        this.selectedRating = rating;
-    }
-
-    async submitRating() {
-        if (this.selectedRating === 0 || !this.partnerIdToRate) {
-            this.closeRatingModal();
-            return;
-        }
-
-        try {
-            await lastValueFrom(this.api.post('/profile/rating', {
-                raterId: this.currentUser.id,
-                ratedId: this.partnerIdToRate,
-                rating: this.selectedRating,
-                comment: this.ratingComment
-            }));
-        } catch (error) {
-            // Error submitting rating
-        }
-
-        this.closeRatingModal();
-    }
-
-    skipRating() {
-        this.closeRatingModal();
-    }
-
-    closeRatingModal() {
-        this.showRatingModal = false;
-        this.selectedRating = 0;
-        this.ratingComment = '';
-        this.partnerIdToRate = null;
     }
 
     // Filter modal methods
