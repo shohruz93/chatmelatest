@@ -108,7 +108,7 @@ class Auth {
                 $sessionToken = base64_encode(json_encode([
                     "id" => $userId,
                     "email" => $userData['email'],
-                    "exp" => time() + (24 * 60 * 60) // 24 hours
+                    "exp" => time() + (30 * 24 * 60 * 60) // 30 days
                 ]));
 
                 echo json_encode([
@@ -281,7 +281,7 @@ class Auth {
         $sessionToken = base64_encode(json_encode([
             "id" => $userId,
             "email" => $email,
-            "exp" => time() + (24 * 60 * 60)
+            "exp" => time() + (30 * 24 * 60 * 60) // 30 days
         ]));
 
         echo json_encode([
@@ -304,13 +304,16 @@ class Auth {
     public static function validateToken($token) {
         $json = base64_decode($token, true);
         if (!$json) {
+            error_log("Auth::validateToken - Invalid token encoding: " . substr($token, 0, 10) . "...");
             throw new Exception("Invalid token encoding");
         }
         $data = json_decode($json);
         if (!$data || !isset($data->exp)) {
+            error_log("Auth::validateToken - Invalid token data or missing exp: " . $json);
             throw new Exception("Invalid token data");
         }
         if ($data->exp < time()) {
+            error_log("Auth::validateToken - Token expired. Exp: " . $data->exp . ", Current: " . time() . ", Diff: " . (time() - $data->exp) . "s");
             throw new Exception("Token expired");
         }
         return $data;

@@ -56,8 +56,48 @@ export class GamificationService {
         );
     }
 
+    trackMission(conditionKey: string, amount: number = 1): void {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return;
+
+        try {
+            const user = JSON.parse(userStr);
+            this.http.post(`${this.apiUrl}/gamification/track`, {
+                userId: user.id,
+                conditionKey: conditionKey,
+                amount: amount
+            }, { headers: this.getHeaders() }).subscribe({
+                error: (err) => console.error('Failed to track mission:', err)
+            });
+        } catch (e) {
+            console.error('Failed to parse user for mission tracking:', e);
+        }
+    }
+
     setWalletState(coins: number, xp: number) {
         this.userCoins.set(coins || 0);
         this.userXp.set(xp || 0);
+    }
+
+    bet(amount: number, game: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/games/bet`, { amount, game }, { headers: this.getHeaders() }).pipe(
+            tap((res: any) => {
+                if (res.current_coins !== undefined) {
+                    this.userCoins.set(res.current_coins);
+                }
+            })
+        );
+    }
+
+    win(amount: number, game: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/games/win`, { amount, game }, { headers: this.getHeaders() }).pipe(
+            tap((res: any) => {
+                if (res.current_coins !== undefined) {
+                    this.userCoins.set(res.current_coins);
+                }
+                // XP update handled by tap or reload
+                this.userXp.update(x => x + 10);
+            })
+        );
     }
 }

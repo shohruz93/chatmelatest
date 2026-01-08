@@ -11,6 +11,7 @@ import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AppVersionService } from '../../services/app-version.service';
+import { GamificationService } from '../../services/gamification.service';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
@@ -44,6 +45,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     private api = inject(ApiService);
     private countryService = inject(CountryService);
     private appVersionService = inject(AppVersionService);
+    private gamificationService = inject(GamificationService);
 
     users: UserProfile[] = [];
     filteredUsers: UserProfile[] = [];
@@ -164,12 +166,12 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
     hasIncompleteProfile() {
         if (!this.currentUser) return false;
-        const hasNative = !!this.currentUser?.native_language && 
-                         this.currentUser.native_language !== '' && 
-                         this.currentUser.native_language !== 'any';
-        const hasLearning = !!this.currentUser?.learning_language && 
-                           this.currentUser.learning_language !== '' && 
-                           this.currentUser.learning_language !== 'any';
+        const hasNative = !!this.currentUser?.native_language &&
+            this.currentUser.native_language !== '' &&
+            this.currentUser.native_language !== 'any';
+        const hasLearning = !!this.currentUser?.learning_language &&
+            this.currentUser.learning_language !== '' &&
+            this.currentUser.learning_language !== 'any';
         return !hasNative || !hasLearning;
     }
 
@@ -220,6 +222,9 @@ export class ExploreComponent implements OnInit, OnDestroy {
         });
 
         this.checkForUpdates();
+
+        // Track explore page visit as a daily login mission
+        this.gamificationService.trackMission('login');
     }
 
     async checkForUpdates() {

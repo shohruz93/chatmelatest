@@ -156,7 +156,7 @@ class GamificationController {
     }
 
     // Helper: Initialize daily missions for user
-    private function assignDailyMissions($userId) {
+    public function assignDailyMissions($userId) {
         // Get all daily missions
         $query = "SELECT id FROM missions WHERE type = 'daily'";
         $stmt = $this->conn->prepare($query);
@@ -185,6 +185,9 @@ class GamificationController {
     // Helper: Update progress (To be called from other controllers)
     // Example usage: GamificationController::updateProgress($userId, 'send_message', 1);
     public static function updateProgress($userId, $conditionKey, $amount = 1) {
+        $instance = new self();
+        $instance->assignDailyMissions($userId);
+
         $db = new Database();
         $conn = $db->getConnection();
         
@@ -224,32 +227,28 @@ class GamificationController {
 
     // Helper: Extract User ID from Bearer Token (Simulated/Reused logic)
     private function getUserIdFromToken($headers) {
-        // Basic implementation matching existing simple auth or JWT
-        // Check Auth header
-        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        
+        if (empty($authHeader) && function_exists('apache_request_headers')) {
+            $apacheHeaders = apache_request_headers();
+            $authHeader = $apacheHeaders['Authorization'] ?? $apacheHeaders['authorization'] ?? '';
+        }
+
         if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-            // For now, assume token is user_id or very simple decodable
-            // Creating a real JWT check here would require including the JWT lib if used
-            // OR reuse Auth class.
-            // Let's use Auth logic if available.
-            require_once __DIR__ . '/Auth.php';
-            // Assuming Auth class has verification
-            // If Auth.php is simple, let's peek at it.
-            // Earlier I saw Auth.php.
-            // Let's just try to decode assuming it's a valid ID for this stage 
-            // OR better, look at existing controllers.
-            // I'll assume standard JWT decoding.
-            // For safety, I'll return false if fails.
-            
             try {
+                require_once __DIR__ . '/Auth.php';
                 $decoded = Auth::validateToken($matches[1]);
-                // Auth.php returns a flat object with 'id'
                 return $decoded->id ?? $decoded->sub ?? null;
             } catch (Exception $e) {
-                error_log("GamificationController::getUserIdFromToken - Error: " . $e->getMessage());
+                error_log("GamificationController::getUserIdFromToken - Auth error: " . $e->getMessage());
                 return null;
             }
         }
+        
+        if (empty($authHeader)) {
+            error_log("GamificationController::getUserIdFromToken - No Authorization header found.");
+        }
+        
         return null;
     }
 }

@@ -16,9 +16,9 @@ export class SocketService implements OnDestroy {
     public isSearching = signal(false);
     public selectedLanguage = this.languageService.currentLang;
     public onlineUsers = signal<Set<number>>(new Set());
-    
+
     private destroy$ = new Subject<void>();
-    
+
     private matchFoundSubject = new Subject<any>();
     private messageSubject = new Subject<any>();
     private messageSentSubject = new Subject<any>();
@@ -35,7 +35,13 @@ export class SocketService implements OnDestroy {
     private matchRetrySubject = new Subject<any>();
     private translationResultSubject = new Subject<any>();
     private messageReadSubject = new Subject<any>();
-    
+    private checkersInviteSubject = new Subject<any>();
+    private checkersStartSubject = new Subject<any>();
+    private checkersMoveSubject = new Subject<any>();
+    private checkersChatSubject = new Subject<any>();
+    private checkersGameOverSubject = new Subject<any>();
+    private checkersErrorSubject = new Subject<any>();
+
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public message$ = this.messageSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
@@ -52,6 +58,12 @@ export class SocketService implements OnDestroy {
     public matchRetry$ = this.matchRetrySubject.asObservable().pipe(shareReplay(1));
     public translationResult$ = this.translationResultSubject.asObservable().pipe(shareReplay(1));
     public messageRead$ = this.messageReadSubject.asObservable().pipe(shareReplay(1));
+    public checkersInvite$ = this.checkersInviteSubject.asObservable().pipe(shareReplay(1));
+    public checkersStart$ = this.checkersStartSubject.asObservable().pipe(shareReplay(1));
+    public checkersMove$ = this.checkersMoveSubject.asObservable().pipe(shareReplay(1));
+    public checkersChat$ = this.checkersChatSubject.asObservable().pipe(shareReplay(1));
+    public checkersGameOver$ = this.checkersGameOverSubject.asObservable().pipe(shareReplay(1));
+    public checkersError$ = this.checkersErrorSubject.asObservable().pipe(shareReplay(1));
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -97,6 +109,12 @@ export class SocketService implements OnDestroy {
         this.socket.on('match_retry', (data) => this.matchRetrySubject.next(data));
         this.socket.on('translation_result', (data) => this.translationResultSubject.next(data));
         this.socket.on('message_read', (data) => this.messageReadSubject.next(data));
+        this.socket.on('checkers_invite_received', (data) => this.checkersInviteSubject.next(data));
+        this.socket.on('checkers_start', (data) => this.checkersStartSubject.next(data));
+        this.socket.on('checkers_move', (data) => this.checkersMoveSubject.next(data));
+        this.socket.on('checkers_chat', (data) => this.checkersChatSubject.next(data));
+        this.socket.on('checkers_game_over', (data) => this.checkersGameOverSubject.next(data));
+        this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
@@ -106,7 +124,7 @@ export class SocketService implements OnDestroy {
             }
         });
     }
-    
+
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
@@ -249,6 +267,27 @@ export class SocketService implements OnDestroy {
 
     onMessageRead(): Observable<any> {
         return this.messageRead$;
+    }
+
+    // Checkers Methods
+    sendCheckersInvite(targetUserId: number, amount: number) {
+        this.socket.emit('checkers_invite', { targetUserId, amount });
+    }
+
+    acceptCheckersInvite(requesterSocketId: string, amount: number) {
+        this.socket.emit('checkers_accept', { requesterSocketId, amount });
+    }
+
+    sendCheckersMove(roomId: string, move: any) {
+        this.socket.emit('checkers_move', { roomId, move });
+    }
+
+    sendCheckersChat(roomId: string, message: string) {
+        this.socket.emit('checkers_chat', { roomId, message });
+    }
+
+    sendCheckersGameOver(roomId: string, winnerId: number) {
+        this.socket.emit('checkers_game_over', { roomId, winnerId });
     }
 
     // Generic methods for raw access

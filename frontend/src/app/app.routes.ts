@@ -46,6 +46,14 @@ export const routes: Routes = [
             {
                 path: 'explore',
                 loadComponent: () => import('./pages/explore/explore.component').then(m => m.ExploreComponent)
+            },
+            {
+                path: 'games',
+                loadComponent: () => import('./pages/games/games.component').then(m => m.GamesComponent)
+            },
+            {
+                path: 'games/checkers',
+                loadComponent: () => import('./pages/games/checkers/checkers.component').then(m => m.CheckersComponent)
             }
         ]
     },

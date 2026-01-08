@@ -10,6 +10,10 @@
         <span class="badge">{{ unreadCount() }}</span>
         }
     </a>
+    <a routerLink="/dashboard/games" class="tab-link" [class.active]="isActive('/dashboard/games')">
+        <span class="tab-icon">🎲</span>
+        <span class="tab-label">Games</span>
+    </a>
     <a routerLink="/dashboard/profile" class="tab-link" [class.active]="isActive('/dashboard/profile')">
         <span class="tab-icon">👤</span>
         <span class="tab-label">Profile</span>

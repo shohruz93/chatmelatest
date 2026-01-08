@@ -690,6 +690,60 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Checkers Game Events
+    socket.on('checkers_invite', ({ targetUserId, amount }) => {
+        const senderId = userSocketMap.get(socket.id);
+        const targetSocketId = onlineUsers.get(targetUserId);
+
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('checkers_invite_received', {
+                fromUserId: senderId,
+                amount: amount,
+                socketId: socket.id
+            });
+        } else {
+            socket.emit('checkers_error', { message: 'User is offline' });
+        }
+    });
+
+    socket.on('checkers_accept', ({ requesterSocketId, amount }) => {
+        const userId1 = userSocketMap.get(socket.id);
+        const userId2 = userSocketMap.get(requesterSocketId);
+
+        if (!userId1 || !userId2) return;
+
+        const roomId = `checkers_${Math.min(userId1, userId2)}_${Math.max(userId1, userId2)}_${Date.now()}`;
+
+        socket.join(roomId);
+        const requesterSocket = io.sockets.sockets.get(requesterSocketId);
+        if (requesterSocket) {
+            requesterSocket.join(roomId);
+
+            io.to(roomId).emit('checkers_start', {
+                roomId,
+                players: [userId1, userId2],
+                amount,
+                turn: userId2 // Requester starts or random
+            });
+            console.log(`Checkers game started in room ${roomId}`);
+        }
+    });
+
+    socket.on('checkers_move', ({ roomId, move }) => {
+        const senderId = userSocketMap.get(socket.id);
+        socket.to(roomId).emit('checkers_move', { senderId, move });
+    });
+
+    socket.on('checkers_chat', ({ roomId, message }) => {
+        const senderId = userSocketMap.get(socket.id);
+        io.to(roomId).emit('checkers_chat', { senderId, message, timestamp: Date.now() });
+    });
+
+    socket.on('checkers_game_over', ({ roomId, winnerId }) => {
+        io.to(roomId).emit('checkers_game_over', { winnerId });
+        // The client will handle the API call to /games/win for the winner
+    });
+
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
 

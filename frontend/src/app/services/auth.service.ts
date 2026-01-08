@@ -136,7 +136,12 @@ export class AuthService {
                     this.updateUser(profile);
                 }
             },
-            error: (err) => console.error('Failed to refresh profile', err)
+            error: (err) => {
+                console.error('Failed to refresh profile', err);
+                if (err.status === 401) {
+                    this.logout();
+                }
+            }
         });
     }
 }
