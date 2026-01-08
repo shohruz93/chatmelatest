@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { LanguageService } from '../../services/language.service';
 import { SocketService } from '../../services/socket.service';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
@@ -35,6 +36,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private countryService = inject(CountryService);
     private timestampService = inject(TimestampService);
     private cdr = inject(ChangeDetectorRef);
+    private router = inject(Router);
+    private languageService = inject(LanguageService);
 
     messages: any[] = [];
     newMessage: string = '';
@@ -94,6 +97,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private requestSub!: Subscription;
     private editSub!: Subscription;
     private deleteSub!: Subscription;
+    private gameInviteSub!: Subscription;
+    private gameStartSub!: Subscription;
+    private gameRejectedSub!: Subscription;
 
     // Filter modal
     showFilterModal = false;
@@ -120,6 +126,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Edit/Reply state
     editingMessage: any = null;
     replyingToMessage: any = null;
+
+    // Game invitation state
+    gameInvitation: any = null;
 
     // Advanced matching features
     queuePosition: number = 0;
@@ -411,6 +420,25 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.deleteSub = this.socketService.on('message_deleted').subscribe((data: any) => {
             this.messages = this.messages.filter(m => m.id !== data.messageId);
         });
+
+        // Listen for game invitations
+        this.gameInviteSub = this.socketService.checkersInvite$.subscribe(invite => {
+            this.gameInvitation = invite;
+            this.socketService.playNotificationSound();
+            this.cdr.markForCheck();
+        });
+
+        this.gameStartSub = this.socketService.checkersStart$.subscribe(data => {
+            // Redirect to checkers game
+            this.router.navigate(['/dashboard/games/checkers']);
+        });
+
+        this.gameRejectedSub = this.socketService.checkersRejected$.subscribe(data => {
+            if (this.gameInvitation && this.gameInvitation.fromUserId === data.byUserId) {
+                this.gameInvitation = null;
+            }
+            this.cdr.markForCheck();
+        });
     }
 
     sendRequest() {
@@ -476,6 +504,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.requestSub) this.requestSub.unsubscribe();
         if (this.editSub) this.editSub.unsubscribe();
         if (this.deleteSub) this.deleteSub.unsubscribe();
+        if (this.gameInviteSub) this.gameInviteSub.unsubscribe();
+        if (this.gameStartSub) this.gameStartSub.unsubscribe();
+        if (this.gameRejectedSub) this.gameRejectedSub.unsubscribe();
 
         if (this.roomId) {
             this.socketService.emitTyping(this.roomId, false);
@@ -881,6 +912,33 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.partner) {
             this.showPartnerProfileModal = true;
         }
+    }
+
+    getTranslation(key: string, params: any = null): string {
+        return this.languageService.translate(key, params);
+    }
+
+    sendGameInvite() {
+        if (!this.partnerId) return;
+        // Default bet amount 50
+        this.socketService.sendCheckersInvite(this.partnerId, 50);
+        // Optionally show 'Waiting for partner to accept game...'
+        this.messages = [...this.messages, { type: 'system', content: 'You invited partner to a game of Checkers (50 🪙)' }];
+        this.cdr.markForCheck();
+    }
+
+    acceptGameInvite() {
+        if (!this.gameInvitation) return;
+        this.socketService.acceptCheckersInvite(this.gameInvitation.socketId, this.gameInvitation.amount);
+        this.gameInvitation = null;
+        this.cdr.markForCheck();
+    }
+
+    rejectGameInvite() {
+        if (!this.gameInvitation) return;
+        this.socketService.rejectCheckersInvite(this.gameInvitation.socketId);
+        this.gameInvitation = null;
+        this.cdr.markForCheck();
     }
 
     // Filter modal methods

@@ -98,7 +98,7 @@
     gap: 1rem;
 }
 
-.theme-toggle {
+.btn-action-header {
     background: transparent;
     border: 1px solid var(--border-color);
     color: var(--text-primary);
@@ -114,8 +114,13 @@
     transition: all 0.3s ease;
 }
 
-.theme-toggle:hover {
+.btn-action-header:hover {
     background: var(--bg-tertiary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle:hover {
     transform: rotate(15deg);
 }
 
@@ -600,6 +605,35 @@
     gap: 1rem;
     justify-content: flex-end;
     border-top: 1px solid var(--border-color);
+}
+
+.center-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.game-icon-large {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: floating 3s ease-in-out infinite;
+}
+
+.bet-info {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 .btn-reject,

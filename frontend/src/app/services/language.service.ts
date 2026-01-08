@@ -213,7 +213,10 @@ export class LanguageService {
                 'RECORDING': 'Recording...',
                 'EDITING_MESSAGE': 'Editing message',
                 'REPLYING_TO': 'Replying to',
-                'LOADING_MESSAGES': 'Loading messages...'
+                'LOADING_MESSAGES': 'Loading messages...',
+                'INVITE_GAME': 'Invite to Game',
+                'GAME_INVITATION': 'Game Invitation',
+                'INVITED_YOU_TO_GAME': '{{name}} invited you to play Checkers for {{amount}} 🪙'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -415,7 +418,10 @@ export class LanguageService {
                 'RECORDING': 'Запись...',
                 'EDITING_MESSAGE': 'Редактирование',
                 'REPLYING_TO': 'В ответ на',
-                'LOADING_MESSAGES': 'Загрузка сообщений...'
+                'LOADING_MESSAGES': 'Загрузка сообщений...',
+                'INVITE_GAME': 'Пригласить в игру',
+                'GAME_INVITATION': 'Приглашение в игру',
+                'INVITED_YOU_TO_GAME': '{{name}} пригласил вас сыграть в шашки на {{amount}} 🪙'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -614,7 +620,10 @@ export class LanguageService {
                 'ANY_LOCATION': 'Ҳар ҷо',
                 'ONLINE_ONLY': 'Танҳо онлайн',
                 'SEARCH': 'Ҷустуҷӯ',
-                'RECORDING': 'Сабт...'
+                'RECORDING': 'Сабт...',
+                'INVITE_GAME': 'Даъват ба бозӣ',
+                'GAME_INVITATION': 'Даъвати бозӣ',
+                'INVITED_YOU_TO_GAME': '{{name}} шуморо даъват кард ба бозии шашка барои {{amount}} 🪙'
             },
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',
@@ -1798,7 +1807,7 @@ export class LanguageService {
         { code: 'fa', name: 'فارسی', flag: '🇮🇷' }
     ];
 
-    translate(key: string): string {
+    translate(key: string, params: any = null): string {
         const lang = this.currentLang();
         const keys = key.split('.');
         let result = this.translations[lang] || this.translations['en'];
@@ -1809,16 +1818,27 @@ export class LanguageService {
             } else {
                 // Fallback to English if key missing in current language
                 let fallback = this.translations['en'];
+                let foundFallback = true;
                 for (const fk of keys) {
                     if (fallback && fallback[fk]) {
                         fallback = fallback[fk];
                     } else {
-                        return key; // Return key if not found at all
+                        foundFallback = false;
+                        break;
                     }
                 }
-                return fallback;
+                result = foundFallback ? fallback : key;
+                break;
             }
         }
+
+        if (typeof result === 'string' && params) {
+            Object.keys(params).forEach(p => {
+                const placeholder = `{{${p}}}`;
+                result = (result as string).replace(new RegExp(placeholder, 'g'), params[p]);
+            });
+        }
+
         return result;
     }
 

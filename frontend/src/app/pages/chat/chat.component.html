@@ -15,6 +15,15 @@
                 </span>
             </div>
         </div>
+
+        <div class="header-actions">
+            <button class="btn-action-header" (click)="sendGameInvite()" [title]="'CHAT.INVITE_GAME' | translate">
+                <span class="icon">🎮</span>
+            </button>
+            <!-- <button class="btn-action-header theme-toggle" (click)="toggleTheme()" title="Toggle Theme">
+                <span class="icon">{{ isDarkMode() ? '☀️' : '🌙' }}</span>
+            </button> -->
+        </div>
         } @else {
         @if (socketService.isSearching()) {
         <div class="header-user-info">
@@ -313,5 +322,27 @@
     @if (showPartnerProfileModal && partner) {
     <app-user-profile-modal [user]="partner" (closeEvent)="showPartnerProfileModal = false">
     </app-user-profile-modal>
+    }
+
+    @if (gameInvitation) {
+    <div class="modal-overlay">
+        <div class="modal-content glass-panel game-invite-modal">
+            <div class="modal-header">
+                <h3>{{ 'CHAT.GAME_INVITATION' | translate }}</h3>
+            </div>
+            <div class="modal-body center-content">
+                <div class="game-icon-large">🎮</div>
+                <h3>Checkers</h3>
+                <p>{{ getTranslation('CHAT.INVITED_YOU_TO_GAME', { name: partnerName, amount: gameInvitation.amount })
+                    }}
+                </p>
+                <div class="bet-info">{{ gameInvitation.amount }} 🪙</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-reject" (click)="rejectGameInvite()">{{ 'CHAT.DECLINE' | translate }}</button>
+                <button class="btn-accept" (click)="acceptGameInvite()">{{ 'CHAT.ACCEPT' | translate }}</button>
+            </div>
+        </div>
+    </div>
     }
 </div>
