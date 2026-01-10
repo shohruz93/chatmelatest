@@ -123,19 +123,35 @@ export class ChatStorageService {
       let addedCount = 0;
 
       for (const msg of messages) {
-        // Check if message already exists
-        const existingRequest = store.get(msg.id);
-        existingRequest.onsuccess = () => {
-          if (!existingRequest.result) {
-            // Message doesn't exist, add it
-            console.log('[STORAGE] Adding message:', msg.id);
-            store.put(msg);
-            addedCount++;
-          } else {
-            console.log('[STORAGE] Message already exists:', msg.id);
-          }
-        };
+        // Simple put: if ID exists, it updates; if not, it adds.
+        // This is safe because server IDs are unique.
+        // We only need special handling for temp messages.
+        store.put(msg);
+        addedCount++;
       }
+
+      // Cleanup matching temp messages after adding real ones
+      const tempIndex = store.index('status');
+      const tempRequest = tempIndex.openCursor(IDBKeyRange.only('sending'));
+      tempRequest.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const tempMsg = cursor.value;
+          // If we find a temp message that matches a real message we just added
+          // (same content, room, and close timestamp), delete it.
+          const isDuplicate = messages.some(m => 
+            m.roomId === tempMsg.roomId && 
+            m.content === tempMsg.content && 
+            Math.abs((m.created_at || 0) - (tempMsg.created_at || 0)) < 60000
+          );
+
+          if (isDuplicate) {
+            console.log('[STORAGE] Cleaning up duplicate temp message:', tempMsg.id);
+            cursor.delete();
+          }
+          cursor.continue();
+        }
+      };
 
       transaction.oncomplete = () => {
         console.log('[STORAGE] Transaction complete, added', addedCount, 'messages');

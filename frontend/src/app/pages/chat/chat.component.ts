@@ -551,12 +551,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (typeof timestamp === 'number' && timestamp < 10000000000) {
             timestamp *= 1000;
         }
+        const isSent = String(msg.sender_id || msg.senderId) === String(this.currentUser.id);
         return {
             id: msg.id,
-            type: msg.type || (String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received'),
+            type: isSent ? 'sent' : 'received',
             content: msg.content,
             created_at: timestamp,
-            messageType: this.detectMessageType(msg.content, msg.messageType),
+            messageType: this.detectMessageType(msg.content, msg.messageType || msg.type),
             read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
             status: msg.status || ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
             replyTo: msg.replyTo,
