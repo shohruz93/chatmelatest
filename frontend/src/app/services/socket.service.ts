@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { shareReplay, takeUntil } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { LanguageService } from './language.service';
+import { ChatStorageService } from './chat-storage.service'; // Import ChatStorageService
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -13,6 +14,7 @@ export class SocketService implements OnDestroy {
     private socket: Socket;
     private url = environment.nodeBaseUrl;
     private languageService = inject(LanguageService);
+    private chatStorage = inject(ChatStorageService); // Inject ChatStorageService
     public isSearching = signal(false);
     public selectedLanguage = this.languageService.currentLang;
     public onlineUsers = signal<Set<number>>(new Set());
@@ -21,11 +23,9 @@ export class SocketService implements OnDestroy {
     private destroy$ = new Subject<void>();
 
     private matchFoundSubject = new Subject<any>();
-    private messageSubject = new Subject<any>();
     private messageSentSubject = new Subject<any>();
     private userStatusChangedSubject = new Subject<any>();
     private userTypingSubject = new Subject<any>();
-    private messagesLoadedSubject = new Subject<any>();
     private randomUserFoundSubject = new Subject<any>();
     private chatRequestReceivedSubject = new Subject<any>();
     private chatRequestRejectedSubject = new Subject<any>();
@@ -36,6 +36,7 @@ export class SocketService implements OnDestroy {
     private matchRetrySubject = new Subject<any>();
     private translationResultSubject = new Subject<any>();
     private messageReadSubject = new Subject<any>();
+    private connectedSubject = new Subject<void>();
     private checkersInviteSubject = new Subject<any>();
     private checkersStartSubject = new Subject<any>();
     private checkersMoveSubject = new Subject<any>();
@@ -45,21 +46,20 @@ export class SocketService implements OnDestroy {
     private checkersRejectedSubject = new Subject<any>();
 
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
-    public message$ = this.messageSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
     public userStatusChanged$ = this.userStatusChangedSubject.asObservable().pipe(shareReplay(1));
     public userTyping$ = this.userTypingSubject.asObservable().pipe(shareReplay(1));
-    public messagesLoaded$ = this.messagesLoadedSubject.asObservable().pipe(shareReplay(1));
     public randomUserFound$ = this.randomUserFoundSubject.asObservable().pipe(shareReplay(1));
     public chatRequestReceived$ = this.chatRequestReceivedSubject.asObservable().pipe(shareReplay(1));
     public chatRequestRejected$ = this.chatRequestRejectedSubject.asObservable();
-    public partnerLeft$ = this.partnerLeftSubject.asObservable().pipe(shareReplay(1));
+    public partnerLeft$ = this.partnerLeftSubject.asObservable();
     public noMatchFound$ = this.noMatchFoundSubject.asObservable().pipe(shareReplay(1));
     public waitingForMatch$ = this.waitingForMatchSubject.asObservable().pipe(shareReplay(1));
     public queueUpdate$ = this.queueUpdateSubject.asObservable().pipe(shareReplay(1));
     public matchRetry$ = this.matchRetrySubject.asObservable().pipe(shareReplay(1));
     public translationResult$ = this.translationResultSubject.asObservable().pipe(shareReplay(1));
     public messageRead$ = this.messageReadSubject.asObservable().pipe(shareReplay(1));
+    public connected$ = this.connectedSubject.asObservable();
     public checkersInvite$ = this.checkersInviteSubject.asObservable();
     public checkersStart$ = this.checkersStartSubject.asObservable();
     public checkersMove$ = this.checkersMoveSubject.asObservable();
@@ -98,10 +98,16 @@ export class SocketService implements OnDestroy {
         });
 
         this.socket.on('match_found', (data) => this.matchFoundSubject.next(data));
-        this.socket.on('message', (data) => this.messageSubject.next(data));
+        this.socket.on('message', (data) => {
+            console.log('[SOCKET] Received message event:', data);
+            this.chatStorage.addMessage(data);
+        });
+        this.socket.on('messages_loaded', (data) => {
+            console.log('[SOCKET] Received messages_loaded event:', data.messages?.length, 'messages');
+            this.chatStorage.addMessagesIfNotExists(data.messages);
+        });
         this.socket.on('message_sent', (data) => this.messageSentSubject.next(data));
         this.socket.on('user_typing', (data) => this.userTypingSubject.next(data));
-        this.socket.on('messages_loaded', (data) => this.messagesLoadedSubject.next(data));
         this.socket.on('random_user_found', (data) => this.randomUserFoundSubject.next(data));
         this.socket.on('chat_request_received', (data) => this.chatRequestReceivedSubject.next(data));
         this.socket.on('chat_request_rejected', () => this.chatRequestRejectedSubject.next({}));
@@ -129,6 +135,7 @@ export class SocketService implements OnDestroy {
                 this.socket.emit('register', current.id);
                 this.socket.emit('get_online_users');
             }
+            this.connectedSubject.next();
         });
     }
 
@@ -142,10 +149,12 @@ export class SocketService implements OnDestroy {
 
     connect(userId: number) {
         if (!this.socket.connected) {
-            this.socket.connect();
-            this.socket.emit('register', userId);
-            // Request current online users
-            this.socket.emit('get_online_users');
+            this.chatStorage.openDb(userId).then(() => {
+                this.socket.connect();
+                this.socket.emit('register', userId);
+                // Request current online users
+                this.socket.emit('get_online_users');
+            });
         }
     }
 
@@ -169,9 +178,9 @@ export class SocketService implements OnDestroy {
         this.socket.emit('send_chat_request', { targetUserId, myProfile });
     }
 
-    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null) {
+    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null, tempId?: string) {
         const normalizedLang = originalLang === 'tj' ? 'tg' : originalLang;
-        this.socket.emit('private_message', { roomId, content, originalLang: normalizedLang, type, replyTo });
+        this.socket.emit('private_message', { roomId, content, originalLang: normalizedLang, type, replyTo, tempId });
     }
 
     isUserOnline(userId: number): boolean {
@@ -190,10 +199,6 @@ export class SocketService implements OnDestroy {
 
     onMatchFound(): Observable<any> {
         return this.matchFound$;
-    }
-
-    onMessage(): Observable<any> {
-        return this.message$;
     }
 
     onMessageSent(): Observable<any> {
@@ -218,10 +223,6 @@ export class SocketService implements OnDestroy {
 
     loadMessages(roomId: string, limit: number = 50, offset: number = 0) {
         this.socket.emit('load_messages', { roomId, limit, offset });
-    }
-
-    onMessagesLoaded(): Observable<any> {
-        return this.messagesLoaded$;
     }
 
     // Chat Request Methods

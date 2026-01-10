@@ -320,9 +320,22 @@ export class CheckersComponent implements OnInit, OnDestroy {
         });
 
         this.socket.checkersRejected$.subscribe(() => {
+
             this.waitingForInviteTo.set(null);
+
         });
-    }
+
+        
+
+        this.socket.partnerLeft$.subscribe(() => {
+
+            if (this.gameStarted()) {
+
+                this.onGameOver(this.currentUserId);
+
+            }
+
+        });    }
 
     ngOnDestroy() {
         if (this.phaserGame) {

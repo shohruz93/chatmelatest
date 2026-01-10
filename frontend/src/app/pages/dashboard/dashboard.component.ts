@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { UiService } from '../../services/ui.service';
 import { LanguageService } from '../../services/language.service';
 import { FormsModule } from '@angular/forms';
 import { GamificationService } from '../../services/gamification.service';
+import { ChatStorageService } from '../../services/chat-storage.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -25,6 +26,8 @@ export class DashboardComponent implements OnInit {
     public ui = inject(UiService);
     public languageService = inject(LanguageService);
     public gameService = inject(GamificationService);
+    private chatStorage = inject(ChatStorageService);
+    private cdr = inject(ChangeDetectorRef);
 
     currentUser = this.auth.currentUserValue;
     isDarkMode = signal(false);
@@ -96,19 +99,8 @@ export class DashboardComponent implements OnInit {
         });
 
         // Listen for new messages to update unread count
-        this.socketService.onMessage().subscribe((message: any) => {
-            // Use senderId (camelCase) as sent by server.js
-            const senderId = message.senderId || message.sender_id;
-
-            if (senderId !== this.currentUser.id) {
-                // Check if we are currently chatting with this user
-                const isChattingWithUser = this.router.url === `/dashboard/chat/${senderId}`;
-
-                if (!isChattingWithUser) {
-                    this.unreadCount++;
-                    this.socketService.playNotificationSound();
-                }
-            }
+        this.chatStorage.messagesUpdated$.subscribe(() => {
+            this.checkUnread();
         });
     }
 
@@ -121,10 +113,16 @@ export class DashboardComponent implements OnInit {
 
     checkUnread() {
         if (this.currentUser) {
+            const oldUnreadCount = this.unreadCount;
             this.api.get(`/conversations?userId=${this.currentUser.id}`).subscribe({
                 next: (data: any) => {
                     const total = data.reduce((acc: number, curr: any) => acc + parseInt(curr.unread_count || 0), 0);
                     this.unreadCount = total;
+                    
+                    if (this.unreadCount > oldUnreadCount) {
+                        this.socketService.playNotificationSound();
+                    }
+                    this.cdr.detectChanges(); // Manually trigger change detection
                 },
                 error: () => this.unreadCount = 0
             });

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SocketService } from '../../../services/socket.service';
 import { ApiService } from '../../../services/api.service';
 import { HttpClient } from '@angular/common/http';
+import { ChatStorageService } from '../../../services/chat-storage.service';
 
 @Component({
   selector: 'app-support-chat',
@@ -29,7 +30,7 @@ import { HttpClient } from '@angular/common/http';
                class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex items-center transition-colors">
             
             <div class="relative">
-              <img [src]="conv.avatar || 'assets/default-avatar.png'" class="w-12 h-12 rounded-full object-cover">
+              <img [src]="conv.avatar || 'default-avatar.png'" class="w-12 h-12 rounded-full object-cover">
               <span *ngIf="conv.unread_count > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {{conv.unread_count}}
               </span>
@@ -63,7 +64,7 @@ import { HttpClient } from '@angular/common/http';
           <!-- Chat Header -->
           <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between shrink-0">
             <div class="flex items-center">
-              <img [src]="selectedUser.avatar || 'assets/default-avatar.png'" class="w-10 h-10 rounded-full object-cover">
+              <img [src]="selectedUser.avatar || 'default-avatar.png'" class="w-10 h-10 rounded-full object-cover">
               <div class="ml-3">
                 <h3 class="font-bold text-gray-800 dark:text-white">{{selectedUser.name}}</h3>
                 <p class="text-xs text-gray-500">{{selectedUser.email}}</p>
@@ -138,6 +139,7 @@ export class SupportChatComponent implements OnInit {
   currentUser: any = null;
   roomId: string | null = null;
   private http = inject(HttpClient);
+  private chatStorage = inject(ChatStorageService); // Inject ChatStorageService
 
   constructor(
     private socketService: SocketService,
@@ -150,6 +152,7 @@ export class SupportChatComponent implements OnInit {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         this.currentUser = JSON.parse(userStr);
+        this.chatStorage.openDb(this.currentUser.id); // Open DB for the admin
         this.loadConversations();
         this.setupSocketListeners();
       }
@@ -172,28 +175,18 @@ export class SupportChatComponent implements OnInit {
   }
 
   setupSocketListeners() {
-    this.socketService.onMessage().subscribe((msg: any) => {
-      // If we are currently chatting with this user, append message
-      if (this.selectedUser && (msg.senderId == this.selectedUser.user_id || msg.senderId == this.currentUser.id)) {
-        this.messages.push({
-          sender_id: msg.senderId,
-          content: msg.content,
-          created_at: new Date(),
-          messageType: this.detectMessageType(msg.content, msg.type)
-        });
-        this.scrollToBottom();
-
-        // Mark as read immediately if the message is from the user we are chatting with
-        if (msg.senderId == this.selectedUser.user_id) {
-          this.markAsRead(msg.senderId);
-        }
+    // Listen for storage changes, which indicates a new message has arrived or been synced
+    this.chatStorage.messagesUpdated$.subscribe(() => {
+      // If we are currently chatting with a user, refresh the messages
+      if (this.selectedUser) {
+        this.loadLocalMessages(this.roomId!);
       }
-      // Refresh conversations to update last message/unread count
+      // Always refresh conversations to update last message/unread count
       this.loadConversations();
     });
   }
 
-  selectUser(user: any) {
+  async selectUser(user: any) {
     // Avatar fix
     if (user.avatar && !user.avatar.startsWith('http')) {
       user.avatar = `${this.apiService.phpBaseUrl}${user.avatar}`;
@@ -202,28 +195,28 @@ export class SupportChatComponent implements OnInit {
     this.messages = [];
 
     // Construct Room ID: Lower ID first
-    const sortedIds = [this.currentUser.id, user.user_id].sort();
+    const sortedIds = [this.currentUser.id, user.user_id].sort((a, b) => a - b);
     this.roomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
 
     this.socketService.emit('join_chat', { roomId: this.roomId });
 
-    // Load messages
-    this.socketService.loadMessages(this.roomId!, 50, 0);
+    // Load messages from local storage first
+    await this.loadLocalMessages(this.roomId);
 
-    // Subscribe to loaded messages (one-time)
-    const sub = this.socketService.onMessagesLoaded().subscribe((data: any) => {
-      if (data.roomId === this.roomId) {
-        this.messages = data.messages.map((msg: any) => ({
-          ...msg,
-          messageType: this.detectMessageType(msg.content, msg.type)
-        }));
-        this.scrollToBottom();
-        sub.unsubscribe();
-      }
-    });
+    // Then, sync with the server
+    this.socketService.loadMessages(this.roomId!, 50, 0);
 
     // Mark as read immediately when opening chat
     this.markAsRead(user.user_id);
+  }
+
+  async loadLocalMessages(roomId: string) {
+    const localMessages = await this.chatStorage.getMessages(roomId, 100, 0); // Load more for support chat
+    this.messages = localMessages.map((msg: any) => ({
+      ...msg,
+      messageType: this.detectMessageType(msg.content, msg.type)
+    }));
+    this.scrollToBottom();
   }
 
   markAsRead(senderId: number) {
@@ -235,19 +228,25 @@ export class SupportChatComponent implements OnInit {
     }
   }
 
-  sendMessage() {
+  async sendMessage() {
     if (!this.newMessage.trim() || !this.roomId) return;
 
     const content = this.newMessage;
-    this.socketService.sendMessage(this.roomId, content, 'en', 'text'); // Admin sends in En default for now
+    const tempId = `temp_${Date.now()}`;
 
-    // Optimistic update
-    this.messages.push({
+    this.socketService.sendMessage(this.roomId, content, 'en', 'text', null, tempId); // Admin sends in En default for now
+
+    // Optimistic update to local storage
+    const messageObj = {
+      id: tempId,
+      roomId: this.roomId,
       sender_id: this.currentUser.id,
       content: content,
-      created_at: new Date(),
-      messageType: 'text'
-    });
+      created_at: new Date().getTime(),
+      messageType: 'text',
+      status: 'sending'
+    };
+    await this.chatStorage.addMessage(messageObj);
 
     this.newMessage = '';
     this.scrollToBottom();

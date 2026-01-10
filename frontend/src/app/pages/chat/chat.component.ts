@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { TimestampService } from '../../services/timestamp.service';
+import { ChatStorageService } from '../../services/chat-storage.service';
 import { Subscription, lastValueFrom } from 'rxjs';
 import { VoiceRecorder, RecordingData } from '@independo/capacitor-voice-recorder';
 
@@ -38,6 +39,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
     private languageService = inject(LanguageService);
+    private chatStorage = inject(ChatStorageService); // Inject ChatStorageService
 
     messages: any[] = [];
     newMessage: string = '';
@@ -47,6 +49,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     partnerTyping: boolean = false;
     private typingTimeout: any;
     waitingForResponse = false;
+    isSyncing = signal(false);
+    isOnline = signal(navigator.onLine);
 
     // Modal states
     showPartnerLeftBanner = false;
@@ -88,7 +92,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     get isPartnerTyping() { return this.partnerTyping; }
 
     private matchSub!: Subscription;
-    private messageSub!: Subscription;
+    private messageSentSub!: Subscription;
+    private storageSub!: Subscription;
     private typingSub!: Subscription;
     private partnerLeftSub!: Subscription;
     private randomUserSub!: Subscription;
@@ -100,6 +105,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private gameInviteSub!: Subscription;
     private gameStartSub!: Subscription;
     private gameRejectedSub!: Subscription;
+    private paramMapSub!: Subscription;
 
     // Filter modal
     showFilterModal = false;
@@ -142,16 +148,27 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
 
 
-    ngOnInit() {
+    async ngOnInit() {
         this.locationOptions = this.countryService.getCountryOptions();
         // Initialize current user from localStorage
         const userStr = localStorage.getItem('user');
         if (userStr) {
             this.currentUser = JSON.parse(userStr);
+            await this.chatStorage.openDb(this.currentUser.id); // Ensure DB is open
+
+            // Clean up old temporary messages
+            await this.chatStorage.cleanupOldTempMessages();
         } else {
             console.error('No user found in localStorage');
             // Redirect to login or handle appropriately
         }
+
+        // *** NEW: Subscribe to storage updates ***
+        this.storageSub = this.chatStorage.messagesUpdated$.subscribe(() => {
+            if (this.roomId) {
+                this.loadMessagesFromStorage(this.roomId);
+            }
+        });
 
         // Listen for incoming chat requests
         this.requestSub = this.socketService.onChatRequestReceived().subscribe(data => {
@@ -191,22 +208,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         });
 
         // Check for partner ID in route (resuming conversation)
-        const partnerId = this.route.snapshot.paramMap.get('userId');
-        if (partnerId) {
-            const pId = parseInt(partnerId);
-            if (!isNaN(pId)) {
-                const sortedIds = [this.currentUser.id, pId].sort();
-                this.roomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
+        this.paramMapSub = this.route.paramMap.subscribe(async params => {
+            const partnerId = params.get('userId');
+            if (partnerId) {
+                const pId = parseInt(partnerId);
+                if (!isNaN(pId)) {
+                    const sortedIds = [this.currentUser.id, pId].sort((a, b) => a - b);
+                    this.roomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
 
-                // Join the chat room
-                this.socketService.emit('join_chat', { roomId: this.roomId });
+                    // Join the chat room
+                    this.socketService.emit('join_chat', { roomId: this.roomId });
 
-                // Load messages and partner details
-                this.loadMessageHistory();
-                // Set partner initial status correctly
-                this.socketService.emit('get_room_details', { roomId: this.roomId });
+                    // Try to load partner info from storage first
+                    const cachedPartner = await this.chatStorage.getPartnerInfo(this.roomId);
+                    if (cachedPartner) {
+                        console.log('[CHAT] Loaded partner from cache:', cachedPartner);
+                        this.partner = cachedPartner;
+                        this.partnerStatus = this.socketService.isUserOnline(cachedPartner.id) ? 'online' : 'offline';
+                    }
+
+                    // Load messages and partner details
+                    console.log('[CHAT] Loading messages for room:', this.roomId);
+                    this.loadMessagesFromStorage(this.roomId!, true); // Load from local
+                    this.syncMessages(); // Sync with server
+                    // Set partner initial status correctly
+                    this.socketService.emit('get_room_details', { roomId: this.roomId });
+                }
             }
-        }
+        });
 
         this.matchSub = this.socketService.onMatchFound().subscribe(data => {
             this.roomId = data.roomId;
@@ -219,13 +248,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.matchReasons = data.matchReasons || [];
             this.compatibilityBreakdown = data.breakdown || null;
 
-            const matchMsg = this.compatibilityScore > 0
-                ? `Match found! Compatibility: ${this.compatibilityScore.toFixed(0)}%`
-                : 'Match found! Say hello.';
-            this.messages = [...this.messages, { type: 'system', content: matchMsg }];
-            this.cdr.markForCheck();
+            const matchMsg = {
+                id: `sys_${Date.now()}`,
+                type: 'system',
+                roomId: this.roomId,
+                content: this.compatibilityScore > 0
+                    ? `Match found! Compatibility: ${this.compatibilityScore.toFixed(0)}%`
+                    : 'Match found! Say hello.'
+            };
+            this.chatStorage.addMessage(matchMsg);
 
-            this.loadMessageHistory();
+
+            this.loadMessagesFromStorage(this.roomId!);
+            this.syncMessages();
+
 
             // Send any pending messages
             if (this.pendingMessages.length > 0) {
@@ -239,7 +275,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.socketService.emit('get_room_details', { roomId: this.roomId });
         });
 
-        this.roomDetailsSub = this.socketService.on('room_details').subscribe((data: any) => {
+        this.roomDetailsSub = this.socketService.on('room_details').subscribe(async (data: any) => {
             if (data.roomId === this.roomId) {
                 // Fix: Use string comparison to ensure we don't pick the current user if types differ
                 const partnerProfile = data.participants.find((p: any) => String(p.id) !== String(this.currentUser.id));
@@ -258,75 +294,39 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     }
 
                     this.partner = partnerProfile;
+                    console.log('[CHAT] Received partner details:', partnerProfile);
+
+                    // Save partner info to storage for future use
+                    await this.chatStorage.savePartnerInfo(this.roomId!, partnerProfile);
+
                     // Set partner initial status correctly
                     this.partnerStatus = this.socketService.isUserOnline(partnerProfile.id) ? 'online' : 'offline';
                 }
             }
         });
 
-        this.messageSub = this.socketService.onMessage().subscribe(message => {
-            // Construct roomId if missing (backward compatibility)
-            let messageRoomId = message.roomId;
-            if (!messageRoomId && message.senderId && message.receiverId) {
-                const sortedIds = [Number(message.senderId), Number(message.receiverId)].sort();
-                messageRoomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
-            }
-
-            // Check if message belongs to current room
-            if (messageRoomId === this.roomId) {
-                const shouldScroll = this.isUserNearBottom();
-
-                let timestamp = message.timestamp || new Date();
-                if (typeof timestamp === 'number' && timestamp < 10000000000) {
-                    timestamp *= 1000;
-                }
-
-                // Add message with proper ID (immutable update)
-                this.messages = [...this.messages, {
-                    id: message.id || Date.now(),
-                    type: 'received',
-                    content: message.content,
-                    created_at: timestamp,
-                    messageType: this.detectMessageType(message.content, message.type),
-                    read: false,
-                    originalLang: message.originalLang,
-                    replyTo: message.replyTo,
-                    senderName: message.senderName || this.partnerName
-                }];
-                this.cdr.markForCheck();
-
-                if (shouldScroll) {
-                    this.scrollToBottom();
-                }
-
-                // Mark as read immediately if we are in the room
-                this.markMessagesAsRead();
-            }
-        });
-
         // Listen for server ack that message was saved (sent)
-        this.socketService.onMessageSent().subscribe((messageData: any) => {
+        this.messageSentSub = this.socketService.onMessageSent().subscribe(async (messageData: any) => {
             if (messageData.roomId !== this.roomId) return;
 
-            // Find the first sending message with same content and update it (immutable)
-            const pendingIndex = this.messages.findIndex(m => m.type === 'sent' && m.status === 'sending' && m.content === messageData.content);
-            if (pendingIndex !== -1) {
-                const updatedMessage = { ...this.messages[pendingIndex], status: 'sent' };
-                if (messageData.id) updatedMessage.id = messageData.id;
-                if (messageData.timestamp) {
-                    let timestamp = messageData.timestamp;
-                    if (typeof timestamp === 'number' && timestamp < 10000000000) {
-                        timestamp *= 1000;
-                    }
-                    updatedMessage.created_at = timestamp;
-                }
-                this.messages = [
-                    ...this.messages.slice(0, pendingIndex),
-                    updatedMessage,
-                    ...this.messages.slice(pendingIndex + 1)
-                ];
-                this.cdr.markForCheck();
-            }
+            const tempId = messageData.tempId;
+            if (!tempId) return;
+
+            // Replace temp message with real message from server
+            const finalMessage = {
+                id: messageData.id,
+                sender_id: messageData.senderId,
+                roomId: messageData.roomId,
+                content: messageData.content,
+                created_at: messageData.timestamp * 1000, // Convert to milliseconds
+                messageType: messageData.type || 'text',
+                status: 'sent',
+                replyTo: messageData.replyTo,
+                originalLang: messageData.originalLang,
+                type: 'sent'
+            };
+
+            await this.chatStorage.replaceTempMessage(tempId, finalMessage);
         });
 
         this.typingSub = this.socketService.onUserTyping().subscribe((data: any) => {
@@ -348,7 +348,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // Listen for partner leaving
         this.partnerLeftSub = this.socketService.onPartnerLeft().subscribe((data) => {
             this.showPartnerLeftBanner = true;
-            this.messages = [...this.messages, { type: 'system', content: 'Partner has left the chat.' }];
+            const systemMessage = { type: 'system', content: 'Partner has left the chat.', roomId: this.roomId, id: `sys_${Date.now()}` };
+            this.chatStorage.addMessage(systemMessage);
             this.partnerStatus = 'offline';
             this.cdr.markForCheck();
         });
@@ -379,14 +380,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         });
 
         // Listen for message read receipts
-        this.socketService.onMessageRead().subscribe((data: any) => {
+        this.socketService.onMessageRead().subscribe(async (data: any) => {
             if (data.roomId === this.roomId) {
-                this.messages.forEach(msg => {
-                    if (msg.type === 'sent' && !msg.read) {
-                        msg.read = true;
-                        msg.status = 'read'; // Update status to read
-                    }
-                });
+                const messagesToUpdate = this.messages.filter(msg => msg.type === 'sent' && msg.status !== 'read');
+                for (const msg of messagesToUpdate) {
+                    msg.read = true;
+                    msg.status = 'read';
+                    await this.chatStorage.updateMessage(msg);
+                }
             }
         });
 
@@ -438,6 +439,32 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 this.gameInvitation = null;
             }
             this.cdr.markForCheck();
+        });
+
+        // Online/offline detection
+        window.addEventListener('online', async () => {
+            this.isOnline.set(true);
+            console.log('Back online - retrying pending messages');
+
+            // Retry pending messages
+            if (this.roomId) {
+                const pendingMessages = await this.chatStorage.getPendingMessages(this.roomId);
+                for (const msg of pendingMessages) {
+                    this.socketService.sendMessage(
+                        msg.roomId,
+                        msg.content,
+                        msg.originalLang || this.socketService.selectedLanguage(),
+                        msg.messageType || 'text',
+                        msg.replyTo,
+                        msg.id // Use the existing temp ID
+                    );
+                }
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            this.isOnline.set(false);
+            console.log('Gone offline');
         });
     }
 
@@ -495,7 +522,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     ngOnDestroy() {
         if (this.matchSub) this.matchSub.unsubscribe();
-        if (this.messageSub) this.messageSub.unsubscribe();
+        if (this.messageSentSub) this.messageSentSub.unsubscribe();
+        if (this.storageSub) this.storageSub.unsubscribe();
         if (this.typingSub) this.typingSub.unsubscribe();
         if (this.partnerLeftSub) this.partnerLeftSub.unsubscribe();
         if (this.randomUserSub) this.randomUserSub.unsubscribe();
@@ -507,6 +535,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.gameInviteSub) this.gameInviteSub.unsubscribe();
         if (this.gameStartSub) this.gameStartSub.unsubscribe();
         if (this.gameRejectedSub) this.gameRejectedSub.unsubscribe();
+        if (this.paramMapSub) this.paramMapSub.unsubscribe();
 
         if (this.roomId) {
             this.socketService.emitTyping(this.roomId, false);
@@ -524,12 +553,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
         return {
             id: msg.id,
-            type: String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received',
+            type: msg.type || (String(msg.sender_id) === String(this.currentUser.id) ? 'sent' : 'received'),
             content: msg.content,
             created_at: timestamp,
-            messageType: this.detectMessageType(msg.content, msg.type),
+            messageType: this.detectMessageType(msg.content, msg.messageType),
             read: (msg.is_read !== undefined) ? Boolean(msg.is_read) : (msg.read || false),
-            status: ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
+            status: msg.status || ((msg.is_read !== undefined ? msg.is_read : msg.read) ? 'read' : 'sent'),
             replyTo: msg.replyTo,
             originalLang: msg.original_lang,
             senderName: msg.senderName
@@ -537,6 +566,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     get groupedMessages() {
+        console.log('[CHAT] groupedMessages called, messages.length:', this.messages?.length);
         if (!this.messages || this.messages.length === 0) return [];
 
         if (this.messages === this.lastMessagesRef && this.cachedGroupedMessages.length > 0) {
@@ -603,113 +633,88 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
     }
 
-    loadMessageHistory() {
-        if (!this.roomId) return;
+    // *** NEW: Load messages from local storage ***
+    async loadMessagesFromStorage(roomId: string, scrollToBottom = false) {
+        console.log('[CHAT] loadMessagesFromStorage called for room:', roomId);
         this.isLoadingHistory = true;
-        this.messages = [];
-        this.cachedGroupedMessages = [];
-        this.lastMessagesRef = null;
+        const localMessages = await this.chatStorage.getMessages(roomId, 50, 0);
+        console.log('[CHAT] Loaded', localMessages.length, 'messages from IndexedDB:', localMessages);
+
+        // Handle message mapping and sorting
+        const mappedMessages = localMessages.map(this.mapMessage.bind(this));
+        console.log('[CHAT] Mapped', mappedMessages.length, 'messages:', mappedMessages);
+
+        // Keep track of pending messages to avoid duplicates when they are confirmed
+        this.messages = mappedMessages;
+        console.log('[CHAT] Set this.messages to', this.messages.length, 'messages');
+
+        this.isLoadingHistory = false;
+        this.allMessagesLoaded = localMessages.length < 50;
         this.cdr.markForCheck();
 
-        this.socketService.loadMessages(this.roomId, 50, 0);
+        if (scrollToBottom) {
+            this.scrollToBottom('auto');
+        }
 
-        const sub = this.socketService.onMessagesLoaded().subscribe({
-            next: (data: any) => {
-                if (data.roomId === this.roomId && !this.isLoadingMore) {
-                    this.messages = data.messages.map((msg: any) => this.mapMessage(msg));
-                    this.cachedGroupedMessages = [];
-                    this.lastMessagesRef = null;
-
-                    this.markMessagesAsRead();
-                    setTimeout(() => {
-                        this.scrollToBottom('auto');
-                    }, 0);
-                    this.isLoadingHistory = false;
-                    this.cdr.markForCheck();
-                    sub.unsubscribe();
-                }
-            },
-            error: (err) => {
-                this.isLoadingHistory = false;
-                this.cdr.markForCheck();
-                sub.unsubscribe();
-            }
-        });
+        this.markMessagesAsRead();
     }
 
-    loadMoreMessages() {
-        if (!this.roomId || this.isLoadingMore) return;
+    // *** NEW: Sync messages with server ***
+    async syncMessages() {
+        if (!this.roomId) return;
+
+        // We could use the last message timestamp to fetch only new ones
+        // For now, let's just load the latest page to ensure consistency
+        this.socketService.loadMessages(this.roomId, 50, 0);
+
+        await this.chatStorage.setLastSyncTimestamp(this.roomId, Date.now());
+    }
+
+    // *** REFACTORED: Now loads from local storage ***
+    async loadMoreMessages() {
+        if (!this.roomId || this.isLoadingMore || this.allMessagesLoaded) return;
 
         this.isLoadingMore = true;
         const currentScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
-        const offset = this.messages.length;
+        const offset = this.messages.filter(m => m.status !== 'sending').length;
 
-        this.socketService.loadMessages(this.roomId, 30, offset);
+        const newMessages = await this.chatStorage.getMessages(this.roomId, 30, offset);
 
-        // We need a one-time subscription for this specific load
-        const sub = this.socketService.onMessagesLoaded().subscribe({
-            next: (data: any) => {
-                if (data.roomId === this.roomId) {
-                    if (data.messages.length === 0) {
-                        this.allMessagesLoaded = true;
-                    } else {
-                        const newMessages = data.messages.map((msg: any) => this.mapMessage(msg));
-                        this.messages = [...newMessages, ...this.messages];
+        if (newMessages.length === 0) {
+            this.allMessagesLoaded = true;
+        } else {
+            const mappedMessages = newMessages.map(this.mapMessage.bind(this));
 
-                        // Restore scroll position
-                        setTimeout(() => {
-                            if (this.scrollContainer) {
-                                const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
-                                this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
-                            }
-                        }, 0);
-                    }
+            // Avoid duplicates
+            const existingIds = new Set(this.messages.map(m => m.id));
+            const uniqueNewMessages = mappedMessages.filter(m => !existingIds.has(m.id));
+
+            this.messages = [...uniqueNewMessages, ...this.messages];
+
+            // Restore scroll position
+            setTimeout(() => {
+                if (this.scrollContainer) {
+                    const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+                    this.scrollContainer.nativeElement.scrollTop = newScrollHeight - currentScrollHeight;
                 }
-                this.isLoadingMore = false;
-                this.cdr.markForCheck();
-                sub.unsubscribe();
-            },
-            error: (err) => {
-                this.isLoadingMore = false;
-                this.cdr.markForCheck();
-                sub.unsubscribe();
-            }
-        });
-    }
-
-    sendMessage() {
-        if (!this.newMessage.trim()) {
-            return;
+            }, 0);
         }
 
-        if (!this.roomId && !this.waitingForResponse) {
+        this.isLoadingMore = false;
+        this.cdr.markForCheck();
+    }
+
+    // *** REFACTORED: Saves to local storage first ***
+    async sendMessage() {
+        if (!this.newMessage.trim() || (!this.roomId && !this.waitingForResponse)) {
             return;
         }
 
         const content = this.newMessage;
 
         if (this.editingMessage) {
-            this.socketService.emit('edit_message', {
-                roomId: this.roomId,
-                messageId: this.editingMessage.id,
-                content: content
-            });
-            // Immutable update for edited message
-            const editIndex = this.messages.findIndex(m => m.id === this.editingMessage.id);
-            if (editIndex !== -1) {
-                const updatedMsg = {
-                    ...this.messages[editIndex],
-                    content,
-                    translatedContent: null,
-                    showTranslation: false
-                };
-                this.messages = [
-                    ...this.messages.slice(0, editIndex),
-                    updatedMsg,
-                    ...this.messages.slice(editIndex + 1)
-                ];
-                this.cdr.markForCheck();
-            }
+            // Handle edit logic (unchanged for now, but should also update storage)
+            this.socketService.emit('edit_message', { roomId: this.roomId, messageId: this.editingMessage.id, content });
             this.cancelInputMode();
             this.newMessage = '';
             return;
@@ -721,41 +726,37 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             senderName: this.replyingToMessage.senderName || 'Partner'
         } : null;
 
-        const tempMessageId = Date.now();
-
-        if (this.roomId) {
-            this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo);
-        } else if (this.waitingForResponse) {
-            this.pendingMessages = [...this.pendingMessages, content];
-        }
-
-        const messageObj: any = {
-            id: tempMessageId,
-            type: 'sent',
+        const tempId = `temp_${Date.now()}`;
+        const messageObj = {
+            id: tempId,
+            roomId: this.roomId,
+            sender_id: this.currentUser.id,
             content: content,
-            created_at: new Date(),
+            created_at: new Date().getTime(),
             messageType: 'text',
-            read: false,
             status: 'sending',
             replyTo: replyTo,
             senderName: this.currentUser.name
         };
 
-        this.messages = [...this.messages, messageObj];
-        this.cdr.markForCheck();
+        // Immediately save to local storage
+        await this.chatStorage.addMessage(messageObj);
+
+        // UI will update automatically via the `messagesUpdated$` subscription
+
+        if (this.roomId) {
+            // Pass tempId to the server so it can be returned for confirmation
+            this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), 'text', replyTo, tempId);
+        } else if (this.waitingForResponse) {
+            this.pendingMessages.push(content);
+        }
 
         this.newMessage = '';
         this.cancelInputMode();
-
-        if (this.roomId) {
-            this.socketService.emitTyping(this.roomId, false);
-        }
-        if (this.typingTimeout) {
-            clearTimeout(this.typingTimeout);
-        }
+        if (this.roomId) this.socketService.emitTyping(this.roomId, false);
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
 
         this.scrollToBottom();
-        // status will be updated when server acknowledges via 'message_sent'
     }
 
 
@@ -843,14 +844,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         // this.messageInput.nativeElement.focus();
     }
 
-    deleteMessage(msg: any) {
+    async deleteMessage(msg: any) {
         if (confirm('Are you sure you want to delete this message?')) {
             this.socketService.emit('delete_message', {
                 roomId: this.roomId,
                 messageId: msg.id
             });
-            // Instantly remove from UI
-            this.messages = this.messages.filter(m => m.id !== msg.id);
+            // Instantly remove from UI and storage
+            await this.chatStorage.deleteMessage(msg.id);
         }
     }
 
@@ -926,8 +927,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
         // Default bet amount 50
         this.socketService.sendCheckersInvite(this.partnerId, 50);
-        // Optionally show 'Waiting for partner to accept game...'
-        this.messages = [...this.messages, { type: 'system', content: 'You invited partner to a game of Checkers (50 🪙)' }];
+        const systemMessage = { type: 'system', content: 'You invited partner to a game of Checkers (50 🪙)', roomId: this.roomId, id: `sys_${Date.now()}` };
+        this.chatStorage.addMessage(systemMessage);
         this.cdr.markForCheck();
     }
 
@@ -1093,28 +1094,26 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
-    sendMediaMessage(content: string, type: string) {
-        if (this.roomId) {
-            const tempMessageId = Date.now();
-            this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), type);
+    async sendMediaMessage(content: string, type: string) {
+        if (!this.roomId) return;
+        const tempId = `temp_${Date.now()}`;
 
-            const messageObj: any = {
-                id: tempMessageId,
-                type: 'sent',
-                content: content,
-                created_at: new Date(),
-                messageType: type,
-                read: false,
-                status: 'sending',
-                senderName: this.currentUser.name
-            };
+        const messageObj = {
+            id: tempId,
+            roomId: this.roomId,
+            sender_id: this.currentUser.id,
+            content: content,
+            created_at: new Date().getTime(),
+            messageType: type,
+            status: 'sending',
+            senderName: this.currentUser.name
+        };
 
-            this.messages.push(messageObj);
+        await this.chatStorage.addMessage(messageObj);
 
-            this.scrollToBottom();
+        this.socketService.sendMessage(this.roomId, content, this.socketService.selectedLanguage(), type, null, tempId);
 
-            // status will be updated when server acknowledges via 'message_sent'
-        }
+        this.scrollToBottom();
     }
 
     openImageModal(imageUrl: string) {

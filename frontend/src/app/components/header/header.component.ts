@@ -6,6 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { LanguageService } from '../../services/language.service';
+import { ChatStorageService } from '../../services/chat-storage.service';
 
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
@@ -24,6 +25,7 @@ export class HeaderComponent {
     private api = inject(ApiService); // Assuming ApiService is available in same scope or imported
     private auth = inject(AuthService); // Need auth to get user ID
     private socketService = inject(SocketService);
+    private chatStorage = inject(ChatStorageService);
     public languageService = inject(LanguageService);
     currentRoute = '';
     showLangMenu = false;
@@ -86,27 +88,14 @@ export class HeaderComponent {
 
     ngOnInit() {
         // Initialize theme based on current state or default
-        // Assuming default is dark as per original code
         if (document.documentElement.getAttribute('data-theme') !== 'dark' && this.isDarkMode()) {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
         this.currentRoute = this.router.url;
 
         // Listen for new messages to update unread count
-        this.socketService.onMessage().subscribe(() => {
-            // If we are not on the chat page, or (TODO: check if message is for current room), increment
-            // For now, just increment as the API checkUnread handles the reset when navigating
-            if (!this.currentRoute.includes('/chat')) {
-                this.unreadCount.update(count => count + 1);
-            } else {
-                // If we are on chat page, we might want to check if it's the active room
-                // But for now, let's rely on the fact that if we are on chat, we probably read it?
-                // Actually, if we are on /chat but not in a room, or in a different room...
-                // Simpler approach: Just increment if not on /chat for now.
-                // Or better: re-fetch unread count? No, that's an API call.
-                // Let's just increment.
-                this.checkUnread();
-            }
+        this.chatStorage.messagesUpdated$.subscribe(() => {
+            this.checkUnread();
         });
     }
 }

@@ -387,7 +387,7 @@ io.on('connection', (socket) => {
         });
     });
 
-    socket.on('private_message', async ({ roomId, content, originalLang, type, replyTo }) => {
+    socket.on('private_message', async ({ roomId, content, originalLang, type, replyTo, tempId }) => {
         const senderId = userSocketMap.get(socket.id);
         if (!senderId) return;
 
@@ -421,7 +421,8 @@ io.on('connection', (socket) => {
             originalLang,
             type: type || 'text',
             timestamp: Math.floor(Date.now() / 1000),
-            replyTo: replyTo
+            replyTo: replyTo,
+            tempId: tempId // Include tempId for optimistic UI updates
         };
 
         // Save message via PHP API
@@ -466,7 +467,7 @@ io.on('connection', (socket) => {
         // Broadcast to the room (to receiver only, sender already has it)
         socket.to(roomId).emit('message', messageData);
 
-        // Acknowledge sender with saved message data (id assigned by PHP API)
+        // Acknowledge sender with saved message data (id assigned by PHP API) and tempId
         try {
             io.to(socket.id).emit('message_sent', messageData);
         } catch (err) {
@@ -514,9 +515,18 @@ io.on('connection', (socket) => {
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
+                // Normalize message format for IndexedDB storage
+                const normalizedMessages = messages.map(msg => ({
+                    ...msg,
+                    roomId: msg.roomId || msg.room_id || roomId,
+                    created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
+                    sender_id: msg.sender_id || msg.senderId,
+                    messageType: msg.type || msg.messageType || 'text'
+                }));
+
                 socket.emit('messages_loaded', {
                     roomId: roomId,
-                    messages: messages.reverse()
+                    messages: normalizedMessages.reverse()
                 });
             } else {
                 console.error('Invalid messages format from API:', messages);

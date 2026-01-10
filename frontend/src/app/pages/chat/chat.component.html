@@ -10,11 +10,21 @@
             <div class="user-details">
                 <h2 class="user-name">{{ partnerName || ('CHAT.CHAT_PARTNER' | translate) }}</h2>
                 <span class="user-status">
-                    {{ isPartnerOnline ? ('CHAT.ONLINE' | translate) : (formatLastActive(partner?.last_active) ||
-                    ('CHAT.OFFLINE' | translate)) }}
+                    @if (isSyncing()) {
+                        <span class="syncing-indicator">{{ 'CHAT.SYNCING' | translate }}...</span>
+                    } @else {
+                        {{ isPartnerOnline ? ('CHAT.ONLINE' | translate) : (formatLastActive(partner?.last_active) ||
+                        ('CHAT.OFFLINE' | translate)) }}
+                    }
                 </span>
             </div>
         </div>
+
+        @if (!isOnline()) {
+            <div class="offline-banner">
+                <span>{{ 'CHAT.OFFLINE_MODE' | translate }}</span>
+            </div>
+        }
 
         <div class="header-actions">
             <button class="btn-action-header" (click)="sendGameInvite()" [title]="'CHAT.INVITE_GAME' | translate">
