@@ -23,7 +23,9 @@ export class SocketService implements OnDestroy {
     private destroy$ = new Subject<void>();
 
     private matchFoundSubject = new Subject<any>();
+    private syncResponseSubject = new Subject<any>();
     private messageSentSubject = new Subject<any>();
+    private messageReceivedSubject = new Subject<any>(); // Add this
     private userStatusChangedSubject = new Subject<any>();
     private userTypingSubject = new Subject<any>();
     private randomUserFoundSubject = new Subject<any>();
@@ -47,6 +49,7 @@ export class SocketService implements OnDestroy {
 
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
+    public messageReceived$ = this.messageReceivedSubject.asObservable().pipe(shareReplay(1)); // Add this
     public userStatusChanged$ = this.userStatusChangedSubject.asObservable().pipe(shareReplay(1));
     public userTyping$ = this.userTypingSubject.asObservable().pipe(shareReplay(1));
     public randomUserFound$ = this.randomUserFoundSubject.asObservable().pipe(shareReplay(1));
@@ -101,6 +104,7 @@ export class SocketService implements OnDestroy {
         this.socket.on('message', (data) => {
             console.log('[SOCKET] Received message event:', data);
             this.chatStorage.addMessage(data);
+            this.messageReceivedSubject.next(data); // Notify subscribers
         });
         this.socket.on('messages_loaded', (data) => {
             console.log('[SOCKET] Received messages_loaded event:', data.messages?.length, 'messages');
@@ -137,6 +141,15 @@ export class SocketService implements OnDestroy {
             }
             this.connectedSubject.next();
         });
+    }
+
+    // Add this method
+    translateMessage(messageId: string, text: string, targetLang: string) {
+        this.socket.emit('translate_message', { messageId, text, targetLang });
+    }
+
+    markMessageRead(messageId: string, roomId: string) {
+        this.socket.emit('mark_message_read', { messageId, roomId });
     }
 
     ngOnDestroy() {
@@ -180,7 +193,20 @@ export class SocketService implements OnDestroy {
 
     sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null, tempId?: string) {
         const normalizedLang = originalLang === 'tj' ? 'tg' : originalLang;
-        this.socket.emit('private_message', { roomId, content, originalLang: normalizedLang, type, replyTo, tempId });
+        const currentUser = this.auth.currentUserValue;
+        const senderName = currentUser?.name;
+        const avatar = currentUser?.avatar;
+
+        this.socket.emit('private_message', {
+            roomId,
+            content,
+            originalLang: normalizedLang,
+            type,
+            replyTo,
+            tempId,
+            senderName,
+            avatar
+        });
     }
 
     isUserOnline(userId: number): boolean {
@@ -223,6 +249,14 @@ export class SocketService implements OnDestroy {
 
     loadMessages(roomId: string, limit: number = 50, offset: number = 0) {
         this.socket.emit('load_messages', { roomId, limit, offset });
+    }
+
+    syncMessages(roomId: string, lastMessageId: string | null) {
+        this.socket.emit('sync_messages', { roomId, lastMessageId });
+    }
+
+    onSyncResponse(): Observable<any> {
+        return this.syncResponseSubject.asObservable();
     }
 
     // Chat Request Methods

@@ -521,7 +521,8 @@ io.on('connection', (socket) => {
                     roomId: msg.roomId || msg.room_id || roomId,
                     created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
                     sender_id: msg.sender_id || msg.senderId,
-                    messageType: msg.type || msg.messageType || 'text'
+                    messageType: msg.type || msg.messageType || 'text',
+                    id: String(msg.id)
                 }));
 
                 socket.emit('messages_loaded', {
@@ -535,6 +536,69 @@ io.on('connection', (socket) => {
         } catch (error) {
             console.error('Error loading messages:', error);
             socket.emit('messages_error', { error: 'Failed to load messages' });
+        }
+    });
+
+    socket.on('sync_messages', async ({ roomId, lastMessageId }) => {
+        try {
+            // Fetch recent messages to check for updates/new items
+            // We fetch 50 to cover a reasonable gap
+            const limit = 20;
+            const response = await fetch(`https://shphbjeio23.chatme.tj/messages/room?roomId=${roomId}&limit=${limit}&offset=0`);
+            const messages = await response.json();
+
+            if (Array.isArray(messages)) {
+                // Normalize first
+                const normalizedMessages = messages.map(msg => ({
+                    ...msg,
+                    roomId: msg.roomId || msg.room_id || roomId,
+                    created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
+                    sender_id: msg.sender_id || msg.senderId,
+                    messageType: msg.type || msg.messageType || 'text',
+                    id: String(msg.id)
+                }));
+
+                let newMessages = [];
+
+                if (lastMessageId) {
+                    // API typically returns newest first.
+                    // Collect messages until we hit the lastMessageId
+                    const lastIdStr = String(lastMessageId);
+                    for (const msg of normalizedMessages) {
+                        if (String(msg.id) === lastIdStr) break;
+                        newMessages.push(msg);
+                    }
+                    // Reverse to get chronological order (Oldest -> Newest)
+                    newMessages.reverse();
+                } else {
+                    // Initial sync or lost state: return last 20 as requested
+                    newMessages = normalizedMessages.slice(0, 20).reverse();
+                }
+
+                socket.emit('sync_response', {
+                    roomId,
+                    newMessages,
+                    updatedMessages: [], // API doesn't support delta updates yet
+                    deletedMessageIds: []
+                });
+            } else {
+                // Even if API fails, emit empty response to stop loading spinner
+                socket.emit('sync_response', {
+                    roomId,
+                    newMessages: [],
+                    updatedMessages: [],
+                    deletedMessageIds: []
+                });
+            }
+        } catch (error) {
+            console.error('Error syncing messages:', error);
+            // Emit empty response to stop loading spinner on error
+            socket.emit('sync_response', {
+                roomId,
+                newMessages: [],
+                updatedMessages: [],
+                deletedMessageIds: []
+            });
         }
     });
 

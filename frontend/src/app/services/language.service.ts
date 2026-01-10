@@ -217,7 +217,8 @@ export class LanguageService {
                 'INVITE_GAME': 'Invite to Game',
                 'GAME_INVITATION': 'Game Invitation',
                 'INVITED_YOU_TO_GAME': '{{name}} invited you to play Checkers for {{amount}} 🪙',
-                'USER_OFFLINE': 'User is offline'
+                'USER_OFFLINE': 'User is offline',
+                'SYNCING': 'Syncing...'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -423,7 +424,8 @@ export class LanguageService {
                 'INVITE_GAME': 'Пригласить в игру',
                 'GAME_INVITATION': 'Приглашение в игру',
                 'INVITED_YOU_TO_GAME': '{{name}} пригласил вас сыграть в шашки на {{amount}} 🪙',
-                'USER_OFFLINE': 'Пользователь не в сети'
+                'USER_OFFLINE': 'Пользователь не в сети',
+                'SYNCING': 'Синхронизация...'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -626,7 +628,8 @@ export class LanguageService {
                 'INVITE_GAME': 'Даъват ба бозӣ',
                 'GAME_INVITATION': 'Даъвати бозӣ',
                 'INVITED_YOU_TO_GAME': '{{name}} шуморо даъват кард ба бозии шашка барои {{amount}} 🪙',
-                'USER_OFFLINE': 'Корбар ғайрифаъол аст'
+                'USER_OFFLINE': 'Корбар ғайрифаъол аст',
+                'SYNCING': 'Ҳамоҳангсозӣ...'
             },
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',
@@ -1348,6 +1351,7 @@ export class LanguageService {
                 'MALE': 'Männlich',
                 'FEMALE': 'Weiblich',
                 'VALIDATION_MESSAGE': 'Bitte vervollständigen Sie zuerst Ihre Profilinformationen (Sprachen und Interessen), um diese Funktion nutzen zu können.',
+                'SYNCING': 'Synchronisierung...',
                 'COMPLETE_PROFILE': 'Profil vervollständigen'
             },
             'DASHBOARD': {
@@ -1493,6 +1497,7 @@ export class LanguageService {
                 'MALE': '男',
                 'FEMALE': '女',
                 'VALIDATION_MESSAGE': '请先完善您的个人资料（语言和兴趣）以使用此功能。',
+                'SYNCING': '同步中...',
                 'COMPLETE_PROFILE': '完善个人资料'
             },
             'DASHBOARD': {
@@ -1635,6 +1640,7 @@ export class LanguageService {
                 'ONLINE_ONLY': 'केवल ऑनलाइन',
                 'SEARCH': 'खोजें',
                 'ANY_GENDER': 'कोई भी लिंग',
+                'SYNCING': 'सिंक हो रहा है...',
                 'MALE': 'पुरुष',
                 'FEMALE': 'महिला',
                 'VALIDATION_MESSAGE': 'इस सुविधा का उपयोग करने के लिए कृपया पहले अपनी प्रोफ़ाइल जानकारी (भाषाएं और रुचियां) पूरी करें।',

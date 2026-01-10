@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-conversations',
@@ -14,11 +15,12 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
     templateUrl: './conversations.component.html',
     styleUrl: './conversations.component.css'
 })
-export class ConversationsComponent implements OnInit {
+export class ConversationsComponent implements OnInit, OnDestroy {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private router = inject(Router);
     public socketService = inject(SocketService);
+    private subs = new Subscription();
 
     conversations: any[] = [];
     loading = true;
@@ -31,7 +33,67 @@ export class ConversationsComponent implements OnInit {
         this.currentUser = this.auth.currentUserValue;
         if (this.currentUser) {
             this.loadConversations();
+            this.setupSocketListeners();
         }
+    }
+
+    ngOnDestroy() {
+        this.subs.unsubscribe();
+    }
+
+    setupSocketListeners() {
+        // Listen for incoming messages
+        this.subs.add(this.socketService.messageReceived$.subscribe((msg: any) => {
+            if (msg) this.handleNewMessage(msg, false);
+        }));
+
+        // Listen for sent messages
+        this.subs.add(this.socketService.messageSent$.subscribe((msg: any) => {
+            if (msg) this.handleNewMessage(msg, true);
+        }));
+    }
+
+    handleNewMessage(msg: any, isSent: boolean) {
+        // Determine partner ID
+        // If sent by me, partner is the receiver (but message object might vary)
+        // Usually msg.roomId = 'room_smallId_bigId'
+        // msg.senderId
+
+        // Find existing conversation
+        // We need to parse roomId or check participants if not available in msg object properly
+        const partnerId = isSent
+            ? (msg.roomId ? this.getPartnerIdFromRoom(msg.roomId) : null)
+            : Number(msg.senderId || msg.sender_id);
+
+        if (!partnerId) return;
+
+        const index = this.conversations.findIndex(c => Number(c.partner_id) === partnerId);
+
+        if (index > -1) {
+            // Update existing
+            const conv = this.conversations[index];
+            conv.last_message = msg.content;
+            conv.last_message_time = msg.createdAt || msg.created_at || Date.now();
+            if (!isSent) {
+                conv.unread_count = (conv.unread_count || 0) + 1;
+            }
+
+            // Move to top
+            this.conversations.splice(index, 1);
+            this.conversations.unshift(conv);
+        } else {
+            // New conversation? Reload list to get full details properly
+            this.loadConversations();
+        }
+    }
+
+    getPartnerIdFromRoom(roomId: string): number | null {
+        if (!roomId) return null;
+        const parts = roomId.split('_');
+        if (parts.length < 3) return null;
+        const id1 = Number(parts[1]);
+        const id2 = Number(parts[2]);
+        return id1 === this.currentUser.id ? id2 : id1;
     }
 
     loadConversations() {
