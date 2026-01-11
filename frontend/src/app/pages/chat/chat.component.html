@@ -341,4 +341,30 @@
         </div>
     </div>
     }
+
+    @if (waitingForGameResponse) {
+    <div class="modal-overlay">
+        <div class="modal-content glass-panel game-waiting-modal">
+            <div class="modal-body center-content">
+                <div class="game-waiting-animation">
+                    <div class="game-icon-waiting">🎮</div>
+                    <div class="waiting-ripple">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <h3>{{ 'CHAT.WAITING_FOR_RESPONSE' | translate }}</h3>
+                <p class="waiting-subtext">{{ 'CHAT.WAITING_DESC' | translate }}</p>
+                <div class="waiting-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            <div class="modal-footer center-footer">
+                <button class="btn-cancel-waiting" (click)="cancelGameInvite()">{{ 'COMMON.CANCEL' | translate
+                    }}</button>
+            </div>
+        </div>
+    </div>
+    }
 </div>

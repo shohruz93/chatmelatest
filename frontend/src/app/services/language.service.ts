@@ -220,7 +220,10 @@ export class LanguageService {
                 'USER_OFFLINE': 'User is offline',
                 'SYNCING': 'Syncing...',
                 'INVITE_SENT': 'Invitation sent!',
-                'INVITE_DECLINED': 'Invitation declined'
+                'INVITE_DECLINED': 'Invitation declined',
+                'WAITING_FOR_RESPONSE': 'Waiting for response',
+                'WAITING_DESC': 'Waiting for your partner to accept or decline the game invite...',
+                'USER_NOT_IN_ROOM': 'User is not in this chat room'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -429,7 +432,10 @@ export class LanguageService {
                 'USER_OFFLINE': 'Пользователь не в сети',
                 'SYNCING': 'Синхронизация...',
                 'INVITE_SENT': 'Приглашение отправлено!',
-                'INVITE_DECLINED': 'Приглашение отклонено'
+                'INVITE_DECLINED': 'Приглашение отклонено',
+                'WAITING_FOR_RESPONSE': 'Ожидание ответа',
+                'WAITING_DESC': 'Ожидание, пока партнёр примет или отклонит приглашение в игру...',
+                'USER_NOT_IN_ROOM': 'Пользователь не находится в этом чате'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -636,6 +642,8 @@ export class LanguageService {
                 'SYNCING': 'Ҳамоҳангсозӣ...',
                 'INVITE_SENT': 'Даъватнома фиристода шуд!',
                 'INVITE_DECLINED': 'Даъватнома рад карда шуд',
+                'WAITING_FOR_RESPONSE': 'Интизории ҷавоб',
+                'WAITING_DESC': 'Интизории қабул ё радкунии даъвати бозӣ аз ҷониби ҳамсӯҳбат...',
                 'USER_NOT_IN_ROOM': 'Истифодабаранда дар ин чат нест'
             },
             'DASHBOARD': {

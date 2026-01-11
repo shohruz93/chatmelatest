@@ -171,6 +171,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Game Invites
     gameInvitation: any = null;
+    waitingForGameResponse: boolean = false;
 
     lastMessageCount: number = 0;
 
@@ -268,11 +269,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         // Checkers Start
         this.subs.add(this.socketService.checkersStart$.subscribe(() => {
+            this.waitingForGameResponse = false;
+            this.cdr.markForCheck();
             this.router.navigate(['/dashboard/games/checkers'], { state: { returnUrl: this.router.url } });
         }));
 
         // Checkers Rejected
         this.subs.add(this.socketService.checkersRejected$.subscribe((data: any) => {
+            this.waitingForGameResponse = false;
+            this.cdr.markForCheck();
             alert(this.languageService.translate('CHAT.INVITE_DECLINED') || 'Invitation declined');
         }));
     }
@@ -414,8 +419,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
             // Default 50 coins for chat invite
             this.socketService.sendCheckersInvite(this.partner.id, 50);
-            alert(this.languageService.translate('CHAT.INVITE_SENT')); // Optional feedback
+            this.waitingForGameResponse = true;
+            this.cdr.markForCheck();
         }
+    }
+
+    cancelGameInvite() {
+        this.waitingForGameResponse = false;
+        this.cdr.markForCheck();
     }
 
     triggerFileInput() {

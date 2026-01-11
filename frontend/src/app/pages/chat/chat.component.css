@@ -1077,7 +1077,8 @@
 
 /* Sticker Picker */
 .sticker-picker {
-    display: none; /* Hidden by default for performance */
+    display: none;
+    /* Hidden by default for performance */
     position: absolute;
     bottom: 100%;
     right: 1.5rem;
@@ -1094,13 +1095,21 @@
 }
 
 .sticker-picker.visible {
-    display: block; /* Show when active */
+    display: block;
+    /* Show when active */
     animation: slideUp 0.2s ease-out;
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .sticker-grid {
@@ -1263,4 +1272,174 @@
     50% {
         transform: translateY(-20px);
     }
+}
+
+/* Game Waiting Modal Styles */
+.game-waiting-modal {
+    max-width: 400px;
+}
+
+.game-waiting-modal .modal-body {
+    padding: 3rem 2rem;
+}
+
+.game-waiting-animation {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.game-icon-waiting {
+    font-size: 3.5rem;
+    animation: gameBounce 1.5s ease-in-out infinite;
+    z-index: 2;
+    position: relative;
+}
+
+@keyframes gameBounce {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    25% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    50% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    75% {
+        transform: scale(1.1) rotate(5deg);
+    }
+}
+
+.waiting-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+}
+
+.waiting-ripple span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    animation: rippleEffect 2s linear infinite;
+}
+
+.waiting-ripple span:nth-child(1) {
+    width: 60px;
+    height: 60px;
+    animation-delay: 0s;
+}
+
+.waiting-ripple span:nth-child(2) {
+    width: 80px;
+    height: 80px;
+    animation-delay: 0.3s;
+}
+
+.waiting-ripple span:nth-child(3) {
+    width: 100px;
+    height: 100px;
+    animation-delay: 0.6s;
+}
+
+@keyframes rippleEffect {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+.game-waiting-modal h3 {
+    font-size: 1.4rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.waiting-subtext {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.waiting-dots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.waiting-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    animation: waitingDotPulse 1.4s infinite ease-in-out;
+}
+
+.waiting-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.waiting-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.waiting-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes waitingDotPulse {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.6);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.center-footer {
+    justify-content: center;
+}
+
+.btn-cancel-waiting {
+    padding: 0.75rem 2.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.btn-cancel-waiting:hover {
+    background: var(--bg-tertiary);
+    border-color: #ef4444;
+    color: #ef4444;
 }
