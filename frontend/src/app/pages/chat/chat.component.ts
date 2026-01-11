@@ -286,7 +286,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     addSticker(sticker: string) {
         this.newMessage += sticker;
-        this.showStickerPicker = false;
+        // Keep picker open for multiple selections
+        // this.showStickerPicker = false; 
     }
 
     toggleStickerPicker() {

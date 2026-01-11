@@ -103,39 +103,42 @@ import * as Phaser from 'phaser';
     styles: [`
     .checkers-wrapper {
       width: 100%;
-      height: calc(100vh - 70px);
+      min-height: calc(100vh - 70px);
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start; /* Changed from center to allow scrolling if needed */
       background: #1a1a1a;
       color: white;
       padding: 20px;
+      overflow-y: auto; /* Enable vertical scroll if content overflows */
     }
     .lobby-container {
       background: #2a2a2a;
       padding: 30px;
       border-radius: 15px;
-      width: 400px;
+      width: 100%;
+      max-width: 400px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-top: 20px;
     }
     .coin-balance { font-size: 1.2rem; margin: 15px 0; color: #fbbf24; }
-    .bet-input { margin-bottom: 20px; }
-    .bet-input input { padding: 8px; border-radius: 5px; border: none; width: 100px; margin-left: 10px; background: #333; color: white; }
+    .bet-input { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;}
+    .bet-input input { padding: 8px; border-radius: 5px; border: none; width: 100px; background: #333; color: white; }
     
-    .online-users { text-align: left; background: #1a1a1a; padding: 15px; border-radius: 10px; margin-top: 20px; }
-    .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
-    .invite-btn, .accept-btn { background: #6366f1; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
-    .reject-btn { background: #ef4444; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+    .online-users { text-align: left; background: #1a1a1a; padding: 15px; border-radius: 10px; margin-top: 20px; max-height: 300px; overflow-y: auto; }
+    .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; flex-wrap: wrap; gap: 10px;}
+    .invite-btn, .accept-btn { background: #6366f1; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+    .reject-btn { background: #ef4444; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; white-space: nowrap; }
     .invitation-card { background: #374151; padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #6366f1; }
 
-    .game-area { display: flex; gap: 20px; max-width: 1000px; width: 100%; }
+    .game-area { display: flex; gap: 20px; max-width: 1200px; width: 100%; justify-content: center; }
     .canvas-wrapper {
-        flex: 1;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         min-width: 0;
+        flex: 1 1 auto;
     }
     .hidden { display: none; }
     #checkers-container { 
@@ -144,27 +147,37 @@ import * as Phaser from 'phaser';
         overflow: hidden; 
         border: 4px solid #333;
         width: 100%;
-        max-width: 600px;
+        max-width: 600px; /* Max size for desktop */
         aspect-ratio: 1 / 1;
+        position: relative;
     }
-    #checkers-container canvas {
+    /* Ensure canvas fits inside container */
+    ::ng-deep #checkers-container canvas {
         width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
+        display: block;
     }
     
-    .game-sidebar { width: 300px; display: flex; flex-direction: column; gap: 20px; }
+    .game-sidebar { 
+        width: 300px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 20px; 
+        flex-shrink: 0;
+    }
+    
     .game-info { background: #2a2a2a; padding: 15px; border-radius: 10px; }
     .player-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-    .p-red, .p-black { padding: 8px; border-radius: 5px; background: #333; }
+    .p-red, .p-black { padding: 8px; border-radius: 5px; background: #333; font-size: 0.9rem; }
     .active { border: 2px solid #6366f1; background: #374151; }
     .turn-indicator { text-align: center; font-weight: bold; padding: 10px; border-radius: 5px; background: #333; }
     .my-turn { background: #059669; color: white; animation: pulse 1.5s infinite; }
 
-    .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 350px; }
+    .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 400px; min-height: 300px; }
     .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .chat-msg { background: #374151; padding: 8px 30px 8px 8px; border-radius: 8px; max-width: 90%; align-self: flex-start; position: relative; }
+    .chat-msg { background: #374151; padding: 8px 30px 8px 8px; border-radius: 8px; max-width: 90%; align-self: flex-start; position: relative; word-break: break-word; font-size: 0.9rem; }
     .chat-msg.own { background: #6366f1; align-self: flex-end; padding-right: 8px; }
-    .sender { font-size: 0.7rem; display: block; opacity: 0.7; }
+    .sender { font-size: 0.75rem; display: block; opacity: 0.7; margin-bottom: 2px; }
     .translate-btn {
         position: absolute;
         right: 5px;
@@ -180,21 +193,33 @@ import * as Phaser from 'phaser';
     }
     .translate-btn:hover { color: white; background: rgba(255,255,255,0.1); }
     .chat-input { display: flex; padding: 10px; gap: 5px; }
-    .chat-input input { flex-grow: 1; background: #333; border: none; color: white; padding: 8px; border-radius: 5px; }
-    .chat-input button { background: #6366f1; border: none; color: white; padding: 0 15px; border-radius: 5px; cursor: pointer; }
+    .chat-input input { flex-grow: 1; background: #333; border: none; color: white; padding: 8px; border-radius: 5px; min-width: 0; }
+    .chat-input button { background: #6366f1; border: none; color: white; padding: 0 15px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
 
-    .leave-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    .leave-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: auto; }
 
     @media (max-width: 950px) {
         .game-area { flex-direction: column; align-items: center; }
-        .game-sidebar { width: 100%; max-width: 600px; }
-        .checkers-wrapper { height: auto; padding-top: 80px; }
+        .game-sidebar { width: 100%; max-width: 600px; order: 2; }
+        .canvas-wrapper { width: 100%; max-width: 600px; order: 1; }
+        .checkers-wrapper { padding: 10px; padding-top: 80px; align-items: flex-start; }
         .game-chat { height: 300px; }
     }
 
     @media (max-width: 500px) {
-        .lobby-container { width: 100%; }
-        .online-users { max-height: 300px; overflow-y: auto; }
+        .checkers-wrapper { padding: 5px; padding-top: 70px; }
+        .lobby-container { padding: 20px 15px; }
+        .coin-balance { font-size: 1rem; }
+        .game-chat { height: 250px; }
+        .chat-input { padding: 5px; }
+        .chat-input button { padding: 0 10px; font-size: 0.9rem; }
+        
+        .user-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .user-row button { width: 100%; }
+        .user-row span { width: 100%; }
+        
+        /* Adjust game board size for very small screens if needed, 
+           although aspect-ratio: 1/1 with max-width: 100% should handle it. */
     }
 
     @keyframes pulse {
@@ -231,6 +256,7 @@ import * as Phaser from 'phaser';
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.7; transform: scale(0.98); }
     }
+  
   `]
 })
 export class CheckersComponent implements OnInit, OnDestroy {
@@ -325,7 +351,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
         });
 
-        
+
 
         this.socket.partnerLeft$.subscribe(() => {
 
@@ -335,7 +361,8 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
             }
 
-        });    }
+        });
+    }
 
     ngOnDestroy() {
         if (this.phaserGame) {

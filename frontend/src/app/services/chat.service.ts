@@ -20,6 +20,7 @@ export interface ChatMessage {
         id: string;
         content: string;
         senderName: string;
+        messageType?: 'text' | 'image' | 'audio' | 'sticker';
     } | null;
     originalLang?: string;
     translatedContent?: string;
@@ -285,7 +286,8 @@ export class ChatService {
         const replyToData = replyToMessage ? {
             id: replyToMessage.id,
             content: replyToMessage.content,
-            senderName: replyToMessage.senderName || 'Partner'
+            senderName: replyToMessage.senderName || 'Partner',
+            messageType: replyToMessage.messageType // Include type for UI
         } : null;
 
         const newMessage: ChatMessage = {
@@ -369,6 +371,28 @@ export class ChatService {
             content = `data:audio/webm;base64,${content}`;
         }
 
+        // Process replyTo data to ensure messageType exists
+        let processedReplyTo = data.replyTo;
+        if (processedReplyTo) {
+            let replyType = processedReplyTo.messageType;
+            const replyContent = processedReplyTo.content || '';
+
+            if (!replyType) {
+                if (replyContent.startsWith('data:image')) {
+                    replyType = 'image';
+                } else if (replyContent.startsWith('data:audio')) {
+                    replyType = 'audio';
+                } else {
+                    replyType = 'text';
+                }
+            }
+
+            processedReplyTo = {
+                ...processedReplyTo,
+                messageType: replyType
+            };
+        }
+
         return {
             id: String(data.id),
             roomId: data.roomId,
@@ -378,7 +402,7 @@ export class ChatService {
             type: isSent ? 'sent' : 'received',
             status: data.status || 'read', // Default to 'read' for loaded messages
             messageType: msgType,
-            replyTo: data.replyTo,
+            replyTo: processedReplyTo,
             originalLang: data.originalLang || data.original_lang,
             translatedContent: data.translatedContent,
             showTranslation: !!data.translatedContent,

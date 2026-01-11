@@ -88,7 +88,12 @@ export class DashboardComponent implements OnInit {
 
 
         // Refresh unread/guests count on navigation
-        this.router.events.subscribe(() => {
+        this.router.events.subscribe((event) => {
+            // Close sidebar on mobile when navigating
+            if (window.innerWidth < 1024) {
+                this.ui.sidebarOpen.set(false);
+            }
+
             this.checkUnread();
             this.checkNewGuests();
         });
@@ -118,7 +123,7 @@ export class DashboardComponent implements OnInit {
                 next: (data: any) => {
                     const total = data.reduce((acc: number, curr: any) => acc + parseInt(curr.unread_count || 0), 0);
                     this.unreadCount = total;
-                    
+
                     if (this.unreadCount > oldUnreadCount) {
                         this.socketService.playNotificationSound();
                     }

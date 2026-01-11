@@ -89,8 +89,16 @@
 
                     <!-- Reply Preview -->
                     @if (msg.replyTo) {
-                    <div class="reply-preview">
-                        <strong>{{ msg.replyTo.senderName }}:</strong> {{ msg.replyTo.content }}
+                    <div class="reply-preview glass-panel">
+                        <strong>{{ msg.replyTo.senderName }}:</strong>
+                        <span class="reply-text">
+                            @switch (msg.replyTo.messageType) {
+                            @case ('image') { 📷 Photo }
+                            @case ('audio') { 🎤 Voice Message }
+                            @case ('sticker') { 😊 Sticker }
+                            @default { {{ msg.replyTo.content }} }
+                            }
+                        </span>
                     </div>
                     }
 
@@ -187,12 +195,19 @@
     @if (roomId) {
     <footer class="chat-input-area glass-panel">
         @if (replyingToMessage) {
-        <div class="input-preview-bar">
+        <div class="input-preview-bar glass-panel">
             <div class="preview-content">
                 <span>Replying to {{ replyingToMessage.senderName }}</span>
-                <p>{{ replyingToMessage.content }}</p>
+                <p class="preview-text">
+                    @switch (replyingToMessage.messageType) {
+                    @case ('image') { 📷 Photo }
+                    @case ('audio') { 🎤 Voice Message }
+                    @case ('sticker') { 😊 Sticker }
+                    @default { {{ replyingToMessage.content }} }
+                    }
+                </p>
             </div>
-            <button (click)="cancelReply()">✕</button>
+            <button class="btn-cancel-reply" (click)="cancelReply()">✕</button>
         </div>
         }
 
@@ -210,18 +225,21 @@
         </div>
         } @else {
         <div class="input-wrapper">
-            <button class="btn-toggle-media" (click)="showMediaMenu = !showMediaMenu">+</button>
+            <button class="btn-toggle-media" (click)="showMediaMenu = !showMediaMenu" [class.active]="showMediaMenu"
+                [class.rotated]="showMediaMenu">+</button>
 
             <!-- Media Actions: Always visible on desktop, toggled on mobile -->
             <div class="media-actions" [class.show]="showMediaMenu">
                 <button class="btn-media" (click)="triggerFileInput()" title="Image">📷</button>
                 <button class="btn-media" (click)="startRecording()" title="Voice">🎤</button>
-                <button class="btn-media" (click)="toggleStickerPicker()" title="Sticker">😊</button>
+                <button class="btn-media" (click)="toggleStickerPicker()" title="Sticker"
+                    [class.active]="showStickerPicker">😊</button>
             </div>
 
             <div class="text-input-container">
                 <input id="chatInput" type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
-                    (input)="onTyping()" placeholder="{{ 'CHAT.TYPE_MESSAGE' | translate }}" class="message-input">
+                    (input)="onTyping()" placeholder="{{ 'CHAT.TYPE_MESSAGE' | translate }}" class="message-input"
+                    autocomplete="off">
 
                 <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
                     ➤
@@ -230,13 +248,11 @@
         </div>
         }
 
-        @if (showStickerPicker) {
-        <div class="sticker-picker glass-panel">
+        <div class="sticker-picker glass-panel" [class.visible]="showStickerPicker">
             @for (sticker of stickers; track $index) {
-            <button (click)="addSticker(sticker)">{{ sticker }}</button>
+            <button (click)="addSticker(sticker)" class="sticker-btn">{{ sticker }}</button>
             }
         </div>
-        }
     </footer>
     }
 
