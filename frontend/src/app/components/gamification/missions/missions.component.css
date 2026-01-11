@@ -62,6 +62,13 @@
     justify-content: center;
     color: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.mission-icon.emoji-icon {
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 .mission-content {
