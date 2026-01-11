@@ -29,6 +29,10 @@
     overflow: hidden;
 }
 
+.currency-card.coins {
+    cursor: pointer;
+}
+
 .currency-card::after {
     content: '';
     position: absolute;

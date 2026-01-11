@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { GamificationService } from '../../../services/gamification.service';
 
 @Component({
     selector: 'app-wallet',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './wallet.component.html',
     styleUrls: ['./wallet.component.css']
 })

@@ -27,9 +27,22 @@
         }
 
         <div class="header-actions">
-            <button class="btn-action-header" (click)="sendGameInvite()" [title]="'CHAT.INVITE_GAME' | translate">
-                <span class="icon">🎮</span>
-            </button>
+            <div class="actions-dropdown">
+                <button class="btn-action-header" (click)="toggleActionsMenu($event)"
+                    [title]="'CHAT.ACTIONS' | translate">
+                    <span class="icon">⚡</span>
+                </button>
+                <div class="dropdown-menu glass-panel" [class.visible]="showActionsMenu">
+                    <button class="dropdown-item" (click)="sendGameInvite(); showActionsMenu = false">
+                        <span class="dropdown-icon">🎮</span>
+                        <span>{{ 'CHAT.INVITE_GAME' | translate }}</span>
+                    </button>
+                    <button class="dropdown-item" (click)="openSendCoinsModal(); showActionsMenu = false">
+                        <span class="dropdown-icon">🪙</span>
+                        <span>{{ 'CHAT.SEND_COINS' | translate }}</span>
+                    </button>
+                </div>
+            </div>
 
         </div>
         } @else {
@@ -363,6 +376,44 @@
             <div class="modal-footer center-footer">
                 <button class="btn-cancel-waiting" (click)="cancelGameInvite()">{{ 'COMMON.CANCEL' | translate
                     }}</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (showSendCoinsModal) {
+    <div class="modal-overlay" (click)="closeSendCoinsModal()">
+        <div class="modal-content glass-panel send-coins-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ 'CHAT.SEND_COINS' | translate }}</h3>
+                <button class="modal-close" (click)="closeSendCoinsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="coins-balance-display">
+                    <span class="balance-label">{{ 'COINS.BALANCE' | translate }}:</span>
+                    <span class="balance-value">🪙 {{ gamificationService.userCoins() }}</span>
+                </div>
+                <div class="send-to-user">
+                    <img [src]="partnerAvatar || 'assets/default-avatar.png'" class="recipient-avatar">
+                    <span class="recipient-name">{{ partnerName }}</span>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'COINS.AMOUNT' | translate }}</label>
+                    <input type="number" [(ngModel)]="sendCoinsAmount" min="1" [max]="gamificationService.userCoins()"
+                        class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>{{ 'COINS.NOTE' | translate }} ({{ 'COMMON.OPTIONAL' | translate }})</label>
+                    <input type="text" [(ngModel)]="sendCoinsNote"
+                        placeholder="{{ 'COINS.NOTE_PLACEHOLDER' | translate }}" class="form-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeSendCoinsModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+                <button class="btn-primary" (click)="sendCoins()"
+                    [disabled]="sendingCoins || sendCoinsAmount <= 0 || sendCoinsAmount > gamificationService.userCoins()">
+                    {{ sendingCoins ? ('COMMON.SENDING' | translate) : ('COINS.SEND' | translate) }}
+                </button>
             </div>
         </div>
     </div>

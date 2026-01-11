@@ -173,6 +173,22 @@ $router->add('POST', '/games/win', function() use ($gameController) {
     $gameController->win();
 });
 
+// Coins Routes
+require_once __DIR__ . '/../src/CoinsController.php';
+$coinsController = new CoinsController();
+
+$router->add('GET', '/coins/balance', function() use ($coinsController) {
+    $coinsController->getBalance();
+});
+
+$router->add('GET', '/coins/transactions', function() use ($coinsController) {
+    $coinsController->getTransactions();
+});
+
+$router->add('POST', '/coins/send', function() use ($coinsController) {
+    $coinsController->sendCoins();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

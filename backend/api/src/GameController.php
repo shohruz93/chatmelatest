@@ -46,6 +46,9 @@ class GameController {
         // Deduct coins
         $this->user->addCurrency($userId, -$amount, 'coins');
 
+        // Log transaction (User -> System)
+        $this->logTransaction($userId, 0, $amount, 'bet', "Bet on " . $game);
+
         echo json_encode([
             "message" => "Bet placed",
             "deducted" => $amount,
@@ -74,12 +77,16 @@ class GameController {
         }
 
         $amount = intval($data->amount);
+        $game = $data->game ?? 'Game';
         
         // Award coins
         $this->user->addCurrency($userId, $amount, 'coins');
         
         // Award XP for winning
         $this->user->addCurrency($userId, 10, 'xp');
+
+        // Log transaction (System -> User)
+        $this->logTransaction(0, $userId, $amount, 'win', "Won in " . $game);
 
         $profile = $this->user->getProfile($userId);
 
@@ -88,6 +95,21 @@ class GameController {
             "added" => $amount,
             "current_coins" => $profile['coins']
         ]);
+    }
+
+    /**
+     * Log a coin transaction
+     */
+    private function logTransaction($senderId, $receiverId, $amount, $type = 'transfer', $note = null) {
+        $query = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note) 
+                  VALUES (:sender_id, :receiver_id, :amount, :type, :note)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':sender_id', $senderId);
+        $stmt->bindParam(':receiver_id', $receiverId);
+        $stmt->bindParam(':amount', $amount);
+        $stmt->bindParam(':type', $type);
+        $stmt->bindParam(':note', $note);
+        return $stmt->execute();
     }
 
     private function getUserIdFromToken($headers) {

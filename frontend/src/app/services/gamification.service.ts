@@ -100,4 +100,28 @@ export class GamificationService {
             })
         );
     }
+
+    // Coins API Methods
+    getTransactions(type: 'all' | 'incoming' | 'outgoing' = 'all', limit: number = 20, offset: number = 0): Observable<any[]> {
+        return this.http.get<any[]>(`${this.apiUrl}/coins/transactions?type=${type}&limit=${limit}&offset=${offset}`, { headers: this.getHeaders() });
+    }
+
+    sendCoins(receiverId: number, amount: number, note?: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/coins/send`, {
+            receiverId,
+            amount,
+            note: note || null
+        }, { headers: this.getHeaders() }).pipe(
+            tap((res: any) => {
+                if (res.current_coins !== undefined) {
+                    this.userCoins.set(res.current_coins);
+                }
+            })
+        );
+    }
+
+    getBalance(): Observable<{ coins: number; xp: number }> {
+        return this.http.get<{ coins: number; xp: number }>(`${this.apiUrl}/coins/balance`, { headers: this.getHeaders() });
+    }
 }
+

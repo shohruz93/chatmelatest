@@ -54,6 +54,10 @@ export const routes: Routes = [
             {
                 path: 'games/checkers',
                 loadComponent: () => import('./pages/games/checkers/checkers.component').then(m => m.CheckersComponent)
+            },
+            {
+                path: 'coins',
+                loadComponent: () => import('./pages/coins/coins.component').then(m => m.CoinsComponent)
             }
         ]
     },

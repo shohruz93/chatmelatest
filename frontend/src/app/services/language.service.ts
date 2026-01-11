@@ -223,7 +223,9 @@ export class LanguageService {
                 'INVITE_DECLINED': 'Invitation declined',
                 'WAITING_FOR_RESPONSE': 'Waiting for response',
                 'WAITING_DESC': 'Waiting for your partner to accept or decline the game invite...',
-                'USER_NOT_IN_ROOM': 'User is not in this chat room'
+                'USER_NOT_IN_ROOM': 'User is not in this chat room',
+                'SEND_COINS': 'Send Coins',
+                'ACTIONS': 'Actions'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -237,7 +239,23 @@ export class LanguageService {
                 'CLOSE': 'Close',
                 'SUBMIT': 'Submit',
                 'SEARCH_PLACEHOLDER': 'Search...',
-                'NO_RESULTS': 'No results found'
+                'NO_RESULTS': 'No results found',
+                'LOADING': 'Loading',
+                'OPTIONAL': 'optional',
+                'SENDING': 'Sending...'
+            },
+            'COINS': {
+                'TITLE': 'Coins',
+                'BALANCE': 'Balance',
+                'ALL': 'All',
+                'INCOMING': 'Incoming',
+                'OUTGOING': 'Outgoing',
+                'NO_TRANSACTIONS': 'No transactions yet',
+                'NO_TRANSACTIONS_DESC': 'Your transaction history will appear here.',
+                'AMOUNT': 'Amount',
+                'NOTE': 'Note',
+                'NOTE_PLACEHOLDER': 'Add a message...',
+                'SEND': 'Send'
             },
             'GAMES': {
                 'TITLE': 'Games',

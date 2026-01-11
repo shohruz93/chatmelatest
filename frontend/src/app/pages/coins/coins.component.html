@@ -1,0 +1,65 @@
+<div class="coins-page">
+    <div class="page-header">
+        <h1>{{ 'COINS.TITLE' | translate }}</h1>
+    </div>
+
+    <!-- Wallet Display -->
+    <app-wallet></app-wallet>
+
+    <!-- Transaction Tabs -->
+    <div class="tabs-container">
+        <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">
+            {{ 'COINS.ALL' | translate }}
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'incoming'" (click)="setTab('incoming')">
+            <span class="tab-icon incoming">↓</span>
+            {{ 'COINS.INCOMING' | translate }}
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'outgoing'" (click)="setTab('outgoing')">
+            <span class="tab-icon outgoing">↑</span>
+            {{ 'COINS.OUTGOING' | translate }}
+        </button>
+    </div>
+
+    <!-- Transaction List -->
+    <div class="transactions-container">
+        @if (loading()) {
+        <div class="loading-state">
+            <div class="loader"></div>
+            <p>{{ 'COMMON.LOADING' | translate }}...</p>
+        </div>
+        } @else if (transactions().length === 0) {
+        <div class="empty-state">
+            <div class="empty-icon">🪙</div>
+            <h3>{{ 'COINS.NO_TRANSACTIONS' | translate }}</h3>
+            <p>{{ 'COINS.NO_TRANSACTIONS_DESC' | translate }}</p>
+        </div>
+        } @else {
+        <div class="transactions-list">
+            @for (tx of transactions(); track tx.id) {
+            <div class="transaction-card glass-panel" [class.incoming]="tx.direction === 'incoming'"
+                [class.outgoing]="tx.direction === 'outgoing'">
+                <div class="tx-avatar">
+                    @if (isGameTx(tx)) {
+                    <div class="game-icon-placeholder">🎮</div>
+                    } @else {
+                    <img [src]="getAvatar(tx)" alt="User">
+                    }
+                </div>
+                <div class="tx-details">
+                    <span class="tx-name">{{ getName(tx) }}</span>
+                    <span class="tx-date">{{ formatDate(tx.created_at) }}</span>
+                    @if (tx.note) {
+                    <span class="tx-note">{{ tx.note }}</span>
+                    }
+                </div>
+                <div class="tx-amount" [class.positive]="tx.direction === 'incoming'"
+                    [class.negative]="tx.direction === 'outgoing'">
+                    {{ tx.direction === 'incoming' ? '+' : '-' }}{{ tx.amount }} 🪙
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>

@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { ChatService, ChatMessage } from '../../services/chat.service';
+import { GamificationService } from '../../services/gamification.service';
 import { Subscription } from 'rxjs';
 import { VoiceRecorder } from '@independo/capacitor-voice-recorder';
 
@@ -53,6 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
     public languageService = inject(LanguageService);
+    public gamificationService = inject(GamificationService);
 
     // Signals from Service
     messages = this.chatService.orderedMessages;
@@ -87,6 +89,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     showStickerPicker = false;
     isRecording = false;
     recordingDuration = 0; // in seconds
+
+    // Actions Dropdown & Send Coins
+    showActionsMenu = false;
+    showSendCoinsModal = false;
+    sendCoinsAmount: number = 10;
+    sendCoinsNote: string = '';
+    sendingCoins = false;
     private recordingInterval: any = null;
     stickers = [
         '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌',
@@ -436,6 +445,54 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
         this.waitingForGameResponse = false;
         this.cdr.markForCheck();
+    }
+
+    // Actions dropdown toggle
+    toggleActionsMenu(event: Event) {
+        event.stopPropagation();
+        this.showActionsMenu = !this.showActionsMenu;
+
+        // Close on outside click
+        if (this.showActionsMenu) {
+            const closeHandler = () => {
+                this.showActionsMenu = false;
+                this.cdr.markForCheck();
+                document.removeEventListener('click', closeHandler);
+            };
+            setTimeout(() => document.addEventListener('click', closeHandler), 0);
+        }
+    }
+
+    openSendCoinsModal() {
+        this.showSendCoinsModal = true;
+        this.sendCoinsAmount = 10;
+        this.sendCoinsNote = '';
+    }
+
+    closeSendCoinsModal() {
+        this.showSendCoinsModal = false;
+        this.sendCoinsAmount = 10;
+        this.sendCoinsNote = '';
+    }
+
+    sendCoins() {
+        if (!this.partner || this.sendCoinsAmount <= 0 || this.sendingCoins) return;
+
+        this.sendingCoins = true;
+        this.gamificationService.sendCoins(this.partner.id, this.sendCoinsAmount, this.sendCoinsNote).subscribe({
+            next: (res: any) => {
+                this.sendingCoins = false;
+                this.closeSendCoinsModal();
+                // Show success message
+                alert(`${res.sent_amount} coins sent to ${res.receiver_name}!`);
+                this.cdr.markForCheck();
+            },
+            error: (err: any) => {
+                this.sendingCoins = false;
+                alert(err.error?.error || 'Failed to send coins');
+                this.cdr.markForCheck();
+            }
+        });
     }
 
     triggerFileInput() {
