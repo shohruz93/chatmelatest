@@ -218,7 +218,9 @@ export class LanguageService {
                 'GAME_INVITATION': 'Game Invitation',
                 'INVITED_YOU_TO_GAME': '{{name}} invited you to play Checkers for {{amount}} 🪙',
                 'USER_OFFLINE': 'User is offline',
-                'SYNCING': 'Syncing...'
+                'SYNCING': 'Syncing...',
+                'INVITE_SENT': 'Invitation sent!',
+                'INVITE_DECLINED': 'Invitation declined'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -425,7 +427,9 @@ export class LanguageService {
                 'GAME_INVITATION': 'Приглашение в игру',
                 'INVITED_YOU_TO_GAME': '{{name}} пригласил вас сыграть в шашки на {{amount}} 🪙',
                 'USER_OFFLINE': 'Пользователь не в сети',
-                'SYNCING': 'Синхронизация...'
+                'SYNCING': 'Синхронизация...',
+                'INVITE_SENT': 'Приглашение отправлено!',
+                'INVITE_DECLINED': 'Приглашение отклонено'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -629,7 +633,10 @@ export class LanguageService {
                 'GAME_INVITATION': 'Даъвати бозӣ',
                 'INVITED_YOU_TO_GAME': '{{name}} шуморо даъват кард ба бозии шашка барои {{amount}} 🪙',
                 'USER_OFFLINE': 'Корбар ғайрифаъол аст',
-                'SYNCING': 'Ҳамоҳангсозӣ...'
+                'SYNCING': 'Ҳамоҳангсозӣ...',
+                'INVITE_SENT': 'Даъватнома фиристода шуд!',
+                'INVITE_DECLINED': 'Даъватнома рад карда шуд',
+                'USER_NOT_IN_ROOM': 'Истифодабаранда дар ин чат нест'
             },
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',

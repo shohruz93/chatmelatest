@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SocketService } from '../../../services/socket.service';
@@ -267,9 +268,11 @@ export class CheckersComponent implements OnInit, OnDestroy {
     private auth = inject(AuthService);
     private gamification = inject(GamificationService);
     private lang = inject(LanguageService);
+    private router = inject(Router);
 
     currentUserId = 0;
     coins = this.gamification.userCoins;
+    returnUrl: string | null = null;
     betAmount = 50;
 
     gameStarted = signal(false);
@@ -291,6 +294,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
     currentTurn = signal(0);
 
     ngOnInit() {
+        if (history.state['returnUrl']) {
+            this.returnUrl = history.state['returnUrl'];
+        }
+
         const user = this.auth.currentUserValue;
         if (user) this.currentUserId = user.id;
 
@@ -411,27 +418,37 @@ export class CheckersComponent implements OnInit, OnDestroy {
         this.blackPlayerId.set(Number(data.players[1]));
         this.currentTurn.set(Number(data.turn));
 
-        // Deduct coins
-        this.gamification.bet(this.betAmount, 'checkers').subscribe();
-        this.waitingForInviteTo.set(null);
-        this.gameStarted.set(true);
+        // Deduct coins first
+        this.gamification.bet(this.betAmount, 'checkers').subscribe({
+            next: () => {
+                this.waitingForInviteTo.set(null);
+                this.gameStarted.set(true);
 
-        // Initialize Phaser with delay to ensure container is ready
-        setTimeout(() => {
-            const config: Phaser.Types.Core.GameConfig = {
-                type: Phaser.AUTO,
-                parent: 'checkers-container',
-                scale: {
-                    mode: Phaser.Scale.FIT,
-                    autoCenter: Phaser.Scale.CENTER_BOTH,
-                    width: 600,
-                    height: 600
-                },
-                scene: [new CheckersScene(this)],
-                backgroundColor: '#000000'
-            };
-            this.phaserGame = new Phaser.Game(config);
-        }, 100);
+                // Initialize Phaser with delay to ensure container is ready
+                setTimeout(() => {
+                    if (!this.gameStarted()) return; // Double check
+
+                    const config: Phaser.Types.Core.GameConfig = {
+                        type: Phaser.AUTO,
+                        parent: 'checkers-container',
+                        scale: {
+                            mode: Phaser.Scale.FIT,
+                            autoCenter: Phaser.Scale.CENTER_BOTH,
+                            width: 600,
+                            height: 600
+                        },
+                        scene: [new CheckersScene(this)],
+                        backgroundColor: '#000000'
+                    };
+                    this.phaserGame = new Phaser.Game(config);
+                }, 100);
+            },
+            error: (err) => {
+                console.error("Bet failed", err);
+                alert("Insufficient coins to play! Game aborted.");
+                this.leaveGame(); // or just reset
+            }
+        });
     }
 
     isMyTurn() {
@@ -472,6 +489,12 @@ export class CheckersComponent implements OnInit, OnDestroy {
             this.phaserGame = undefined;
         }
         this.socket.clearCheckersGame();
+
+        if (this.returnUrl) {
+            this.router.navigateByUrl(this.returnUrl);
+        } else {
+            this.router.navigate(['/dashboard/games']);
+        }
     }
 
     leaveGame() {
@@ -483,6 +506,12 @@ export class CheckersComponent implements OnInit, OnDestroy {
             }
             this.socket.leaveChat(this.roomId());
             this.socket.clearCheckersGame();
+
+            if (this.returnUrl) {
+                this.router.navigateByUrl(this.returnUrl);
+            } else {
+                this.router.navigate(['/dashboard/games']);
+            }
         }
     }
 

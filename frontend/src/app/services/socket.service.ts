@@ -46,6 +46,7 @@ export class SocketService implements OnDestroy {
     private checkersGameOverSubject = new Subject<any>();
     private checkersErrorSubject = new Subject<any>();
     private checkersRejectedSubject = new Subject<any>();
+    private roomUsersSubject = new Subject<any>(); // New subject for room users
 
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
@@ -70,6 +71,7 @@ export class SocketService implements OnDestroy {
     public checkersGameOver$ = this.checkersGameOverSubject.asObservable();
     public checkersError$ = this.checkersErrorSubject.asObservable();
     public checkersRejected$ = this.checkersRejectedSubject.asObservable();
+    public roomUsers$ = this.roomUsersSubject.asObservable(); // New observable
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -131,7 +133,10 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_chat', (data) => this.checkersChatSubject.next(data));
         this.socket.on('checkers_game_over', (data) => this.checkersGameOverSubject.next(data));
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
+        this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
+        this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
         this.socket.on('checkers_rejected', (data) => this.checkersRejectedSubject.next(data));
+        this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data)); // New event listener
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;

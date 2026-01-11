@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -52,12 +52,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private countryService = inject(CountryService);
     private cdr = inject(ChangeDetectorRef);
     private router = inject(Router);
-    // languageService needed? maybe for translation
+    public languageService = inject(LanguageService);
 
     // Signals from Service
     messages = this.chatService.orderedMessages;
     loadingMessages = this.chatService.loadingMessages;
     isSyncing = this.chatService.isSyncing;
+    usersInRoom = signal<number[]>([]); // Track users in current room
 
     newMessage: string = '';
     roomId: string | null = null;
@@ -95,19 +96,55 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑',
         '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
         '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕',
-        '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙',
-        '👈', '👉', '👆', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌',
-        '👐', '🤲', '🙏', '🤝', '💪', '🦾', '🖕',
-        '❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞',
+        '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈',
+        '👉', '👆', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌',
+        '👐', '🤲', '🤝', '🙏', '💪', '🦾', '🖕',
+        '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞',
         '💓', '💗', '💖', '💘', '💝', '💟', '🔥', '💥', '💫', '💦', '💨', '💤', '💢',
         '💯', '✨', '⭐', '🌟', '⚡', '☄️', '🌈',
         '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😈', '👿', '👹', '👺', '🤡',
-        '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷',
-        '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥',
-        '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌',
-        '🐞', '🐜', '🪲', '🪳', '🕷️', '🕸️', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕',
-        '🎉', '🎊', '🎈', '🎁', '🎀', '🎂', '🍰', '🍕', '🍔', '🍟', '🌭', '🍿',
-        '🥤', '🍺', '🍻', '🥂', '🍷', '🥃', '☕', '🍵'
+        '💩', '😼', '😻', '😹', '😽', '🙀', '😿', '😾', '🐶', '🐱', '🐭', '🐹', '🐰',
+        '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊',
+        '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄',
+        '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🕸', '🦂', '🐢',
+        '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟',
+        '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏',
+        '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐',
+        '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊',
+        '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔', '🐾', '🐉', '🐲',
+        '🌵', '🎄', '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃', '🍂',
+        '🍁', '🍄', '🐚', '🌾', '💐', '🌷', '🌹', '🥀', '🌺', '🌸', '🌼', '🌻',
+        '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔',
+        '🌙', '🌎', '🌍', '🌏', '🪐', '💫', '⭐️', '🌟', '✨', '⚡', '☄️', '💥', '🔥',
+        '🌪', '🌈', '☀️', '🌤', '⛅', '🌥', '☁️', '🌦', '🌧', '⛈', '🌩', '🌨', '❄️',
+        '☃️', '⛄', '🌬', '💨', '💧', '💦', '☔', '☂️', '🌊', '🌫',
+        '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭',
+        '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🌽', '🥕', '🧄',
+        '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞',
+        '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆',
+        '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪',
+        '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧',
+        '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🍯',
+        '🥛', '🍼', '☕', '🍵', '🧃', '🥤', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸',
+        '🍹', '🧉', '🍾', '🧊', '🥄', '🍴', '🍽', '🥣', '🥡', '🥢', '🧂',
+        '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸',
+        '🏒', '🏑', '🥍', '🏏', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽',
+        '🛹', '🛷', '⛸', '🥌', '🎿', '⛷', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤺',
+        '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆',
+        '🥇', '🥈', '🥉', '🏅', '🎖', '🏵', '🎗', '🎫', '🎟', '🎪', '🤹', '🎭', '🩰',
+        '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲',
+        '♟', '🎯', '🎳', '🎮', '🎰', '🧩',
+        '🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜',
+        '🦯', '🦽', '🦼', '🛴', '🚲', '🛵', '🏍', '🛺', '🚨', '🚔', '🚍', '🚘', '🚖',
+        '🚡', '🚠', '🚟', '🚃', '🚋', '🚞', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇',
+        '🚊', '🚉', '🚁', '🛩', '✈️', '🛫', '🛬', '🪂', '💺', '🛰', '🚀', '🛸', '🛶',
+        '⛵', '🛥', '🚤', '⛴', '🛳', '🚢', '⚓', '⛽', '🚧', '🚦', '🚥', '🚏', '🗺',
+        '🗿', '🗽', '🗼', '🏰', '🏯', '🏟', '🎡', '🎢', '🎠', '⛲', '⛱', '🏖', '🏝',
+        '🏜', '🌋', '⛰', '🏔', '🗻', '🏕', '⛺', '🏠', '🏡', '🏘', '🏚', '🏗', '🏭',
+        '🏢', '🏬', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏩', '💒', '🏛', '⛪',
+        '🕌', '🕍', '🛕', '🕋', '⛩', '🛤', '🛣',
+        '🎉', '🎊', '🎈', '🎁', '🎀', '🎂', '🍰', '🧁', '🕯', '🍬', '🍭', '🎌',
+        '🎎', '🎏', '🎐', '🎑', '🍷', '🥂', '☕', '🍵'
     ];
 
     partner: any = null;
@@ -173,6 +210,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }));
 
+        // Listen for room user updates
+        this.subs.add(this.socketService.roomUsers$.subscribe((data: any) => {
+            if (data.roomId === this.roomId) {
+                this.usersInRoom.set(data.users);
+            }
+        }));
+
         this.setupSocketEvents();
     }
 
@@ -214,6 +258,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.showPartnerLeftBanner = true;
             this.partnerStatus = 'offline';
             this.cdr.markForCheck();
+        }));
+
+        // Checkers Invite
+        this.subs.add(this.socketService.checkersInvite$.subscribe(invite => {
+            this.gameInvitation = invite;
+            this.cdr.markForCheck();
+        }));
+
+        // Checkers Start
+        this.subs.add(this.socketService.checkersStart$.subscribe(() => {
+            this.router.navigate(['/dashboard/games/checkers'], { state: { returnUrl: this.router.url } });
+        }));
+
+        // Checkers Rejected
+        this.subs.add(this.socketService.checkersRejected$.subscribe((data: any) => {
+            alert(this.languageService.translate('CHAT.INVITE_DECLINED') || 'Invitation declined');
         }));
     }
 
@@ -327,22 +387,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     acceptGameInvite() {
         if (this.gameInvitation) {
-            this.socketService.emit('accept_game_invite', { inviteId: this.gameInvitation.id });
+            this.socketService.acceptCheckersInvite(this.gameInvitation.socketId, this.gameInvitation.amount);
             this.gameInvitation = null;
         }
     }
 
     rejectGameInvite() {
         if (this.gameInvitation) {
-            this.socketService.emit('reject_game_invite', { inviteId: this.gameInvitation.id });
+            this.socketService.rejectCheckersInvite(this.gameInvitation.socketId);
             this.gameInvitation = null;
         }
     }
 
     sendGameInvite() {
-        if (this.roomId) {
-            // Example: invite to 'checkers' for 100 coins
-            this.socketService.emit('send_game_invite', { roomId: this.roomId, game: 'checkers', amount: 100 });
+        if (this.roomId && this.partner) {
+            if (!this.socketService.isUserOnline(this.partner.id)) {
+                alert(this.languageService.translate('CHAT.USER_OFFLINE') || 'User is offline');
+                return;
+            }
+
+            // Check if partner is in the room
+            if (!this.usersInRoom().includes(this.partner.id)) {
+                alert(this.languageService.translate('CHAT.USER_NOT_IN_ROOM') || 'User is not in this chat room');
+                return;
+            }
+
+            // Default 50 coins for chat invite
+            this.socketService.sendCheckersInvite(this.partner.id, 50);
+            alert(this.languageService.translate('CHAT.INVITE_SENT')); // Optional feedback
         }
     }
 
@@ -460,9 +532,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // Grouping logic (Date headers)
     // We can do this in the template with @for and tracking, OR computed signal
-    // For now, let's just return the list and handle grouping visually or if needed logic
-    // The previous implementation had complex grouping.
-    // Let's implement a computed signal for grouped messages in the service or here.
 
     // Simple helper to check if date changed from previous message
     showDateHeader(msg: any, index: number): boolean {

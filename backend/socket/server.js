@@ -364,6 +364,33 @@ io.on('connection', (socket) => {
                 }
             }
         }
+
+        // Notify others in room ensuring we have a complete list
+        const roomSockets = io.sockets.adapter.rooms.get(roomId);
+        if (roomSockets) {
+            const usersInRoom = [];
+            roomSockets.forEach(socketId => {
+                const uid = userSocketMap.get(socketId);
+                if (uid) usersInRoom.push(uid);
+            });
+            io.to(roomId).emit('room_users_update', { roomId, users: usersInRoom });
+        }
+    });
+
+    socket.on('leave_chat', ({ roomId }) => {
+        socket.leave(roomId);
+        const userId = userSocketMap.get(socket.id);
+        console.log(`User ${userId} left room ${roomId}`);
+
+        const roomSockets = io.sockets.adapter.rooms.get(roomId);
+        const usersInRoom = [];
+        if (roomSockets) {
+            roomSockets.forEach(socketId => {
+                const uid = userSocketMap.get(socketId);
+                if (uid) usersInRoom.push(uid);
+            });
+        }
+        io.to(roomId).emit('room_users_update', { roomId, users: usersInRoom });
     });
 
     socket.on('typing', ({ roomId, isTyping }) => {
