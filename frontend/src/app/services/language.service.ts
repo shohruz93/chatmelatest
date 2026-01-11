@@ -264,9 +264,10 @@ export class LanguageService {
                 'SEND': 'Send',
                 'LEAVE': 'Leave Game',
                 'TYPE_MESSAGE': 'Type a message...',
-                'VICTORY': 'VICTORY! You won',
-                'LOSE': 'LOSE! Better luck next time.',
-                'WAITING_ACCEPT': 'Waiting accept'
+                'VICTORY': 'VICTORY!',
+                'LOSE': 'DEFEAT!',
+                'WAITING_ACCEPT': 'Waiting accept',
+                'YOU': 'You'
             }
         },
         'ru': {
@@ -476,9 +477,10 @@ export class LanguageService {
                 'SEND': 'Отправить',
                 'LEAVE': 'Выйти из игры',
                 'TYPE_MESSAGE': 'Введите сообщение...',
-                'VICTORY': 'ПОБЕДА! Вы выиграли',
-                'LOSE': 'ПРОИГРЫШ! Повезет в следующий раз.',
-                'WAITING_ACCEPT': 'Ожидание принятия'
+                'VICTORY': 'ПОБЕДА!',
+                'LOSE': 'ПОРАЖЕНИЕ!',
+                'WAITING_ACCEPT': 'Ожидание принятия',
+                'YOU': 'Вы'
             }
         },
         'tj': {
@@ -685,9 +687,10 @@ export class LanguageService {
                 'SEND': 'Равон кардан',
                 'LEAVE': 'Баромадан аз бозӣ',
                 'TYPE_MESSAGE': 'Паём нависед...',
-                'VICTORY': 'ҒАЛАБА! Шумо бурд кардед',
-                'LOSE': 'БОХТ! Дафъاи оянда барори кор.',
-                'WAITING_ACCEPT': 'Интизори қабул'
+                'VICTORY': 'ҒАЛАБА!',
+                'LOSE': 'БОХТ!',
+                'WAITING_ACCEPT': 'Интизори қабул',
+                'YOU': 'Шумо'
             }
         },
         'es': {

@@ -61,15 +61,34 @@ import * as Phaser from 'phaser';
 
       <!-- Game UI -->
       <div class="game-area" [class.hidden]="!gameStarted()">
+        <!-- Mobile Player Info - Top -->
+        <div class="mobile-player-info">
+          <div class="player-badge" [class.active]="currentTurn() === redPlayerId()" [class.red-player]="true">
+            <span class="player-color red"></span>
+            <span class="player-name">{{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}</span>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="player-badge" [class.active]="currentTurn() === blackPlayerId()" [class.black-player]="true">
+            <span class="player-color black"></span>
+            <span class="player-name">{{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}</span>
+          </div>
+        </div>
+
         <div class="canvas-wrapper">
           <div id="checkers-container" #gameContainer></div>
         </div>
         
         <div class="game-sidebar">
-          <div class="game-info">
+          <div class="game-info desktop-only">
             <div class="player-info">
-              <div class="p-red" [class.active]="currentTurn() === redPlayerId()">{{ 'CHECKERS.RED' | translate }} (Player {{ redPlayerId() }})</div>
-              <div class="p-black" [class.active]="currentTurn() === blackPlayerId()">{{ 'CHECKERS.BLACK' | translate }} (Player {{ blackPlayerId() }})</div>
+              <div class="p-red" [class.active]="currentTurn() === redPlayerId()">
+                <span class="player-color-dot red"></span>
+                {{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}
+              </div>
+              <div class="p-black" [class.active]="currentTurn() === blackPlayerId()">
+                <span class="player-color-dot black"></span>
+                {{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}
+              </div>
             </div>
             <div class="turn-indicator" [class.my-turn]="isMyTurn()">
               {{ isMyTurn() ? ('CHECKERS.YOUR_TURN' | translate) : ('CHECKERS.WAITING' | translate) }}
@@ -99,6 +118,24 @@ import * as Phaser from 'phaser';
           <button class="leave-btn" (click)="leaveGame()">{{ 'CHECKERS.LEAVE' | translate }}</button>
         </div>
       </div>
+
+      <!-- Game Result Modal -->
+      @if (showGameResult()) {
+        <div class="result-modal-overlay">
+          <div class="result-modal">
+            <div class="result-icon" [class.win]="gameResultWin()" [class.lose]="!gameResultWin()">
+              {{ gameResultWin() ? '🏆' : '😔' }}
+            </div>
+            <h2 class="result-title" [class.win]="gameResultWin()" [class.lose]="!gameResultWin()">
+              {{ gameResultWin() ? ('CHECKERS.VICTORY' | translate) : ('CHECKERS.LOSE' | translate) }}
+            </h2>
+            @if (gameResultWin()) {
+              <div class="result-coins">+{{ betAmount * 2 }} 🪙</div>
+            }
+            <button class="result-btn" (click)="closeResultAndNavigate()">{{ 'COMMON.CLOSE' | translate }}</button>
+          </div>
+        </div>
+      }
     </div>
   `,
     styles: [`
@@ -257,6 +294,200 @@ import * as Phaser from 'phaser';
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.7; transform: scale(0.98); }
     }
+
+    /* Mobile Player Info - Top */
+    .mobile-player-info {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .player-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #333;
+      border-radius: 8px;
+      flex: 1;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .player-badge.active {
+      background: #374151;
+      border: 2px solid #6366f1;
+      animation: pulse 1.5s infinite;
+    }
+
+    .player-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .player-color.red { background: #ef4444; }
+    .player-color.black { background: #111827; border: 2px solid #555; }
+
+    .player-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+
+    .vs-badge {
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #6366f1;
+      flex-shrink: 0;
+    }
+
+    .player-color-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .player-color-dot.red { background: #ef4444; }
+    .player-color-dot.black { background: #111827; border: 2px solid #555; }
+
+    /* Result Modal */
+    .result-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-modal {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: scaleIn 0.4s ease;
+    }
+
+    .result-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: bounceIn 0.6s ease;
+    }
+
+    .result-icon.win { animation: winPulse 1.5s infinite; }
+    .result-icon.lose { opacity: 0.8; }
+
+    .result-title {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .result-title.win { color: #10b981; }
+    .result-title.lose { color: #ef4444; }
+
+    .result-coins {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fbbf24;
+      margin-bottom: 25px;
+      animation: coinPop 0.5s ease 0.3s both;
+    }
+
+    .result-btn {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .result-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes winPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    @keyframes coinPop {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Desktop only */
+    .desktop-only { display: block; }
+
+    @media (max-width: 950px) {
+        .game-area { flex-direction: column; align-items: center; }
+        .game-sidebar { width: 100%; max-width: 600px; order: 2; }
+        .canvas-wrapper { width: 100%; max-width: 600px; order: 1; }
+        .checkers-wrapper { padding: 10px; padding-top: 80px; align-items: flex-start; }
+        .game-chat { height: 300px; }
+        .mobile-player-info { display: flex; order: 0; }
+        .desktop-only { display: none; }
+    }
+
+    @media (max-width: 500px) {
+        .checkers-wrapper { padding: 5px; padding-top: 70px; }
+        .lobby-container { padding: 20px 15px; }
+        .coin-balance { font-size: 1rem; }
+        .game-chat { height: 250px; }
+        .chat-input { padding: 5px; }
+        .chat-input button { padding: 0 10px; font-size: 0.9rem; }
+        
+        .user-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .user-row button { width: 100%; }
+        .user-row span { width: 100%; }
+        
+        .player-name { max-width: 60px; font-size: 0.8rem; }
+        .result-modal { padding: 30px 20px; }
+        .result-icon { font-size: 4rem; }
+        .result-title { font-size: 1.5rem; }
+    }
   
   `]
 })
@@ -292,6 +523,11 @@ export class CheckersComponent implements OnInit, OnDestroy {
     redPlayerId = signal(0);
     blackPlayerId = signal(0);
     currentTurn = signal(0);
+    partnerName = 'Partner';
+
+    // Game Result Modal
+    showGameResult = signal(false);
+    gameResultWin = signal(false);
 
     ngOnInit() {
         if (history.state['returnUrl']) {
@@ -361,13 +597,14 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
 
         this.socket.partnerLeft$.subscribe(() => {
-
             if (this.gameStarted()) {
-
                 this.onGameOver(this.currentUserId);
-
             }
+        });
 
+        // Checkers Cancelled (sender cancelled their invite)
+        this.socket.checkersCancelled$.subscribe(() => {
+            this.invitation.set(null);
         });
     }
 
@@ -455,6 +692,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
         return this.currentTurn() === this.currentUserId;
     }
 
+    isRedPlayer() {
+        return this.currentUserId === this.redPlayerId();
+    }
+
     translateMessage(msg: any) {
         this.socket.emit('translate_message', {
             messageId: msg.id,
@@ -476,12 +717,14 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
     onGameOver(winnerId: number) {
         const isWinner = winnerId === this.currentUserId;
-        const msg = isWinner ? `${this.lang.translate('CHECKERS.VICTORY')} ${this.betAmount * 2} 🪙` : this.lang.translate('CHECKERS.LOSE');
-        alert(msg);
 
         if (isWinner) {
             this.gamification.win(this.betAmount * 2, 'checkers').subscribe();
         }
+
+        // Show result modal instead of alert
+        this.gameResultWin.set(isWinner);
+        this.showGameResult.set(true);
 
         this.gameStarted.set(false);
         if (this.phaserGame) {
@@ -489,7 +732,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
             this.phaserGame = undefined;
         }
         this.socket.clearCheckersGame();
+    }
 
+    closeResultAndNavigate() {
+        this.showGameResult.set(false);
         if (this.returnUrl) {
             this.router.navigateByUrl(this.returnUrl);
         } else {

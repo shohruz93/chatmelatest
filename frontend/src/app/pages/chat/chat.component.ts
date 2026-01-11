@@ -280,6 +280,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.cdr.markForCheck();
             alert(this.languageService.translate('CHAT.INVITE_DECLINED') || 'Invitation declined');
         }));
+
+        // Checkers Cancelled (sender cancelled the invite)
+        this.subs.add(this.socketService.checkersCancelled$.subscribe(() => {
+            this.gameInvitation = null;
+            this.cdr.markForCheck();
+        }));
     }
 
     ngOnDestroy() {
@@ -425,6 +431,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     cancelGameInvite() {
+        if (this.partner) {
+            this.socketService.cancelCheckersInvite(this.partner.id);
+        }
         this.waitingForGameResponse = false;
         this.cdr.markForCheck();
     }

@@ -71,6 +71,8 @@ export class SocketService implements OnDestroy {
     public checkersGameOver$ = this.checkersGameOverSubject.asObservable();
     public checkersError$ = this.checkersErrorSubject.asObservable();
     public checkersRejected$ = this.checkersRejectedSubject.asObservable();
+    private checkersCancelledSubject = new Subject<any>();
+    public checkersCancelled$ = this.checkersCancelledSubject.asObservable();
     public roomUsers$ = this.roomUsersSubject.asObservable(); // New observable
 
     constructor(private auth: AuthService) {
@@ -136,6 +138,7 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
         this.socket.on('checkers_rejected', (data) => this.checkersRejectedSubject.next(data));
+        this.socket.on('checkers_cancelled', (data) => this.checkersCancelledSubject.next(data));
         this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data)); // New event listener
 
         this.socket.on('connect', () => {
@@ -344,6 +347,10 @@ export class SocketService implements OnDestroy {
 
     rejectCheckersInvite(requesterSocketId: string) {
         this.socket.emit('checkers_reject', { requesterSocketId });
+    }
+
+    cancelCheckersInvite(targetUserId: number) {
+        this.socket.emit('checkers_cancel', { targetUserId });
     }
 
     sendCheckersMove(roomId: string, move: any) {

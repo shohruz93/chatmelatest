@@ -813,6 +813,15 @@ io.on('connection', (socket) => {
         });
     });
 
+    socket.on('checkers_cancel', ({ targetUserId }) => {
+        const targetSocketId = onlineUsers.get(targetUserId);
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('checkers_cancelled', {
+                byUserId: userSocketMap.get(socket.id)
+            });
+        }
+    });
+
     socket.on('checkers_accept', ({ requesterSocketId, amount }) => {
         const userId1 = userSocketMap.get(socket.id);
         const userId2 = userSocketMap.get(requesterSocketId);
