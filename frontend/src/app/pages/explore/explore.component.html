@@ -214,6 +214,19 @@
         <div class="user-info">
           <h3 class="user-name">{{ user.name }}</h3>
 
+          <!-- User Rating -->
+          @if (user.rating && user.rating > 0) {
+          <div class="user-rating">
+            <span class="rating-stars">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+              <span class="star" [class.filled]="star <= (user.rating || 0)">★</span>
+              }
+            </span>
+            <span class="rating-value">{{ user.rating | number:'1.1-1' }}</span>
+            <span class="rating-count">({{ user.rating_count }})</span>
+          </div>
+          }
+
           <!-- Location & Gender (Inline) -->
           <div class="user-meta-row">
             @if (user.location) {

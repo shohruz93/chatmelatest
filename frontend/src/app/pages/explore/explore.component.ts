@@ -28,6 +28,8 @@ interface UserProfile {
     isOnline?: boolean;
     last_active?: string;
     interests?: { id: number; name: string }[];
+    rating?: number;
+    rating_count?: number;
 }
 
 @Component({

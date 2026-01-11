@@ -166,8 +166,9 @@ class User {
         
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Fetch interests for each user
+        // Fetch interests and ratings for each user
         foreach ($users as &$user) {
+            // Fetch interests
             $query = "SELECT i.id, i.name FROM interests i 
                       JOIN user_interests ui ON i.id = ui.interest_id 
                       WHERE ui.user_id = :user_id";
@@ -175,6 +176,16 @@ class User {
             $stmt->bindParam(":user_id", $user['id']);
             $stmt->execute();
             $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch rating data
+            $ratingQuery = "SELECT AVG(rating) as average_rating, COUNT(*) as rating_count 
+                           FROM user_ratings WHERE rated_id = :user_id AND rating IS NOT NULL";
+            $ratingStmt = $this->conn->prepare($ratingQuery);
+            $ratingStmt->bindParam(":user_id", $user['id']);
+            $ratingStmt->execute();
+            $ratingData = $ratingStmt->fetch(PDO::FETCH_ASSOC);
+            $user['rating'] = $ratingData['average_rating'] ? round($ratingData['average_rating'], 1) : 0;
+            $user['rating_count'] = $ratingData['rating_count'] ?: 0;
         }
 
         return $users;

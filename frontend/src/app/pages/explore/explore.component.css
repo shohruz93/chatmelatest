@@ -425,7 +425,43 @@
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.35rem;
+}
+
+/* User Rating Display */
+.user-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 1px;
+}
+
+.rating-stars .star {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    transition: color 0.2s;
+}
+
+.rating-stars .star.filled {
+    color: #fbbf24;
+    text-shadow: 0 0 4px rgba(251, 191, 36, 0.3);
+}
+
+.user-rating .rating-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-rating .rating-count {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
 }
 
 .user-location {
