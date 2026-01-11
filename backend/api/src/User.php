@@ -57,7 +57,7 @@ class User {
 
             $query = "INSERT INTO " . $this->table_name . " 
                     SET google_id=:google_id, email=:email, name=:name, 
-                        first_name=:first_name, family_name=:family_name, avatar=:avatar";
+                        first_name=:first_name, family_name=:family_name, avatar=:avatar, created_at=UNIX_TIMESTAMP(), last_active=UNIX_TIMESTAMP()";
             
             $stmt = $this->conn->prepare($query);
 
@@ -98,7 +98,7 @@ class User {
             $this->id = $row['id'];
             return $this->id;
         } else {
-            $query = "INSERT INTO " . $this->table_name . " (email, name) VALUES (:email, :name)";
+            $query = "INSERT INTO " . $this->table_name . " (email, name, created_at, last_active) VALUES (:email, :name, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())";
             $stmt = $this->conn->prepare($query);
             $defaultName = 'User';
             $stmt->bindParam(":email", $email);

@@ -42,6 +42,8 @@
                 <div class="tx-avatar">
                     @if (isGameTx(tx)) {
                     <div class="game-icon-placeholder">🎮</div>
+                    } @else if (isMissionTx(tx)) {
+                    <div class="game-icon-placeholder">📅</div>
                     } @else {
                     <img [src]="getAvatar(tx)" alt="User">
                     }

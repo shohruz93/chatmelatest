@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, GetUsersResponse } from '../../services/admin.service';
 import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 @Component({
    selector: 'app-admin-users',
    standalone: true,
-   imports: [CommonModule, FormsModule],
+   imports: [CommonModule, FormsModule, UnixDatePipe],
    template: `
     <div class="space-y-6 relative">
        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -89,10 +90,10 @@ import { Observable, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
                           <span *ngIf="!user.is_admin" class="text-gray-500 text-sm">Member</span>
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
-                         {{ user.created_at | date:'mediumDate' }}
+                         {{ user.created_at | unixDate:'mediumDate' }}
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
-                         {{ user.last_active ? (user.last_active | date:'short') : '-' }}
+                         {{ user.last_active ? (user.last_active | unixDate:'short') : '-' }}
                       </td>
                       <td class="px-6 py-4 text-right" (click)="$event.stopPropagation()">
                          <div class="flex items-center justify-end gap-2 text-gray-500">

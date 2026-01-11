@@ -69,6 +69,7 @@ export class CoinsComponent implements OnInit {
 
     getName(tx: Transaction): string {
         if (this.isGameTx(tx)) return 'Game Reward';
+        if (this.isMissionTx(tx)) return 'Daily Mission';
         const name = tx.direction === 'incoming' ? tx.sender_name : tx.receiver_name;
         return name || 'Unknown User';
     }
@@ -82,7 +83,12 @@ export class CoinsComponent implements OnInit {
             minute: '2-digit'
         });
     }
+
     isGameTx(tx: Transaction): boolean {
         return ['bet', 'win'].includes(tx.type);
+    }
+
+    isMissionTx(tx: Transaction): boolean {
+        return tx.note === 'Reward for mission: ';
     }
 }
