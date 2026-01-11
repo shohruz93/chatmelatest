@@ -149,7 +149,19 @@ export class SocketService implements OnDestroy {
     }
 
     markMessageRead(messageId: string, roomId: string) {
-        this.socket.emit('mark_message_read', { messageId, roomId });
+        // Extract partner ID from roomId (format: room_ID1_ID2)
+        // Backend expects roomId and senderId (the partner's user ID)
+        const currentUserId = this.auth.currentUserValue?.id;
+        if (!currentUserId || !roomId) return;
+
+        const parts = roomId.split('_');
+        if (parts.length === 3) {
+            const id1 = parseInt(parts[1]);
+            const id2 = parseInt(parts[2]);
+            const senderId = (id1 === currentUserId) ? id2 : id1;
+
+            this.socket.emit('mark_as_read', { roomId, senderId });
+        }
     }
 
     ngOnDestroy() {

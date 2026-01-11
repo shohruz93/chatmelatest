@@ -184,8 +184,8 @@ export class ChatService {
                 await this.chatStorage.openDb(currentUser.id);
             }
 
-            // 1. Load from IndexedDB
-            const localMsgs = await this.chatStorage.getMessages(roomId, 50, 0); // Limit 50 for now
+            // 1. Load from IndexedDB (limit to 20 initially for performance)
+            const localMsgs = await this.chatStorage.getMessages(roomId, 20, 0);
             const mappedLocal = localMsgs.map(m => this.mapServerMessage(m)).reverse(); // Storage returns reversed usually? verify
             // Actually getMessages in storage reverses them at the end: `resolve(messages.reverse())`
             // So we get chronological order.
@@ -376,7 +376,7 @@ export class ChatService {
             content: content,
             createdAt: createdAt,
             type: isSent ? 'sent' : 'received',
-            status: data.status || (isSent ? 'sent' : 'read'),
+            status: data.status || 'read', // Default to 'read' for loaded messages
             messageType: msgType,
             replyTo: data.replyTo,
             originalLang: data.originalLang || data.original_lang,

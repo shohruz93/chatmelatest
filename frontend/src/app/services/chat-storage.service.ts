@@ -73,14 +73,31 @@ export class ChatStorageService {
 
   async addMessage(message: any): Promise<void> {
     const store = this.getStore(MESSAGES_STORE, 'readwrite');
+
+    // Normalize message fields for consistent indexing
+    const normalizedMsg = this.normalizeMessage(message);
+
     return new Promise((resolve, reject) => {
-      const request = store.put(message);
+      const request = store.put(normalizedMsg);
       request.onsuccess = () => {
         this.messagesUpdated.next();
         resolve();
       };
       request.onerror = (event) => reject((event.target as IDBRequest).error);
     });
+  }
+
+  // Normalize message fields to ensure consistent indexing
+  private normalizeMessage(msg: any): any {
+    return {
+      ...msg,
+      id: String(msg.id),
+      roomId: msg.roomId || msg.room_id,
+      // Ensure created_at is always set for indexing (index uses created_at snake_case)
+      created_at: msg.created_at || msg.createdAt || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
+      sender_id: msg.sender_id || msg.senderId,
+      messageType: msg.messageType || msg.type || 'text'
+    };
   }
 
   async addMessages(messages: any[]): Promise<void> {
@@ -94,7 +111,7 @@ export class ChatStorageService {
       }
       const transaction = this.db.transaction(MESSAGES_STORE, 'readwrite');
       const store = transaction.objectStore(MESSAGES_STORE);
-      messages.forEach(msg => store.put(msg));
+      messages.forEach(msg => store.put(this.normalizeMessage(msg)));
       transaction.oncomplete = () => {
         this.messagesUpdated.next();
         resolve();
@@ -126,7 +143,7 @@ export class ChatStorageService {
         // Simple put: if ID exists, it updates; if not, it adds.
         // This is safe because server IDs are unique.
         // We only need special handling for temp messages.
-        store.put(msg);
+        store.put(this.normalizeMessage(msg));
         addedCount++;
       }
 
@@ -139,9 +156,9 @@ export class ChatStorageService {
           const tempMsg = cursor.value;
           // If we find a temp message that matches a real message we just added
           // (same content, room, and close timestamp), delete it.
-          const isDuplicate = messages.some(m => 
-            m.roomId === tempMsg.roomId && 
-            m.content === tempMsg.content && 
+          const isDuplicate = messages.some(m =>
+            m.roomId === tempMsg.roomId &&
+            m.content === tempMsg.content &&
             Math.abs((m.created_at || 0) - (tempMsg.created_at || 0)) < 60000
           );
 

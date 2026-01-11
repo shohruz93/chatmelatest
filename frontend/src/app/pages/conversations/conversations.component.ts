@@ -26,13 +26,18 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     loading = true;
     error: string | null = null;
     currentUser: any;
+    private hasLoadedConversations = false;
 
     isDarkMode = signal(document.documentElement.getAttribute('data-theme') === 'dark');
 
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
         if (this.currentUser) {
-            this.loadConversations();
+            // Only load conversations on first init
+            if (!this.hasLoadedConversations) {
+                this.loadConversations();
+                this.hasLoadedConversations = true;
+            }
             this.setupSocketListeners();
         }
     }
@@ -67,6 +72,10 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
         if (!partnerId) return;
 
+        // Check if user is currently viewing this chat room
+        const currentUrl = this.router.url;
+        const isInThisChat = currentUrl.includes(`/dashboard/chat/${partnerId}`);
+
         const index = this.conversations.findIndex(c => Number(c.partner_id) === partnerId);
 
         if (index > -1) {
@@ -74,7 +83,18 @@ export class ConversationsComponent implements OnInit, OnDestroy {
             const conv = this.conversations[index];
             conv.last_message = msg.content;
             conv.last_message_time = msg.createdAt || msg.created_at || Date.now();
-            if (!isSent) {
+
+            // Handle unread count:
+            if (isSent) {
+                // If user sent a message, they're engaging with this chat - reset unread count
+                conv.unread_count = 0;
+            } else if (isInThisChat) {
+                // If user is currently viewing this chat, message is marked as read - reset unread count
+                conv.unread_count = 0;
+            } else {
+                // Only increment unread count if:
+                // 1. Message was received (not sent by current user)
+                // 2. User is NOT currently viewing this chat
                 conv.unread_count = (conv.unread_count || 0) + 1;
             }
 
@@ -121,7 +141,13 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     openConversation(event: Event, partnerId: number) {
         event.preventDefault();
 
-        // Mark messages as read
+        // Immediately update local state to clear unread count
+        const index = this.conversations.findIndex(c => Number(c.partner_id) === partnerId);
+        if (index > -1) {
+            this.conversations[index].unread_count = 0;
+        }
+
+        // Mark messages as read on backend
         this.api.post('/conversations/read', {
             userId: this.currentUser.id,
             otherUserId: partnerId
@@ -132,7 +158,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 console.error('Error marking messages as read:', err);
-                // Navigate anyway
+                // Navigate anyway (local state is already updated)
                 this.router.navigate(['/dashboard/chat', partnerId]);
             }
         });

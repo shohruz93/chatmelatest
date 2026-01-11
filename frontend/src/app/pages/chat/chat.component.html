@@ -196,14 +196,26 @@
         </div>
         }
 
+        @if (isRecording) {
+        <div class="recording-timer-bar">
+            <div class="recording-indicator">
+                <span class="recording-dot"></span>
+                <span class="recording-text">{{ 'CHAT.RECORDING' | translate }}</span>
+            </div>
+            <span class="recording-duration">{{ formatRecordingTime(recordingDuration) }}</span>
+            <div class="recording-actions">
+                <button class="btn-cancel-recording" (click)="cancelRecording()" title="Cancel">✕</button>
+                <button class="btn-send-recording" (click)="stopAndSendRecording()" title="Send">➤</button>
+            </div>
+        </div>
+        } @else {
         <div class="input-wrapper">
             <button class="btn-toggle-media" (click)="showMediaMenu = !showMediaMenu">+</button>
 
             <!-- Media Actions: Always visible on desktop, toggled on mobile -->
             <div class="media-actions" [class.show]="showMediaMenu">
                 <button class="btn-media" (click)="triggerFileInput()" title="Image">📷</button>
-                <button class="btn-media" (click)="toggleRecording()" title="Voice"
-                    [class.recording]="isRecording">🎤</button>
+                <button class="btn-media" (click)="startRecording()" title="Voice">🎤</button>
                 <button class="btn-media" (click)="toggleStickerPicker()" title="Sticker">😊</button>
             </div>
 
@@ -216,6 +228,7 @@
                 </button>
             </div>
         </div>
+        }
 
         @if (showStickerPicker) {
         <div class="sticker-picker glass-panel">

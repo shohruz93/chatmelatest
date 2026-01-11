@@ -85,6 +85,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     showMediaMenu = false;
     showStickerPicker = false;
     isRecording = false;
+    recordingDuration = 0; // in seconds
+    private recordingInterval: any = null;
     stickers = [
         '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌',
         '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓',
@@ -190,9 +192,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             }
         }));
 
-        // Typing
+        // Typing - Check if the typing user is our partner (backend sends userId, not roomId)
         this.subs.add(this.socketService.onUserTyping().subscribe((data) => {
-            if (data.roomId === this.roomId) {
+            if (this.partner && Number(data.userId) === Number(this.partner.id)) {
                 this.partnerTyping = data.isTyping;
                 this.cdr.markForCheck();
                 if (this.partnerTyping) this.scrollToBottom();
@@ -233,11 +235,24 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.socketService.emitTyping(this.roomId!, false);
     }
 
+    // Debounce timer for typing indicator
+    private typingTimeout: any = null;
+
     onTyping() {
         if (this.roomId) {
             this.socketService.emitTyping(this.roomId, true);
-            // debounce logic usually inside service or simplified here
-            // assuming service handles debounce or server handles it
+
+            // Clear previous timeout
+            if (this.typingTimeout) {
+                clearTimeout(this.typingTimeout);
+            }
+
+            // Set new timeout to stop typing after 2 seconds of inactivity
+            this.typingTimeout = setTimeout(() => {
+                if (this.roomId) {
+                    this.socketService.emitTyping(this.roomId, false);
+                }
+            }, 2000);
         }
     }
 
@@ -352,34 +367,72 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         input.click();
     }
 
-    async toggleRecording() {
-        if (!this.isRecording) {
-            // Start
-            try {
-                // Check permissions
-                const status = await VoiceRecorder.requestAudioRecordingPermission();
-                if (status.value) {
-                    await VoiceRecorder.startRecording();
-                    this.isRecording = true;
-                }
-            } catch (e) {
-                console.error('Error starting recording', e);
+    async startRecording() {
+        try {
+            const status = await VoiceRecorder.requestAudioRecordingPermission();
+            if (status.value) {
+                await VoiceRecorder.startRecording();
+                this.isRecording = true;
+                this.recordingDuration = 0;
+                this.cdr.markForCheck();
+
+                // Start timer
+                this.recordingInterval = setInterval(() => {
+                    this.recordingDuration++;
+                    this.cdr.markForCheck();
+                }, 1000);
             }
-        } else {
-            // Stop
-            try {
-                const result = await VoiceRecorder.stopRecording();
-                this.isRecording = false;
-                if (result.value && result.value.recordDataBase64) {
-                    const base64Sound = 'data:audio/aac;base64,' + result.value.recordDataBase64;
-                    this.chatService.sendMessage(base64Sound, this.replyingToMessage, 'audio');
-                    this.showMediaMenu = false;
-                }
-            } catch (e) {
-                console.error('Error stopping recording', e);
-                this.isRecording = false;
-            }
+        } catch (e) {
+            console.error('Error starting recording', e);
         }
+    }
+
+    async stopAndSendRecording() {
+        try {
+            if (this.recordingInterval) {
+                clearInterval(this.recordingInterval);
+                this.recordingInterval = null;
+            }
+
+            const result = await VoiceRecorder.stopRecording();
+            this.isRecording = false;
+            this.recordingDuration = 0;
+            this.cdr.markForCheck();
+
+            if (result.value && result.value.recordDataBase64) {
+                const base64Sound = 'data:audio/aac;base64,' + result.value.recordDataBase64;
+                this.chatService.sendMessage(base64Sound, this.replyingToMessage, 'audio');
+                this.showMediaMenu = false;
+            }
+        } catch (e) {
+            console.error('Error stopping recording', e);
+            this.isRecording = false;
+            this.recordingDuration = 0;
+        }
+    }
+
+    async cancelRecording() {
+        try {
+            if (this.recordingInterval) {
+                clearInterval(this.recordingInterval);
+                this.recordingInterval = null;
+            }
+
+            await VoiceRecorder.stopRecording();
+            this.isRecording = false;
+            this.recordingDuration = 0;
+            this.cdr.markForCheck();
+        } catch (e) {
+            console.error('Error canceling recording', e);
+            this.isRecording = false;
+            this.recordingDuration = 0;
+        }
+    }
+
+    formatRecordingTime(seconds: number): string {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
 
     translateMessage(msg: any) {
