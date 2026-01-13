@@ -42,12 +42,27 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
              <table class="w-full text-left">
                 <thead>
                    <tr class="bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 text-sm">
-                      <th class="px-6 py-4 font-semibold">User</th>
+                      <th (click)="sort('name')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                          <div class="flex items-center gap-1">
+                              User
+                              <span *ngIf="sortBy === 'name'" class="text-xs">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                          </div>
+                      </th>
                       <th class="px-6 py-4 font-semibold">Real Name</th>
                       <th class="px-6 py-4 font-semibold">Status</th>
                       <th class="px-6 py-4 font-semibold">Role</th>
-                      <th class="px-6 py-4 font-semibold">Joined</th>
-                      <th class="px-6 py-4 font-semibold">Last Active</th>
+                      <th (click)="sort('created_at')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                          <div class="flex items-center gap-1">
+                              Joined
+                              <span *ngIf="sortBy === 'created_at'" class="text-xs">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                          </div>
+                      </th>
+                      <th (click)="sort('last_active')" class="px-6 py-4 font-semibold cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                          <div class="flex items-center gap-1">
+                              Last Active
+                              <span *ngIf="sortBy === 'last_active'" class="text-xs">{{ sortDir === 'asc' ? '↑' : '↓' }}</span>
+                          </div>
+                      </th>
                       <th class="px-6 py-4 font-semibold text-right">Actions</th>
                    </tr>
                 </thead>
@@ -132,8 +147,15 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                             <!-- Header -->
                             <div class="bg-gray-50 dark:bg-gray-900 px-4 py-6 sm:px-6 border-b dark:border-gray-700">
                                 <div class="flex items-center justify-between">
-                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white" id="slide-over-title">User Profile</h2>
-                                    <div class="ml-3 flex h-7 items-center">
+                                    <h2 class="text-lg font-medium text-gray-900 dark:text-white" id="slide-over-title">
+                                        {{ isEditing ? 'Edit User' : 'User Profile' }}
+                                    </h2>
+                                    <div class="ml-3 flex h-7 items-center gap-2">
+                                         <button *ngIf="!isEditing" (click)="startEdit()" class="p-1 text-gray-400 hover:text-blue-500 transition-colors" title="Edit User">
+                                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                           </svg>
+                                         </button>
                                         <button type="button" class="rounded-md bg-transparent text-gray-400 hover:text-gray-500 focus:outline-none" (click)="closeUserDrawer()">
                                             <span class="sr-only">Close panel</span>
                                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -145,102 +167,138 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                             </div>
                             
                             <div class="relative flex-1 px-4 py-6 sm:px-6 space-y-6" *ngIf="userDetails; else loadingDetails">
-                                <!-- Profile Info -->
-                                <div class="flex flex-col items-center">
-                                    <div class="w-24 h-24 rounded-full overflow-hidden shadow-md mb-4">
-                                        <img *ngIf="userDetails.avatar" [src]="getAvatarUrl(userDetails.avatar)" class="w-full h-full object-cover">
-                                        <div *ngIf="!userDetails.avatar" class="w-full h-full flex items-center justify-center bg-gray-200 text-3xl font-bold text-gray-600">
-                                            {{ userDetails.name.substring(0,2).toUpperCase() }}
-                                        </div>
-                                    </div>
-                                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white text-center">{{ userDetails.name }}</h3>
-                                    <p class="text-gray-500 text-sm">{{ userDetails.email }}</p>
-                                    
-                                    <div class="flex mt-4 gap-2">
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="isBanned(selectedUser) ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'">
-                                            {{ isBanned(selectedUser) ? 'Banned' : 'Active' }}
-                                        </span>
-                                        <span *ngIf="userDetails.is_admin" class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
-                                            Admin
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <button *ngIf="!isBanned(selectedUser)" (click)="banUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-full">
-                                        Ban Check
-                                    </button>
-                                     <button *ngIf="isBanned(selectedUser)" (click)="unbanUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full">
-                                        Unban User
-                                    </button>
-                                    <button (click)="toggleAdmin(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 w-full">
-                                        {{ selectedUser.is_admin ? 'Demote Admin' : 'Make Admin' }}
-                                    </button>
-                                </div>
-
-                                <!-- Stats -->
-                                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-700">
-                                    <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Activity Stats</h4>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.messages_sent || 0 }}</div>
-                                            <div class="text-xs text-gray-500">Messages Sent</div>
-                                        </div>
-                                        <div>
-                                            <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.total_conversations || 0 }}</div>
-                                            <div class="text-xs text-gray-500">Conversations</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Details List -->
-                                <div class="space-y-4">
+                                <!-- Edit Mode -->
+                                <div *ngIf="isEditing" class="space-y-4">
                                     <div>
-                                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Bio</h4>
-                                        <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.bio || 'No bio provided' }}</p>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Display Name</label>
+                                        <input [(ngModel)]="editForm.name" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
                                     </div>
-                                    
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</h4>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200 capitalize">{{ userDetails.gender || 'Not specified' }}</p>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</h4>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.location || 'Not specified' }}</p>
-                                        </div>
-                                         <div>
-                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Native Lang</h4>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.native_language || '-' }}</p>
-                                        </div>
-                                        <div>
-                                            <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Learning Lang</h4>
-                                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.learning_language || '-' }}</p>
-                                        </div>
+                                     <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                                        <input [(ngModel)]="editForm.email" type="email" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+                                        <textarea [(ngModel)]="editForm.bio" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                                        <input [(ngModel)]="editForm.location" type="text" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Gender</label>
+                                        <select [(ngModel)]="editForm.gender" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
                                     </div>
 
-                                    <div *ngIf="userDetails.interests?.length">
-                                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h4>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span *ngFor="let interest of userDetails.interests" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                                {{ interest.name }}
-                                            </span>
-                                        </div>
+                                    <div class="flex gap-3 pt-4">
+                                        <button (click)="saveUser()" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Changes</button>
+                                        <button (click)="cancelEdit()" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Cancel</button>
                                     </div>
                                 </div>
 
-                            </div>
-                             <ng-template #loadingDetails>
-                                <div class="flex items-center justify-center h-64">
-                                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                                <!-- View Mode -->
+                                <div *ngIf="!isEditing">
+                                   <!-- Profile Info -->
+                                   <div class="flex flex-col items-center">
+                                       <div class="w-24 h-24 rounded-full overflow-hidden shadow-md mb-4 bg-gray-200">
+                                           <img *ngIf="userDetails.avatar" [src]="getAvatarUrl(userDetails.avatar)" class="w-full h-full object-cover">
+                                           <div *ngIf="!userDetails.avatar" class="w-full h-full flex items-center justify-center bg-gray-200 text-3xl font-bold text-gray-600">
+                                               {{ userDetails.name.substring(0,2).toUpperCase() }}
+                                           </div>
+                                       </div>
+                                       <h3 class="text-2xl font-bold text-gray-900 dark:text-white text-center">{{ userDetails.name }}</h3>
+                                       <p class="text-gray-500 text-sm">{{ userDetails.email }}</p>
+                                       
+                                       <div class="flex mt-4 gap-2">
+                                           <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="isBanned(selectedUser) ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'">
+                                               {{ isBanned(selectedUser) ? 'Banned' : 'Active' }}
+                                           </span>
+                                           <span *ngIf="userDetails.is_admin" class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800">
+                                               Admin
+                                           </span>
+                                       </div>
+                                   </div>
+
+                                   <!-- Actions -->
+                                   <div class="grid grid-cols-2 gap-4 mt-6">
+                                       <button *ngIf="!isBanned(selectedUser)" (click)="banUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 w-full">
+                                           Ban User
+                                       </button>
+                                        <button *ngIf="isBanned(selectedUser)" (click)="unbanUser(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full">
+                                           Unban User
+                                       </button>
+                                       <button (click)="toggleAdmin(selectedUser.id)" class="flex justify-center items-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 w-full">
+                                           {{ selectedUser.is_admin ? 'Demote Admin' : 'Make Admin' }}
+                                       </button>
+                                   </div>
+
+                                   <!-- Stats -->
+                                   <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-100 dark:border-gray-700 mt-6">
+                                       <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Activity Stats</h4>
+                                       <div class="grid grid-cols-2 gap-4">
+                                           <div>
+                                               <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.messages_sent || 0 }}</div>
+                                               <div class="text-xs text-gray-500">Messages Sent</div>
+                                           </div>
+                                           <div>
+                                               <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ userDetails.stats?.total_conversations || 0 }}</div>
+                                               <div class="text-xs text-gray-500">Conversations</div>
+                                           </div>
+                                       </div>
+                                   </div>
+
+                                   <!-- Details List -->
+                                   <div class="space-y-4 mt-6">
+                                       <div>
+                                           <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Bio</h4>
+                                           <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.bio || 'No bio provided' }}</p>
+                                       </div>
+                                       
+                                       <div class="grid grid-cols-2 gap-4">
+                                           <div>
+                                               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Gender</h4>
+                                               <p class="mt-1 text-sm text-gray-900 dark:text-gray-200 capitalize">{{ userDetails.gender || 'Not specified' }}</p>
+                                           </div>
+                                           <div>
+                                               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</h4>
+                                               <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.location || 'Not specified' }}</p>
+                                           </div>
+                                            <div>
+                                               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Native Lang</h4>
+                                               <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.native_language || '-' }}</p>
+                                           </div>
+                                           <div>
+                                               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Learning Lang</h4>
+                                               <p class="mt-1 text-sm text-gray-900 dark:text-gray-200">{{ userDetails.learning_language || '-' }}</p>
+                                           </div>
+                                       </div>
+
+                                       <div *ngIf="userDetails.interests?.length">
+                                           <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h4>
+                                           <div class="flex flex-wrap gap-2">
+                                               <span *ngFor="let interest of userDetails.interests" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                                   {{ interest.name }}
+                                               </span>
+                                           </div>
+                                       </div>
+                                   </div>
                                 </div>
-                            </ng-template>
-                        </div>
-                    </div>
-                </div>
-            </div>
-       </div>
+
+                           </div>
+                            <ng-template #loadingDetails>
+                               <div class="flex items-center justify-center h-64">
+                                   <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+                               </div>
+                           </ng-template>
+                       </div>
+                   </div>
+               </div>
+           </div>
+      </div>
 
     </div>
   `
@@ -250,10 +308,14 @@ export class AdminUsersComponent implements OnInit {
    searchTerm: string = '';
    currentStatus: string = 'all';
    currentPage: number = 1;
+   sortBy: string = 'created_at';
+   sortDir: string = 'desc';
    searchSubject = new Subject<string>();
 
    selectedUser: any = null;
    userDetails: any = null;
+   isEditing: boolean = false;
+   editForm: any = {};
 
    constructor(private adminService: AdminService) {
       this.searchSubject.pipe(
@@ -280,13 +342,23 @@ export class AdminUsersComponent implements OnInit {
       this.loadUsers();
    }
 
+   sort(column: string) {
+      if (this.sortBy === column) {
+         this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+         this.sortBy = column;
+         this.sortDir = 'asc';
+      }
+      this.loadUsers();
+   }
+
    loadPage(page: number) {
       this.currentPage = page;
       this.loadUsers();
    }
 
    loadUsers() {
-      this.usersResponse$ = this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus);
+      this.usersResponse$ = this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus, this.sortBy, this.sortDir);
    }
 
    isBanned(user: any): boolean {
@@ -301,15 +373,48 @@ export class AdminUsersComponent implements OnInit {
 
    viewUser(user: any) {
       this.selectedUser = user;
-      this.userDetails = null; // Clear previous details
+      this.userDetails = null;
+      this.isEditing = false;
       this.adminService.getUserDetails(user.id).subscribe(details => {
          this.userDetails = details;
+      });
+   }
+
+   startEdit() {
+      this.isEditing = true;
+      this.editForm = { ...this.userDetails };
+   }
+
+   cancelEdit() {
+      this.isEditing = false;
+      this.editForm = {};
+   }
+
+   saveUser() {
+      if (!this.editForm) return;
+
+      this.adminService.updateUser(this.selectedUser.id, this.editForm).subscribe({
+         next: () => {
+            this.isEditing = false;
+            this.userDetails = { ...this.userDetails, ...this.editForm };
+            // Also update the list item if needed
+            if (this.selectedUser) {
+               this.selectedUser.name = this.editForm.name;
+               this.selectedUser.email = this.editForm.email;
+            }
+            this.loadUsers(); // Refresh list to ensure consistency
+         },
+         error: (err) => {
+            alert('Failed to update user');
+            console.error(err);
+         }
       });
    }
 
    closeUserDrawer() {
       this.selectedUser = null;
       this.userDetails = null;
+      this.isEditing = false;
    }
 
    banUser(userId: number) {

@@ -58,6 +58,15 @@ class AdminController {
         $offset = ($page - 1) * $limit;
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $status = isset($_GET['status']) ? $_GET['status'] : 'all'; // all, banned, admin
+        
+        // Sorting
+        $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'created_at';
+        $orderDir = isset($_GET['order_dir']) && strtoupper($_GET['order_dir']) === 'ASC' ? 'ASC' : 'DESC';
+        
+        $allowedSortCols = ['name', 'created_at', 'last_active', 'email'];
+        if (!in_array($sortBy, $allowedSortCols)) {
+            $sortBy = 'created_at';
+        }
 
         $query = "SELECT id, name, first_name, family_name, email, is_admin, status, gender, avatar, created_at, last_active FROM users";
         $countQuery = "SELECT COUNT(*) as count FROM users";
@@ -82,7 +91,7 @@ class AdminController {
         
         $whereClause = " WHERE " . implode(" AND ", $conditions);
         
-        $query .= $whereClause . " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
+        $query .= $whereClause . " ORDER BY $sortBy $orderDir LIMIT :limit OFFSET :offset";
         $countQuery .= $whereClause;
         
         $stmt = $this->db->prepare($query);
@@ -185,6 +194,46 @@ class AdminController {
         } else {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to update admin status']);
+        }
+    }
+
+    public function updateUser() {
+        $data = json_decode(file_get_contents("php://input"));
+        
+        if (!isset($data->user_id)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User ID required']);
+            return;
+        }
+
+        $allowedFields = ['name', 'email', 'gender', 'bio', 'location'];
+        $updates = [];
+        $params = [':id' => $data->user_id];
+
+        foreach ($allowedFields as $field) {
+            if (isset($data->$field)) {
+                $updates[] = "$field = :$field";
+                $params[":$field"] = $data->$field;
+            }
+        }
+
+        if (empty($updates)) {
+             echo json_encode(['message' => 'No changes provided']);
+             return;
+        }
+
+        $query = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+
+        if($stmt->execute()) {
+            echo json_encode(['message' => 'User updated successfully']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update user']);
         }
     }
 

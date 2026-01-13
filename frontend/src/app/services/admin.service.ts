@@ -31,12 +31,14 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
-  getUsers(page: number = 1, search: string = '', status: string = 'all'): Observable<GetUsersResponse> {
+  getUsers(page: number = 1, search: string = '', status: string = 'all', sortBy: string = 'created_at', orderDir: string = 'desc'): Observable<GetUsersResponse> {
     return this.http.get<GetUsersResponse>(`${this.apiUrl}/admin/users`, {
       params: {
         page: page.toString(),
         search,
-        status
+        status,
+        sort_by: sortBy,
+        order_dir: orderDir
       }
     }).pipe(
       map((resp: GetUsersResponse) => {
@@ -68,6 +70,10 @@ export class AdminService {
 
   toggleAdmin(userId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/users/toggle-admin`, { userId });
+  }
+
+  updateUser(userId: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/update`, { user_id: userId, ...data });
   }
 
   getUserDetails(userId: number): Observable<any> {
