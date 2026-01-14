@@ -543,14 +543,21 @@ io.on('connection', (socket) => {
 
             if (Array.isArray(messages)) {
                 // Normalize message format for IndexedDB storage
-                const normalizedMessages = messages.map(msg => ({
-                    ...msg,
-                    roomId: msg.roomId || msg.room_id || roomId,
-                    created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
-                    sender_id: msg.sender_id || msg.senderId,
-                    messageType: msg.type || msg.messageType || 'text',
-                    id: String(msg.id)
-                }));
+                const normalizedMessages = messages.map(msg => {
+                    let type = msg.type || msg.messageType || 'text';
+                    if (type === 'text' && msg.content) {
+                        if (msg.content.startsWith('data:image')) type = 'image';
+                        else if (msg.content.startsWith('data:audio')) type = 'audio';
+                    }
+                    return {
+                        ...msg,
+                        roomId: msg.roomId || msg.room_id || roomId,
+                        created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
+                        sender_id: msg.sender_id || msg.senderId,
+                        messageType: type,
+                        id: String(msg.id)
+                    };
+                });
 
                 socket.emit('messages_loaded', {
                     roomId: roomId,
@@ -576,14 +583,21 @@ io.on('connection', (socket) => {
 
             if (Array.isArray(messages)) {
                 // Normalize first
-                const normalizedMessages = messages.map(msg => ({
-                    ...msg,
-                    roomId: msg.roomId || msg.room_id || roomId,
-                    created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
-                    sender_id: msg.sender_id || msg.senderId,
-                    messageType: msg.type || msg.messageType || 'text',
-                    id: String(msg.id)
-                }));
+                const normalizedMessages = messages.map(msg => {
+                    let type = msg.type || msg.messageType || 'text';
+                    if (type === 'text' && msg.content) {
+                        if (msg.content.startsWith('data:image')) type = 'image';
+                        else if (msg.content.startsWith('data:audio')) type = 'audio';
+                    }
+                    return {
+                        ...msg,
+                        roomId: msg.roomId || msg.room_id || roomId,
+                        created_at: msg.created_at || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
+                        sender_id: msg.sender_id || msg.senderId,
+                        messageType: type,
+                        id: String(msg.id)
+                    };
+                });
 
                 let newMessages = [];
 
@@ -858,6 +872,37 @@ io.on('connection', (socket) => {
     socket.on('checkers_game_over', ({ roomId, winnerId }) => {
         io.to(roomId).emit('checkers_game_over', { winnerId });
         // The client will handle the API call to /games/win for the winner
+    });
+
+    // Voice Chat Signaling
+    socket.on('voice_offer', ({ targetUserId, offer }) => {
+        const targetSocketId = onlineUsers.get(targetUserId);
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('voice_offer', {
+                senderId: userSocketMap.get(socket.id),
+                offer: offer
+            });
+        }
+    });
+
+    socket.on('voice_answer', ({ targetUserId, answer }) => {
+        const targetSocketId = onlineUsers.get(targetUserId);
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('voice_answer', {
+                senderId: userSocketMap.get(socket.id),
+                answer: answer
+            });
+        }
+    });
+
+    socket.on('voice_candidate', ({ targetUserId, candidate }) => {
+        const targetSocketId = onlineUsers.get(targetUserId);
+        if (targetSocketId) {
+            io.to(targetSocketId).emit('voice_candidate', {
+                senderId: userSocketMap.get(socket.id),
+                candidate: candidate
+            });
+        }
     });
 
     socket.on('disconnect', () => {

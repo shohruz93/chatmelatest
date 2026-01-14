@@ -183,6 +183,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     waitingForGameResponse: boolean = false;
 
     lastMessageCount: number = 0;
+    private sendSound = new Audio('/mp3/tick.mp3');
 
     constructor() {
         // Auto-scroll effect
@@ -309,10 +310,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (!this.newMessage.trim()) return;
 
         this.chatService.sendMessage(this.newMessage, this.replyingToMessage);
+        this.playSendSound();
 
         this.newMessage = '';
         this.replyingToMessage = null;
         this.socketService.emitTyping(this.roomId!, false);
+    }
+
+    private playSendSound() {
+        this.sendSound.currentTime = 0;
+        this.sendSound.play().catch(e => console.error('Error playing sound:', e));
     }
 
     // Debounce timer for typing indicator
@@ -509,6 +516,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 reader.onload = () => {
                     const base64 = reader.result as string;
                     this.chatService.sendMessage(base64, this.replyingToMessage, 'image');
+                    this.playSendSound();
                     this.showMediaMenu = false;
                 };
                 reader.readAsDataURL(file);
@@ -552,6 +560,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             if (result.value && result.value.recordDataBase64) {
                 const base64Sound = 'data:audio/aac;base64,' + result.value.recordDataBase64;
                 this.chatService.sendMessage(base64Sound, this.replyingToMessage, 'audio');
+                this.playSendSound();
                 this.showMediaMenu = false;
             }
         } catch (e) {

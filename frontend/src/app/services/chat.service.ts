@@ -191,6 +191,8 @@ export class ChatService {
             // Actually getMessages in storage reverses them at the end: `resolve(messages.reverse())`
             // So we get chronological order.
 
+            console.log('[ChatService] Loaded local messages:', mappedLocal.length, mappedLocal.map(m => ({ id: m.id, type: m.messageType })));
+
             this.messages.set(mappedLocal);
             this.loadingMessages.set(false);
 
@@ -361,7 +363,7 @@ export class ChatService {
 
         // Handling Base64 Media Prefixes
         let content = data.content;
-        const msgType = data.messageType || data.type || 'text';
+        let msgType = data.messageType || data.type || 'text';
 
         if (msgType === 'image' && content && !content.startsWith('http') && !content.startsWith('data:image')) {
             // Assume JPEG if unknown, but could be PNG. 
@@ -369,6 +371,20 @@ export class ChatService {
             content = `data:image/jpeg;base64,${content}`;
         } else if (msgType === 'audio' && content && !content.startsWith('http') && !content.startsWith('data:audio')) {
             content = `data:audio/webm;base64,${content}`;
+        }
+
+        // Auto-detect type if it's text but has media prefix (Fix for broken history)
+        if (msgType === 'text' && typeof content === 'string') {
+            if (content.startsWith('data:image')) {
+                msgType = 'image';
+            } else if (content.startsWith('data:audio')) {
+                msgType = 'audio';
+            }
+        }
+
+        // DEBUG LOG
+        if (msgType !== 'text') {
+            console.log('[ChatService] Mapping special message:', { id: data.id, originalType: data.messageType || data.type, finalType: msgType, contentPrefix: content?.substring(0, 30) });
         }
 
         // Process replyTo data to ensure messageType exists
