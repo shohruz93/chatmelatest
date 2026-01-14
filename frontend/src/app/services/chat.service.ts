@@ -363,21 +363,23 @@ export class ChatService {
 
         // Handling Base64 Media Prefixes
         let content = data.content;
-        let msgType = data.messageType || data.type || 'text';
+        // Prioritize explicit messageType, then fallback to type, then message_type
+        let msgType = data.messageType || data.type || data.message_type || 'text';
 
-        if (msgType === 'image' && content && !content.startsWith('http') && !content.startsWith('data:image')) {
+        if (msgType === 'image' && content && typeof content === 'string' && !content.startsWith('http') && !content.startsWith('data:image')) {
             // Assume JPEG if unknown, but could be PNG. 
-            // Better to check first few chars but simplistic approach for now:
             content = `data:image/jpeg;base64,${content}`;
-        } else if (msgType === 'audio' && content && !content.startsWith('http') && !content.startsWith('data:audio')) {
+        } else if (msgType === 'audio' && content && typeof content === 'string' && !content.startsWith('http') && !content.startsWith('data:audio')) {
             content = `data:audio/webm;base64,${content}`;
         }
 
-        // Auto-detect type if it's text but has media prefix (Fix for broken history)
-        if (msgType === 'text' && typeof content === 'string') {
-            if (content.startsWith('data:image')) {
+        // Auto-detect type if it's text but has media prefix (Fix for broken history/indexedDB data)
+        if (typeof content === 'string') {
+            const trimmed = content.trim();
+            if (trimmed.startsWith('data:image') || trimmed.includes(';base64,iVBOR')) {
                 msgType = 'image';
-            } else if (content.startsWith('data:audio')) {
+            } else if (trimmed.startsWith('data:audio') || trimmed.includes('data:audio/webm') || trimmed.includes(';base64,GkXfo')) {
+                // Common opus header start often starts with GkXfo...
                 msgType = 'audio';
             }
         }

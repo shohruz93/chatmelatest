@@ -89,6 +89,18 @@ export class ChatStorageService {
 
   // Normalize message fields to ensure consistent indexing
   private normalizeMessage(msg: any): any {
+    // Check various possible locations for message type
+    let msgType = msg.messageType || msg.type || msg.message_type || 'text';
+
+    // Explicitly check for media content strings if type is still text/unknown
+    if ((msgType === 'text' || !msgType) && typeof msg.content === 'string') {
+      if (msg.content.startsWith('data:image') || msg.content.includes(';base64,GkXfo')) {
+        msgType = 'image';
+      } else if (msg.content.startsWith('data:audio') || msg.content.includes('data:audio/webm')) {
+        msgType = 'audio';
+      }
+    }
+
     return {
       ...msg,
       id: String(msg.id),
@@ -96,7 +108,8 @@ export class ChatStorageService {
       // Ensure created_at is always set for indexing (index uses created_at snake_case)
       created_at: msg.created_at || msg.createdAt || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
       sender_id: msg.sender_id || msg.senderId,
-      messageType: msg.messageType || msg.type || 'text'
+      messageType: msgType,
+      message_type: msgType // Store snake_case version too just in case
     };
   }
 
