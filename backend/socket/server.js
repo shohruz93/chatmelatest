@@ -810,15 +810,34 @@ io.on('connection', (socket) => {
         const senderId = userSocketMap.get(socket.id);
         const targetSocketId = onlineUsers.get(targetUserId);
 
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('checkers_invite_received', {
-                fromUserId: senderId,
-                amount: amount,
-                socketId: socket.id
-            });
-        } else {
+        if (!targetSocketId) {
             socket.emit('checkers_error', { message: 'User is offline' });
+            return;
         }
+
+        // Validate that both users are in the same chat room
+        const sortedIds = [senderId, targetUserId].sort();
+        const expectedRoomId = `room_${sortedIds[0]}_${sortedIds[1]}`;
+
+        // Check if the room exists in activeRooms
+        const room = activeRooms.get(expectedRoomId);
+        if (!room) {
+            socket.emit('checkers_error', { message: 'You must be in an active chat with this user to invite them to a game' });
+            return;
+        }
+
+        // Verify both users are actually in the room
+        const roomSockets = io.sockets.adapter.rooms.get(expectedRoomId);
+        if (!roomSockets || !roomSockets.has(socket.id) || !roomSockets.has(targetSocketId)) {
+            socket.emit('checkers_error', { message: 'Both users must be in the chat room to start a game' });
+            return;
+        }
+
+        io.to(targetSocketId).emit('checkers_invite_received', {
+            fromUserId: senderId,
+            amount: amount,
+            socketId: socket.id
+        });
     });
 
     socket.on('checkers_reject', ({ requesterSocketId }) => {
@@ -840,23 +859,39 @@ io.on('connection', (socket) => {
         const userId1 = userSocketMap.get(socket.id);
         const userId2 = userSocketMap.get(requesterSocketId);
 
-        if (!userId1 || !userId2) return;
+        if (!userId1 || !userId2) {
+            socket.emit('checkers_error', { message: 'Invalid player connection' });
+            return;
+        }
 
         const roomId = `checkers_${Math.min(userId1, userId2)}_${Math.max(userId1, userId2)}_${Date.now()}`;
 
+        // Join both players to the room
         socket.join(roomId);
         const requesterSocket = io.sockets.sockets.get(requesterSocketId);
-        if (requesterSocket) {
-            requesterSocket.join(roomId);
-
-            io.to(roomId).emit('checkers_start', {
-                roomId,
-                players: [userId1, userId2],
-                amount,
-                turn: userId2 // Requester starts or random
-            });
-            console.log(`Checkers game started in room ${roomId}`);
+        if (!requesterSocket) {
+            socket.emit('checkers_error', { message: 'Requester is no longer connected' });
+            return;
         }
+        requesterSocket.join(roomId);
+
+        // Prepare game start data
+        const gameData = {
+            roomId,
+            players: [userId1, userId2],
+            amount,
+            turn: userId2 // Requester starts
+        };
+
+        console.log(`Checkers game started in room ${roomId}`);
+
+        // Emit to each player individually to ensure delivery
+        // This prevents race conditions where players might not be fully in the room yet
+        io.to(socket.id).emit('checkers_start', gameData);
+        io.to(requesterSocketId).emit('checkers_start', gameData);
+
+        // Also emit to room as backup
+        io.to(roomId).emit('checkers_start', gameData);
     });
 
     socket.on('checkers_move', ({ roomId, move }) => {
@@ -876,33 +911,57 @@ io.on('connection', (socket) => {
 
     // Voice Chat Signaling
     socket.on('voice_offer', ({ targetUserId, offer }) => {
+        const senderId = userSocketMap.get(socket.id);
         const targetSocketId = onlineUsers.get(targetUserId);
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('voice_offer', {
-                senderId: userSocketMap.get(socket.id),
-                offer: offer
+
+        if (!targetSocketId) {
+            socket.emit('voice_error', {
+                message: 'Target user is not available for voice chat',
+                targetUserId
             });
+            return;
         }
+
+        io.to(targetSocketId).emit('voice_offer', {
+            senderId: senderId,
+            offer: offer
+        });
+        console.log(`[Voice] Offer sent from ${senderId} to ${targetUserId}`);
     });
 
     socket.on('voice_answer', ({ targetUserId, answer }) => {
+        const senderId = userSocketMap.get(socket.id);
         const targetSocketId = onlineUsers.get(targetUserId);
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('voice_answer', {
-                senderId: userSocketMap.get(socket.id),
-                answer: answer
+
+        if (!targetSocketId) {
+            socket.emit('voice_error', {
+                message: 'Target user is not available for voice chat',
+                targetUserId
             });
+            return;
         }
+
+        io.to(targetSocketId).emit('voice_answer', {
+            senderId: senderId,
+            answer: answer
+        });
+        console.log(`[Voice] Answer sent from ${senderId} to ${targetUserId}`);
     });
 
     socket.on('voice_candidate', ({ targetUserId, candidate }) => {
+        const senderId = userSocketMap.get(socket.id);
         const targetSocketId = onlineUsers.get(targetUserId);
-        if (targetSocketId) {
-            io.to(targetSocketId).emit('voice_candidate', {
-                senderId: userSocketMap.get(socket.id),
-                candidate: candidate
-            });
+
+        if (!targetSocketId) {
+            // Silently ignore missing candidates as they may arrive after disconnect
+            console.log(`[Voice] Candidate ignored - target ${targetUserId} not online`);
+            return;
         }
+
+        io.to(targetSocketId).emit('voice_candidate', {
+            senderId: senderId,
+            candidate: candidate
+        });
     });
 
     socket.on('disconnect', () => {

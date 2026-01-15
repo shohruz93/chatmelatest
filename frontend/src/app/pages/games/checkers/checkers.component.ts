@@ -96,10 +96,17 @@ import * as Phaser from 'phaser';
             </div>
             
             <!-- Voice Chat Controls -->
-            <button class="voice-btn" [class.active]="voiceChat.isActive()" [class.muted]="voiceChat.isMuted()" (click)="toggleMic()">
+            <button class="voice-btn" [class.active]="voiceChat.isActive()" [class.muted]="voiceChat.isMuted()" [class.connecting]="voiceChat.isConnecting()" (click)="toggleMic()" [disabled]="voiceChat.isConnecting()">
                <i class="voice-icon">{{ voiceChat.isMuted() ? '🔇' : (voiceChat.isActive() ? '🎙️' : '📞') }}</i>
-               {{ voiceChat.isActive() ? (voiceChat.isMuted() ? 'Unmute' : 'Mute') : 'Start Call' }}
+               {{ voiceChat.isConnecting() ? 'Connecting...' : (voiceChat.isActive() ? (voiceChat.isMuted() ? 'Unmute' : 'Mute') : 'Start Call') }}
             </button>
+            
+            @if (voiceChat.connectionError()) {
+              <div class="voice-error">
+                {{ voiceChat.connectionError() }}
+                <button class="retry-btn" (click)="retryVoiceConnection()">Retry</button>
+              </div>
+            }
           </div>
 
           <div class="game-chat">
@@ -236,6 +243,35 @@ import * as Phaser from 'phaser';
     .voice-btn:hover { background: #4b5563; }
     .voice-btn.active { background: #059669; }
     .voice-btn.muted { background: #ef4444; }
+    .voice-btn.connecting { background: #f59e0b; cursor: wait; }
+    .voice-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .voice-error {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .retry-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.2s;
+    }
+
+    .retry-btn:hover {
+        background: #dc2626;
+    }
 
     .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 400px; min-height: 300px; }
     .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
@@ -827,6 +863,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
     } else {
       this.voiceChat.toggleMute();
     }
+  }
+
+  retryVoiceConnection() {
+    this.voiceChat.retryConnection();
   }
 }
 
