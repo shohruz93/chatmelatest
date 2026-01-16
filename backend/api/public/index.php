@@ -7,6 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
+// Initialize Error Handling Middleware (must be first)
+require_once __DIR__ . '/../src/ErrorMiddleware.php';
+define('DEBUG_MODE', true); // Set to false in production
+ErrorMiddleware::init();
+
 require_once __DIR__ . '/../src/Router.php';
 require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/Auth.php';
@@ -23,6 +28,8 @@ require_once __DIR__ . '/../src/Telegram.php';
 require_once __DIR__ . '/../src/TelegramWebhook.php';
 require_once __DIR__ . '/../src/GamificationController.php';
 require_once __DIR__ . '/../src/GameController.php';
+require_once __DIR__ . '/../src/GalleryController.php';
+require_once __DIR__ . '/../src/CommunityController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -48,6 +55,8 @@ $telegram = new Telegram($db);
 $telegramWebhook = new TelegramWebhook($db);
 $gamificationController = new GamificationController();
 $gameController = new GameController();
+$galleryController = new GalleryController();
+$communityController = new CommunityController();
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -436,6 +445,123 @@ $router->add('POST', '/heartbeat', function() use ($db) {
         http_response_code(400);
         echo json_encode(['error' => 'User ID required']);
     }
+});
+
+// Gallery Routes
+$router->add('POST', '/gallery/upload', function() use ($galleryController) {
+    $userId = $_GET['userId'] ?? 0;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $galleryController->upload($userId);
+});
+
+$router->add('GET', '/gallery', function() use ($galleryController) {
+    $userId = $_GET['userId'] ?? 0;
+    $viewerId = $_GET['viewerId'] ?? null;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $galleryController->getGallery($userId, $viewerId);
+});
+
+$router->add('POST', '/gallery/react', function() use ($galleryController) {
+    $userId = $_GET['userId'] ?? 0;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $galleryController->react($userId);
+});
+
+$router->add('DELETE', '/gallery', function() use ($galleryController) {
+    $imageId = $_GET['imageId'] ?? 0;
+    $userId = $_GET['userId'] ?? 0;
+    if (!$imageId || !$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Image ID and User ID required']);
+        return;
+    }
+    $galleryController->delete($imageId, $userId);
+});
+
+// Community Routes
+$router->add('POST', '/community/post', function() use ($communityController) {
+    $userId = $_GET['userId'] ?? 0;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $communityController->createPost($userId);
+});
+
+$router->add('GET', '/community/feed', function() use ($communityController) {
+    $viewerId = $_GET['viewerId'] ?? null;
+    $page = $_GET['page'] ?? 1;
+    $limit = $_GET['limit'] ?? 20;
+    $communityController->getFeed($viewerId, $page, $limit);
+});
+
+$router->add('GET', '/community/user', function() use ($communityController) {
+    $userId = $_GET['userId'] ?? 0;
+    $viewerId = $_GET['viewerId'] ?? null;
+    $page = $_GET['page'] ?? 1;
+    $limit = $_GET['limit'] ?? 20;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $communityController->getUserPosts($userId, $viewerId, $page, $limit);
+});
+
+$router->add('POST', '/community/react', function() use ($communityController) {
+    $userId = $_GET['userId'] ?? 0;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $communityController->react($userId);
+});
+
+$router->add('POST', '/community/comment', function() use ($communityController) {
+    $userId = $_GET['userId'] ?? 0;
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'User ID required']);
+        return;
+    }
+    $communityController->addComment($userId);
+});
+
+$router->add('GET', '/community/comments', function() use ($communityController) {
+    $postId = $_GET['postId'] ?? 0;
+    $page = $_GET['page'] ?? 1;
+    $limit = $_GET['limit'] ?? 20;
+    if (!$postId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Post ID required']);
+        return;
+    }
+    $communityController->getComments($postId, $page, $limit);
+});
+
+$router->add('DELETE', '/community/post', function() use ($communityController) {
+    $postId = $_GET['postId'] ?? 0;
+    $userId = $_GET['userId'] ?? 0;
+    if (!$postId || !$userId) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Post ID and User ID required']);
+        return;
+    }
+    $communityController->deletePost($postId, $userId);
 });
 
 // Test Route

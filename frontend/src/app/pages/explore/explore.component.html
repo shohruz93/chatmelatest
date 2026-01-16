@@ -1,4 +1,19 @@
 <div class="explore-container">
+  <!-- Tab Navigation -->
+  <div class="explore-tabhost">
+    <div class="tab-navigation">
+      <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+        <span class="tab-icon">👥</span>
+        <span>Users</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'community'" (click)="activeTab = 'community'">
+        <span class="tab-icon">📱</span>
+        <span>Community</span>
+      </button>
+    </div>
+  </div>
+
+  @if (activeTab === 'users') {
   <!-- Filter Sidebar (hidden by default) -->
   @if (showFilters()) {
   <aside class="filter-sidebar">
@@ -338,6 +353,14 @@
     </div>
     }
   </main>
+  }
+
+  @if (activeTab === 'community') {
+  <!-- Community Feed -->
+  <div class="community-tab-content">
+    <app-community-feed></app-community-feed>
+  </div>
+  }
 
   <!-- Profile Modal -->
   @if (selectedUser) {

@@ -20,6 +20,7 @@ import { TelegramService } from '../../services/telegram.service';
 import { GamificationService } from '../../services/gamification.service';
 import { WalletComponent } from '../../components/gamification/wallet/wallet.component';
 import { MissionsComponent } from '../../components/gamification/missions/missions.component';
+import { GalleryService, GalleryImage } from '../../services/gallery.service';
 
 @Component({
     selector: 'app-profile',
@@ -36,6 +37,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private countryService = inject(CountryService);
     private telegramService = inject(TelegramService);
     private gameService = inject(GamificationService);
+    private galleryService = inject(GalleryService);
 
     private appVersionService = inject(AppVersionService);
 
@@ -85,6 +87,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
     showReplyInput: { [key: number]: boolean } = {};
     showReplies: { [key: number]: boolean } = {};
     hasRated: boolean = false;
+
+    // Tab Navigation
+    activeTab: 'missions' | 'rates' | 'gallery' = 'missions';
+
+    // Gallery
+    galleryImages: GalleryImage[] = [];
+    showUploadModal: boolean = false;
+    showViewModal: boolean = false;
+    viewingImage: GalleryImage | null = null;
+    uploadFile: File | null = null;
+    uploadPreview: string | null = null;
+    uploadCaption: string = '';
+    galleryLoading: boolean = false;
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -138,7 +153,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     this.api.recordView(this.currentUser.id, userId).subscribe();
                 } else if (this.isOwnProfile) {
                     this.checkTelegramStatus();
-                    
+
                     // Check for edit query parameter
                     this.route.queryParams.subscribe(queryParams => {
                         if (queryParams['edit'] === 'true') {
@@ -599,6 +614,123 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 alert('Failed to update notification settings.');
             }
         });
+    }
+
+    // Tab Navigation
+    setActiveTab(tab: 'missions' | 'rates' | 'gallery') {
+        this.activeTab = tab;
+        if (tab === 'gallery' && this.galleryImages.length === 0) {
+            this.loadGallery();
+        }
+    }
+
+    // Gallery Methods
+    loadGallery() {
+        if (!this.profileUser?.id) return;
+        this.galleryLoading = true;
+        this.galleryService.getGallery(this.profileUser.id, this.currentUser?.id).subscribe({
+            next: (images) => {
+                this.galleryImages = images;
+                this.galleryLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load gallery', err);
+                this.galleryLoading = false;
+            }
+        });
+    }
+
+    openUploadModal() {
+        this.showUploadModal = true;
+        this.uploadFile = null;
+        this.uploadPreview = null;
+        this.uploadCaption = '';
+    }
+
+    closeUploadModal() {
+        this.showUploadModal = false;
+        this.uploadFile = null;
+        this.uploadPreview = null;
+        this.uploadCaption = '';
+    }
+
+    onGalleryFileSelect(event: any) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            this.uploadFile = file;
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.uploadPreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    uploadGalleryImage() {
+        if (!this.uploadFile || !this.currentUser?.id) return;
+
+        this.galleryLoading = true;
+        this.galleryService.uploadImage(this.currentUser.id, this.uploadFile, this.uploadCaption).subscribe({
+            next: (res) => {
+                if (res.success && res.image) {
+                    this.galleryImages.unshift(res.image);
+                }
+                this.closeUploadModal();
+                this.galleryLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to upload image', err);
+                alert('Failed to upload image');
+                this.galleryLoading = false;
+            }
+        });
+    }
+
+    viewImage(image: GalleryImage) {
+        this.viewingImage = image;
+        this.showViewModal = true;
+    }
+
+    closeViewModal() {
+        this.showViewModal = false;
+        this.viewingImage = null;
+    }
+
+    reactToImage(image: GalleryImage, type: 'like' | 'dislike', event?: Event) {
+        if (event) event.stopPropagation();
+        if (!this.currentUser?.id) return;
+
+        this.galleryService.react(this.currentUser.id, image.id, type).subscribe({
+            next: (res) => {
+                image.likes_count = res.likes_count;
+                image.dislikes_count = res.dislikes_count;
+                image.user_liked = type === 'like' && !image.user_liked;
+                image.user_disliked = type === 'dislike' && !image.user_disliked;
+            },
+            error: (err) => console.error('Failed to react', err)
+        });
+    }
+
+    deleteGalleryImage(image: GalleryImage, event: Event) {
+        event.stopPropagation();
+        if (!this.currentUser?.id) return;
+        if (!confirm('Delete this image?')) return;
+
+        this.galleryService.deleteImage(this.currentUser.id, image.id).subscribe({
+            next: () => {
+                this.galleryImages = this.galleryImages.filter(img => img.id !== image.id);
+            },
+            error: (err) => {
+                console.error('Failed to delete image', err);
+                alert('Failed to delete image');
+            }
+        });
+    }
+
+    getGalleryImageUrl(path: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${this.api.phpBaseUrl}${path}`;
     }
 
     ngOnDestroy() {

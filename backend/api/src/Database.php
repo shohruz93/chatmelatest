@@ -3,10 +3,20 @@
 require_once __DIR__ . '/Config.php';
 
 class Database {
+    private static $instance = null;
     public $conn;
 
+    public static function getInstance() {
+        if (self::$instance === null) {
+            self::$instance = new Database();
+        }
+        return self::$instance;
+    }
+
     public function getConnection() {
-        $this->conn = null;
+        if ($this->conn !== null) {
+            return $this->conn;
+        }
 
         $host = Config::get('DB_HOST', 'localhost');
         $db_name = Config::get('DB_NAME', 'chatme_db');

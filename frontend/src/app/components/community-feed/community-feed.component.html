@@ -1,0 +1,197 @@
+<div class="community-feed">
+    <!-- Create Post Button -->
+    <div class="create-post-card" (click)="openCreateModal()">
+        <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
+        <div class="create-placeholder">What's on your mind? Share with the community...</div>
+        <div class="create-icons">
+            <span>📷</span>
+            <span>📝</span>
+            <span>🎬</span>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+    <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading posts...</p>
+    </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && posts().length === 0) {
+    <div class="empty-state">
+        <div class="empty-icon">📱</div>
+        <h3>No posts yet</h3>
+        <p>Be the first to share something with the community!</p>
+    </div>
+    }
+
+    <!-- Posts Feed -->
+    <div class="posts-container">
+        @for (post of posts(); track post.id) {
+        <div class="post-card">
+            <div class="post-header">
+                <a [routerLink]="['/dashboard/profile', post.user_id]" class="post-author">
+                    <img [src]="getAvatarUrl(post.user_avatar)" class="author-avatar" alt="">
+                    <div class="author-info">
+                        <span class="author-name">{{ post.user_name }}</span>
+                        <span class="post-time">{{ formatTimestamp(post.created_at) }}</span>
+                    </div>
+                </a>
+                @if (currentUser?.id === post.user_id) {
+                <button class="btn-delete-post" (click)="deletePost(post)" title="Delete">🗑️</button>
+                }
+            </div>
+
+            <!-- Text Content -->
+            @if (post.text_content) {
+            <div class="post-text">{{ post.text_content }}</div>
+            }
+
+            <!-- Media Content -->
+            @if (post.content_type === 'image' && post.media_path) {
+            <div class="post-media">
+                <img [src]="getMediaUrl(post.media_path)" alt="Post image" loading="lazy">
+            </div>
+            }
+
+            @if (post.content_type === 'video' && post.media_path) {
+            <div class="post-media">
+                <video [src]="getMediaUrl(post.media_path)" controls preload="metadata"></video>
+            </div>
+            }
+
+            <div class="post-actions">
+                <button class="action-btn" [class.liked]="post.user_liked" (click)="likePost(post)">
+                    <span class="action-icon">{{ post.user_liked ? '❤️' : '🤍' }}</span>
+                    <span class="action-count">{{ post.likes_count }}</span>
+                </button>
+                <button class="action-btn" (click)="openComments(post)">
+                    <span class="action-icon">💬</span>
+                    <span class="action-count">{{ post.comments_count }}</span>
+                </button>
+            </div>
+
+            <!-- Recent Comments Preview -->
+            @if (post.recent_comments && post.recent_comments.length > 0) {
+            <div class="comments-preview">
+                @for (comment of post.recent_comments.slice(0, 2); track comment.id) {
+                <div class="comment-item">
+                    <span class="comment-author">{{ comment.user_name }}</span>
+                    <span class="comment-text">{{ comment.content }}</span>
+                </div>
+                }
+                @if (post.comments_count > 2) {
+                <button class="view-all-comments" (click)="openComments(post)">
+                    View all {{ post.comments_count }} comments
+                </button>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Create Post Modal -->
+@if (showCreateModal()) {
+<div class="modal-overlay" (click)="closeCreateModal()">
+    <div class="modal-content create-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Create Post</h3>
+            <button class="modal-close" (click)="closeCreateModal()">×</button>
+        </div>
+
+        <div class="post-type-tabs">
+            <button [class.active]="postType === 'text'" (click)="setPostType('text')">
+                <span>📝</span> Text
+            </button>
+            <button [class.active]="postType === 'image'" (click)="setPostType('image')">
+                <span>📷</span> Photo
+            </button>
+            <button [class.active]="postType === 'video'" (click)="setPostType('video')">
+                <span>🎬</span> Video
+            </button>
+        </div>
+
+        <div class="create-form">
+            <textarea [(ngModel)]="postText"
+                [placeholder]="postType === 'text' ? 'What\'s on your mind?' : 'Add a caption...'" rows="4">
+            </textarea>
+
+            @if (postType !== 'text') {
+            <div class="media-upload">
+                @if (!postPreview) {
+                <label class="upload-area">
+                    <input type="file" [accept]="postType === 'image' ? 'image/*' : 'video/*'"
+                        (change)="onFileSelect($event)" hidden>
+                    <div class="upload-placeholder">
+                        <span class="upload-icon">{{ postType === 'image' ? '📷' : '🎬' }}</span>
+                        <p>Click to upload {{ postType }}</p>
+                        @if (postType === 'video') {
+                        <small>Maximum 1 minute</small>
+                        }
+                    </div>
+                </label>
+                } @else {
+                <div class="media-preview">
+                    @if (postType === 'image') {
+                    <img [src]="postPreview" alt="Preview">
+                    } @else {
+                    <video [src]="postPreview" controls></video>
+                    }
+                    <button class="remove-media" (click)="postFile = null; postPreview = null">×</button>
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
+            <button class="btn-post" [disabled]="uploadProgress()" (click)="createPost()">
+                @if (uploadProgress()) {
+                <span class="loading-spinner"></span> Posting...
+                } @else {
+                Post
+                }
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Comments Modal -->
+@if (showCommentsModal() && selectedPost) {
+<div class="modal-overlay" (click)="closeCommentsModal()">
+    <div class="modal-content comments-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Comments</h3>
+            <button class="modal-close" (click)="closeCommentsModal()">×</button>
+        </div>
+
+        <div class="comments-list">
+            @if (allComments.length === 0) {
+            <div class="no-comments">No comments yet. Be the first!</div>
+            } @else {
+            @for (comment of allComments; track comment.id) {
+            <div class="comment-full">
+                <img [src]="getAvatarUrl(comment.user_avatar)" class="comment-avatar" alt="">
+                <div class="comment-body">
+                    <span class="comment-author-name">{{ comment.user_name }}</span>
+                    <p class="comment-content">{{ comment.content }}</p>
+                    <span class="comment-time">{{ formatTimestamp(comment.created_at) }}</span>
+                </div>
+            </div>
+            }
+            }
+        </div>
+
+        <div class="add-comment-form">
+            <input type="text" [(ngModel)]="newComment" placeholder="Write a comment..." (keyup.enter)="addComment()">
+            <button class="btn-send" [disabled]="!newComment.trim()" (click)="addComment()">Send</button>
+        </div>
+    </div>
+</div>
+}

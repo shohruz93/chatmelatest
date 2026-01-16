@@ -10,6 +10,7 @@ import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
 import { AppVersionService } from '../../services/app-version.service';
 import { GamificationService } from '../../services/gamification.service';
 import { Capacitor } from '@capacitor/core';
@@ -35,7 +36,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, UserProfileModalComponent, TranslatePipe, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, CommunityFeedComponent, UserProfileModalComponent],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -55,6 +56,9 @@ export class ExploreComponent implements OnInit, OnDestroy {
     isLoading = signal(false);
     selectedUser: UserProfile | null = null;
     updateAvailable = signal<any>(null);
+
+    // Tab Navigation
+    activeTab: 'users' | 'community' = 'users';
 
     // Filters
     filterStatus: string = 'any';

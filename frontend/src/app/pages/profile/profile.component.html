@@ -318,105 +318,350 @@
         </div>
 
         @if (isOwnProfile) {
-        <app-missions></app-missions>
-        }
-
-        <!-- Comments & Ratings Section -->
-        <div class="comments-section">
-            <h3>{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
-
-            @if (!isOwnProfile && currentUser) {
-            <!-- Rating form (only if user hasn't rated yet) -->
-            @if (!hasRated) {
-            <div class="add-rating-form">
-                <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
-                <div class="rating-stars">
-                    @for (star of [1,2,3,4,5]; track star) {
-                    <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
-                    }
-                </div>
-                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
-                    rows="3"></textarea>
-                <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{
-                    'PROFILE.SUBMIT_RATING' | translate }}</button>
-            </div>
-            } @else {
-            <!-- Comment-only form (if user has already rated) -->
-            <div class="add-comment-form">
-                <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
-                <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
-                    rows="3"></textarea>
-                <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate
-                    }}</button>
-            </div>
-            }
-            }
-
-            <div class="comments-list">
-                @for (comment of displayedComments; track comment.id) {
-                <div class="comment-card">
-                    <div class="comment-header">
-                        <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
-                        <div class="comment-meta">
-                            <span class="comment-author">{{ comment.rater_name }}</span>
-                            <span class="comment-rating">
-                                @for (star of [1,2,3,4,5]; track star) {
-                                <span class="star-display" [class.filled]="star <= comment.rating">★</span>
-                                }
-                            </span>
-                            <span class="comment-date">{{ comment.created_at | unixDate:'short' }}</span>
-                        </div>
-                    </div>
-                    <div class="comment-body">
-                        {{ comment.comment }}
-                    </div>
-                    <div class="comment-actions">
-                        <button class="btn-action" (click)="likeComment(comment.id, 'like')">
-                            👍 {{ comment.likes }}
-                        </button>
-                        <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
-                            👎 {{ comment.dislikes }}
-                        </button>
-                        <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
-                        @if (comment.replies?.length) {
-                        <button class="btn-action btn-toggle-replies" (click)="toggleReplies(comment.id)">
-                            {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} replies
-                        </button>
-                        }
-                    </div>
-
-                    @if (showReplyInput[comment.id]) {
-                    <div class="reply-input">
-                        <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
-                        <button (click)="submitReply(comment.id)">Send</button>
-                    </div>
-                    }
-
-                    @if (comment.replies?.length && showReplies[comment.id]) {
-                    <div class="replies-list">
-                        @for (reply of comment.replies; track reply.id) {
-                        <div class="reply-item">
-                            <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
-                            <div class="reply-content">
-                                <span class="reply-author">{{ reply.replier_name }}</span>
-                                <span class="reply-text">{{ reply.content }}</span>
-                            </div>
-                        </div>
-                        }
-                    </div>
-                    }
-                </div>
-                } @empty {
-                <p class="no-comments">No comments yet.</p>
-                }
-
-                @if (hasMoreComments) {
-                <a class="view-all-link" [routerLink]="['/dashboard/profile', profileUser.id, 'comments']">
-                    View all {{ comments.length }} comments →
-                </a>
-                }
+        <!-- Tab Navigation -->
+        <div class="profile-tabhost">
+            <div class="tab-navigation">
+                <button class="tab-btn" [class.active]="activeTab === 'missions'" (click)="setActiveTab('missions')">
+                    <span class="tab-icon">🎯</span>
+                    <span>Daily Missions</span>
+                </button>
+                <button class="tab-btn" [class.active]="activeTab === 'rates'" (click)="setActiveTab('rates')">
+                    <span class="tab-icon">⭐</span>
+                    <span>Rates</span>
+                </button>
+                <button class="tab-btn" [class.active]="activeTab === 'gallery'" (click)="setActiveTab('gallery')">
+                    <span class="tab-icon">🖼️</span>
+                    <span>Gallery</span>
+                </button>
             </div>
         </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            @if (activeTab === 'missions') {
+            <app-missions></app-missions>
+            }
+
+            @if (activeTab === 'rates') {
+            <!-- Comments & Ratings Section -->
+            <div class="comments-section">
+                <h3>{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
+
+                <div class="comments-list">
+                    @for (comment of displayedComments; track comment.id) {
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
+                            <div class="comment-meta">
+                                <span class="comment-author">{{ comment.rater_name }}</span>
+                                <span class="comment-rating">
+                                    @for (star of [1,2,3,4,5]; track star) {
+                                    <span class="star-display" [class.filled]="star <= comment.rating">★</span>
+                                    }
+                                </span>
+                                <span class="comment-date">{{ comment.created_at | unixDate:'short' }}</span>
+                            </div>
+                        </div>
+                        <div class="comment-body">
+                            {{ comment.comment }}
+                        </div>
+                        <div class="comment-actions">
+                            <button class="btn-action" (click)="likeComment(comment.id, 'like')">
+                                👍 {{ comment.likes }}
+                            </button>
+                            <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
+                                👎 {{ comment.dislikes }}
+                            </button>
+                            <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                            @if (comment.replies?.length) {
+                            <button class="btn-action btn-toggle-replies" (click)="toggleReplies(comment.id)">
+                                {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} replies
+                            </button>
+                            }
+                        </div>
+
+                        @if (showReplyInput[comment.id]) {
+                        <div class="reply-input">
+                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
+                            <button (click)="submitReply(comment.id)">Send</button>
+                        </div>
+                        }
+
+                        @if (comment.replies?.length && showReplies[comment.id]) {
+                        <div class="replies-list">
+                            @for (reply of comment.replies; track reply.id) {
+                            <div class="reply-item">
+                                <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
+                                <div class="reply-content">
+                                    <span class="reply-author">{{ reply.replier_name }}</span>
+                                    <span class="reply-text">{{ reply.content }}</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                    } @empty {
+                    <p class="no-comments">No comments yet.</p>
+                    }
+
+                    @if (hasMoreComments) {
+                    <a class="view-all-link" [routerLink]="['/dashboard/profile', profileUser.id, 'comments']">
+                        View all {{ comments.length }} comments →
+                    </a>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (activeTab === 'gallery') {
+            <!-- Gallery Section -->
+            <div class="gallery-section">
+                <div class="gallery-header">
+                    <h3>My Gallery</h3>
+                    <button class="btn-upload" (click)="openUploadModal()">
+                        <span>📷</span> Upload Photo
+                    </button>
+                </div>
+
+                @if (galleryLoading) {
+                <div class="loading-state">
+                    <div class="loader-large"></div>
+                    <p>Loading gallery...</p>
+                </div>
+                } @else if (galleryImages.length === 0) {
+                <div class="empty-gallery">
+                    <div class="empty-gallery-icon">🖼️</div>
+                    <h4>No photos yet</h4>
+                    <p>Upload your first photo to start your gallery!</p>
+                </div>
+                } @else {
+                <div class="gallery-grid">
+                    @for (image of galleryImages; track image.id) {
+                    <div class="gallery-item" (click)="viewImage(image)">
+                        <img [src]="getGalleryImageUrl(image.image_path)" [alt]="image.caption || 'Gallery photo'">
+                        <div class="gallery-overlay">
+                            <div class="gallery-reactions">
+                                <button class="reaction-btn" [class.active]="image.user_liked" (click)="reactToImage(image, 'like', $event)">
+                                    👍 {{ image.likes_count }}
+                                </button>
+                                <button class="reaction-btn" [class.active]="image.user_disliked" (click)="reactToImage(image, 'dislike', $event)">
+                                    👎 {{ image.dislikes_count }}
+                                </button>
+                            </div>
+                            <button class="btn-delete-image" (click)="deleteGalleryImage(image, $event)">🗑️</button>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </div>
+        } @else {
+        <!-- For viewing other users' profiles -->
+        <div class="profile-tabhost">
+            <div class="tab-navigation">
+                <button class="tab-btn" [class.active]="activeTab === 'rates'" (click)="setActiveTab('rates')">
+                    <span class="tab-icon">⭐</span>
+                    <span>Rates</span>
+                </button>
+                <button class="tab-btn" [class.active]="activeTab === 'gallery'" (click)="setActiveTab('gallery')">
+                    <span class="tab-icon">🖼️</span>
+                    <span>Gallery</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            @if (activeTab === 'rates') {
+            <!-- Comments & Ratings Section for other user -->
+            <div class="comments-section">
+                <h3>{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
+
+                @if (currentUser) {
+                <!-- Rating form (only if user hasn't rated yet) -->
+                @if (!hasRated) {
+                <div class="add-rating-form">
+                    <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
+                    <div class="rating-stars">
+                        @for (star of [1,2,3,4,5]; track star) {
+                        <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
+                        }
+                    </div>
+                    <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
+                        rows="3"></textarea>
+                    <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{
+                        'PROFILE.SUBMIT_RATING' | translate }}</button>
+                </div>
+                } @else {
+                <!-- Comment-only form (if user has already rated) -->
+                <div class="add-comment-form">
+                    <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
+                    <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
+                        rows="3"></textarea>
+                    <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate
+                        }}</button>
+                </div>
+                }
+                }
+
+                <div class="comments-list">
+                    @for (comment of displayedComments; track comment.id) {
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
+                            <div class="comment-meta">
+                                <span class="comment-author">{{ comment.rater_name }}</span>
+                                <span class="comment-rating">
+                                    @for (star of [1,2,3,4,5]; track star) {
+                                    <span class="star-display" [class.filled]="star <= comment.rating">★</span>
+                                    }
+                                </span>
+                                <span class="comment-date">{{ comment.created_at | unixDate:'short' }}</span>
+                            </div>
+                        </div>
+                        <div class="comment-body">
+                            {{ comment.comment }}
+                        </div>
+                        <div class="comment-actions">
+                            <button class="btn-action" (click)="likeComment(comment.id, 'like')">
+                                👍 {{ comment.likes }}
+                            </button>
+                            <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
+                                👎 {{ comment.dislikes }}
+                            </button>
+                            <button class="btn-action" (click)="toggleReply(comment.id)">Reply</button>
+                            @if (comment.replies?.length) {
+                            <button class="btn-action btn-toggle-replies" (click)="toggleReplies(comment.id)">
+                                {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} replies
+                            </button>
+                            }
+                        </div>
+
+                        @if (showReplyInput[comment.id]) {
+                        <div class="reply-input">
+                            <input type="text" [(ngModel)]="replyContent[comment.id]" placeholder="Write a reply...">
+                            <button (click)="submitReply(comment.id)">Send</button>
+                        </div>
+                        }
+
+                        @if (comment.replies?.length && showReplies[comment.id]) {
+                        <div class="replies-list">
+                            @for (reply of comment.replies; track reply.id) {
+                            <div class="reply-item">
+                                <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
+                                <div class="reply-content">
+                                    <span class="reply-author">{{ reply.replier_name }}</span>
+                                    <span class="reply-text">{{ reply.content }}</span>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                        }
+                    </div>
+                    } @empty {
+                    <p class="no-comments">No comments yet.</p>
+                    }
+
+                    @if (hasMoreComments) {
+                    <a class="view-all-link" [routerLink]="['/dashboard/profile', profileUser.id, 'comments']">
+                        View all {{ comments.length }} comments →
+                    </a>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (activeTab === 'gallery') {
+            <!-- Gallery Section for other user -->
+            <div class="gallery-section">
+                <div class="gallery-header">
+                    <h3>{{ profileUser?.name }}'s Gallery</h3>
+                </div>
+
+                @if (galleryLoading) {
+                <div class="loading-state">
+                    <div class="loader-large"></div>
+                    <p>Loading gallery...</p>
+                </div>
+                } @else if (galleryImages.length === 0) {
+                <div class="empty-gallery">
+                    <div class="empty-gallery-icon">🖼️</div>
+                    <h4>No photos yet</h4>
+                </div>
+                } @else {
+                <div class="gallery-grid">
+                    @for (image of galleryImages; track image.id) {
+                    <div class="gallery-item" (click)="viewImage(image)">
+                        <img [src]="getGalleryImageUrl(image.image_path)" [alt]="image.caption || 'Gallery photo'">
+                        <div class="gallery-overlay">
+                            <div class="gallery-reactions">
+                                <button class="reaction-btn" [class.active]="image.user_liked" (click)="reactToImage(image, 'like', $event)">
+                                    👍 {{ image.likes_count }}
+                                </button>
+                                <button class="reaction-btn" [class.active]="image.user_disliked" (click)="reactToImage(image, 'dislike', $event)">
+                                    👎 {{ image.dislikes_count }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Upload Modal -->
+        @if (showUploadModal) {
+        <div class="upload-modal-overlay" (click)="closeUploadModal()">
+            <div class="upload-modal" (click)="$event.stopPropagation()">
+                <h3>Upload Photo</h3>
+                
+                @if (!uploadPreview) {
+                <label class="upload-dropzone">
+                    <input type="file" accept="image/*" (change)="onGalleryFileSelect($event)" hidden>
+                    <div class="upload-icon">📷</div>
+                    <p>Click or drag to upload an image</p>
+                </label>
+                } @else {
+                <img [src]="uploadPreview" class="image-preview" alt="Preview">
+                }
+                
+                <div class="form-group">
+                    <label>Caption (optional)</label>
+                    <input type="text" [(ngModel)]="uploadCaption" placeholder="Add a caption...">
+                </div>
+                
+                <div class="upload-actions">
+                    <button class="btn-cancel" (click)="closeUploadModal()">Cancel</button>
+                    <button class="btn-save" [disabled]="!uploadFile || galleryLoading" (click)="uploadGalleryImage()">
+                        Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- View Modal -->
+        @if (showViewModal && viewingImage) {
+        <div class="view-modal-overlay" (click)="closeViewModal()">
+            <div class="view-modal" (click)="$event.stopPropagation()">
+                <button class="view-modal-close" (click)="closeViewModal()">×</button>
+                <img [src]="getGalleryImageUrl(viewingImage.image_path)" [alt]="viewingImage.caption || 'Gallery photo'">
+                <div class="view-modal-reactions">
+                    <button class="reaction-btn" [class.active]="viewingImage.user_liked" (click)="reactToImage(viewingImage, 'like')">
+                        👍 {{ viewingImage.likes_count }}
+                    </button>
+                    <button class="reaction-btn" [class.active]="viewingImage.user_disliked" (click)="reactToImage(viewingImage, 'dislike')">
+                        👎 {{ viewingImage.dislikes_count }}
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
         }
     </div>
 
