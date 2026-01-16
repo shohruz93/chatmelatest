@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpEventType, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface CommunityPost {
@@ -68,7 +69,21 @@ export class CommunityService {
         return this.http.post(
             `${this.apiUrl}/community/post?userId=${userId}`,
             formData,
-            { headers: this.getHeaders() }
+            {
+                headers: this.getHeaders(),
+                reportProgress: true,
+                observe: 'events'
+            }
+        ).pipe(
+            map((event: HttpEvent<any>) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    const progress = event.total ? Math.round((100 * event.loaded) / event.total) : 0;
+                    return { type: 'progress', progress };
+                } else if (event.type === HttpEventType.Response) {
+                    return { type: 'response', body: event.body };
+                }
+                return { type: 'other' };
+            })
         );
     }
 

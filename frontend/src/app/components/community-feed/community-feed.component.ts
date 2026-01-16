@@ -33,6 +33,7 @@ export class CommunityFeedComponent implements OnInit {
     postPreview: string | null = null;
     videoDuration: number = 0;
     uploadProgress = signal(false);
+    uploadPercent = signal(0);
 
     private apiUrl = environment.phpBaseUrl;
 
@@ -144,17 +145,24 @@ export class CommunityFeedComponent implements OnInit {
                 this.postText,
                 this.videoDuration
             ).subscribe({
-                next: (res) => {
-                    if (res.success && res.post) {
-                        this.posts.update(posts => [res.post, ...posts]);
+                next: (event) => {
+                    if (event.type === 'progress') {
+                        this.uploadPercent.set(event.progress);
+                    } else if (event.type === 'response') {
+                        const res = event.body;
+                        if (res.success && res.post) {
+                            this.posts.update(posts => [res.post, ...posts]);
+                        }
+                        this.closeCreateModal();
+                        this.uploadProgress.set(false);
+                        this.uploadPercent.set(0);
                     }
-                    this.closeCreateModal();
-                    this.uploadProgress.set(false);
                 },
                 error: (err) => {
                     console.error('Failed to create post', err);
                     alert('Failed to create post');
                     this.uploadProgress.set(false);
+                    this.uploadPercent.set(0);
                 }
             });
         }

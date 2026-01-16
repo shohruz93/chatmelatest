@@ -4,9 +4,7 @@
         <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
         <div class="create-placeholder">What's on your mind? Share with the community...</div>
         <div class="create-icons">
-            <span>📷</span>
-            <span>📝</span>
-            <span>🎬</span>
+            <button class="add-btn">+</button>
         </div>
     </div>
 
@@ -147,6 +145,15 @@
             </div>
             }
         </div>
+
+        @if (uploadProgress() && uploadPercent() > 0) {
+        <div class="upload-progress-container">
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" [style.width.%]="uploadPercent()"></div>
+            </div>
+            <div class="progress-text">Uploading... {{ uploadPercent() }}%</div>
+        </div>
+        }
 
         <div class="modal-actions">
             <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>

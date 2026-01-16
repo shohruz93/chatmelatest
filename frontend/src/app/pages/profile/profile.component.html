@@ -442,10 +442,12 @@
                         <img [src]="getGalleryImageUrl(image.image_path)" [alt]="image.caption || 'Gallery photo'">
                         <div class="gallery-overlay">
                             <div class="gallery-reactions">
-                                <button class="reaction-btn" [class.active]="image.user_liked" (click)="reactToImage(image, 'like', $event)">
+                                <button class="reaction-btn" [class.active]="image.user_liked"
+                                    (click)="reactToImage(image, 'like', $event)">
                                     👍 {{ image.likes_count }}
                                 </button>
-                                <button class="reaction-btn" [class.active]="image.user_disliked" (click)="reactToImage(image, 'dislike', $event)">
+                                <button class="reaction-btn" [class.active]="image.user_disliked"
+                                    (click)="reactToImage(image, 'dislike', $event)">
                                     👎 {{ image.dislikes_count }}
                                 </button>
                             </div>
@@ -500,7 +502,8 @@
                     <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
                     <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
                         rows="3"></textarea>
-                    <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' | translate
+                    <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' |
+                        translate
                         }}</button>
                 </div>
                 }
@@ -597,10 +600,12 @@
                         <img [src]="getGalleryImageUrl(image.image_path)" [alt]="image.caption || 'Gallery photo'">
                         <div class="gallery-overlay">
                             <div class="gallery-reactions">
-                                <button class="reaction-btn" [class.active]="image.user_liked" (click)="reactToImage(image, 'like', $event)">
+                                <button class="reaction-btn" [class.active]="image.user_liked"
+                                    (click)="reactToImage(image, 'like', $event)">
                                     👍 {{ image.likes_count }}
                                 </button>
-                                <button class="reaction-btn" [class.active]="image.user_disliked" (click)="reactToImage(image, 'dislike', $event)">
+                                <button class="reaction-btn" [class.active]="image.user_disliked"
+                                    (click)="reactToImage(image, 'dislike', $event)">
                                     👎 {{ image.dislikes_count }}
                                 </button>
                             </div>
@@ -619,7 +624,7 @@
         <div class="upload-modal-overlay" (click)="closeUploadModal()">
             <div class="upload-modal" (click)="$event.stopPropagation()">
                 <h3>Upload Photo</h3>
-                
+
                 @if (!uploadPreview) {
                 <label class="upload-dropzone">
                     <input type="file" accept="image/*" (change)="onGalleryFileSelect($event)" hidden>
@@ -629,12 +634,21 @@
                 } @else {
                 <img [src]="uploadPreview" class="image-preview" alt="Preview">
                 }
-                
+
                 <div class="form-group">
                     <label>Caption (optional)</label>
                     <input type="text" [(ngModel)]="uploadCaption" placeholder="Add a caption...">
                 </div>
-                
+
+                @if (galleryLoading && uploadPercent > 0) {
+                <div class="upload-progress-container">
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar" [style.width.%]="uploadPercent"></div>
+                    </div>
+                    <div class="progress-text">Uploading... {{ uploadPercent }}%</div>
+                </div>
+                }
+
                 <div class="upload-actions">
                     <button class="btn-cancel" (click)="closeUploadModal()">Cancel</button>
                     <button class="btn-save" [disabled]="!uploadFile || galleryLoading" (click)="uploadGalleryImage()">
@@ -650,12 +664,15 @@
         <div class="view-modal-overlay" (click)="closeViewModal()">
             <div class="view-modal" (click)="$event.stopPropagation()">
                 <button class="view-modal-close" (click)="closeViewModal()">×</button>
-                <img [src]="getGalleryImageUrl(viewingImage.image_path)" [alt]="viewingImage.caption || 'Gallery photo'">
+                <img [src]="getGalleryImageUrl(viewingImage.image_path)"
+                    [alt]="viewingImage.caption || 'Gallery photo'">
                 <div class="view-modal-reactions">
-                    <button class="reaction-btn" [class.active]="viewingImage.user_liked" (click)="reactToImage(viewingImage, 'like')">
+                    <button class="reaction-btn" [class.active]="viewingImage.user_liked"
+                        (click)="reactToImage(viewingImage, 'like')">
                         👍 {{ viewingImage.likes_count }}
                     </button>
-                    <button class="reaction-btn" [class.active]="viewingImage.user_disliked" (click)="reactToImage(viewingImage, 'dislike')">
+                    <button class="reaction-btn" [class.active]="viewingImage.user_disliked"
+                        (click)="reactToImage(viewingImage, 'dislike')">
                         👎 {{ viewingImage.dislikes_count }}
                     </button>
                 </div>

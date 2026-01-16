@@ -35,7 +35,7 @@ class GalleryController {
             return;
         }
 
-        $uploadDir = __DIR__ . '/../../uploads/gallery/' . $userId . '/';
+        $uploadDir = __DIR__ . '/../public_html/uploads/gallery/' . $userId . '/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -179,7 +179,7 @@ class GalleryController {
         }
 
         // Delete file
-        $filepath = __DIR__ . '/../..' . $image['image_path'];
+        $filepath = __DIR__ . '/../public_html' . $image['image_path'];
         if (file_exists($filepath)) {
             unlink($filepath);
         }

@@ -100,6 +100,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     uploadPreview: string | null = null;
     uploadCaption: string = '';
     galleryLoading: boolean = false;
+    uploadPercent: number = 0;
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -670,18 +671,26 @@ export class ProfileComponent implements OnInit, OnDestroy {
         if (!this.uploadFile || !this.currentUser?.id) return;
 
         this.galleryLoading = true;
+        this.uploadPercent = 0;
         this.galleryService.uploadImage(this.currentUser.id, this.uploadFile, this.uploadCaption).subscribe({
-            next: (res) => {
-                if (res.success && res.image) {
-                    this.galleryImages.unshift(res.image);
+            next: (event) => {
+                if (event.type === 'progress') {
+                    this.uploadPercent = event.progress;
+                } else if (event.type === 'response') {
+                    const res = event.body;
+                    if (res.success && res.image) {
+                        this.galleryImages.unshift(res.image);
+                    }
+                    this.closeUploadModal();
+                    this.galleryLoading = false;
+                    this.uploadPercent = 0;
                 }
-                this.closeUploadModal();
-                this.galleryLoading = false;
             },
             error: (err) => {
                 console.error('Failed to upload image', err);
                 alert('Failed to upload image');
                 this.galleryLoading = false;
+                this.uploadPercent = 0;
             }
         });
     }

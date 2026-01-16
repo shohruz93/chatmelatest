@@ -67,7 +67,7 @@ class CommunityController {
                 return;
             }
 
-            $uploadDir = __DIR__ . '/../../uploads/community/' . $userId . '/';
+            $uploadDir = __DIR__ . '/../public_html/uploads/community/' . $userId . '/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -140,7 +140,10 @@ class CommunityController {
             ORDER BY cp.created_at DESC
             LIMIT ? OFFSET ?
         ");
-        $stmt->execute([$viewerId ?? 0, $limit, $offset]);
+        $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(3, (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get recent comments for each post (max 2)
@@ -178,7 +181,11 @@ class CommunityController {
             ORDER BY cp.created_at DESC
             LIMIT ? OFFSET ?
         ");
-        $stmt->execute([$viewerId ?? 0, $userId, $limit, $offset]);
+        $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(2, $userId, PDO::PARAM_INT);
+        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(4, (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($posts);
@@ -310,7 +317,10 @@ class CommunityController {
             ORDER BY cc.created_at ASC
             LIMIT ? OFFSET ?
         ");
-        $stmt->execute([$postId, $limit, $offset]);
+        $stmt->bindValue(1, $postId, PDO::PARAM_INT);
+        $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(3, (int)$offset, PDO::PARAM_INT);
+        $stmt->execute();
         $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode($comments);
@@ -333,7 +343,7 @@ class CommunityController {
 
         // Delete media file
         if ($post['media_path']) {
-            $filepath = __DIR__ . '/../..' . $post['media_path'];
+            $filepath = __DIR__ . '/../public_html' . $post['media_path'];
             if (file_exists($filepath)) {
                 unlink($filepath);
             }
