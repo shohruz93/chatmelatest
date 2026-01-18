@@ -630,7 +630,10 @@ export class CheckersComponent implements OnInit, OnDestroy {
       if (this.gameScene) {
         this.gameScene.handleOpponentMove(data.move);
       }
-      this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
+      // Only switch turn if the move was NOT a partial multi-jump
+      if (data.move.endTurn !== false) {
+        this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
+      }
     });
 
     this.socket.checkersChat$.subscribe(data => {
@@ -787,9 +790,11 @@ export class CheckersComponent implements OnInit, OnDestroy {
     });
   }
 
-  sendMove(move: any) {
-    this.socket.sendCheckersMove(this.roomId(), move);
-    this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
+  sendMove(move: any, endTurn: boolean = true) {
+    this.socket.sendCheckersMove(this.roomId(), { ...move, endTurn });
+    if (endTurn) {
+      this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
+    }
   }
 
   sendChat() {
@@ -884,6 +889,8 @@ class CheckersScene extends Phaser.Scene {
   private graphics?: Phaser.GameObjects.Graphics;
 
   private selectedPiece?: { r: number, c: number };
+  private mustJumpPieces: Set<string> = new Set(); // Stores "r,c" of pieces that MUST jump
+  private multiJumpSource: { r: number, c: number } | null = null; // Track piece in middle of multi-jump
   private tileSize = 75; // 600 / 8
 
   constructor(component: CheckersComponent) {
@@ -897,6 +904,10 @@ class CheckersScene extends Phaser.Scene {
     this.initBoard();
     this.drawBoard();
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => this.handleInput(pointer));
+
+    // Initial check for forced jumps if I am the starting player
+    // setTimeout to ensure board is ready
+    setTimeout(() => this.updateMandatoryJumps(), 100);
   }
 
   initBoard() {
@@ -933,6 +944,8 @@ class CheckersScene extends Phaser.Scene {
         const isDark = (r + c) % 2 !== 0;
         this.graphics!.fillStyle(isDark ? 0x2d3748 : 0xf1f5f9);
         this.graphics!.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);
+
+        // Highlight valid moves or mandatory pieces could go here
       }
     }
 
@@ -949,6 +962,11 @@ class CheckersScene extends Phaser.Scene {
           const color = (val === 1 || val === 11) ? 0xef4444 : 0x111827;
           const piece = this.add.circle(c * this.tileSize + this.tileSize / 2, r * this.tileSize + this.tileSize / 2, this.tileSize * 0.4, color);
           piece.setStrokeStyle(4, 0xffffff, 0.5);
+
+          // Highlight forced jumps
+          if (this.component.isMyTurn() && this.mustJumpPieces.has(`${r},${c}`)) {
+            piece.setStrokeStyle(4, 0xf59e0b, 1); // Orange highlight for forced jump
+          }
 
           if (val > 10) { // King
             const label = this.add.text(c * this.tileSize + this.tileSize / 2 - 10, r * this.tileSize + this.tileSize / 2 - 15, 'K', { fontSize: '24px', fontStyle: 'bold' });
@@ -976,18 +994,56 @@ class CheckersScene extends Phaser.Scene {
 
     if (val !== 0 && (val === myType || val === myType * 11)) {
       // Selection
+
+      // Enforce Multi-Jump Constraint
+      if (this.multiJumpSource) {
+        if (r !== this.multiJumpSource.r || c !== this.multiJumpSource.c) {
+          // Cannot select other pieces during multi-jump
+          return;
+        }
+      }
+
+      // Enforce Mandatory Jump Constraint
+      if (this.mustJumpPieces.size > 0 && !this.mustJumpPieces.has(`${r},${c}`)) {
+        // Player trying to select a piece that cannot jump while others can
+        return;
+      }
+
       this.selectedPiece = { r, c };
       this.drawBoard();
     } else if (this.selectedPiece) {
       // Move attempt
       if (this.isValidMove(this.selectedPiece, { r, c })) {
+        const moveIsJump = Math.abs(this.selectedPiece.r - r) === 2;
+
+        // Execute move locally first
         this.executeMove(this.selectedPiece, { r, c });
-        this.component.sendMove({ from: this.selectedPiece, to: { r, c } });
-        this.selectedPiece = undefined;
+
+        let endTurn = true;
+        this.multiJumpSource = null;
+
+        if (moveIsJump) {
+          // Check for multi-jump availability
+          if (this.canCaptureMore({ r, c })) {
+            endTurn = false;
+            this.multiJumpSource = { r, c };
+            this.selectedPiece = { r, c }; // Keep selected
+            this.updateMandatoryJumps(); // Re-calculate (should only contain this piece)
+          }
+        }
+
+        this.component.sendMove({ from: this.selectedPiece, to: { r, c } }, endTurn);
+        if (endTurn) {
+          this.selectedPiece = undefined;
+          this.mustJumpPieces.clear();
+        }
+
         this.drawBoard();
 
-        // Win check
-        if (this.checkWin()) {
+        // Win check (Stalemate included)
+        if (endTurn && this.checkWin()) {
+          // If I just finished my turn, and checkWin returns true, it means the opponent (now current turn) has lost/no moves
+          // However, checkWin logic below needs to verify if the opponent has pieces/moves
           this.component.socket.sendCheckersGameOver(this.component.roomId(), this.component.currentUserId);
         }
       }
@@ -1029,6 +1085,52 @@ class CheckersScene extends Phaser.Scene {
     return false;
   }
 
+  // Calculate if a specific piece can capture anything
+  canCaptureMore(pos: { r: number, c: number }): boolean {
+    const piece = this.board[pos.r][pos.c];
+    if (piece === 0) return false;
+
+    const dirs = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
+    for (const [dr, dc] of dirs) {
+      const targetR = pos.r + dr;
+      const targetC = pos.c + dc;
+
+      if (targetR >= 0 && targetR < 8 && targetC >= 0 && targetC < 8) {
+        if (this.isValidMove(pos, { r: targetR, c: targetC })) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Scan board for any mandatory jumps for the current player
+  updateMandatoryJumps() {
+    this.mustJumpPieces.clear();
+
+    const myId = this.component.currentUserId;
+    const myType = myId === this.component.redPlayerId() ? 1 : 2;
+
+    // If we are in multi-bump mode, only that piece is mandatory (if it can jump)
+    if (this.multiJumpSource) {
+      if (this.canCaptureMore(this.multiJumpSource)) {
+        this.mustJumpPieces.add(`${this.multiJumpSource.r},${this.multiJumpSource.c}`);
+      }
+      return;
+    }
+
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const val = this.board[r][c];
+        if (val === myType || val === myType * 11) {
+          if (this.canCaptureMore({ r, c })) {
+            this.mustJumpPieces.add(`${r},${c}`);
+          }
+        }
+      }
+    }
+  }
+
   executeMove(from: { r: number, c: number }, to: { r: number, c: number }) {
     let piece = this.board[from.r][from.c];
 
@@ -1050,6 +1152,24 @@ class CheckersScene extends Phaser.Scene {
   handleOpponentMove(move: any) {
     this.executeMove(move.from, move.to);
     this.drawBoard();
+
+    // After opponent moves, check if it's my turn now.
+    // If opponent finished turn (endTurn was true in component), then it IS my turn.
+    // We should update our mandatory jumps.
+    setTimeout(() => {
+      if (this.component.isMyTurn()) {
+        this.updateMandatoryJumps();
+
+        // Check for stalemate (I have no moves)
+        if (!this.hasValidMoves(this.component.currentUserId)) {
+          // I lost because I can't move
+          // In a rigorous implementation, the SERVER should call this.
+          // Here, we can trigger game over for opponents win
+          const opponentId = this.component.currentUserId === this.component.redPlayerId() ? this.component.blackPlayerId() : this.component.redPlayerId();
+          this.component.socket.sendCheckersGameOver(this.component.roomId(), opponentId);
+        }
+      }
+    }, 100);
   }
 
   checkWin(): boolean {
@@ -1065,5 +1185,28 @@ class CheckersScene extends Phaser.Scene {
       }
     }
     return enemyCount === 0;
+  }
+
+  hasValidMoves(playerId: number): boolean {
+    const type = playerId === this.component.redPlayerId() ? 1 : 2;
+
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const val = this.board[r][c];
+        if (val === type || val === type * 11) {
+          // Check simple moves
+          const dirs = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+          for (const [dr, dc] of dirs) {
+            if (this.isValidMove({ r, c }, { r: r + dr, c: c + dc })) return true;
+          }
+          // Check jumps
+          const jumpDirs = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
+          for (const [dr, dc] of jumpDirs) {
+            if (this.isValidMove({ r, c }, { r: r + dr, c: c + dc })) return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 }
