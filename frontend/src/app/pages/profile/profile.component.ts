@@ -21,6 +21,7 @@ import { GamificationService } from '../../services/gamification.service';
 import { WalletComponent } from '../../components/gamification/wallet/wallet.component';
 import { MissionsComponent } from '../../components/gamification/missions/missions.component';
 import { GalleryService, GalleryImage } from '../../services/gallery.service';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
     selector: 'app-profile',
@@ -38,6 +39,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private telegramService = inject(TelegramService);
     private gameService = inject(GamificationService);
     private galleryService = inject(GalleryService);
+    private languageService = inject(LanguageService);
 
     private appVersionService = inject(AppVersionService);
 
@@ -688,7 +690,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 console.error('Failed to upload image', err);
-                alert('Failed to upload image');
+                alert(this.languageService.translate('GALLERY.UPLOAD_ERROR'));
                 this.galleryLoading = false;
                 this.uploadPercent = 0;
             }
@@ -723,7 +725,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     deleteGalleryImage(image: GalleryImage, event: Event) {
         event.stopPropagation();
         if (!this.currentUser?.id) return;
-        if (!confirm('Delete this image?')) return;
+        if (!confirm(this.languageService.translate('GALLERY.DELETE_CONFIRM'))) return;
 
         this.galleryService.deleteImage(this.currentUser.id, image.id).subscribe({
             next: () => {
@@ -731,7 +733,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 console.error('Failed to delete image', err);
-                alert('Failed to delete image');
+                alert(this.languageService.translate('GALLERY.DELETE_ERROR'));
             }
         });
     }

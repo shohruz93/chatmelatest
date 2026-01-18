@@ -175,23 +175,48 @@ export class CommunityFeedComponent implements OnInit {
 
     translatePost(post: CommunityPost) {
         if (post.translated_text) {
-            post.show_translation = !post.show_translation;
+            this.posts.update(posts => posts.map(p => {
+                if (p.id === post.id) {
+                    return { ...p, show_translation: !p.show_translation };
+                }
+                return p;
+            }));
             return;
         }
 
         const targetLang = this.languageService.currentLang();
         if (!post.text_content) return;
 
-        post.translating = true;
+        // Set translating state
+        this.posts.update(posts => posts.map(p => {
+            if (p.id === post.id) {
+                return { ...p, translating: true };
+            }
+            return p;
+        }));
+
         this.translationService.translate(post.text_content, targetLang).subscribe({
             next: (translated) => {
-                post.translated_text = translated;
-                post.show_translation = true;
-                post.translating = false;
+                this.posts.update(posts => posts.map(p => {
+                    if (p.id === post.id) {
+                        return {
+                            ...p,
+                            translated_text: translated,
+                            show_translation: true,
+                            translating: false
+                        };
+                    }
+                    return p;
+                }));
             },
             error: (err) => {
                 console.error('Translation failed', err);
-                post.translating = false;
+                this.posts.update(posts => posts.map(p => {
+                    if (p.id === post.id) {
+                        return { ...p, translating: false };
+                    }
+                    return p;
+                }));
             }
         });
     }
@@ -201,8 +226,16 @@ export class CommunityFeedComponent implements OnInit {
 
         this.communityService.likePost(this.currentUser.id, post.id).subscribe({
             next: (res) => {
-                post.likes_count = res.likes_count;
-                post.user_liked = res.liked;
+                this.posts.update(posts => posts.map(p => {
+                    if (p.id === post.id) {
+                        return {
+                            ...p,
+                            likes_count: res.likes_count,
+                            user_liked: res.liked
+                        };
+                    }
+                    return p;
+                }));
             },
             error: (err) => console.error('Failed to like post', err)
         });

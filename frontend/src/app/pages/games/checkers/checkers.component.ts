@@ -29,7 +29,7 @@ import * as Phaser from 'phaser';
 
           @if (invitation()) {
             <div class="invitation-card">
-              <p>User #{{ invitation().fromUserId }} {{ 'CHECKERS.INVITED_YOU' | translate }} {{ invitation().amount }} 🪙</p>
+              <p>{{ 'PROFILE.USER_PREFIX' | translate }}{{ invitation().fromUserId }} {{ 'CHECKERS.INVITED_YOU' | translate }} {{ invitation().amount }} 🪙</p>
               <div class="actions">
                 <button class="accept-btn" (click)="acceptInvite()">{{ 'CHECKERS.ACCEPT' | translate }}</button>
                 <button class="reject-btn" (click)="rejectInvite()">{{ 'CHECKERS.REJECT' | translate }}</button>
@@ -41,7 +41,7 @@ import * as Phaser from 'phaser';
                 @for (userId of onlinePlayers(); track userId) {
                     @if (userId !== currentUserId) {
                         <div class="user-row">
-                            <span>Player #{{ userId }}</span>
+                            <span>{{ 'PROFILE.PLAYER_PREFIX' | translate }}{{ userId }}</span>
                             @if (waitingForInviteTo() === userId) {
                                 <div class="waiting-accept">
                                     <span>{{ 'CHECKERS.WAITING_ACCEPT' | translate }}</span>
@@ -66,12 +66,12 @@ import * as Phaser from 'phaser';
         <div class="mobile-player-info">
           <div class="player-badge" [class.active]="currentTurn() === redPlayerId()" [class.red-player]="true">
             <span class="player-color red"></span>
-            <span class="player-name">{{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}</span>
+            <span class="player-name">{{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}</span>
           </div>
           <div class="vs-badge">VS</div>
           <div class="player-badge" [class.active]="currentTurn() === blackPlayerId()" [class.black-player]="true">
             <span class="player-color black"></span>
-            <span class="player-name">{{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}</span>
+            <span class="player-name">{{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}</span>
           </div>
         </div>
 
@@ -84,11 +84,11 @@ import * as Phaser from 'phaser';
             <div class="player-info">
               <div class="p-red" [class.active]="currentTurn() === redPlayerId()">
                 <span class="player-color-dot red"></span>
-                {{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}
+                {{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}
               </div>
               <div class="p-black" [class.active]="currentTurn() === blackPlayerId()">
                 <span class="player-color-dot black"></span>
-                {{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerName }}
+                {{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}
               </div>
             </div>
             <div class="turn-indicator" [class.my-turn]="isMyTurn()">
@@ -98,13 +98,13 @@ import * as Phaser from 'phaser';
             <!-- Voice Chat Controls -->
             <button class="voice-btn" [class.active]="voiceChat.isActive()" [class.muted]="voiceChat.isMuted()" [class.connecting]="voiceChat.isConnecting()" (click)="toggleMic()" [disabled]="voiceChat.isConnecting()">
                <i class="voice-icon">{{ voiceChat.isMuted() ? '🔇' : (voiceChat.isActive() ? '🎙️' : '📞') }}</i>
-               {{ voiceChat.isConnecting() ? 'Connecting...' : (voiceChat.isActive() ? (voiceChat.isMuted() ? 'Unmute' : 'Mute') : 'Start Call') }}
+               {{ voiceChat.isConnecting() ? ('VOICE.CONNECTING' | translate) : (voiceChat.isActive() ? (voiceChat.isMuted() ? ('VOICE.UNMUTE' | translate) : ('VOICE.MUTE' | translate)) : ('VOICE.START_CALL' | translate)) }}
             </button>
             
             @if (voiceChat.connectionError()) {
               <div class="voice-error">
                 {{ voiceChat.connectionError() }}
-                <button class="retry-btn" (click)="retryVoiceConnection()">Retry</button>
+                <button class="retry-btn" (click)="retryVoiceConnection()">{{ 'COMMON.RETRY' | translate }}</button>
               </div>
             }
           </div>
@@ -673,6 +673,11 @@ export class CheckersComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Placeholder for partner name logic - should be updated based on opponent data
+  get partnerNameTranslated() {
+    return this.partnerName === 'Partner' ? this.lang.translate('CHECKERS.PARTNER_DEFAULT') : this.partnerName;
+  }
+
   ngOnDestroy() {
     if (this.phaserGame) {
       this.phaserGame.destroy(true);
@@ -690,7 +695,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
   sendInvite(userId: number) {
     if (this.coins() < this.betAmount) {
-      alert("Not enough coins!");
+      alert(this.lang.translate('ALERTS.NOT_ENOUGH_COINS'));
       return;
     }
     this.waitingForInviteTo.set(userId);
@@ -702,7 +707,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
     if (!invite) return;
 
     if (this.coins() < invite.amount) {
-      alert("Not enough coins!");
+      alert(this.lang.translate('ALERTS.NOT_ENOUGH_COINS'));
       return;
     }
 
@@ -760,7 +765,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error("Bet failed", err);
-        alert("Insufficient coins to play! Game aborted.");
+        alert(this.lang.translate('ALERTS.INSUFFICIENT_COINS'));
         this.leaveGame(); // or just reset
       }
     });

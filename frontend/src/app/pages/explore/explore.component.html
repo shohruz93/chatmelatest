@@ -4,11 +4,11 @@
     <div class="tab-navigation">
       <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
         <span class="tab-icon">👥</span>
-        <span>Users</span>
+        <span>{{ 'EXPLORE_PAGE.USERS' | translate }}</span>
       </button>
       <button class="tab-btn" [class.active]="activeTab === 'community'" (click)="activeTab = 'community'">
         <span class="tab-icon">📱</span>
-        <span>Community</span>
+        <span>{{ 'EXPLORE_PAGE.COMMUNITY' | translate }}</span>
       </button>
     </div>
   </div>

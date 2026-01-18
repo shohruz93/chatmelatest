@@ -1,19 +1,20 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-confirm-dialog',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslatePipe],
     templateUrl: './confirm-dialog.component.html',
     styleUrl: './confirm-dialog.component.css'
 })
 export class ConfirmDialogComponent {
     @Input() isOpen = false;
-    @Input() title = 'Confirm Action';
-    @Input() message = 'Are you sure you want to proceed?';
-    @Input() confirmText = 'Confirm';
-    @Input() cancelText = 'Cancel';
+    @Input() title = 'DIALOG.TITLE_DEFAULT';
+    @Input() message = 'DIALOG.MESSAGE_DEFAULT';
+    @Input() confirmText = 'COMMON.CONFIRM';
+    @Input() cancelText = 'COMMON.CANCEL';
     @Input() confirmButtonClass = 'btn-confirm';
     @Input() icon = '❓';
 

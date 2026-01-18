@@ -7,6 +7,8 @@ import { AuthService } from '../../services/auth.service';
 import { CountryService } from '../../services/country.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+import { LanguageService } from '../../services/language.service';
+
 @Component({
     selector: 'app-user-profile-modal',
     standalone: true,
@@ -22,6 +24,7 @@ export class UserProfileModalComponent implements OnInit {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private countryService = inject(CountryService);
+    public languageService = inject(LanguageService);
 
     currentUser: any;
     ratings: any = { average: 0, count: 0 };
@@ -133,7 +136,7 @@ export class UserProfileModalComponent implements OnInit {
 
     submitRating() {
         if (this.newRating === 0) {
-            alert('Please select a rating');
+            alert(this.languageService.translate('ALERTS.PLEASE_SELECT_RATING'));
             return;
         }
 
@@ -150,13 +153,13 @@ export class UserProfileModalComponent implements OnInit {
                 this.newComment = '';
                 this.loadRatingsAndComments();
             },
-            error: (err) => alert('Failed to submit rating')
+            error: (err) => alert(this.languageService.translate('ALERTS.FAILED_SUBMIT_RATING'))
         });
     }
 
     submitComment() {
         if (!this.newComment.trim()) {
-            alert('Please enter a comment');
+            alert(this.languageService.translate('ALERTS.PLEASE_ENTER_COMMENT'));
             return;
         }
 
@@ -165,7 +168,7 @@ export class UserProfileModalComponent implements OnInit {
                 this.newComment = '';
                 this.loadComments();
             },
-            error: (err) => alert('Failed to submit comment')
+            error: (err) => alert(this.languageService.translate('ALERTS.FAILED_SUBMIT_COMMENT'))
         });
     }
 
@@ -192,7 +195,7 @@ export class UserProfileModalComponent implements OnInit {
                 this.showReplyInput[commentId] = false;
                 this.loadComments();
             },
-            error: (err) => alert('Failed to reply')
+            error: (err) => alert(this.languageService.translate('ALERTS.FAILED_REPLY'))
         });
     }
 
@@ -262,13 +265,19 @@ export class UserProfileModalComponent implements OnInit {
         const diffDays = Math.floor(diffHours / 24);
 
         if (diffMins < 1) {
-            return 'just now';
+            return this.languageService.translate('TIME.JUST_NOW');
         } else if (diffMins < 60) {
-            return `${diffMins} min ago`;
+            return this.languageService.translate('TIME.MIN_AGO', { count: diffMins });
         } else if (diffHours < 24) {
-            return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            if (diffHours === 1) {
+                return this.languageService.translate('TIME.HOUR_AGO', { count: diffHours });
+            }
+            return this.languageService.translate('TIME.HOURS_AGO', { count: diffHours });
         } else if (diffDays < 7) {
-            return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            if (diffDays === 1) {
+                return this.languageService.translate('TIME.DAY_AGO', { count: diffDays });
+            }
+            return this.languageService.translate('TIME.DAYS_AGO', { count: diffDays });
         } else {
             return lastActiveDate.toLocaleDateString();
         }

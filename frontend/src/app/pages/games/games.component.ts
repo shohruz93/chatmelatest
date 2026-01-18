@@ -19,8 +19,8 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         @if (invitation()) {
           <div class="invitation-overlay">
             <div class="invitation-card">
-              <h3>Checkers Invite!</h3>
-              <p>User #{{ invitation().fromUserId }} {{ 'GAMES.INVITE_RECEIVED' | translate }} {{ invitation().amount }} 🪙</p>
+              <h3>{{ 'GAMES.INVITE_TITLE' | translate }}</h3>
+              <p>{{ 'PROFILE.USER_PREFIX' | translate }}{{ invitation().fromUserId }} {{ 'GAMES.INVITE_RECEIVED' | translate }} {{ invitation().amount }} 🪙</p>
               <div class="actions">
                 <button class="accept-btn" (click)="acceptInvite()">{{ 'CHECKERS.ACCEPT' | translate }}</button>
                 <button class="reject-btn" (click)="rejectInvite()">{{ 'CHECKERS.REJECT' | translate }}</button>

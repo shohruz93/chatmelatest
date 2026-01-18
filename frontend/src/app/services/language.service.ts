@@ -135,7 +135,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'Any Language',
                 'NO_RANDOM_USER': 'No users found to connect with! Try again later.',
                 'VALIDATION_MESSAGE': 'Please complete your profile information (languages and interests) first to use this feature.',
-                'COMPLETE_PROFILE': 'Complete Profile'
+                'COMPLETE_PROFILE': 'Complete Profile',
+                'USERS': 'Users',
+                'COMMUNITY': 'Community'
             },
 
             'NAV': {
@@ -155,6 +157,9 @@ export class LanguageService {
                 'DARK_MODE': 'Dark Mode'
             },
             'PROFILE': {
+                'DAILY_MISSIONS': 'Daily Missions',
+                'RATES': 'Rates',
+                'GALLERY': 'Gallery',
                 'COMPLETE_PROFILE': 'Complete your profile',
                 'COMPLETE_PROFILE_DESC': 'Tell us about yourself to find better matches.',
                 'ABOUT': 'About',
@@ -177,7 +182,75 @@ export class LanguageService {
                 'REPLY_SINGULAR': 'reply',
                 'NO_COMMENTS': 'No comments yet.',
                 'SEND_MESSAGE': 'Send Message',
-                'LAST_ONLINE': 'Last online'
+                'LAST_ONLINE': 'Last online',
+                'REVIEWS': 'reviews',
+                'USER_PREFIX': 'User #',
+                'PLAYER_PREFIX': 'Player #',
+                'DISPLAY_NAME': 'Display Name',
+                'ENTER_DISPLAY_NAME': 'Enter your display name',
+                'BIO': 'Bio',
+                'TELL_US': 'Tell us about yourself...',
+                'SELECT_LOCATION': 'Select your location',
+                'ADD_NATIVE': 'Add native language...',
+                'ADD_LEARNING': 'Add learning language...',
+                'ADD_INTEREST_PLACEHOLDER': 'Add an interest (e.g. Coding, Music)',
+                'ADD': 'Add',
+                'EDIT_PROFILE': 'Edit Profile',
+                'TELEGRAM_NOTIFICATIONS': 'Telegram Notifications',
+                'CHECKING_STATUS': 'Checking status...',
+                'CONNECT_TELEGRAM_DESC': 'Connect your Telegram to receive notifications about new messages and guests.',
+                'CONNECT_TELEGRAM': 'Connect Telegram',
+                'CONNECTED_AS': 'Connected as',
+                'DISCONNECT': 'Disconnect',
+                'RECEIVE_NOTIFICATIONS': 'Receive Notifications',
+                'OPEN_BOT': 'Open @{{name}}',
+                'SEND_CODE_MANUALLY': 'Or send this code manually:',
+                'DONE': 'Done',
+                'DETAILS': 'Details',
+                'NOT_SPECIFIED': 'Not specified',
+                'NO_INTERESTS': 'No interests added yet.',
+                'GET_APP': 'Get the App',
+                'GET_APP_DESC': 'Experience ChatMe on your mobile device for the best experience.'
+            },
+            'GALLERY': {
+                'TITLE': 'Gallery',
+                'MY_GALLERY': 'My Gallery',
+                'USER_GALLERY': '{{name}}\'s Gallery',
+                'UPLOAD_PHOTO': 'Upload Photo',
+                'LOADING': 'Loading gallery...',
+                'NO_PHOTOS': 'No photos yet',
+                'START_GALLERY': 'Upload your first photo to start your gallery!',
+                'CLICK_DROP': 'Click or drag to upload an image',
+                'CAPTION': 'Caption (optional)',
+                'ADD_CAPTION': 'Add a caption...',
+                'UPLOADING': 'Uploading...',
+                'UPLOAD': 'Upload',
+                'DELETE_CONFIRM': 'Are you sure you want to delete this photo?',
+                'UPLOAD_ERROR': 'Failed to upload image',
+                'DELETE_ERROR': 'Failed to delete image'
+            },
+            'VOICE': {
+                'CONNECTING': 'Connecting...',
+                'MUTE': 'Mute',
+                'UNMUTE': 'Unmute',
+                'START_CALL': 'Start Call'
+            },
+            'TIME': {
+                'JUST_NOW': 'just now',
+                'MIN_AGO': '{{count}} min ago',
+                'HOUR_AGO': '{{count}} hour ago',
+                'HOURS_AGO': '{{count}} hours ago',
+                'DAY_AGO': '{{count}} day ago',
+                'DAYS_AGO': '{{count}} days ago'
+            },
+            'ALERTS': {
+                'PLEASE_SELECT_RATING': 'Please select a rating',
+                'FAILED_SUBMIT_RATING': 'Failed to submit rating',
+                'PLEASE_ENTER_COMMENT': 'Please enter a comment',
+                'FAILED_SUBMIT_COMMENT': 'Failed to submit comment',
+                'FAILED_REPLY': 'Failed to reply',
+                'NOT_ENOUGH_COINS': 'Not enough coins!',
+                'INSUFFICIENT_COINS': 'Insufficient coins to play! Game aborted.'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Select a Conversation',
@@ -243,7 +316,13 @@ export class LanguageService {
                 'NO_RESULTS': 'No results found',
                 'LOADING': 'Loading',
                 'OPTIONAL': 'optional',
-                'SENDING': 'Sending...'
+                'SENDING': 'Sending...',
+                'RETRY': 'Retry',
+                'CONFIRM': 'Confirm'
+            },
+            'DIALOG': {
+                'TITLE_DEFAULT': 'Confirm Action',
+                'MESSAGE_DEFAULT': 'Are you sure you want to proceed?'
             },
             'COINS': {
                 'TITLE': 'Coins',
@@ -264,7 +343,8 @@ export class LanguageService {
                 'CHECKERS': 'Checkers',
                 'CHECKERS_DESC': 'Traditional board game. Multi-player & Coins.',
                 'PLAY_NOW': 'Play Now',
-                'INVITE_RECEIVED': 'wants to play for'
+                'INVITE_RECEIVED': 'wants to play for',
+                'INVITE_TITLE': 'Checkers Invite!'
             },
             'CHECKERS': {
                 'LOBBY': 'Checkers Lobby',
@@ -286,7 +366,8 @@ export class LanguageService {
                 'VICTORY': 'VICTORY!',
                 'LOSE': 'DEFEAT!',
                 'WAITING_ACCEPT': 'Waiting accept',
-                'YOU': 'You'
+                'YOU': 'You',
+                'PARTNER_DEFAULT': 'Partner'
             },
             'COMMUNITY': {
                 'CREATE_POST_PLACEHOLDER': 'What\'s on your mind? Share with the community...',
@@ -318,6 +399,9 @@ export class LanguageService {
                 'STATUS_CLAIM': 'Claim',
                 'STATUS_DONE': 'Done',
                 'NO_MISSIONS': 'No missions available right now.'
+            },
+            'GAMIFICATION': {
+                'LEVEL_SHORT': 'Lvl'
             }
         },
         'ru': {
@@ -401,7 +485,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'Любой язык',
                 'NO_RANDOM_USER': 'Не найдено пользователей для связи! Попробуйте позже.',
                 'VALIDATION_MESSAGE': 'Пожалуйста, заполните информацию профиля (языки и интересы) перед использованием этой функции.',
-                'COMPLETE_PROFILE': 'Заполнить профиль'
+                'COMPLETE_PROFILE': 'Заполнить профиль',
+                'USERS': 'Пользователи',
+                'COMMUNITY': 'Сообщество'
             },
             'NAV': {
                 'DASHBOARD': 'Панель',
@@ -440,7 +526,33 @@ export class LanguageService {
                 'REPLY_SINGULAR': 'ответ',
                 'NO_COMMENTS': 'Нет комментариев.',
                 'SEND_MESSAGE': 'Отправить сообщение',
-                'LAST_ONLINE': 'Был(а) в сети'
+                'LAST_ONLINE': 'Был(а) в сети',
+                'REVIEWS': 'отзывов',
+                'USER_PREFIX': 'Польз. #',
+                'PLAYER_PREFIX': 'Игрок #'
+            },
+            'VOICE': {
+                'CONNECTING': 'Подключение...',
+                'MUTE': 'Выкл. микрофон',
+                'UNMUTE': 'Вкл. микрофон',
+                'START_CALL': 'Начать звонок'
+            },
+            'TIME': {
+                'JUST_NOW': 'только что',
+                'MIN_AGO': '{{count}} мин. назад',
+                'HOUR_AGO': '{{count}} час назад',
+                'HOURS_AGO': '{{count}} ч. назад',
+                'DAY_AGO': '{{count}} день назад',
+                'DAYS_AGO': '{{count}} дн. назад'
+            },
+            'ALERTS': {
+                'PLEASE_SELECT_RATING': 'Пожалуйста, выберите оценку',
+                'FAILED_SUBMIT_RATING': 'Не удалось отправить оценку',
+                'PLEASE_ENTER_COMMENT': 'Пожалуйста, введите комментарий',
+                'FAILED_SUBMIT_COMMENT': 'Не удалось отправить комментарий',
+                'FAILED_REPLY': 'Не удалось ответить',
+                'NOT_ENOUGH_COINS': 'Недостаточно монет!',
+                'INSUFFICIENT_COINS': 'Недостаточно монет для игры! Игра прервана.'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Выберите беседу',
@@ -501,7 +613,13 @@ export class LanguageService {
                 'CLOSE': 'Закрыть',
                 'SUBMIT': 'Отправить',
                 'SEARCH_PLACEHOLDER': 'Поиск...',
-                'NO_RESULTS': 'Результаты не найдены'
+                'NO_RESULTS': 'Результаты не найдены',
+                'RETRY': 'Повторить',
+                'CONFIRM': 'Подтвердить'
+            },
+            'DIALOG': {
+                'TITLE_DEFAULT': 'Подтверждение',
+                'MESSAGE_DEFAULT': 'Вы уверены, что хотите продолжить?'
             },
             'GAMES': {
                 'TITLE': 'Игры',
@@ -509,7 +627,8 @@ export class LanguageService {
                 'CHECKERS': 'Шашки',
                 'CHECKERS_DESC': 'Классическая настольная игра. Мультиплеер и монеты.',
                 'PLAY_NOW': 'Играть сейчас',
-                'INVITE_RECEIVED': 'хочет сыграть на'
+                'INVITE_RECEIVED': 'хочет сыграть на',
+                'INVITE_TITLE': 'Приглашение в шашки!'
             },
             'CHECKERS': {
                 'LOBBY': 'Лобби шашек',
@@ -531,7 +650,8 @@ export class LanguageService {
                 'VICTORY': 'ПОБЕДА!',
                 'LOSE': 'ПОРАЖЕНИЕ!',
                 'WAITING_ACCEPT': 'Ожидание принятия',
-                'YOU': 'Вы'
+                'YOU': 'Вы',
+                'PARTNER_DEFAULT': 'Партнер'
             },
             'COMMUNITY': {
                 'CREATE_POST_PLACEHOLDER': 'О чем вы думаете? Поделитесь с сообществом...',
@@ -563,6 +683,9 @@ export class LanguageService {
                 'STATUS_CLAIM': 'Забрать',
                 'STATUS_DONE': 'Готово',
                 'NO_MISSIONS': 'В данный момент миссий нет.'
+            },
+            'GAMIFICATION': {
+                'LEVEL_SHORT': 'Ур.'
             }
         },
         'tj': {
@@ -646,7 +769,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'Ҳар гуна',
                 'NO_RANDOM_USER': 'Барои пайвастшавӣ корбар ёфт нашуд! Баъдтар кӯшиш кунед.',
                 'VALIDATION_MESSAGE': 'Лутфан аввал маълумоти профили худро (забонҳо ва манфиатҳо) пур кунед, то ин хусусиятро истифода баред.',
-                'COMPLETE_PROFILE': 'Профилро пур кунед'
+                'COMPLETE_PROFILE': 'Профилро пур кунед',
+                'USERS': 'Корбарон',
+                'COMMUNITY': 'Ҷамъият'
             },
             'NAV': {
                 'DASHBOARD': 'Панел',
@@ -684,8 +809,34 @@ export class LanguageService {
                 'REPLIES': 'ҷавобҳо',
                 'REPLY_SINGULAR': 'ҷавоб',
                 'NO_COMMENTS': 'Ҳанӯз шарҳ нест.',
-                'SEND_MESSAGE': 'Равон кардани паём',
-                'LAST_ONLINE': 'Охирин бор дар шабака'
+                'SEND_MESSAGE': 'Паём фиристодан',
+                'LAST_ONLINE': 'Охирин бор дар шабака',
+                'REVIEWS': 'тафсирҳо',
+                'USER_PREFIX': 'Корбар #',
+                'PLAYER_PREFIX': 'Бозингар #'
+            },
+            'VOICE': {
+                'CONNECTING': 'Пайвастшавӣ...',
+                'MUTE': 'Хомӯш кардан',
+                'UNMUTE': 'Фаъол кардан',
+                'START_CALL': 'Оғози занг'
+            },
+            'TIME': {
+                'JUST_NOW': 'ҳозир',
+                'MIN_AGO': '{{count}} дақ пеш',
+                'HOUR_AGO': '{{count}} соат пеш',
+                'HOURS_AGO': '{{count}} соат пеш',
+                'DAY_AGO': '{{count}} рӯз пеш',
+                'DAYS_AGO': '{{count}} рӯз пеш'
+            },
+            'ALERTS': {
+                'PLEASE_SELECT_RATING': 'Лутфан баҳоро интихоб кунед',
+                'FAILED_SUBMIT_RATING': 'Баҳодиҳӣ ноком шуд',
+                'PLEASE_ENTER_COMMENT': 'Лутфан шарҳ нависед',
+                'FAILED_SUBMIT_COMMENT': 'Фиристодани шарҳ ноком шуд',
+                'FAILED_REPLY': 'Ҷавоб додан ноком шуд',
+                'NOT_ENOUGH_COINS': 'Тангаҳо кофӣ нестанд!',
+                'INSUFFICIENT_COINS': 'Тангаҳо барои бозӣ кофӣ нестанд! Бозӣ қатъ шуд.'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Сӯҳбатро интихоб кунед',
@@ -743,7 +894,13 @@ export class LanguageService {
                 'CLOSE': 'Пӯшидан',
                 'SUBMIT': 'Фиристодан',
                 'SEARCH_PLACEHOLDER': 'Ҷустуҷӯ...',
-                'NO_RESULTS': 'Натиҷаҳо ёфт нашуданд'
+                'NO_RESULTS': 'Натиҷаҳо ёфт нашуданд',
+                'RETRY': 'Такрор',
+                'CONFIRM': 'Тасдиқ'
+            },
+            'DIALOG': {
+                'TITLE_DEFAULT': 'Тасдиқ',
+                'MESSAGE_DEFAULT': 'Шумо боварӣ доред?'
             },
             'GAMES': {
                 'TITLE': 'Бозиҳо',
@@ -751,7 +908,8 @@ export class LanguageService {
                 'CHECKERS': 'Шашка',
                 'CHECKERS_DESC': 'Бозии классикии рӯи миз. Мултиплеер ва тангаҳо.',
                 'PLAY_NOW': 'Бозӣ кардан',
-                'INVITE_RECEIVED': 'мехоҳад бозӣ кунад барои'
+                'INVITE_RECEIVED': 'мехоҳад бозӣ кунад барои',
+                'INVITE_TITLE': 'Даъвати шашка!'
             },
             'CHECKERS': {
                 'LOBBY': 'Лоббии шашка',
@@ -773,7 +931,8 @@ export class LanguageService {
                 'VICTORY': 'ҒАЛАБА!',
                 'LOSE': 'БОХТ!',
                 'WAITING_ACCEPT': 'Интизори қабул',
-                'YOU': 'Шумо'
+                'YOU': 'Шумо',
+                'PARTNER_DEFAULT': 'Ҳамсӯҳбат'
             },
             'COMMUNITY': {
                 'CREATE_POST_PLACEHOLDER': 'Шумо чӣ фикр мекунед? Бо ҷамъият мубодила кунед...',
@@ -805,6 +964,9 @@ export class LanguageService {
                 'STATUS_CLAIM': 'Гирифтан',
                 'STATUS_DONE': 'Тайёр',
                 'NO_MISSIONS': 'Дар айни замон миссияҳо дастрас нестанд.'
+            },
+            'GAMIFICATION': {
+                'LEVEL_SHORT': 'Сатҳ'
             }
         },
         'es': {
@@ -892,7 +1054,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'Cualquier Idioma',
                 'NO_RANDOM_USER': '¡No se encontraron usuarios para conectar! Inténtalo de nuevo más tarde.',
                 'VALIDATION_MESSAGE': 'Por favor, completa tu información de perfil (idiomas e intereses) primero para usar esta función.',
-                'COMPLETE_PROFILE': 'Completar perfil'
+                'COMPLETE_PROFILE': 'Completar perfil',
+                'USERS': 'Usuarios',
+                'COMMUNITY': 'Comunidad'
             },
             'NAV': {
                 'DASHBOARD': 'Panel',
@@ -931,7 +1095,33 @@ export class LanguageService {
                 'REPLY_SINGULAR': 'respuesta',
                 'NO_COMMENTS': 'Aún no hay comentarios.',
                 'SEND_MESSAGE': 'Enviar Mensaje',
-                'LAST_ONLINE': 'Última conexión'
+                'LAST_ONLINE': 'Última conexión',
+                'REVIEWS': 'reseñas',
+                'USER_PREFIX': 'Usuario #',
+                'PLAYER_PREFIX': 'Jugador #'
+            },
+            'VOICE': {
+                'CONNECTING': 'Conectando...',
+                'MUTE': 'Silenciar',
+                'UNMUTE': 'Activar sonido',
+                'START_CALL': 'Iniciar llamada'
+            },
+            'TIME': {
+                'JUST_NOW': 'justo ahora',
+                'MIN_AGO': 'hace {{count}} min',
+                'HOUR_AGO': 'hace {{count}} hora',
+                'HOURS_AGO': 'hace {{count}} horas',
+                'DAY_AGO': 'hace {{count}} día',
+                'DAYS_AGO': 'hace {{count}} días'
+            },
+            'ALERTS': {
+                'PLEASE_SELECT_RATING': 'Por favor seleccione una calificación',
+                'FAILED_SUBMIT_RATING': 'Error al enviar la calificación',
+                'PLEASE_ENTER_COMMENT': 'Por favor ingrese un comentario',
+                'FAILED_SUBMIT_COMMENT': 'Error al enviar el comentario',
+                'FAILED_REPLY': 'Error al responder',
+                'NOT_ENOUGH_COINS': '¡No hay suficientes monedas!',
+                'INSUFFICIENT_COINS': '¡Monedas insuficientes para jugar! Juego abortado.'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Selecciona una conversación',
@@ -978,7 +1168,13 @@ export class LanguageService {
                 'CLOSE': 'Cerrar',
                 'SUBMIT': 'Enviar',
                 'SEARCH_PLACEHOLDER': 'Buscar...',
-                'NO_RESULTS': 'No se encontraron resultados'
+                'NO_RESULTS': 'No se encontraron resultados',
+                'RETRY': 'Reintentar',
+                'CONFIRM': 'Confirmar'
+            },
+            'DIALOG': {
+                'TITLE_DEFAULT': 'Confirmar',
+                'MESSAGE_DEFAULT': '¿Estás seguro?'
             },
             'GAMES': {
                 'TITLE': 'Juegos',
@@ -986,7 +1182,8 @@ export class LanguageService {
                 'CHECKERS': 'Damas',
                 'CHECKERS_DESC': 'Juego de mesa tradicional. Multijugador y Monedas.',
                 'PLAY_NOW': 'Jugar Ahora',
-                'INVITE_RECEIVED': 'quiere jugar por'
+                'INVITE_RECEIVED': 'quiere jugar por',
+                'INVITE_TITLE': '¡Invitación a Damas!'
             },
             'CHECKERS': {
                 'LOBBY': 'Lobby de Damas',
@@ -1007,7 +1204,9 @@ export class LanguageService {
                 'TYPE_MESSAGE': 'Escribe un mensaje...',
                 'VICTORY': '¡VICTORIA! Ganaste',
                 'LOSE': '¡PERDISTE! Mejor suerte la próxima vez.',
-                'WAITING_ACCEPT': 'Esperando aceptación'
+                'WAITING_ACCEPT': 'Esperando aceptación',
+                'YOU': 'Tú',
+                'PARTNER_DEFAULT': 'Compañero'
             },
             'COMMUNITY': {
                 'CREATE_POST_PLACEHOLDER': '¿Qué estás pensando? Comparte con la comunidad...',
@@ -1032,6 +1231,16 @@ export class LanguageService {
                 'SEND': 'Enviar',
                 'VIEW_ALL_COMMENTS': 'Ver todos los {{count}} comentarios',
                 'DELETE': 'Eliminar'
+            },
+            'MISSIONS': {
+                'TITLE': 'Misiones Diarias',
+                'STATUS_ACTIVE': 'Activo',
+                'STATUS_CLAIM': 'Reclamar',
+                'STATUS_DONE': 'Hecho',
+                'NO_MISSIONS': 'No hay misiones disponibles ahora.'
+            },
+            'GAMIFICATION': {
+                'LEVEL_SHORT': 'Nvl'
             }
         },
         'ar': {
@@ -1119,7 +1328,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'أي لغة',
                 'NO_RANDOM_USER': 'لم يتم العثور على مستخدمين للتواصل معهم! حاول مرة أخرى لاحقًا.',
                 'VALIDATION_MESSAGE': 'يرجى إكمال معلومات ملفك الشخصي (اللغات والاهتمامات) أولاً لاستخدام هذه الميزة.',
-                'COMPLETE_PROFILE': 'إكمال الملف الشخصي'
+                'COMPLETE_PROFILE': 'إكمال الملف الشخصي',
+                'USERS': 'المستخدمين',
+                'COMMUNITY': 'المجتمع'
             },
             'NAV': {
                 'DASHBOARD': 'لوحة التحكم',
@@ -1317,7 +1528,9 @@ export class LanguageService {
                 'ANY_LANGUAGE': 'Toute Langue',
                 'NO_RANDOM_USER': 'Aucun utilisateur trouvé pour se connecter ! Réessayez plus tard.',
                 'VALIDATION_MESSAGE': 'Veuillez d\'abord compléter vos informations de profil (langues et intérêts) pour utiliser cette fonctionnalité.',
-                'COMPLETE_PROFILE': 'Compléter le profil'
+                'COMPLETE_PROFILE': 'Compléter le profil',
+                'USERS': 'Utilisateurs',
+                'COMMUNITY': 'Communauté'
             },
             'NAV': {
                 'DASHBOARD': 'Tableau de bord',
@@ -1560,7 +1773,9 @@ export class LanguageService {
                 'FEMALE': 'Weiblich',
                 'VALIDATION_MESSAGE': 'Bitte vervollständigen Sie zuerst Ihre Profilinformationen (Sprachen und Interessen), um diese Funktion nutzen zu können.',
                 'SYNCING': 'Synchronisierung...',
-                'COMPLETE_PROFILE': 'Profil vervollständigen'
+                'COMPLETE_PROFILE': 'Profil vervollständigen',
+                'USERS': 'Benutzer',
+                'COMMUNITY': 'Gemeinschaft'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
