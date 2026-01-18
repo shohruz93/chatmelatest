@@ -1,21 +1,21 @@
 <nav class="tab-nav">
     <a routerLink="/dashboard/chat" class="tab-link" [class.active]="isActive('/dashboard/chat')">
         <span class="tab-icon">💬</span>
-        <span class="tab-label">Chat</span>
+        <span class="tab-label">{{ 'NAV.CHAT' | translate }}</span>
     </a>
     <a routerLink="/dashboard/conversations" class="tab-link" [class.active]="isActive('/dashboard/conversations')">
         <span class="tab-icon">📬</span>
-        <span class="tab-label">Messages</span>
+        <span class="tab-label">{{ 'NAV.MESSAGES' | translate }}</span>
         @if (unreadCount() > 0) {
         <span class="badge">{{ unreadCount() }}</span>
         }
     </a>
     <!-- <a routerLink="/dashboard/games" class="tab-link" [class.active]="isActive('/dashboard/games')">
         <span class="tab-icon">🎲</span>
-        <span class="tab-label">Games</span>
+        <span class="tab-label">{{ 'NAV.GAMES' | translate }}</span>
     </a> -->
     <a routerLink="/dashboard/profile" class="tab-link" [class.active]="isActive('/dashboard/profile')">
         <span class="tab-icon">👤</span>
-        <span class="tab-label">Profile</span>
+        <span class="tab-label">{{ 'NAV.PROFILE' | translate }}</span>
     </a>
 </nav>

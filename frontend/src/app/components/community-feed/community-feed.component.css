@@ -593,3 +593,74 @@
         display: none;
     }
 }
+
+/* Translation Styles */
+.post-text {
+    position: relative;
+    padding-right: 30px;
+    /* Make space for the icon */
+}
+
+.translate-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 2px 5px;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.translate-btn:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.translate-btn.active {
+    opacity: 1;
+    background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.translate-icon {
+    display: inline-block;
+}
+
+.translation-info {
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.spinner-small {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--primary-color, #007bff);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dark mode adjustments if necessary */
+:host-context(.dark-mode) .translate-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+:host-context(.dark-mode) .spinner-small {
+    border-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary-color, #007bff);
+}

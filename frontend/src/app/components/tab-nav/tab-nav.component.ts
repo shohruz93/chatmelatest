@@ -2,13 +2,14 @@ import { Component, signal, inject } from '@angular/core';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-tab-nav',
     standalone: true,
-    imports: [RouterModule, CommonModule],
+    imports: [RouterModule, CommonModule, TranslatePipe],
     templateUrl: './tab-nav.component.html',
     styleUrl: './tab-nav.component.css'
 })

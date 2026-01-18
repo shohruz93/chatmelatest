@@ -176,7 +176,8 @@ export class LanguageService {
                 'REPLIES': 'replies',
                 'REPLY_SINGULAR': 'reply',
                 'NO_COMMENTS': 'No comments yet.',
-                'SEND_MESSAGE': 'Send Message'
+                'SEND_MESSAGE': 'Send Message',
+                'LAST_ONLINE': 'Last online'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Select a Conversation',
@@ -286,6 +287,37 @@ export class LanguageService {
                 'LOSE': 'DEFEAT!',
                 'WAITING_ACCEPT': 'Waiting accept',
                 'YOU': 'You'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'What\'s on your mind? Share with the community...',
+                'LOADING_POSTS': 'Loading posts...',
+                'NO_POSTS_YET': 'No posts yet',
+                'BE_FIRST_TO_SHARE': 'Be the first to share something with the community!',
+                'CREATE_POST': 'Create Post',
+                'TEXT': 'Text',
+                'PHOTO': 'Photo',
+                'VIDEO': 'Video',
+                'WHATS_ON_YOUR_MIND': 'What\'s on your mind?',
+                'ADD_CAPTION': 'Add a caption...',
+                'CLICK_TO_UPLOAD': 'Click to upload {{type}}',
+                'MAX_ONE_MINUTE': 'Maximum 1 minute',
+                'UPLOADING': 'Uploading...',
+                'CANCEL': 'Cancel',
+                'POST': 'Post',
+                'POSTING': 'Posting...',
+                'COMMENTS': 'Comments',
+                'NO_COMMENTS_YET': 'No comments yet. Be the first!',
+                'WRITE_COMMENT': 'Write a comment...',
+                'SEND': 'Send',
+                'VIEW_ALL_COMMENTS': 'View all {{count}} comments',
+                'DELETE': 'Delete'
+            },
+            'MISSIONS': {
+                'TITLE': 'Daily Missions',
+                'STATUS_ACTIVE': 'Active',
+                'STATUS_CLAIM': 'Claim',
+                'STATUS_DONE': 'Done',
+                'NO_MISSIONS': 'No missions available right now.'
             }
         },
         'ru': {
@@ -407,7 +439,8 @@ export class LanguageService {
                 'REPLIES': 'ответов',
                 'REPLY_SINGULAR': 'ответ',
                 'NO_COMMENTS': 'Нет комментариев.',
-                'SEND_MESSAGE': 'Отправить сообщение'
+                'SEND_MESSAGE': 'Отправить сообщение',
+                'LAST_ONLINE': 'Был(а) в сети'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Выберите беседу',
@@ -499,6 +532,37 @@ export class LanguageService {
                 'LOSE': 'ПОРАЖЕНИЕ!',
                 'WAITING_ACCEPT': 'Ожидание принятия',
                 'YOU': 'Вы'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'О чем вы думаете? Поделитесь с сообществом...',
+                'LOADING_POSTS': 'Загрузка публикаций...',
+                'NO_POSTS_YET': 'Пока нет публикаций',
+                'BE_FIRST_TO_SHARE': 'Будьте первым, кто поделится чем-то с сообществом!',
+                'CREATE_POST': 'Создать публикацию',
+                'TEXT': 'Текст',
+                'PHOTO': 'Фото',
+                'VIDEO': 'Видео',
+                'WHATS_ON_YOUR_MIND': 'О чем вы думаете?',
+                'ADD_CAPTION': 'Добавьте подпись...',
+                'CLICK_TO_UPLOAD': 'Нажмите, чтобы загрузить {{type}}',
+                'MAX_ONE_MINUTE': 'Максимум 1 минута',
+                'UPLOADING': 'Загрузка...',
+                'CANCEL': 'Отмена',
+                'POST': 'Опубликовать',
+                'POSTING': 'Публикация...',
+                'COMMENTS': 'Комментарии',
+                'NO_COMMENTS_YET': 'Пока нет комментариев. Будьте первым!',
+                'WRITE_COMMENT': 'Напишите комментарий...',
+                'SEND': 'Отправить',
+                'VIEW_ALL_COMMENTS': 'Посмотреть все {{count}} комментариев',
+                'DELETE': 'Удалить'
+            },
+            'MISSIONS': {
+                'TITLE': 'Ежедневные миссии',
+                'STATUS_ACTIVE': 'Активно',
+                'STATUS_CLAIM': 'Забрать',
+                'STATUS_DONE': 'Готово',
+                'NO_MISSIONS': 'В данный момент миссий нет.'
             }
         },
         'tj': {
@@ -620,7 +684,8 @@ export class LanguageService {
                 'REPLIES': 'ҷавобҳо',
                 'REPLY_SINGULAR': 'ҷавоб',
                 'NO_COMMENTS': 'Ҳанӯз шарҳ нест.',
-                'SEND_MESSAGE': 'Равон кардани паём'
+                'SEND_MESSAGE': 'Равон кардани паём',
+                'LAST_ONLINE': 'Охирин бор дар шабака'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Сӯҳбатро интихоб кунед',
@@ -669,7 +734,7 @@ export class LanguageService {
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',
                 'PROFILE': 'Профил',
-                'FIND_MATCH': 'Пайдо кардани ҳам‌صحبت',
+                'FIND_MATCH': 'Пайдо кардани ҳамсӯҳбат',
                 'STATUS_ONLINE': 'Дар шабака'
             },
             'COMMON': {
@@ -709,6 +774,37 @@ export class LanguageService {
                 'LOSE': 'БОХТ!',
                 'WAITING_ACCEPT': 'Интизори қабул',
                 'YOU': 'Шумо'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'Шумо чӣ фикр мекунед? Бо ҷамъият мубодила кунед...',
+                'LOADING_POSTS': 'Боргирии нашрҳо...',
+                'NO_POSTS_YET': 'Ҳанӯз нашре нест',
+                'BE_FIRST_TO_SHARE': 'Аввалин кас бошед, ки чизе бо ҷамъият мубодила мекунад!',
+                'CREATE_POST': 'Нашр эҷод кардан',
+                'TEXT': 'Матн',
+                'PHOTO': 'Акс',
+                'VIDEO': 'Видео',
+                'WHATS_ON_YOUR_MIND': 'Шумо чӣ фикр мекунед?',
+                'ADD_CAPTION': 'Зернавис илова кунед...',
+                'CLICK_TO_UPLOAD': 'Барои боргузории {{type}} клик кунед',
+                'MAX_ONE_MINUTE': 'Максималӣ 1 дақиқа',
+                'UPLOADING': 'Боргузорӣ...',
+                'CANCEL': 'Бекор кардан',
+                'POST': 'Нашр кардан',
+                'POSTING': 'Нашр шуда истодааст...',
+                'COMMENTS': 'Шарҳҳо',
+                'NO_COMMENTS_YET': 'Ҳанӯз шарҳе нест. Аввалин бошед!',
+                'WRITE_COMMENT': 'Шарҳ нависед...',
+                'SEND': 'Равон кардан',
+                'VIEW_ALL_COMMENTS': 'Ҳамаи {{count}} шарҳро дидан',
+                'DELETE': 'Нест кардан'
+            },
+            'MISSIONS': {
+                'TITLE': 'Миссияҳои ҳаррӯза',
+                'STATUS_ACTIVE': 'Фаъол',
+                'STATUS_CLAIM': 'Гирифтан',
+                'STATUS_DONE': 'Тайёр',
+                'NO_MISSIONS': 'Дар айни замон миссияҳо дастрас нестанд.'
             }
         },
         'es': {
@@ -834,7 +930,8 @@ export class LanguageService {
                 'REPLIES': 'respuestas',
                 'REPLY_SINGULAR': 'respuesta',
                 'NO_COMMENTS': 'Aún no hay comentarios.',
-                'SEND_MESSAGE': 'Enviar Mensaje'
+                'SEND_MESSAGE': 'Enviar Mensaje',
+                'LAST_ONLINE': 'Última conexión'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Selecciona una conversación',
@@ -911,11 +1008,35 @@ export class LanguageService {
                 'VICTORY': '¡VICTORIA! Ganaste',
                 'LOSE': '¡PERDISTE! Mejor suerte la próxima vez.',
                 'WAITING_ACCEPT': 'Esperando aceptación'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': '¿Qué estás pensando? Comparte con la comunidad...',
+                'LOADING_POSTS': 'Cargando publicaciones...',
+                'NO_POSTS_YET': 'Aún no hay publicaciones',
+                'BE_FIRST_TO_SHARE': '¡Sé el primero en compartir algo con la comunidad!',
+                'CREATE_POST': 'Crear Publicación',
+                'TEXT': 'Texto',
+                'PHOTO': 'Foto',
+                'VIDEO': 'Video',
+                'WHATS_ON_YOUR_MIND': '¿Qué estás pensando?',
+                'ADD_CAPTION': 'Añadir un título...',
+                'CLICK_TO_UPLOAD': 'Haz clic para subir {{type}}',
+                'MAX_ONE_MINUTE': 'Máximo 1 minuto',
+                'UPLOADING': 'Subiendo...',
+                'CANCEL': 'Cancelar',
+                'POST': 'Publicar',
+                'POSTING': 'Publicando...',
+                'COMMENTS': 'Comentarios',
+                'NO_COMMENTS_YET': 'No hay comentarios aún. ¡Sé el primero!',
+                'WRITE_COMMENT': 'Escribe un comentario...',
+                'SEND': 'Enviar',
+                'VIEW_ALL_COMMENTS': 'Ver todos los {{count}} comentarios',
+                'DELETE': 'Eliminar'
             }
         },
         'ar': {
             'HOME': {
-                'TITLE': 'Chatme - تواصل مع العالم',
+
                 'SUBTITLE': 'ابحث عن أصدقاء جدد، ومارس اللغات، ودردش مع أشخاص من جميع أنحاء العالم.',
                 'START_CHATTING': 'ابدأ الدردشة الآن',
                 'FIND_MATCH': 'البحث عن صديق',
@@ -1036,7 +1157,8 @@ export class LanguageService {
                 'REPLIES': 'ردود',
                 'REPLY_SINGULAR': 'رد',
                 'NO_COMMENTS': 'لا توجد تعليقات بعد.',
-                'SEND_MESSAGE': 'إرسال رسالة'
+                'SEND_MESSAGE': 'إرسال رسالة',
+                'LAST_ONLINE': 'آخر ظهور'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'اختر محادثة',
@@ -1084,6 +1206,30 @@ export class LanguageService {
                 'SUBMIT': 'إرسال',
                 'SEARCH_PLACEHOLDER': 'بحث...',
                 'NO_RESULTS': 'لا توجد نتائج'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'ما الذي تفكر فيه؟ شارك مع المجتمع...',
+                'LOADING_POSTS': 'تحميل المنشورات...',
+                'NO_POSTS_YET': 'لا توجد منشورات بعد',
+                'BE_FIRST_TO_SHARE': 'كن أول من يشارك شيئًا مع المجتمع!',
+                'CREATE_POST': 'إنشاء منشور',
+                'TEXT': 'نص',
+                'PHOTO': 'صورة',
+                'VIDEO': 'فيديو',
+                'WHATS_ON_YOUR_MIND': 'ما الذي تفكر فيه؟',
+                'ADD_CAPTION': 'أضف تعليقًا...',
+                'CLICK_TO_UPLOAD': 'انقر لتحميل {{type}}',
+                'MAX_ONE_MINUTE': 'دقيقة واحدة كحد أقصى',
+                'UPLOADING': 'جاري التحميل...',
+                'CANCEL': 'إلغاء',
+                'POST': 'نشر',
+                'POSTING': 'جاري النشر...',
+                'COMMENTS': 'التعليقات',
+                'NO_COMMENTS_YET': 'لا توجد تعليقات بعد. كن الأول!',
+                'WRITE_COMMENT': 'اكتب تعليقًا...',
+                'SEND': 'إرسال',
+                'VIEW_ALL_COMMENTS': 'عرض جميع التعليقات {{count}}',
+                'DELETE': 'حذف'
             }
         },
         'fr': {
@@ -1209,7 +1355,8 @@ export class LanguageService {
                 'REPLIES': 'réponses',
                 'REPLY_SINGULAR': 'réponse',
                 'NO_COMMENTS': 'Aucun commentaire.',
-                'SEND_MESSAGE': 'Envoyer Message'
+                'SEND_MESSAGE': 'Envoyer Message',
+                'LAST_ONLINE': 'Dernière connexion'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Sélectionnez une conversation',
@@ -1257,6 +1404,30 @@ export class LanguageService {
                 'SUBMIT': 'Soumettre',
                 'SEARCH_PLACEHOLDER': 'Rechercher...',
                 'NO_RESULTS': 'Aucun résultat'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'À quoi pensez-vous ? Partagez avec la communauté...',
+                'LOADING_POSTS': 'Chargement des publications...',
+                'NO_POSTS_YET': 'Aucune publication pour le moment',
+                'BE_FIRST_TO_SHARE': 'Soyez le premier à partager quelque chose avec la communauté !',
+                'CREATE_POST': 'Créer une publication',
+                'TEXT': 'Texte',
+                'PHOTO': 'Photo',
+                'VIDEO': 'Vidéo',
+                'WHATS_ON_YOUR_MIND': 'À quoi pensez-vous ?',
+                'ADD_CAPTION': 'Ajouter une légende...',
+                'CLICK_TO_UPLOAD': 'Cliquez pour télécharger {{type}}',
+                'MAX_ONE_MINUTE': 'Maximum 1 minute',
+                'UPLOADING': 'Téléchargement...',
+                'CANCEL': 'Annuler',
+                'POST': 'Publier',
+                'POSTING': 'Publication...',
+                'COMMENTS': 'Commentaires',
+                'NO_COMMENTS_YET': 'Aucun commentaire pour le moment. Soyez le premier !',
+                'WRITE_COMMENT': 'Écrire un commentaire...',
+                'SEND': 'Envoyer',
+                'VIEW_ALL_COMMENTS': 'Voir tous les {{count}} commentaires',
+                'DELETE': 'Supprimer'
             }
         },
         'de': {
@@ -1352,7 +1523,8 @@ export class LanguageService {
                 'REPLIES': 'Antworten',
                 'REPLY_SINGULAR': 'Antwort',
                 'NO_COMMENTS': 'Keine Kommentare.',
-                'SEND_MESSAGE': 'Nachricht senden'
+                'SEND_MESSAGE': 'Nachricht senden',
+                'LAST_ONLINE': 'Zuletzt online'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'Wähle eine Unterhaltung',
@@ -1403,6 +1575,30 @@ export class LanguageService {
                 'SUBMIT': 'Senden',
                 'SEARCH_PLACEHOLDER': 'Suchen...',
                 'NO_RESULTS': 'Keine Ergebnisse'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'Was machst du gerade? Teile es mit der Community...',
+                'LOADING_POSTS': 'Beiträge laden...',
+                'NO_POSTS_YET': 'Noch keine Beiträge',
+                'BE_FIRST_TO_SHARE': 'Sei der Erste, der etwas mit der Community teilt!',
+                'CREATE_POST': 'Beitrag erstellen',
+                'TEXT': 'Text',
+                'PHOTO': 'Foto',
+                'VIDEO': 'Video',
+                'WHATS_ON_YOUR_MIND': 'Was machst du gerade?',
+                'ADD_CAPTION': 'Bildunterschrift hinzufügen...',
+                'CLICK_TO_UPLOAD': 'Klicken zum Hochladen von {{type}}',
+                'MAX_ONE_MINUTE': 'Maximal 1 Minute',
+                'UPLOADING': 'Hochladen...',
+                'CANCEL': 'Abbrechen',
+                'POST': 'Posten',
+                'POSTING': 'Wird gepostet...',
+                'COMMENTS': 'Kommentare',
+                'NO_COMMENTS_YET': 'Noch keine Kommentare. Sei der Erste!',
+                'WRITE_COMMENT': 'Einen Kommentar schreiben...',
+                'SEND': 'Senden',
+                'VIEW_ALL_COMMENTS': 'Alle {{count}} Kommentare ansehen',
+                'DELETE': 'Löschen'
             }
         },
         'zh': {
@@ -1498,7 +1694,8 @@ export class LanguageService {
                 'REPLIES': '回复',
                 'REPLY_SINGULAR': '回复',
                 'NO_COMMENTS': '暂无评论。',
-                'SEND_MESSAGE': '发送消息'
+                'SEND_MESSAGE': '发送消息',
+                'LAST_ONLINE': '最后在线'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': '选择对话',
@@ -1549,6 +1746,30 @@ export class LanguageService {
                 'SUBMIT': '提交',
                 'SEARCH_PLACEHOLDER': '搜索...',
                 'NO_RESULTS': '无结果'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': '你在想什么？与社区分享...',
+                'LOADING_POSTS': '正在加载帖子...',
+                'NO_POSTS_YET': '还没有帖子',
+                'BE_FIRST_TO_SHARE': '成为第一个与社区分享的人！',
+                'CREATE_POST': '创建帖子',
+                'TEXT': '文字',
+                'PHOTO': '照片',
+                'VIDEO': '视频',
+                'WHATS_ON_YOUR_MIND': '你在想什么？',
+                'ADD_CAPTION': '添加标题...',
+                'CLICK_TO_UPLOAD': '点击上传{{type}}',
+                'MAX_ONE_MINUTE': '最多1分钟',
+                'UPLOADING': '上传中...',
+                'CANCEL': '取消',
+                'POST': '发布',
+                'POSTING': '发布中...',
+                'COMMENTS': '评论',
+                'NO_COMMENTS_YET': '还没有评论。成为第一个！',
+                'WRITE_COMMENT': '写评论...',
+                'SEND': '发送',
+                'VIEW_ALL_COMMENTS': '查看所有{{count}}条评论',
+                'DELETE': '删除'
             }
         },
         'hi': {
@@ -1644,7 +1865,8 @@ export class LanguageService {
                 'REPLIES': 'उत्तर',
                 'REPLY_SINGULAR': 'उत्तर',
                 'NO_COMMENTS': 'अभी तक कोई टिप्पणी नहीं।',
-                'SEND_MESSAGE': 'संदेश भेजें'
+                'SEND_MESSAGE': 'संदेश भेजें',
+                'LAST_ONLINE': 'अंतिम बार ऑनलाइन'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'बातचीत चुनें',
@@ -1695,6 +1917,30 @@ export class LanguageService {
                 'SUBMIT': 'भेजें',
                 'SEARCH_PLACEHOLDER': 'खोजें...',
                 'NO_RESULTS': 'कोई परिणाम नहीं'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'आप क्या सोच रहे हैं? समुदाय के साथ साझा करें...',
+                'LOADING_POSTS': 'पोस्ट लोड हो रहे हैं...',
+                'NO_POSTS_YET': 'अभी तक कोई पोस्ट नहीं',
+                'BE_FIRST_TO_SHARE': 'समुदाय के साथ कुछ साझा करने वाले पहले व्यक्ति बनें!',
+                'CREATE_POST': 'पोस्ट बनाएं',
+                'TEXT': 'पाठ',
+                'PHOTO': 'फोटो',
+                'VIDEO': 'वीडियो',
+                'WHATS_ON_YOUR_MIND': 'आप क्या सोच रहे हैं?',
+                'ADD_CAPTION': 'कैप्शन जोड़ें...',
+                'CLICK_TO_UPLOAD': '{{type}} अपलोड करने के लिए क्लिक करें',
+                'MAX_ONE_MINUTE': 'अधिकतम 1 मिनट',
+                'UPLOADING': 'अपलोड हो रहा है...',
+                'CANCEL': 'रद्द करें',
+                'POST': 'पोस्ट',
+                'POSTING': 'पोस्ट किया जा रहा है...',
+                'COMMENTS': 'टिप्पणियाँ',
+                'NO_COMMENTS_YET': 'अभी तक कोई टिप्पणी नहीं। पहले बनें!',
+                'WRITE_COMMENT': 'टिप्पणी लिखें...',
+                'SEND': 'भेजें',
+                'VIEW_ALL_COMMENTS': 'सभी {{count}} टिप्पणियाँ देखें',
+                'DELETE': 'हटाएं'
             }
         },
         'fa': {
@@ -1785,7 +2031,8 @@ export class LanguageService {
                 'REPLIES': 'پاسخ‌ها',
                 'REPLY_SINGULAR': 'پاسخ',
                 'NO_COMMENTS': 'هنوز نظری ثبت نشده است.',
-                'SEND_MESSAGE': 'ارسال پیام'
+                'SEND_MESSAGE': 'ارسال پیام',
+                'LAST_ONLINE': 'آخرین بازدید'
             },
             'CHAT': {
                 'SELECT_CONVERSATION': 'انتخاب گفتگو',
@@ -1835,10 +2082,33 @@ export class LanguageService {
                 'SUBMIT': 'ارسال',
                 'SEARCH_PLACEHOLDER': 'جستجو...',
                 'NO_RESULTS': 'نتیجه‌ای یافت نشد'
+            },
+            'COMMUNITY': {
+                'CREATE_POST_PLACEHOLDER': 'چه فکری می‌کنید؟ با جامعه به اشتراک بگذارید...',
+                'LOADING_POSTS': 'بارگذاری پست‌ها...',
+                'NO_POSTS_YET': 'هنوز پستی وجود ندارد',
+                'BE_FIRST_TO_SHARE': 'اولین نفری باشید که چیزی را با جامعه به اشتراک می‌گذارد!',
+                'CREATE_POST': 'ایجاد پست',
+                'TEXT': 'متن',
+                'PHOTO': 'عکس',
+                'VIDEO': 'ویدیو',
+                'WHATS_ON_YOUR_MIND': 'چه فکری می‌کنید?',
+                'ADD_CAPTION': 'افزودن توضیح...',
+                'CLICK_TO_UPLOAD': 'برای بارگذاری {{type}} کلیک کنید',
+                'MAX_ONE_MINUTE': 'حداکثر 1 دقیقه',
+                'UPLOADING': 'در حال بارگذاری...',
+                'CANCEL': 'لغو',
+                'POST': 'ارسال',
+                'POSTING': 'در حال ارسال...',
+                'COMMENTS': 'نظرات',
+                'NO_COMMENTS_YET': 'هنوز نظری وجود ندارد. اولین نفر باشید!',
+                'WRITE_COMMENT': 'نظر بنویسید...',
+                'SEND': 'ارسال',
+                'VIEW_ALL_COMMENTS': 'مشاهده همه {{count}} نظر',
+                'DELETE': 'حذف'
             }
         }
     };
-
     supportedLanguages = [
         { code: 'en', name: 'English', flag: '🇺🇸' },
         { code: 'ru', name: 'Русский', flag: '🇷🇺' },

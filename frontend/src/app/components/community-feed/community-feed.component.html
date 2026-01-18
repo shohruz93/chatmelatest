@@ -2,7 +2,7 @@
     <!-- Create Post Button -->
     <div class="create-post-card" (click)="openCreateModal()">
         <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
-        <div class="create-placeholder">What's on your mind? Share with the community...</div>
+        <div class="create-placeholder">{{ 'COMMUNITY.CREATE_POST_PLACEHOLDER' | translate }}</div>
         <div class="create-icons">
             <button class="add-btn">+</button>
         </div>
@@ -12,7 +12,7 @@
     @if (loading()) {
     <div class="loading-state">
         <div class="spinner"></div>
-        <p>Loading posts...</p>
+        <p>{{ 'COMMUNITY.LOADING_POSTS' | translate }}</p>
     </div>
     }
 
@@ -20,8 +20,8 @@
     @if (!loading() && posts().length === 0) {
     <div class="empty-state">
         <div class="empty-icon">📱</div>
-        <h3>No posts yet</h3>
-        <p>Be the first to share something with the community!</p>
+        <h3>{{ 'COMMUNITY.NO_POSTS_YET' | translate }}</h3>
+        <p>{{ 'COMMUNITY.BE_FIRST_TO_SHARE' | translate }}</p>
     </div>
     }
 
@@ -38,13 +38,29 @@
                     </div>
                 </a>
                 @if (currentUser?.id === post.user_id) {
-                <button class="btn-delete-post" (click)="deletePost(post)" title="Delete">🗑️</button>
+                <button class="btn-delete-post" (click)="deletePost(post)"
+                    [title]="'COMMUNITY.DELETE' | translate">🗑️</button>
                 }
             </div>
 
             <!-- Text Content -->
             @if (post.text_content) {
-            <div class="post-text">{{ post.text_content }}</div>
+            <div class="post-text">
+                {{ post.show_translation ? post.translated_text : post.text_content }}
+
+                <button class="translate-btn" (click)="translatePost(post)" [class.active]="post.show_translation">
+                    @if (post.translating) {
+                    <span class="spinner-small"></span>
+                    } @else {
+                    <span class="translate-icon">🌐</span>
+                    }
+                </button>
+            </div>
+            @if (post.show_translation) {
+            <div class="translation-info">
+                <small>Translated to {{ languageService.currentLang() | uppercase }}</small>
+            </div>
+            }
             }
 
             <!-- Media Content -->
@@ -82,7 +98,7 @@
                 }
                 @if (post.comments_count > 2) {
                 <button class="view-all-comments" (click)="openComments(post)">
-                    View all {{ post.comments_count }} comments
+                    {{ 'COMMUNITY.VIEW_ALL_COMMENTS' | translate: {count: post.comments_count} }}
                 </button>
                 }
             </div>
@@ -97,25 +113,26 @@
 <div class="modal-overlay" (click)="closeCreateModal()">
     <div class="modal-content create-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h3>Create Post</h3>
+            <h3>{{ 'COMMUNITY.CREATE_POST' | translate }}</h3>
             <button class="modal-close" (click)="closeCreateModal()">×</button>
         </div>
 
         <div class="post-type-tabs">
             <button [class.active]="postType === 'text'" (click)="setPostType('text')">
-                <span>📝</span> Text
+                <span>📝</span> {{ 'COMMUNITY.TEXT' | translate }}
             </button>
             <button [class.active]="postType === 'image'" (click)="setPostType('image')">
-                <span>📷</span> Photo
+                <span>📷</span> {{ 'COMMUNITY.PHOTO' | translate }}
             </button>
             <button [class.active]="postType === 'video'" (click)="setPostType('video')">
-                <span>🎬</span> Video
+                <span>🎬</span> {{ 'COMMUNITY.VIDEO' | translate }}
             </button>
         </div>
 
         <div class="create-form">
             <textarea [(ngModel)]="postText"
-                [placeholder]="postType === 'text' ? 'What\'s on your mind?' : 'Add a caption...'" rows="4">
+                [placeholder]="postType === 'text' ? ('COMMUNITY.WHATS_ON_YOUR_MIND' | translate) : ('COMMUNITY.ADD_CAPTION' | translate)"
+                rows="4">
             </textarea>
 
             @if (postType !== 'text') {
@@ -126,9 +143,9 @@
                         (change)="onFileSelect($event)" hidden>
                     <div class="upload-placeholder">
                         <span class="upload-icon">{{ postType === 'image' ? '📷' : '🎬' }}</span>
-                        <p>Click to upload {{ postType }}</p>
+                        <p>{{ 'COMMUNITY.CLICK_TO_UPLOAD' | translate: {type: postType} }}</p>
                         @if (postType === 'video') {
-                        <small>Maximum 1 minute</small>
+                        <small>{{ 'COMMUNITY.MAX_ONE_MINUTE' | translate }}</small>
                         }
                     </div>
                 </label>
@@ -151,17 +168,17 @@
             <div class="progress-bar-wrapper">
                 <div class="progress-bar" [style.width.%]="uploadPercent()"></div>
             </div>
-            <div class="progress-text">Uploading... {{ uploadPercent() }}%</div>
+            <div class="progress-text">{{ 'COMMUNITY.UPLOADING' | translate }} {{ uploadPercent() }}%</div>
         </div>
         }
 
         <div class="modal-actions">
-            <button class="btn-cancel" (click)="closeCreateModal()">Cancel</button>
+            <button class="btn-cancel" (click)="closeCreateModal()">{{ 'COMMUNITY.CANCEL' | translate }}</button>
             <button class="btn-post" [disabled]="uploadProgress()" (click)="createPost()">
                 @if (uploadProgress()) {
-                <span class="loading-spinner"></span> Posting...
+                <span class="loading-spinner"></span> {{ 'COMMUNITY.POSTING' | translate }}
                 } @else {
-                Post
+                {{ 'COMMUNITY.POST' | translate }}
                 }
             </button>
         </div>
@@ -174,13 +191,13 @@
 <div class="modal-overlay" (click)="closeCommentsModal()">
     <div class="modal-content comments-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h3>Comments</h3>
+            <h3>{{ 'COMMUNITY.COMMENTS' | translate }}</h3>
             <button class="modal-close" (click)="closeCommentsModal()">×</button>
         </div>
 
         <div class="comments-list">
             @if (allComments.length === 0) {
-            <div class="no-comments">No comments yet. Be the first!</div>
+            <div class="no-comments">{{ 'COMMUNITY.NO_COMMENTS_YET' | translate }}</div>
             } @else {
             @for (comment of allComments; track comment.id) {
             <div class="comment-full">
@@ -196,8 +213,10 @@
         </div>
 
         <div class="add-comment-form">
-            <input type="text" [(ngModel)]="newComment" placeholder="Write a comment..." (keyup.enter)="addComment()">
-            <button class="btn-send" [disabled]="!newComment.trim()" (click)="addComment()">Send</button>
+            <input type="text" [(ngModel)]="newComment" [placeholder]="'COMMUNITY.WRITE_COMMENT' | translate"
+                (keyup.enter)="addComment()">
+            <button class="btn-send" [disabled]="!newComment.trim()" (click)="addComment()">{{ 'COMMUNITY.SEND' |
+                translate }}</button>
         </div>
     </div>
 </div>

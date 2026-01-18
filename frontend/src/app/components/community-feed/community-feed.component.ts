@@ -2,21 +2,26 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommunityService, CommunityPost, CommunityComment } from '../../services/community.service';
 import { AuthService } from '../../services/auth.service';
+import { TranslationService } from '../../services/translation.service';
+import { LanguageService } from '../../services/language.service';
 import { environment } from '../../../environments/environment';
 
 
 @Component({
     selector: 'app-community-feed',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
     templateUrl: './community-feed.component.html',
     styleUrls: ['./community-feed.component.css']
 })
 export class CommunityFeedComponent implements OnInit {
     private communityService = inject(CommunityService);
     private auth = inject(AuthService);
+    private translationService = inject(TranslationService);
+    public languageService = inject(LanguageService);
 
     currentUser = this.auth.currentUserValue;
     posts = signal<CommunityPost[]>([]);
@@ -166,6 +171,29 @@ export class CommunityFeedComponent implements OnInit {
                 }
             });
         }
+    }
+
+    translatePost(post: CommunityPost) {
+        if (post.translated_text) {
+            post.show_translation = !post.show_translation;
+            return;
+        }
+
+        const targetLang = this.languageService.currentLang();
+        if (!post.text_content) return;
+
+        post.translating = true;
+        this.translationService.translate(post.text_content, targetLang).subscribe({
+            next: (translated) => {
+                post.translated_text = translated;
+                post.show_translation = true;
+                post.translating = false;
+            },
+            error: (err) => {
+                console.error('Translation failed', err);
+                post.translating = false;
+            }
+        });
     }
 
     likePost(post: CommunityPost) {

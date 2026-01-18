@@ -18,6 +18,10 @@ export interface CommunityPost {
     user_liked: boolean;
     recent_comments: CommunityComment[];
     created_at: number;
+    // Translation properties
+    translated_text?: string;
+    show_translation?: boolean;
+    translating?: boolean;
 }
 
 export interface CommunityComment {

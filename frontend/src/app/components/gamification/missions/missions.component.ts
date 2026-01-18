@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '../../../pipes/translate.pipe';
 import { GamificationService, Mission } from '../../../services/gamification.service';
 
 @Component({
     selector: 'app-missions',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslatePipe],
     templateUrl: './missions.component.html',
     styleUrls: ['./missions.component.css']
 })
