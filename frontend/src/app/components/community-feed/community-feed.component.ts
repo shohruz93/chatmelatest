@@ -7,6 +7,7 @@ import { CommunityService, CommunityPost, CommunityComment } from '../../service
 import { AuthService } from '../../services/auth.service';
 import { TranslationService } from '../../services/translation.service';
 import { LanguageService } from '../../services/language.service';
+import { CommunityStorageService } from '../../services/community-storage.service';
 import { environment } from '../../../environments/environment';
 
 
@@ -22,6 +23,7 @@ export class CommunityFeedComponent implements OnInit {
     private auth = inject(AuthService);
     private translationService = inject(TranslationService);
     public languageService = inject(LanguageService);
+    private communityStorage = inject(CommunityStorageService);
 
     currentUser = this.auth.currentUserValue;
     posts = signal<CommunityPost[]>([]);
@@ -43,7 +45,20 @@ export class CommunityFeedComponent implements OnInit {
     private apiUrl = environment.phpBaseUrl;
 
     ngOnInit() {
-        this.loadFeed();
+        if (this.currentUser?.id) {
+            this.communityStorage.openDb(this.currentUser.id).then(() => {
+                this.loadLocalFeed();
+                this.loadFeed();
+            });
+        }
+    }
+
+    loadLocalFeed() {
+        this.communityStorage.getPosts().then(posts => {
+            if (posts.length > 0 && this.posts().length === 0) {
+                this.posts.set(posts);
+            }
+        });
     }
 
     loadFeed() {
@@ -52,6 +67,7 @@ export class CommunityFeedComponent implements OnInit {
             next: (posts) => {
                 this.posts.set(posts);
                 this.loading.set(false);
+                this.communityStorage.savePosts(posts);
             },
             error: (err) => {
                 console.error('Failed to load feed', err);
@@ -127,6 +143,7 @@ export class CommunityFeedComponent implements OnInit {
                 next: (res) => {
                     if (res.success && res.post) {
                         this.posts.update(posts => [res.post, ...posts]);
+                        this.communityStorage.savePosts([res.post]);
                     }
                     this.closeCreateModal();
                     this.uploadProgress.set(false);
@@ -157,6 +174,7 @@ export class CommunityFeedComponent implements OnInit {
                         const res = event.body;
                         if (res.success && res.post) {
                             this.posts.update(posts => [res.post, ...posts]);
+                            this.communityStorage.savePosts([res.post]);
                         }
                         this.closeCreateModal();
                         this.uploadProgress.set(false);
@@ -208,6 +226,10 @@ export class CommunityFeedComponent implements OnInit {
                     }
                     return p;
                 }));
+                const updatedPost = this.posts().find(p => p.id === post.id);
+                if (updatedPost) {
+                    this.communityStorage.updatePost(updatedPost);
+                }
             },
             error: (err) => {
                 console.error('Translation failed', err);
@@ -236,6 +258,10 @@ export class CommunityFeedComponent implements OnInit {
                     }
                     return p;
                 }));
+                const updatedPost = this.posts().find(p => p.id === post.id);
+                if (updatedPost) {
+                    this.communityStorage.updatePost(updatedPost);
+                }
             },
             error: (err) => console.error('Failed to like post', err)
         });
@@ -283,6 +309,7 @@ export class CommunityFeedComponent implements OnInit {
         this.communityService.deletePost(this.currentUser.id, post.id).subscribe({
             next: () => {
                 this.posts.update(posts => posts.filter(p => p.id !== post.id));
+                this.communityStorage.deletePost(post.id);
             },
             error: (err) => {
                 console.error('Failed to delete post', err);
