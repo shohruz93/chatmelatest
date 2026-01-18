@@ -23,7 +23,7 @@ import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe, SafeUrlPipe],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,

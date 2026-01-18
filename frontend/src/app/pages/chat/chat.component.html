@@ -119,18 +119,18 @@
                     @switch (msg.messageType) {
                     @case ('image') {
                     <div class="message-image-container">
-                        <img [src]="msg.content | safeUrl" alt="Image" class="message-image"
+                        <img [attr.src]="msg.content" alt="Image" class="message-image"
                             (click)="openImageModal(msg.content)">
                     </div>
                     }
                     @case ('sticker') {
                     <div class="message-sticker">
-                        <img [src]="msg.content" alt="Sticker" class="sticker-img">
+                        <img [attr.src]="msg.content" alt="Sticker" class="sticker-img">
                     </div>
                     }
                     @case ('audio') {
                     <div class="message-voice">
-                        <audio [src]="msg.content | safeUrl" controls preload="metadata"></audio>
+                        <audio [attr.src]="msg.content" controls preload="metadata"></audio>
                     </div>
                     }
                     @default {

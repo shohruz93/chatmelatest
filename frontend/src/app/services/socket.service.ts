@@ -131,7 +131,10 @@ export class SocketService implements OnDestroy {
             this.activeCheckersGame.set(data);
             this.checkersStartSubject.next(data);
         });
-        this.socket.on('checkers_move', (data) => this.checkersMoveSubject.next(data));
+        this.socket.on('checkers_move', (data) => {
+            console.log('[SOCKET SERVICE] Received checkers_move event:', data);
+            this.checkersMoveSubject.next(data);
+        });
         this.socket.on('checkers_chat', (data) => this.checkersChatSubject.next(data));
         this.socket.on('checkers_game_over', (data) => this.checkersGameOverSubject.next(data));
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));

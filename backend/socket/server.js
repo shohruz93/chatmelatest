@@ -6,6 +6,9 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
+const API_URL = "https://shphbjeio23.chatme.tj";
+console.log('Using API_URL:', API_URL);
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -122,7 +125,7 @@ io.on('connection', (socket) => {
 
             // Use advanced compatibility matching
             const response = await fetch(
-                `${process.env.API_URL}/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`
+                `${API_URL}/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`
             );
             const compatibleUsers = await response.json();
 
@@ -240,7 +243,7 @@ io.on('connection', (socket) => {
     // Check mutual compatibility
     async function checkMutualCompatibility(userId1, userId2) {
         try {
-            const response = await fetch(`${process.env.API_URL}/match/compatible?userId=${userId2}&limit=20`);
+            const response = await fetch(`${API_URL}/match/compatible?userId=${userId2}&limit=20`);
             const matches = await response.json();
 
             // Check if userId1 is in userId2's compatible matches
@@ -267,7 +270,7 @@ io.on('connection', (socket) => {
     // Record match history
     async function recordMatchHistory(user1Id, user2Id, score, reasons) {
         try {
-            await fetch(`${process.env.API_URL}/match/history`, {
+            await fetch(`${API_URL}/match/history`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -454,7 +457,7 @@ io.on('connection', (socket) => {
 
         // Save message via PHP API
         try {
-            const response = await fetch(`${process.env.API_URL}/messages`, {
+            const response = await fetch(`${API_URL}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -507,7 +510,7 @@ io.on('connection', (socket) => {
     socket.on('edit_message', async ({ roomId, messageId, content }) => {
         console.log(`[EDIT_MESSAGE] Message ${messageId} in room ${roomId}: ${content}`);
         try {
-            const response = await fetch(`${process.env.API_URL}/messages`, {
+            const response = await fetch(`${API_URL}/messages`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: messageId, content })
@@ -523,7 +526,7 @@ io.on('connection', (socket) => {
     socket.on('delete_message', async ({ roomId, messageId }) => {
         console.log(`[DELETE_MESSAGE] Message ${messageId} in room ${roomId}`);
         try {
-            const response = await fetch(`${process.env.API_URL}/messages`, {
+            const response = await fetch(`${API_URL}/messages`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: messageId })
@@ -538,7 +541,7 @@ io.on('connection', (socket) => {
 
     socket.on('load_messages', async ({ roomId, limit = 50, offset = 0 }) => {
         try {
-            const response = await fetch(`${process.env.API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`);
+            const response = await fetch(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`);
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
@@ -578,7 +581,7 @@ io.on('connection', (socket) => {
             // Fetch recent messages to check for updates/new items
             // We fetch 50 to cover a reasonable gap
             const limit = 20;
-            const response = await fetch(`${process.env.API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=0`);
+            const response = await fetch(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=0`);
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
@@ -667,8 +670,8 @@ io.on('connection', (socket) => {
 
             // Fetch profiles
             const [profile1Res, profile2Res] = await Promise.all([
-                fetch(`${process.env.API_URL}/profile?userId=${user1}`),
-                fetch(`${process.env.API_URL}/profile?userId=${user2}`)
+                fetch(`${API_URL}/profile?userId=${user1}`),
+                fetch(`${API_URL}/profile?userId=${user2}`)
             ]);
 
             const profile1 = await profile1Res.json();
@@ -690,7 +693,7 @@ io.on('connection', (socket) => {
 
         try {
             // Call PHP API to mark messages as read
-            const response = await fetch(`${process.env.API_URL}/conversations/read`, {
+            const response = await fetch(`${API_URL}/conversations/read`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -783,7 +786,7 @@ io.on('connection', (socket) => {
                 // Track Polyglot mission (translate_message)
                 const userId = userSocketMap.get(socket.id);
                 if (userId) {
-                    fetch(`${process.env.API_URL}/gamification/track`, {
+                    fetch(`${API_URL}/gamification/track`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -894,9 +897,38 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('checkers_start', gameData);
     });
 
+    socket.on('join_checkers_game', ({ roomId }) => {
+        const userId = userSocketMap.get(socket.id);
+        if (userId) {
+            socket.join(roomId);
+            console.log(`[CHECKERS] User ${userId} (${socket.id}) explicitly joined room ${roomId}`);
+
+            // Optional: Broadcast that user re-connected/joined?
+            // socket.to(roomId).emit('checkers_user_joined', { userId });
+        }
+    });
+
     socket.on('checkers_move', ({ roomId, move }) => {
         const senderId = userSocketMap.get(socket.id);
+        console.log(`[CHECKERS_MOVE] Received from userId ${senderId} in room ${roomId}`);
+        console.log(`[CHECKERS_MOVE] Move data:`, JSON.stringify(move));
+
+        // Get room members to verify
+        const roomSockets = io.sockets.adapter.rooms.get(roomId);
+        if (roomSockets) {
+            console.log(`[CHECKERS_MOVE] Room ${roomId} has ${roomSockets.size} members`);
+            const members = [];
+            roomSockets.forEach(socketId => {
+                const userId = userSocketMap.get(socketId);
+                members.push({ socketId: socketId.substring(0, 8), userId });
+            });
+            console.log(`[CHECKERS_MOVE] Room members:`, members);
+        } else {
+            console.log(`[CHECKERS_MOVE] ERROR: Room ${roomId} does not exist!`);
+        }
+
         socket.to(roomId).emit('checkers_move', { senderId, move });
+        console.log(`[CHECKERS_MOVE] Broadcasted to room ${roomId} (excluding sender)`);
     });
 
     socket.on('checkers_chat', ({ roomId, message }) => {

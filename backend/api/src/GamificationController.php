@@ -90,7 +90,7 @@ class GamificationController {
         }
 
         // Check if mission is completed but not claimed
-        $query = "SELECT um.*, m.reward_coins, m.xp_reward 
+        $query = "SELECT um.*, m.reward_coins, m.xp_reward, m.condition_value, m.title
                   FROM user_missions um
                   JOIN missions m ON um.mission_id = m.id
                   WHERE um.id = :id AND um.user_id = :user_id";

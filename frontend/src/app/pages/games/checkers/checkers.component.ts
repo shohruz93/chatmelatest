@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, inject, signal } f
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { SocketService } from '../../../services/socket.service';
 import { AuthService } from '../../../services/auth.service';
 import { GamificationService } from '../../../services/gamification.service';
@@ -593,6 +595,9 @@ export class CheckersComponent implements OnInit, OnDestroy {
   gameResultWin = signal(false);
   private winSound = new Audio('/mp3/Game_succes.mp3');
 
+  private destroy$ = new Subject<void>();
+  private isInitializing = false; // Synchronous flag to prevent race conditions
+
   ngOnInit() {
     if (history.state['returnUrl']) {
       this.returnUrl = history.state['returnUrl'];
@@ -600,21 +605,24 @@ export class CheckersComponent implements OnInit, OnDestroy {
 
     const user = this.auth.currentUserValue;
     if (user) this.currentUserId = Number(user.id);
-    console.log('Checkers Init: User ID', this.currentUserId);
 
     // Set initial online players
     this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
 
     // Listen for status changes
-    this.socket.userStatusChanged$.subscribe(() => {
-      this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
-    });
+    this.socket.userStatusChanged$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
+      });
 
     // Listen for checkers events
-    this.socket.checkersInvite$.subscribe(invite => {
-      this.invitation.set(invite);
-      this.socket.playNotificationSound();
-    });
+    this.socket.checkersInvite$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(invite => {
+        this.invitation.set(invite);
+        this.socket.playNotificationSound();
+      });
 
     // Check for active game
     const activeGame = this.socket.activeCheckersGame();
@@ -622,58 +630,75 @@ export class CheckersComponent implements OnInit, OnDestroy {
       this.initGame(activeGame);
     }
 
-    this.socket.checkersStart$.subscribe(data => {
-      this.initGame(data);
-    });
+    this.socket.checkersStart$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.initGame(data);
+      });
 
-    this.socket.checkersMove$.subscribe(data => {
-      if (this.gameScene) {
-        this.gameScene.handleOpponentMove(data.move);
-      }
-      // Only switch turn if the move was NOT a partial multi-jump
-      if (data.move.endTurn !== false) {
-        this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
-      }
-    });
+    this.socket.checkersMove$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        if (this.gameScene) {
+          try {
+            this.gameScene.handleOpponentMove(data.move);
+          } catch (error) {
+          }
+        }
+        // Only switch turn if the move was NOT a partial multi-jump
+        if (data.move.endTurn !== false) {
+          this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
+        }
+      });
 
-    this.socket.checkersChat$.subscribe(data => {
-      this.chatMessages.update(msgs => [...msgs, { ...data, id: 'checkers_' + Date.now() }]);
-      setTimeout(() => this.scrollToBottom(), 100);
-    });
+    this.socket.checkersChat$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chatMessages.update(msgs => [...msgs, { ...data, id: 'checkers_' + Date.now() }]);
+        setTimeout(() => this.scrollToBottom(), 100);
+      });
 
-    this.socket.translationResult$.subscribe(data => {
-      this.chatMessages.update(msgs => msgs.map(m =>
-        m.id === data.messageId ? { ...m, translatedText: data.translatedText } : m
-      ));
-    });
+    this.socket.translationResult$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.chatMessages.update(msgs => msgs.map(m =>
+          m.id === data.messageId ? { ...m, translatedText: data.translatedText } : m
+        ));
+      });
 
-    this.socket.checkersGameOver$.subscribe(data => {
-      this.onGameOver(data.winnerId);
-    });
+    this.socket.checkersGameOver$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        this.onGameOver(data.winnerId);
+      });
 
-    this.socket.checkersError$.subscribe(err => {
-      alert(err.message);
-      this.waitingForInviteTo.set(null);
-    });
+    this.socket.checkersError$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(err => {
+        alert(err.message);
+        this.waitingForInviteTo.set(null);
+      });
 
-    this.socket.checkersRejected$.subscribe(() => {
+    this.socket.checkersRejected$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.waitingForInviteTo.set(null);
+      });
 
-      this.waitingForInviteTo.set(null);
-
-    });
-
-
-
-    this.socket.partnerLeft$.subscribe(() => {
-      if (this.gameStarted()) {
-        this.onGameOver(this.currentUserId);
-      }
-    });
+    this.socket.partnerLeft$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.gameStarted()) {
+          this.onGameOver(this.currentUserId);
+        }
+      });
 
     // Checkers Cancelled (sender cancelled their invite)
-    this.socket.checkersCancelled$.subscribe(() => {
-      this.invitation.set(null);
-    });
+    this.socket.checkersCancelled$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.invitation.set(null);
+      });
   }
 
   // Placeholder for partner name logic - should be updated based on opponent data
@@ -682,9 +707,14 @@ export class CheckersComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+
     if (this.phaserGame) {
       this.phaserGame.destroy(true);
     }
+    this.gameScene = undefined; // Clear reference
+
     if (this.roomId()) {
       this.socket.leaveChat(this.roomId());
     }
@@ -727,19 +757,28 @@ export class CheckersComponent implements OnInit, OnDestroy {
   }
 
   initGame(data: any) {
+    // Prevent duplicate initialization with SYNCHRONOUS flag
+    if (this.isInitializing || this.gameStarted()) {
+      return;
+    }
+
+    this.isInitializing = true; // Set immediately to block race conditions
+
     this.roomId.set(data.roomId);
     this.betAmount = Number(data.amount);
     this.redPlayerId.set(Number(data.players[0]));
     this.blackPlayerId.set(Number(data.players[1]));
     this.currentTurn.set(Number(data.turn));
 
-    console.log('Checkers Game Initialized:', {
-      roomId: this.roomId(),
-      red: this.redPlayerId(),
-      black: this.blackPlayerId(),
-      turn: this.currentTurn(),
-      me: this.currentUserId
-    });
+    // Explicitly join room to ensure socket membership
+    this.socket.emit('join_checkers_game', { roomId: this.roomId() });
+
+    // Destroy any existing game instance to prevent duplicates
+    if (this.phaserGame) {
+      this.phaserGame.destroy(true);
+      this.phaserGame = undefined;
+      this.gameScene = undefined;
+    }
 
     // Deduct coins first
     this.gamification.bet(this.betAmount, 'checkers').subscribe({
@@ -767,7 +806,7 @@ export class CheckersComponent implements OnInit, OnDestroy {
         }, 100);
       },
       error: (err) => {
-        console.error("Bet failed", err);
+        this.isInitializing = false; // Reset flag on error
         alert(this.lang.translate('ALERTS.INSUFFICIENT_COINS'));
         this.leaveGame(); // or just reset
       }
@@ -892,6 +931,7 @@ class CheckersScene extends Phaser.Scene {
   private mustJumpPieces: Set<string> = new Set(); // Stores "r,c" of pieces that MUST jump
   private multiJumpSource: { r: number, c: number } | null = null; // Track piece in middle of multi-jump
   private tileSize = 75; // 600 / 8
+  private sceneId = Math.random().toString(36).substring(7);
 
   constructor(component: CheckersComponent) {
     super('CheckersScene');
@@ -911,6 +951,7 @@ class CheckersScene extends Phaser.Scene {
   }
 
   initBoard() {
+
     // 8x8 Board. 0 is empty.
     // Red starts at rows 0-2 (top if player is black, bottom if player is red)
     // To make it simple, player 1 is always red (bottom), player 2 is black (top)
@@ -944,8 +985,6 @@ class CheckersScene extends Phaser.Scene {
         const isDark = (r + c) % 2 !== 0;
         this.graphics!.fillStyle(isDark ? 0x2d3748 : 0xf1f5f9);
         this.graphics!.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);
-
-        // Highlight valid moves or mandatory pieces could go here
       }
     }
 
@@ -955,10 +994,12 @@ class CheckersScene extends Phaser.Scene {
     this.kingLabels.forEach(l => l.destroy());
     this.kingLabels = [];
 
+
     for (let r = 0; r < 8; r++) {
       for (let c = 0; c < 8; c++) {
         const val = this.board[r][c];
         if (val !== 0) {
+
           const color = (val === 1 || val === 11) ? 0xef4444 : 0x111827;
           const piece = this.add.circle(c * this.tileSize + this.tileSize / 2, r * this.tileSize + this.tileSize / 2, this.tileSize * 0.4, color);
           piece.setStrokeStyle(4, 0xffffff, 0.5);
@@ -998,14 +1039,12 @@ class CheckersScene extends Phaser.Scene {
       // Enforce Multi-Jump Constraint
       if (this.multiJumpSource) {
         if (r !== this.multiJumpSource.r || c !== this.multiJumpSource.c) {
-          // Cannot select other pieces during multi-jump
           return;
         }
       }
 
       // Enforce Mandatory Jump Constraint
       if (this.mustJumpPieces.size > 0 && !this.mustJumpPieces.has(`${r},${c}`)) {
-        // Player trying to select a piece that cannot jump while others can
         return;
       }
 
@@ -1028,7 +1067,7 @@ class CheckersScene extends Phaser.Scene {
             endTurn = false;
             this.multiJumpSource = { r, c };
             this.selectedPiece = { r, c }; // Keep selected
-            this.updateMandatoryJumps(); // Re-calculate (should only contain this piece)
+            this.updateMandatoryJumps();
           }
         }
 
@@ -1042,8 +1081,6 @@ class CheckersScene extends Phaser.Scene {
 
         // Win check (Stalemate included)
         if (endTurn && this.checkWin()) {
-          // If I just finished my turn, and checkWin returns true, it means the opponent (now current turn) has lost/no moves
-          // However, checkWin logic below needs to verify if the opponent has pieces/moves
           this.component.socket.sendCheckersGameOver(this.component.roomId(), this.component.currentUserId);
         }
       }
@@ -1051,6 +1088,9 @@ class CheckersScene extends Phaser.Scene {
   }
 
   isValidMove(from: { r: number, c: number }, to: { r: number, c: number }): boolean {
+    // Bounds check
+    if (to.r < 0 || to.r >= 8 || to.c < 0 || to.c >= 8) return false;
+
     if (this.board[to.r][to.c] !== 0) return false; // Target must be empty
     if ((to.r + to.c) % 2 === 0) return false; // Must be dark square
 
@@ -1069,6 +1109,10 @@ class CheckersScene extends Phaser.Scene {
     if (dx === 2 && Math.abs(dy) === 2) {
       const midR = from.r + dy / 2;
       const midC = from.c + (to.c - from.c) / 2;
+
+      // Bounds check for mid too
+      if (midR < 0 || midR >= 8 || midC < 0 || midC >= 8) return false;
+
       const midVal = this.board[midR][midC];
       if (midVal === 0) return false;
 
