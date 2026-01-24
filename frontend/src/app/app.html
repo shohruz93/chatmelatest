@@ -5,15 +5,15 @@
 <div class="modal-overlay" (click)="closeExitModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h3>Exit App</h3>
+            <h3>{{ 'MODALS.EXIT_APP' | translate }}</h3>
             <button class="modal-close" (click)="closeExitModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <p class="request-message">Are you sure you want to exit from the app?</p>
+            <p class="request-message">{{ 'MODALS.EXIT_CONFIRM' | translate }}</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-reject" (click)="closeExitModal()">Cancel</button>
-            <button class="btn-accept" (click)="confirmExit()">Exit</button>
+            <button class="btn-reject" (click)="closeExitModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+            <button class="btn-accept" (click)="confirmExit()">{{ 'MODALS.EXIT' | translate }}</button>
         </div>
     </div>
 </div>
@@ -24,7 +24,7 @@
 <div class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>New Chat Request</h3>
+            <h3>{{ 'MODALS.NEW_REQUEST' | translate }}</h3>
         </div>
         <div class="modal-body">
             <div class="request-user-info">
@@ -37,14 +37,14 @@
                 }
                 <div class="request-details">
                     <h4>{{ incomingRequest.name }}</h4>
-                    <p class="request-meta">Wants to chat with you</p>
+                    <p class="request-meta">{{ 'MODALS.WANTS_TO_CHAT' | translate }}</p>
                 </div>
             </div>
-            <p class="request-message">Would you like to accept this chat request?</p>
+            <p class="request-message">{{ 'MODALS.ACCEPT_QUESTION' | translate }}</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-reject" (click)="rejectChatRequest()">Decline</button>
-            <button class="btn-accept" (click)="acceptChatRequest()">Accept</button>
+            <button class="btn-reject" (click)="rejectChatRequest()">{{ 'CHAT.DECLINE' | translate }}</button>
+            <button class="btn-accept" (click)="acceptChatRequest()">{{ 'CHAT.ACCEPT' | translate }}</button>
         </div>
     </div>
 </div>

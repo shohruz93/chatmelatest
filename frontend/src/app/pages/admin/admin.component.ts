@@ -6,10 +6,12 @@ import { AuthService } from '../../services/auth.service';
 import { AppVersionService } from '../../services/app-version.service';
 import { Observable } from 'rxjs';
 
+import { TranslatePipe } from '../../pipes/translate.pipe';
+
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })

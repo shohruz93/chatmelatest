@@ -25,7 +25,7 @@
         </svg>
         {{ 'EXPLORE_PAGE.FILTERS' | translate }}
       </h2>
-      <button class="reset-btn" (click)="toggleFilterPanel()">Close</button>
+      <button class="reset-btn" (click)="toggleFilterPanel()">{{ 'EXPLORE_PAGE.CLOSE_FILTERS' | translate }}</button>
     </div>
 
     <div class="filter-section">
@@ -134,8 +134,9 @@
   <main class="explore-content">
     <div class="explore-header">
       <div class="header-content">
-        <h1>Explore Users</h1>
-        <p class="user-count">{{ filteredUsers.length }} {{ filteredUsers.length === 1 ? 'user' : 'users' }} found</p>
+        <h1>{{ 'EXPLORE_PAGE.TITLE' | translate }}</h1>
+        <p class="user-count">{{ filteredUsers.length === 1 ? ('EXPLORE_PAGE.USER_FOUND' | translate: {count:
+          filteredUsers.length}) : ('EXPLORE_PAGE.USERS_FOUND' | translate: {count: filteredUsers.length}) }}</p>
       </div>
       <button class="connect-random-btn" (click)="connectRandomly()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -153,13 +154,13 @@
     <div class="p-4 mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700" style="margin-bottom: 20px;">
       <div class="flex justify-between items-center">
         <div>
-          <p class="font-bold">Update Available!</p>
-          <p>Version {{ updateAvailable().version }} is ready to install.</p>
+          <p class="font-bold">{{ 'EXPLORE_PAGE.UPDATE_AVAILABLE' | translate }}</p>
+          <p>{{ 'EXPLORE_PAGE.UPDATE_READY' | translate: {version: updateAvailable().version} }}</p>
           <p class="text-sm mt-1" *ngIf="updateAvailable().release_notes">{{ updateAvailable().release_notes }}</p>
         </div>
         <a href="#" (click)="downloadUpdate($event)"
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Update Now
+          {{ 'EXPLORE_PAGE.UPDATE_NOW' | translate }}
         </a>
       </div>
     </div>

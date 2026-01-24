@@ -1,22 +1,22 @@
 <div class="container mx-auto p-4" *ngIf="isAdmin">
-  <h1 class="text-2xl font-bold mb-4">Admin Panel</h1>
+  <h1 class="text-2xl font-bold mb-4">{{ 'ADMIN_PANEL.TITLE' | translate }}</h1>
 
 
 
   <div *ngIf="usersResponse$ | async as usersResponse">
     <div class="mb-4">
-      <input type="text" placeholder="Search users..." class="p-2 border rounded w-full">
+      <input type="text" [placeholder]="'ADMIN_PANEL.SEARCH_PLACEHOLDER' | translate" class="p-2 border rounded w-full">
     </div>
 
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white">
         <thead class="bg-gray-800 text-white">
           <tr>
-            <th class="w-1/6 py-2 px-4 text-left">ID</th>
-            <th class="w-1/4 py-2 px-4 text-left">Name</th>
-            <th class="w-1/4 py-2 px-4 text-left">Email</th>
-            <th class="w-1/6 py-2 px-4 text-left">Admin</th>
-            <th class="w-1/6 py-2 px-4 text-left">Actions</th>
+            <th class="w-1/6 py-2 px-4 text-left">{{ 'ADMIN_PANEL.TABLE.ID' | translate }}</th>
+            <th class="w-1/4 py-2 px-4 text-left">{{ 'ADMIN_PANEL.TABLE.NAME' | translate }}</th>
+            <th class="w-1/4 py-2 px-4 text-left">{{ 'ADMIN_PANEL.TABLE.EMAIL' | translate }}</th>
+            <th class="w-1/6 py-2 px-4 text-left">{{ 'ADMIN_PANEL.TABLE.ADMIN' | translate }}</th>
+            <th class="w-1/6 py-2 px-4 text-left">{{ 'ADMIN_PANEL.TABLE.ACTIONS' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -24,11 +24,12 @@
             <td class="py-2 px-4">{{ user.id }}</td>
             <td class="py-2 px-4">{{ user.name }}</td>
             <td class="py-2 px-4">{{ user.email }}</td>
-            <td class="py-2 px-4">{{ user.is_admin ? 'Yes' : 'No' }}</td>
+            <td class="py-2 px-4">{{ user.is_admin ? ('ADMIN_PANEL.TABLE.YES' | translate) : ('ADMIN_PANEL.TABLE.NO' |
+              translate) }}</td>
             <td class="py-2 px-4">
               <button (click)="banUser(user.id)"
                 class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Ban
+                {{ 'ADMIN_PANEL.TABLE.BAN' | translate }}
               </button>
             </td>
           </tr>
@@ -37,22 +38,23 @@
     </div>
 
     <div class="mt-4 flex justify-between items-center">
-      <p>Page {{ usersResponse.page }} of {{ usersResponse.pages }}</p>
+      <p>{{ 'ADMIN_PANEL.PAGINATION.PAGE_OF' | translate: { page: usersResponse.page, pages: usersResponse.pages } }}
+      </p>
       <div class="flex">
         <button [disabled]="usersResponse.page <= 1"
           class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l">
-          Prev
+          {{ 'ADMIN_PANEL.PAGINATION.PREV' | translate }}
         </button>
         <button [disabled]="usersResponse.page >= usersResponse.pages"
           class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r">
-          Next
+          {{ 'ADMIN_PANEL.PAGINATION.NEXT' | translate }}
         </button>
       </div>
     </div>
   </div>
 
   <div *ngIf="!(usersResponse$ | async)">
-    <p>Loading users...</p>
+    <p>{{ 'ADMIN_PANEL.LOADING' | translate }}</p>
   </div>
 
 
@@ -60,5 +62,5 @@
 
 </div>
 <div *ngIf="!isAdmin">
-  <p>You are not authorized to view this page.</p>
+  <p>{{ 'ADMIN_PANEL.UNAUTHORIZED' | translate }}</p>
 </div>

@@ -9,10 +9,12 @@ import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
 import { App as NativeApp } from '@capacitor/app';
 
+import { TranslatePipe } from './pipes/translate.pipe';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, CommonModule, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

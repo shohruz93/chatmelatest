@@ -5,87 +5,78 @@
 
     <main class="content">
         <section class="hero-section">
-            <h1 class="page-title">About Chatme</h1>
-            <p class="page-subtitle">Breaking barriers, building connections</p>
+            <h1 class="page-title">{{ 'ABOUT_PAGE.TITLE' | translate }}</h1>
+            <p class="page-subtitle">{{ 'ABOUT_PAGE.SUBTITLE' | translate }}</p>
         </section>
 
         <section class="about-content">
             <div class="about-section">
-                <h2 class="section-title">Our Mission</h2>
+                <h2 class="section-title">{{ 'ABOUT_PAGE.MISSION_TITLE' | translate }}</h2>
                 <p class="section-text">
-                    Chatme was created with a simple yet powerful vision: to connect people from all walks of life,
-                    regardless of language or location. We believe that meaningful conversations can happen anywhere,
-                    at any time, between anyone.
+                    {{ 'ABOUT_PAGE.MISSION_DESC' | translate }}
                 </p>
             </div>
 
             <div class="about-section">
-                <h2 class="section-title">What We Do</h2>
+                <h2 class="section-title">{{ 'ABOUT_PAGE.WHAT_WE_DO_TITLE' | translate }}</h2>
                 <p class="section-text">
-                    We provide a platform for spontaneous, real-time conversations with people around the world.
-                    Our smart matching algorithm connects you with individuals who share your interests, while our
-                    advanced translation technology ensures that language is never a barrier to connection.
+                    {{ 'ABOUT_PAGE.WHAT_WE_DO_DESC' | translate }}
                 </p>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number">50K+</div>
-                    <div class="stat-label">Active Users</div>
+                    <div class="stat-label">{{ 'ABOUT_PAGE.STATS.USERS' | translate }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">100+</div>
-                    <div class="stat-label">Countries</div>
+                    <div class="stat-label">{{ 'ABOUT_PAGE.STATS.COUNTRIES' | translate }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">1M+</div>
-                    <div class="stat-label">Conversations</div>
+                    <div class="stat-label">{{ 'ABOUT_PAGE.STATS.CONVERSATIONS' | translate }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">30+</div>
-                    <div class="stat-label">Languages</div>
+                    <div class="stat-label">{{ 'ABOUT_PAGE.STATS.LANGUAGES' | translate }}</div>
                 </div>
             </div>
 
             <div class="about-section">
-                <h2 class="section-title">Our Values</h2>
+                <h2 class="section-title">{{ 'ABOUT_PAGE.VALUES_TITLE' | translate }}</h2>
                 <div class="values-grid">
                     <div class="value-item">
-                        <h3 class="value-title">🤝 Connection</h3>
-                        <p class="value-text">We believe in the power of human connection and authentic conversations.
+                        <h3 class="value-title">🤝 {{ 'ABOUT_PAGE.VALUES.CONNECTION' | translate }}</h3>
+                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.CONNECTION_DESC' | translate }}
                         </p>
                     </div>
                     <div class="value-item">
-                        <h3 class="value-title">🌍 Inclusivity</h3>
-                        <p class="value-text">Everyone deserves to be heard, regardless of where they're from or what
-                            language they speak.</p>
+                        <h3 class="value-title">🌍 {{ 'ABOUT_PAGE.VALUES.INCLUSIVITY' | translate }}</h3>
+                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.INCLUSIVITY_DESC' | translate }}</p>
                     </div>
                     <div class="value-item">
-                        <h3 class="value-title">🔒 Privacy</h3>
-                        <p class="value-text">Your privacy and security are our top priorities. We never share your
-                            data.</p>
+                        <h3 class="value-title">🔒 {{ 'ABOUT_PAGE.VALUES.PRIVACY' | translate }}</h3>
+                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.PRIVACY_DESC' | translate }}</p>
                     </div>
                     <div class="value-item">
-                        <h3 class="value-title">✨ Innovation</h3>
-                        <p class="value-text">We continuously improve our platform with cutting-edge technology and user
-                            feedback.</p>
+                        <h3 class="value-title">✨ {{ 'ABOUT_PAGE.VALUES.INNOVATION' | translate }}</h3>
+                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.INNOVATION_DESC' | translate }}</p>
                     </div>
                 </div>
             </div>
 
             <div class="about-section">
-                <h2 class="section-title">Join Our Community</h2>
+                <h2 class="section-title">{{ 'ABOUT_PAGE.JOIN_TITLE' | translate }}</h2>
                 <p class="section-text">
-                    Whether you're looking to practice a new language, make friends from around the world,
-                    or simply have interesting conversations with like-minded people, Chatme is here for you.
-                    Join thousands of users who are already breaking barriers and building connections.
+                    {{ 'ABOUT_PAGE.JOIN_DESC' | translate }}
                 </p>
-                <button class="btn-cta" routerLink="/login">Start Your Journey</button>
+                <button class="btn-cta" routerLink="/login">{{ 'ABOUT_PAGE.CTA' | translate }}</button>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <p>© 2025 Chatme. All rights reserved.</p>
+        <p>{{ 'ABOUT_PAGE.FOOTER' | translate }}</p>
     </footer>
 </div>

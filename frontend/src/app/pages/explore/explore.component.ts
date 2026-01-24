@@ -309,7 +309,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     applyFilters() {
-        this.filteredUsers = this.users.filter(user => {
+        const filtered = this.users.filter(user => {
             // Status filter
             if (this.filterStatus === 'online' && !user.isOnline) return false;
             if (this.filterStatus === 'offline' && user.isOnline) return false;
@@ -334,6 +334,51 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
             return true;
         });
+
+        this.filteredUsers = this.sortUsers(filtered);
+    }
+
+    sortUsers(users: UserProfile[]): UserProfile[] {
+        if (!this.currentUser) return this.shuffleArray(users);
+
+        const myLearning = this.getLanguagesArray(this.currentUser.learning_language);
+        if (myLearning.length === 0) return this.shuffleArray(users);
+
+        const matchNative: UserProfile[] = [];
+        const matchLearning: UserProfile[] = [];
+        const others: UserProfile[] = [];
+
+        // Shuffle first to ensure randomness within groups
+        const shuffled = this.shuffleArray([...users]);
+
+        shuffled.forEach(user => {
+            // Skip self if present (though loadUsers should handle it, good safety)
+            if (user.id === this.currentUser.id) return;
+
+            const userNative = this.getLanguagesArray(user.native_language);
+            const userLearning = this.getLanguagesArray(user.learning_language);
+
+            const isNativeMatch = userNative.some(l => myLearning.includes(l));
+            const isLearningMatch = userLearning.some(l => myLearning.includes(l));
+
+            if (isNativeMatch) {
+                matchNative.push(user);
+            } else if (isLearningMatch) {
+                matchLearning.push(user);
+            } else {
+                others.push(user);
+            }
+        });
+
+        return [...matchNative, ...matchLearning, ...others];
+    }
+
+    shuffleArray(array: any[]): any[] {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 
     onFilterChange() {

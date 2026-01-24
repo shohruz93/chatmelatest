@@ -316,7 +316,7 @@
                 <div class="avatar-large">
                     <img [src]="incomingRequest.avatar || 'default-avatar.png'" alt="User">
                 </div>
-                <h3>{{ incomingRequest.name || 'Anonymous' }}</h3>
+                <h3>{{ incomingRequest.name || ('COMMON.ANONYMOUS' | translate) }}</h3>
                 <p>{{ 'CHAT.REQUEST_DESC' | translate }}</p>
             </div>
             <div class="modal-footer">
@@ -343,8 +343,8 @@
             </div>
             <div class="modal-body center-content">
                 <div class="game-icon-large">🎮</div>
-                <h3>Checkers</h3>
-                <p>Checkers Game Invite</p>
+                <h3>{{ 'GAMES.CHECKERS' | translate }}</h3>
+                <p>{{ 'GAMES.CHECKERS_INVITE_DESC' | translate }}</p>
                 <div class="bet-info">{{ gameInvitation.amount }} 🪙</div>
             </div>
             <div class="modal-footer">

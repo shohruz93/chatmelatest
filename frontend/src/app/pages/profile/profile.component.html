@@ -469,11 +469,11 @@
             <div class="tab-navigation">
                 <button class="tab-btn" [class.active]="activeTab === 'rates'" (click)="setActiveTab('rates')">
                     <span class="tab-icon">⭐</span>
-                    <span>Rates</span>
+                    <span>{{ 'PROFILE.RATES' | translate }}</span>
                 </button>
                 <button class="tab-btn" [class.active]="activeTab === 'gallery'" (click)="setActiveTab('gallery')">
                     <span class="tab-icon">🖼️</span>
-                    <span>Gallery</span>
+                    <span>{{ 'PROFILE.GALLERY' | translate }}</span>
                 </button>
             </div>
         </div>
@@ -686,8 +686,8 @@
     </div>
 
     <!-- Logout Confirmation Dialog -->
-    <app-confirm-dialog [isOpen]="showLogoutDialog" title="Logout"
-        message="Are you sure you want to logout? You'll need to sign in again to access your account."
-        confirmText="Logout" cancelText="Stay" confirmButtonClass="btn-danger" icon="🚪" (confirmed)="confirmLogout()"
-        (cancelled)="cancelLogout()"></app-confirm-dialog>
+    <app-confirm-dialog [isOpen]="showLogoutDialog" [title]="'PROFILE.LOGOUT_CONFIRM_TITLE' | translate"
+        [message]="'PROFILE.LOGOUT_CONFIRM_MESSAGE' | translate" [confirmText]="'NAV.LOGOUT' | translate"
+        [cancelText]="'PROFILE.STAY' | translate" confirmButtonClass="btn-danger" icon="🚪"
+        (confirmed)="confirmLogout()" (cancelled)="cancelLogout()"></app-confirm-dialog>
 </div>
