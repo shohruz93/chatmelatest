@@ -386,7 +386,7 @@ class CommunityController {
     /**
      * Increment view count for a post
      */
-    public function viewPost() {
+    public function viewPost($userId = null) {
         $data = json_decode(file_get_contents('php://input'), true);
         $postId = $data['postId'] ?? null;
 
@@ -396,9 +396,41 @@ class CommunityController {
             return;
         }
 
+        // If no user ID provided (e.g. guest), just increment (or maybe we shouldn't? For now allowing it but ideally we track by API consumer IP or something if needed, but request was for per user)
+        // If user ID is provided, check throttling
+        if ($userId) {
+            $now = TimestampHelper::now();
+            // Get start of today (midnight)
+            // Assuming TimestampHelper::now() returns unix timestamp. 
+            // We can just use PHP's date/strtotime relative to that or just simple math if we ignore timezones for simplicity, 
+            // but better to respect local time or UTC. Let's assume UTC for backend consistency.
+            // Actually, simpler: check if a record exists for this user/post within the last 24 hours? 
+            // Or "one time per day" usually means calendar day.
+            // Let's go with: check if record exists created > start of today.
+            
+            $startOfToday = strtotime("today midnight", $now); 
+            
+            // Check if already viewed today
+            $stmt = $this->db->prepare("
+                SELECT id FROM community_post_views 
+                WHERE user_id = ? AND post_id = ? AND created_at >= ?
+                LIMIT 1
+            ");
+            $stmt->execute([$userId, $postId, $startOfToday]);
+            if ($stmt->fetch()) {
+                // Already viewed today
+                echo json_encode(['success' => true, 'viewed' => false]);
+                return;
+            }
+
+            // Record new view
+            $stmt = $this->db->prepare("INSERT INTO community_post_views (user_id, post_id, created_at) VALUES (?, ?, ?)");
+            $stmt->execute([$userId, $postId, $now]);
+        }
+
         $stmt = $this->db->prepare("UPDATE community_posts SET views_count = views_count + 1 WHERE id = ?");
         $stmt->execute([$postId]);
 
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'viewed' => true]);
     }
 }

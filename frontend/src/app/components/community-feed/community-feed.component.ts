@@ -194,7 +194,9 @@ export class CommunityFeedComponent implements OnInit {
     trackView(post: CommunityPost) {
         // Debounce view tracking or check if already seen in session if needed
         // For now, just fire and forget
-        this.communityService.viewPost(post.id).subscribe({
+        if (!this.currentUser?.id) return;
+
+        this.communityService.viewPost(this.currentUser.id, post.id).subscribe({
             next: () => {
                 this.posts.update(posts => posts.map(p => {
                     if (p.id === post.id) {

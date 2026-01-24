@@ -48,6 +48,10 @@
 .community-tab-content {
     flex: 1;
     padding: 0;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    width: 100%;
+    max-width: 100%;
 }
 
 .explore-container {
@@ -708,6 +712,17 @@
     .explore-container {
         flex-direction: column;
         padding: 1.5rem;
+        overflow-x: hidden;
+        /* Prevent horizontal scroll at medium screens */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .community-tab-content {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     .filter-sidebar {
@@ -724,6 +739,11 @@
 @media (max-width: 768px) {
     .explore-container {
         padding: 1rem;
+        overflow-x: hidden;
+        /* Prevent horizontal scroll */
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .explore-header h1 {

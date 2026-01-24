@@ -116,9 +116,9 @@ export class CommunityService {
         );
     }
 
-    viewPost(postId: number): Observable<any> {
+    viewPost(userId: number, postId: number): Observable<any> {
         return this.http.post(
-            `${this.apiUrl}/community/view`,
+            `${this.apiUrl}/community/view?userId=${userId}`,
             { postId },
             { headers: this.getHeaders() }
         );

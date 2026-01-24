@@ -49,5 +49,10 @@
     background-color: var(--bg-primary);
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+    /* Modern alternative to hidden for overflow-x */
+    position: relative;
   }
 }

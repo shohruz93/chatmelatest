@@ -522,7 +522,13 @@ $router->add('GET', '/community/user', function() use ($communityController) {
 });
 
 $router->add('POST', '/community/view', function() use ($communityController) {
-    $communityController->viewPost();
+    $data = json_decode(file_get_contents("php://input"), true);
+    // userId might be in query or body. CommunityService.ts puts it in body for other POSTs but let's check both or stick to standard.
+    // The previous implementation of viewPost() read from php://input which acts on body.
+    // My plan said "Update route /community/view to retrieve userId from $_GET (or request body)".
+    // Let's grab it from $_GET if available (as per my generic update pattern) or body.
+    $userId = $_GET['userId'] ?? null;
+    $communityController->viewPost($userId);
 });
 
 $router->add('POST', '/community/react', function() use ($communityController) {
