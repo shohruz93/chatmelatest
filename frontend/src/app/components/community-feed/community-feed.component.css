@@ -345,17 +345,30 @@
 }
 
 .btn-delete-post {
-    background: none;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
-    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-    padding: 4px;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 5;
+}
+
+.post-card:hover .btn-delete-post {
+    opacity: 1;
 }
 
 .btn-delete-post:hover {
-    opacity: 1;
+    background: #fee2e2;
     color: #ef4444;
 }
 

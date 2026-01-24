@@ -13,19 +13,19 @@
         <div class="filter-group">
             <button class="filter-chip" [class.active]="sortBy() === 'newest'" (click)="onSortChange('newest')">{{
                 'COMMUNITY.NEWEST' | translate }}</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'likes'"
-                (click)="onSortChange('likes')">Popular</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'comments'"
-                (click)="onSortChange('comments')">Discussed</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'views'"
-                (click)="onSortChange('views')">Seen</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'likes'" (click)="onSortChange('likes')">{{
+                'COMMUNITY.POPULAR' | translate }}</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'comments'" (click)="onSortChange('comments')">{{
+                'COMMUNITY.DISCUSSED' | translate }}</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'views'" (click)="onSortChange('views')">{{
+                'COMMUNITY.SEEN' | translate }}</button>
         </div>
         <div class="filter-group time-group">
             <select [ngModel]="timeRange()" (ngModelChange)="onTimeRangeChange($event)" class="time-select">
-                <option value="all">All Time</option>
-                <option value="month">This Month</option>
-                <option value="week">This Week</option>
-                <option value="day">Today</option>
+                <option value="all">{{ 'COMMUNITY.TIME_ALL' | translate }}</option>
+                <option value="month">{{ 'COMMUNITY.TIME_MONTH' | translate }}</option>
+                <option value="week">{{ 'COMMUNITY.TIME_WEEK' | translate }}</option>
+                <option value="day">{{ 'COMMUNITY.TIME_DAY' | translate }}</option>
             </select>
         </div>
     </div>
@@ -47,14 +47,14 @@
         <div class="empty-icon">📱</div>
         <h3>{{ 'COMMUNITY.NO_POSTS_YET' | translate }}</h3>
         <p>{{ 'COMMUNITY.BE_FIRST_TO_SHARE' | translate }}</p>
-        <button class="btn-primary" (click)="openCreateModal()">Create Post</button>
+        <button class="btn-primary" (click)="openCreateModal()">{{ 'COMMUNITY.CREATE_POST' | translate }}</button>
     </div>
     }
 
     <!-- Posts Feed -->
     <div class="posts-container">
         @for (post of posts(); track post.id) {
-        <div class="post-card" [id]="'post-' + post.id" (click)="handleDoubleTap(post)">
+        <div class="post-card" [id]="'post-' + post.id" [attr.data-post-id]="post.id" (click)="handleDoubleTap(post)">
             <div class="post-header">
                 <a [routerLink]="['/dashboard/profile', post.user_id]" class="post-author"
                     (click)="$event.stopPropagation()">
@@ -86,7 +86,8 @@
             </div>
             @if (post.show_translation) {
             <div class="translation-info">
-                <small>Translated to {{ languageService.currentLang() | uppercase }}</small>
+                <small>{{ 'COMMUNITY.TRANSLATED_TO' | translate }} {{ languageService.currentLang() | uppercase
+                    }}</small>
             </div>
             }
             }

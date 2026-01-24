@@ -44,6 +44,26 @@ export class LanguageService {
         return 'en';
     }
 
+    public get(key: string, params?: any): string {
+        const lang = this.currentLang();
+        const keys = key.split('.');
+        let value = this.translations[lang];
+
+        for (const k of keys) {
+            value = value?.[k];
+        }
+
+        if (!value) return key;
+
+        if (params) {
+            Object.keys(params).forEach(param => {
+                value = value.replace(`{{${param}}}`, params[param]);
+            });
+        }
+
+        return value;
+    }
+
     private translations: any = {
         'en': {
             'HOME': {
@@ -390,8 +410,26 @@ export class LanguageService {
                 'NO_COMMENTS_YET': 'No comments yet. Be the first!',
                 'WRITE_COMMENT': 'Write a comment...',
                 'SEND': 'Send',
-                'VIEW_ALL_COMMENTS': 'View all {{count}} comments',
-                'DELETE': 'Delete'
+                'DELETE': 'Delete',
+                'NEWEST': 'Newest',
+                'POPULAR': 'Popular',
+                'DISCUSSED': 'Discussed',
+                'SEEN': 'Seen',
+                'TIME_ALL': 'All Time',
+                'TIME_MONTH': 'This Month',
+                'TIME_WEEK': 'This Week',
+                'TIME_DAY': 'Today',
+                'ALERT_VIDEO_DURATION': 'Video must be 1 minute or less',
+                'ALERT_ENTER_TEXT': 'Please enter some text',
+                'ALERT_SELECT_FILE': 'Please select a file',
+                'ALERT_CREATE_FAILED': 'Failed to create post',
+                'ALERT_DELETE_CONFIRM': 'Delete this post?',
+                'ALERT_DELETE_FAILED': 'Failed to delete post',
+                'TRANSLATED_TO': 'Translated to',
+                'TIME_JUST_NOW': 'Just now',
+                'TIME_M_AGO': '{{count}}m ago',
+                'TIME_H_AGO': '{{count}}h ago',
+                'TIME_D_AGO': '{{count}}d ago'
             },
             'MISSIONS': {
                 'TITLE': 'Daily Missions',
@@ -674,8 +712,26 @@ export class LanguageService {
                 'NO_COMMENTS_YET': 'Пока нет комментариев. Будьте первым!',
                 'WRITE_COMMENT': 'Напишите комментарий...',
                 'SEND': 'Отправить',
-                'VIEW_ALL_COMMENTS': 'Посмотреть все {{count}} комментариев',
-                'DELETE': 'Удалить'
+                'DELETE': 'Удалить',
+                'NEWEST': 'Новые',
+                'POPULAR': 'Популярные',
+                'DISCUSSED': 'Обсуждаемые',
+                'SEEN': 'Просматриваемые',
+                'TIME_ALL': 'За все время',
+                'TIME_MONTH': 'За месяц',
+                'TIME_WEEK': 'За неделю',
+                'TIME_DAY': 'За сегодня',
+                'ALERT_VIDEO_DURATION': 'Видео должно быть 1 минуту или меньше',
+                'ALERT_ENTER_TEXT': 'Пожалуйста, введите текст',
+                'ALERT_SELECT_FILE': 'Пожалуйста, выберите файл',
+                'ALERT_CREATE_FAILED': 'Не удалось создать пост',
+                'ALERT_DELETE_CONFIRM': 'Удалить этот пост?',
+                'ALERT_DELETE_FAILED': 'Не удалось удалить пост',
+                'TRANSLATED_TO': 'Переведено на',
+                'TIME_JUST_NOW': 'Только что',
+                'TIME_M_AGO': '{{count}}м назад',
+                'TIME_H_AGO': '{{count}}ч назад',
+                'TIME_D_AGO': '{{count}}д назад'
             },
             'MISSIONS': {
                 'TITLE': 'Ежедневные миссии',
@@ -956,7 +1012,26 @@ export class LanguageService {
                 'WRITE_COMMENT': 'Шарҳ нависед...',
                 'SEND': 'Равон кардан',
                 'VIEW_ALL_COMMENTS': 'Ҳамаи {{count}} шарҳро дидан',
-                'DELETE': 'Нест кардан'
+                'DELETE': 'Нест кардан',
+                'NEWEST': 'Навтарин',
+                'POPULAR': 'Машҳур',
+                'DISCUSSED': 'Баҳсшуда',
+                'SEEN': 'Дидашуда',
+                'TIME_ALL': 'Ҳама вақт',
+                'TIME_MONTH': 'Ин моҳ',
+                'TIME_WEEK': 'Ин ҳафта',
+                'TIME_DAY': 'Имрӯз',
+                'ALERT_VIDEO_DURATION': 'Видео бояд 1 дақиқа ё камтар бошад',
+                'ALERT_ENTER_TEXT': 'Лутфан матн ворид кунед',
+                'ALERT_SELECT_FILE': 'Лутфан файл интихоб кунед',
+                'ALERT_CREATE_FAILED': 'Постро эҷод карда нашуд',
+                'ALERT_DELETE_CONFIRM': 'Ин постро нест мекунед?',
+                'ALERT_DELETE_FAILED': 'Постро нест карда нашуд',
+                'TRANSLATED_TO': 'Тарҷума ба',
+                'TIME_JUST_NOW': 'Ҳоло',
+                'TIME_M_AGO': '{{count}} дақ пеш',
+                'TIME_H_AGO': '{{count}} соат пеш',
+                'TIME_D_AGO': '{{count}} рӯз пеш'
             },
             'MISSIONS': {
                 'TITLE': 'Миссияҳои ҳаррӯза',

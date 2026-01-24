@@ -57,12 +57,47 @@ export class CommunityFeedComponent implements OnInit {
     private lastTap: number = 0;
     private readonly DOUBLE_TAP_DELAY = 300;
 
+    // View Tracking
+    private observedPosts = new Set<number>();
+    private viewObserver: IntersectionObserver | null = null;
+
     ngOnInit() {
         if (this.currentUser?.id) {
             this.communityStorage.openDb(this.currentUser.id).then(() => {
                 this.loadLocalFeed();
                 this.loadFeed(true);
             });
+        }
+        this.setupViewObserver();
+    }
+
+    ngOnDestroy() {
+        if (this.viewObserver) {
+            this.viewObserver.disconnect();
+        }
+    }
+
+    setupViewObserver() {
+        this.viewObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const postId = Number(entry.target.getAttribute('data-post-id'));
+                    if (postId && !this.observedPosts.has(postId)) {
+                        this.observedPosts.add(postId);
+                        this.trackView({ id: postId } as CommunityPost);
+                        // Optional: Stop observing once viewed
+                        // this.viewObserver?.unobserve(entry.target); 
+                    }
+                }
+            });
+        }, {
+            threshold: 0.5 // Trigger when 50% of the post is visible
+        });
+    }
+
+    observePost(element: Element) {
+        if (this.viewObserver) {
+            this.viewObserver.observe(element);
         }
     }
 
@@ -109,6 +144,12 @@ export class CommunityFeedComponent implements OnInit {
                 if (reset) {
                     this.communityStorage.savePosts(newPosts);
                 }
+
+                // Observe new posts after render
+                setTimeout(() => {
+                    const postElements = document.querySelectorAll('.post-card');
+                    postElements.forEach(el => this.observePost(el));
+                }, 100);
             },
             error: (err) => {
                 console.error('Failed to load feed', err);
@@ -153,7 +194,20 @@ export class CommunityFeedComponent implements OnInit {
     trackView(post: CommunityPost) {
         // Debounce view tracking or check if already seen in session if needed
         // For now, just fire and forget
-        this.communityService.viewPost(post.id).subscribe();
+        this.communityService.viewPost(post.id).subscribe({
+            next: () => {
+                this.posts.update(posts => posts.map(p => {
+                    if (p.id === post.id) {
+                        return {
+                            ...p,
+                            views_count: (p.views_count || 0) + 1
+                        };
+                    }
+                    return p;
+                }));
+            },
+            error: (err) => console.error('Failed to track view', err)
+        });
     }
 
     showHeartAnimation(post: CommunityPost) {
@@ -208,7 +262,7 @@ export class CommunityFeedComponent implements OnInit {
             video.onloadedmetadata = () => {
                 window.URL.revokeObjectURL(video.src);
                 if (video.duration > 60) {
-                    alert('Video must be 1 minute or less');
+                    alert(this.languageService.get('COMMUNITY.ALERT_VIDEO_DURATION'));
                     return;
                 }
                 this.videoDuration = Math.round(video.duration);
@@ -226,7 +280,7 @@ export class CommunityFeedComponent implements OnInit {
 
         if (this.postType === 'text') {
             if (!this.postText.trim()) {
-                alert('Please enter some text');
+                alert(this.languageService.get('COMMUNITY.ALERT_ENTER_TEXT'));
                 this.uploadProgress.set(false);
                 return;
             }
@@ -241,13 +295,13 @@ export class CommunityFeedComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Failed to create post', err);
-                    alert('Failed to create post');
+                    alert(this.languageService.get('COMMUNITY.ALERT_CREATE_FAILED'));
                     this.uploadProgress.set(false);
                 }
             });
         } else {
             if (!this.postFile) {
-                alert('Please select a file');
+                alert(this.languageService.get('COMMUNITY.ALERT_SELECT_FILE'));
                 this.uploadProgress.set(false);
                 return;
             }
@@ -274,7 +328,7 @@ export class CommunityFeedComponent implements OnInit {
                 },
                 error: (err) => {
                     console.error('Failed to create post', err);
-                    alert('Failed to create post');
+                    alert(this.languageService.get('COMMUNITY.ALERT_CREATE_FAILED'));
                     this.uploadProgress.set(false);
                     this.uploadPercent.set(0);
                 }
@@ -395,7 +449,7 @@ export class CommunityFeedComponent implements OnInit {
 
     deletePost(post: CommunityPost) {
         if (!this.currentUser?.id || post.user_id !== this.currentUser.id) return;
-        if (!confirm('Delete this post?')) return;
+        if (!confirm(this.languageService.get('COMMUNITY.ALERT_DELETE_CONFIRM'))) return;
 
         this.communityService.deletePost(this.currentUser.id, post.id).subscribe({
             next: () => {
@@ -404,7 +458,7 @@ export class CommunityFeedComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Failed to delete post', err);
-                alert('Failed to delete post');
+                alert(this.languageService.get('COMMUNITY.ALERT_DELETE_FAILED'));
             }
         });
     }
@@ -425,10 +479,10 @@ export class CommunityFeedComponent implements OnInit {
         const now = Math.floor(Date.now() / 1000);
         const diff = now - timestamp;
 
-        if (diff < 60) return 'Just now';
-        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-        if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+        if (diff < 60) return this.languageService.get('COMMUNITY.TIME_JUST_NOW');
+        if (diff < 3600) return this.languageService.get('COMMUNITY.TIME_M_AGO', { count: Math.floor(diff / 60) });
+        if (diff < 86400) return this.languageService.get('COMMUNITY.TIME_H_AGO', { count: Math.floor(diff / 3600) });
+        if (diff < 604800) return this.languageService.get('COMMUNITY.TIME_D_AGO', { count: Math.floor(diff / 86400) });
 
         const date = new Date(timestamp * 1000);
         return date.toLocaleDateString();

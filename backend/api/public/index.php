@@ -521,6 +521,10 @@ $router->add('GET', '/community/user', function() use ($communityController) {
     $communityController->getUserPosts($userId, $viewerId, $page, $limit);
 });
 
+$router->add('POST', '/community/view', function() use ($communityController) {
+    $communityController->viewPost();
+});
+
 $router->add('POST', '/community/react', function() use ($communityController) {
     $userId = $_GET['userId'] ?? 0;
     if (!$userId) {
