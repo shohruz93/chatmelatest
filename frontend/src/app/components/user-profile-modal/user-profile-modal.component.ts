@@ -6,13 +6,15 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { CountryService } from '../../services/country.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 import { LanguageService } from '../../services/language.service';
+import { GalleryService, GalleryImage } from '../../services/gallery.service';
 
 @Component({
     selector: 'app-user-profile-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslatePipe],
+    imports: [CommonModule, FormsModule, TranslatePipe, UnixDatePipe],
     templateUrl: './user-profile-modal.component.html',
     styleUrls: ['./user-profile-modal.component.css']
 })
@@ -25,6 +27,7 @@ export class UserProfileModalComponent implements OnInit {
     private auth = inject(AuthService);
     private countryService = inject(CountryService);
     public languageService = inject(LanguageService);
+    private galleryService = inject(GalleryService);
 
     currentUser: any;
     ratings: any = { average: 0, count: 0 };
@@ -36,6 +39,15 @@ export class UserProfileModalComponent implements OnInit {
     replyContent: { [key: number]: string } = {};
     showReplyInput: { [key: number]: boolean } = {};
     showReplies: { [key: number]: boolean } = {};
+
+    // Tab Navigation
+    activeTab: 'rates' | 'gallery' = 'rates';
+
+    // Gallery
+    galleryImages: GalleryImage[] = [];
+    showViewModal: boolean = false;
+    viewingImage: GalleryImage | null = null;
+    galleryLoading: boolean = false;
 
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
@@ -210,6 +222,75 @@ export class UserProfileModalComponent implements OnInit {
 
     toggleRepliesVisibility(commentId: number) {
         this.showReplies[commentId] = !this.showReplies[commentId];
+    }
+
+    // Tab Navigation
+    setActiveTab(tab: 'rates' | 'gallery') {
+        this.activeTab = tab;
+        if (tab === 'gallery' && this.galleryImages.length === 0) {
+            this.loadGallery();
+        }
+    }
+
+    // Gallery Methods
+    loadGallery() {
+        if (!this.user?.id) return;
+        this.galleryLoading = true;
+        this.galleryService.getGallery(this.user.id, this.currentUser?.id).subscribe({
+            next: (images) => {
+                this.galleryImages = images;
+                this.galleryLoading = false;
+            },
+            error: (err) => {
+                console.error('Failed to load gallery', err);
+                this.galleryLoading = false;
+            }
+        });
+    }
+
+    viewImage(image: GalleryImage) {
+        this.viewingImage = image;
+        this.showViewModal = true;
+    }
+
+    closeViewModal() {
+        this.showViewModal = false;
+        this.viewingImage = null;
+    }
+
+    reactToImage(image: GalleryImage, type: 'like' | 'dislike', event?: Event) {
+        if (event) event.stopPropagation();
+        if (!this.currentUser?.id) return;
+
+        this.galleryService.react(this.currentUser.id, image.id, type).subscribe({
+            next: (res) => {
+                image.likes_count = res.likes_count;
+                image.dislikes_count = res.dislikes_count;
+                image.user_liked = type === 'like' && !image.user_liked;
+                image.user_disliked = type === 'dislike' && !image.user_disliked;
+            },
+            error: (err) => console.error('Failed to react', err)
+        });
+    }
+
+    getGalleryImageUrl(path: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${this.api.phpBaseUrl}${path}`;
+    }
+
+    getGenderIcon(gender: string): string {
+        const icons: { [key: string]: string } = {
+            'male': '👨',
+            'female': '👩',
+            'other': '🧑',
+            '': ''
+        };
+        return icons[gender?.toLowerCase()] || '';
+    }
+
+    getCountryFlagUrl(countryName: string): string {
+        return this.countryService.getFlagUrl(countryName);
     }
 
     getAvatarColor(name: string): string {

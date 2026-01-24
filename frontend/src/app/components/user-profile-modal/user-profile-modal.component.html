@@ -8,128 +8,127 @@
             </svg>
         </button>
 
-        <div class="profile-header">
-            <div class="avatar-container">
-                <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
-                <div class="status-indicator" [class.online]="user.isOnline" [class.offline]="!user.isOnline"></div>
-            </div>
-
-            <h2 class="user-name">{{ user.name }}</h2>
-
-            <div class="user-status-info">
-                @if (user.isOnline) {
-                <span class="online-status">{{ 'CHAT.ONLINE' | translate }}</span>
-                } @else if (user.last_active) {
-                <span class="last-online">{{ 'PROFILE.LAST_ONLINE' | translate }}: {{
-                    getLastOnlineText(user.last_active) }}</span>
-                } @else {
-                <span class="offline-status">{{ 'CHAT.OFFLINE' | translate }}</span>
-                }
-            </div>
-
-            <div class="user-rating">
-                <span class="star">★</span>
-                <span class="rating-value">{{ ratings.average | number:'1.1-1' }}</span>
-                <span class="rating-count">({{ ratings.count }} {{ 'PROFILE.REVIEWS' | translate }})</span>
-            </div>
-
-            <div class="user-meta">
-                @if (user.location) {
-                <div class="meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="location-icon">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
-                        (error)="$event.target.style.display='none'" />
-                    <span>{{ getLocationLabel(user.location) }}</span>
+        <div class="profile-card">
+            <div class="avatar-section">
+                <div class="avatar-wrapper">
+                    <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name">
+                    <div class="status-indicator" [class.online]="user.isOnline" [class.offline]="!user.isOnline"></div>
                 </div>
-                }
-                @if (user.gender) {
-                <div class="meta-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span>{{ user.gender }}</span>
+            </div>
+
+            <div class="info-section">
+                <div class="view-mode">
+                    <h1 class="user-name">{{ user.name }}</h1>
+                    <div class="user-status-info">
+                        @if (user.isOnline) {
+                        <span class="online-status">{{ 'CHAT.ONLINE' | translate }}</span>
+                        } @else if (user.last_active) {
+                        <span class="last-online">{{ 'PROFILE.LAST_ONLINE' | translate }}: {{
+                            getLastOnlineText(user.last_active) }}</span>
+                        } @else {
+                        <span class="offline-status">{{ 'CHAT.OFFLINE' | translate }}</span>
+                        }
+                    </div>
+
+                    <div class="user-rating">
+                        <span class="star">★</span>
+                        <span class="rating-value">{{ ratings.average | number:'1.1-1' }}</span>
+                        <span class="rating-count">({{ ratings.count }} {{ 'PROFILE.REVIEWS' | translate }})</span>
+                    </div>
+
+                    @if (user.bio) {
+                    <div class="bio-section">
+                        <h3>{{ 'PROFILE.ABOUT' | translate }}</h3>
+                        <p class="bio-text">{{ user.bio }}</p>
+                    </div>
+                    }
+
+                    <div class="details-section">
+                        <h3>{{ 'PROFILE.DETAILS' | translate }}</h3>
+                        @if (user.gender) {
+                        <p><strong>{{ 'EXPLORE_PAGE.GENDER' | translate }}:</strong> {{ user.gender | titlecase }} {{
+                            getGenderIcon(user.gender) }}</p>
+                        }
+                        @if (user.location) {
+                        <p><strong>{{ 'EXPLORE_PAGE.LOCATION' | translate }}:</strong> <span class="location-inline">{{
+                                getLocationLabel(user.location) }} <img *ngIf="getFlagIcon(user.location)"
+                                    [src]="getFlagIcon(user.location)" [alt]="user.location + ' flag'"
+                                    class="country-flag-icon"></span></p>
+                        }
+
+                        <div class="language-display">
+                            <p><strong>{{ 'PROFILE.NATIVE' | translate }}:</strong>
+                                @if (getLanguageArray(user.native_language).length) {
+                                <span class="language-tags-view">
+                                    @for (code of getLanguageArray(user.native_language); track code) {
+                                    <span class="language-tag-view"><img *ngIf="getLanguageFlagUrl(code)"
+                                            [src]="getLanguageFlagUrl(code)" class="language-flag-icon-view">{{
+                                        getLanguageLabel(code) }}</span>
+                                    }
+                                </span>
+                                } @else {
+                                <span class="text-muted">{{ 'PROFILE.NOT_SPECIFIED' | translate }}</span>
+                                }
+                            </p>
+                            <p><strong>{{ 'PROFILE.LEARNING' | translate }}:</strong>
+                                @if (getLanguageArray(user.learning_language).length) {
+                                <span class="language-tags-view">
+                                    @for (code of getLanguageArray(user.learning_language); track code) {
+                                    <span class="language-tag-view"><img *ngIf="getLanguageFlagUrl(code)"
+                                            [src]="getLanguageFlagUrl(code)" class="language-flag-icon-view">{{
+                                        getLanguageLabel(code) }}</span>
+                                    }
+                                </span>
+                                } @else {
+                                <span class="text-muted">{{ 'PROFILE.NOT_SPECIFIED' | translate }}</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="interests-section">
+                        <h3>{{ 'PROFILE.INTERESTS' | translate }}</h3>
+                        @if (user.interests && user.interests.length) {
+                        <div class="interests-list">
+                            @for (interest of user.interests; track interest.id) {
+                            <span class="interest-tag">{{ interest.name || interest }}</span>
+                            }
+                        </div>
+                        } @else {
+                        <p class="no-interests">{{ 'PROFILE.NO_INTERESTS' | translate }}</p>
+                        }
+                    </div>
+
+                    <button class="btn-message" (click)="sendMessage()">
+                        <span class="message-icon">✉️</span> {{ 'PROFILE.SEND_MESSAGE' | translate }}
+                    </button>
                 </div>
-                }
             </div>
         </div>
 
-        <div class="profile-body">
-            @if (user.bio) {
-            <div class="section">
-                <h3 class="section-title">{{ 'PROFILE.ABOUT' | translate }}</h3>
-                <p class="bio-text">{{ user.bio }}</p>
+        <!-- Tab Navigation -->
+        <div class="profile-tabhost">
+            <div class="tab-navigation">
+                <button class="tab-btn" [class.active]="activeTab === 'rates'" (click)="setActiveTab('rates')">
+                    <span class="tab-icon">⭐</span>
+                    <span>{{ 'PROFILE.RATES' | translate }}</span>
+                </button>
+                <button class="tab-btn" [class.active]="activeTab === 'gallery'" (click)="setActiveTab('gallery')">
+                    <span class="tab-icon">🖼️</span>
+                    <span>{{ 'PROFILE.GALLERY' | translate }}</span>
+                </button>
             </div>
-            }
+        </div>
 
-            @if (user.native_language || user.learning_language) {
-            <div class="section">
-                <h3 class="section-title">{{ 'PROFILE.LANGUAGES' | translate }}</h3>
-                <div class="languages-grid">
-                    @if (user.native_language) {
-                    @for (lang of getLanguageArray(user.native_language); track lang) {
-                    <div class="lang-badge native">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lang-icon">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="2" y1="12" x2="22" y2="12"></line>
-                            <path
-                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
-                            </path>
-                        </svg>
-                        <span class="lang-type">{{ 'PROFILE.NATIVE' | translate }}</span>
-                        <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
-                            (error)="$event.target.style.display='none'" />
-                        {{ getLanguageLabel(lang) }}
-                    </div>
-                    }
-                    }
-                    @if (user.learning_language) {
-                    @for (lang of getLanguageArray(user.learning_language); track lang) {
-                    <div class="lang-badge learning">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lang-icon">
-                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                        </svg>
-                        <span class="lang-type">{{ 'PROFILE.LEARNING' | translate }}</span>
-                        <img [src]="getLanguageFlagUrl(lang)" [alt]="lang" class="lang-flag"
-                            (error)="$event.target.style.display='none'" />
-                        {{ getLanguageLabel(lang) }}
-                    </div>
-                    }
-                    }
-                </div>
-            </div>
-            }
-
-            @if (user.interests && user.interests.length > 0) {
-            <div class="section">
-                <h3 class="section-title">{{ 'PROFILE.INTERESTS' | translate }}</h3>
-                <div class="interests-grid">
-                    @for (interest of user.interests; track interest.id) {
-                    <div class="interest-chip">
-                        {{ interest.name }}
-                    </div>
-                    }
-                </div>
-            </div>
-            }
-
+        <!-- Tab Content -->
+        <div class="tab-content">
+            @if (activeTab === 'rates') {
             <!-- Comments & Ratings Section -->
-            @if (currentUser && currentUser.id !== user.id) {
             <div class="comments-section">
-                <h3 class="section-title">{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
+                <h3>{{ 'PROFILE.COMMENTS_RATINGS' | translate }}</h3>
 
-                <!-- Rating Form (only if user hasn't rated yet) -->
+                @if (currentUser && currentUser.id !== user.id) {
+                <!-- Rating form (only if user hasn't rated yet) -->
                 @if (!hasRated) {
                 <div class="add-rating-form">
                     <h4>{{ 'PROFILE.RATE_USER' | translate }}</h4>
@@ -138,25 +137,23 @@
                         <span class="star-input" [class.active]="star <= newRating" (click)="setRating(star)">★</span>
                         }
                     </div>
-                    <textarea [(ngModel)]="newComment" [placeholder]="'PROFILE.WRITE_COMMENT_OPTIONAL' | translate"
+                    <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
                         rows="3"></textarea>
                     <button class="btn-submit-rating" (click)="submitRating()" [disabled]="newRating === 0">{{
                         'PROFILE.SUBMIT_RATING' | translate }}</button>
                 </div>
-                }
-
-                <!-- Comment-only Form (if user has already rated) -->
-                @if (hasRated) {
+                } @else {
+                <!-- Comment-only form (if user has already rated) -->
                 <div class="add-comment-form">
                     <h4>{{ 'PROFILE.ADD_COMMENT' | translate }}</h4>
-                    <textarea [(ngModel)]="newComment" [placeholder]="'PROFILE.WRITE_COMMENT' | translate"
+                    <textarea [(ngModel)]="newComment" placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}"
                         rows="3"></textarea>
                     <button class="btn-submit-comment" (click)="submitComment()">{{ 'PROFILE.ADD_COMMENT_BTN' |
                         translate }}</button>
                 </div>
                 }
+                }
 
-                <!-- Comments List -->
                 <div class="comments-list">
                     @for (comment of comments; track comment.id) {
                     <div class="comment-card">
@@ -164,21 +161,17 @@
                             <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
                             <div class="comment-meta">
                                 <span class="comment-author">{{ comment.rater_name }}</span>
-                                @if (comment.rating && comment.rating > 0) {
                                 <span class="comment-rating">
                                     @for (star of [1,2,3,4,5]; track star) {
                                     <span class="star-display" [class.filled]="star <= comment.rating">★</span>
                                     }
                                 </span>
-                                }
-                                <span class="comment-date">{{ comment.created_at | date }}</span>
+                                <span class="comment-date">{{ comment.created_at | unixDate:'short' }}</span>
                             </div>
                         </div>
-                        @if (comment.comment) {
                         <div class="comment-body">
                             {{ comment.comment }}
                         </div>
-                        }
                         <div class="comment-actions">
                             <button class="btn-action" (click)="likeComment(comment.id, 'like')">
                                 👍 {{ comment.likes || 0 }}
@@ -186,36 +179,25 @@
                             <button class="btn-action" (click)="likeComment(comment.id, 'dislike')">
                                 👎 {{ comment.dislikes || 0 }}
                             </button>
-                            <button class="btn-action" (click)="toggleReply(comment.id, $event)">
-                                {{ showReplyInput[comment.id] ? ('COMMON.CANCEL' | translate) : ('PROFILE.REPLY' |
-                                translate) }}
+                            <button class="btn-action" (click)="toggleReply(comment.id)">{{ 'PROFILE.REPLY' | translate
+                                }}</button>
+                            @if (comment.replies?.length) {
+                            <button class="btn-action btn-toggle-replies" (click)="toggleRepliesVisibility(comment.id)">
+                                {{ showReplies[comment.id] ? '▲' : '▼' }} {{ comment.replies.length }} {{
+                                'PROFILE.REPLIES' | translate }}
                             </button>
+                            }
                         </div>
 
                         @if (showReplyInput[comment.id]) {
                         <div class="reply-input">
                             <input type="text" [(ngModel)]="replyContent[comment.id]"
-                                [placeholder]="'PROFILE.WRITE_COMMENT' | translate"
-                                (keyup.enter)="submitReply(comment.id)">
-                            <button (click)="submitReply(comment.id)" [disabled]="!replyContent[comment.id]?.trim()">{{
-                                'PROFILE.SEND' | translate }}</button>
+                                placeholder="{{ 'PROFILE.WRITE_COMMENT' | translate }}">
+                            <button (click)="submitReply(comment.id)">{{ 'PROFILE.SEND' | translate }}</button>
                         </div>
                         }
 
-                        @if (comment.replies?.length) {
-                        <button class="toggle-replies-btn" (click)="toggleRepliesVisibility(comment.id)">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" [class.rotated]="showReplies[comment.id]">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                            {{ showReplies[comment.id] ? ('PROFILE.HIDE' | translate) : ('PROFILE.SHOW' | translate) }}
-                            {{ comment.replies.length }} {{
-                            comment.replies.length === 1 ? ('PROFILE.REPLY_SINGULAR' | translate) : ('PROFILE.REPLIES' |
-                            translate) }}
-                        </button>
-
-                        @if (showReplies[comment.id]) {
+                        @if (comment.replies?.length && showReplies[comment.id]) {
                         <div class="replies-list">
                             @for (reply of comment.replies; track reply.id) {
                             <div class="reply-item">
@@ -228,7 +210,6 @@
                             }
                         </div>
                         }
-                        }
                     </div>
                     } @empty {
                     <p class="no-comments">{{ 'PROFILE.NO_COMMENTS' | translate }}</p>
@@ -236,17 +217,68 @@
                 </div>
             </div>
             }
+
+            @if (activeTab === 'gallery') {
+            <!-- Gallery Section -->
+            <div class="gallery-section">
+                <div class="gallery-header">
+                    <h3>{{ 'GALLERY.USER_GALLERY' | translate: {name: user.name} }}</h3>
+                </div>
+
+                @if (galleryLoading) {
+                <div class="loading-state">
+                    <div class="loader-large"></div>
+                    <p>{{ 'GALLERY.LOADING' | translate }}</p>
+                </div>
+                } @else if (galleryImages.length === 0) {
+                <div class="empty-gallery">
+                    <div class="empty-gallery-icon">🖼️</div>
+                    <h4>{{ 'GALLERY.NO_PHOTOS' | translate }}</h4>
+                </div>
+                } @else {
+                <div class="gallery-grid">
+                    @for (image of galleryImages; track image.id) {
+                    <div class="gallery-item" (click)="viewImage(image)">
+                        <img [src]="getGalleryImageUrl(image.image_path)" [alt]="image.caption || 'Gallery photo'">
+                        <div class="gallery-overlay">
+                            <div class="gallery-reactions">
+                                <button class="reaction-btn" [class.active]="image.user_liked"
+                                    (click)="reactToImage(image, 'like', $event)">
+                                    👍 {{ image.likes_count }}
+                                </button>
+                                <button class="reaction-btn" [class.active]="image.user_disliked"
+                                    (click)="reactToImage(image, 'dislike', $event)">
+                                    👎 {{ image.dislikes_count }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
         </div>
 
-        <div class="profile-footer">
-            <button class="send-msg-btn" (click)="sendMessage()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-                {{ 'PROFILE.SEND_MESSAGE' | translate }}
-            </button>
+        <!-- View Modal -->
+        @if (showViewModal && viewingImage) {
+        <div class="view-modal-overlay" (click)="closeViewModal()">
+            <div class="view-modal" (click)="$event.stopPropagation()">
+                <button class="view-modal-close" (click)="closeViewModal()">×</button>
+                <img [src]="getGalleryImageUrl(viewingImage.image_path)"
+                    [alt]="viewingImage.caption || 'Gallery photo'">
+                <div class="view-modal-reactions">
+                    <button class="reaction-btn" [class.active]="viewingImage.user_liked"
+                        (click)="reactToImage(viewingImage, 'like')">
+                        👍 {{ viewingImage.likes_count }}
+                    </button>
+                    <button class="reaction-btn" [class.active]="viewingImage.user_disliked"
+                        (click)="reactToImage(viewingImage, 'dislike')">
+                        👎 {{ viewingImage.dislikes_count }}
+                    </button>
+                </div>
+            </div>
         </div>
+        }
     </div>
 </div>
