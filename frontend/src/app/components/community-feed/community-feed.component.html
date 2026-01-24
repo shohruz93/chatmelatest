@@ -1,15 +1,40 @@
-<div class="community-feed">
-    <!-- Create Post Button -->
-    <div class="create-post-card" (click)="openCreateModal()">
-        <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
-        <div class="create-placeholder">{{ 'COMMUNITY.CREATE_POST_PLACEHOLDER' | translate }}</div>
-        <div class="create-icons">
-            <button class="add-btn">+</button>
+<!-- Create Post Button -->
+<div class="create-post-card" (click)="openCreateModal()">
+    <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
+    <div class="create-placeholder">{{ 'COMMUNITY.CREATE_POST_PLACEHOLDER' | translate }}</div>
+    <div class="create-icons">
+        <button class="add-btn">+</button>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar-container">
+    <div class="filter-bar">
+        <div class="filter-group">
+            <button class="filter-chip" [class.active]="sortBy() === 'newest'" (click)="onSortChange('newest')">{{
+                'COMMUNITY.NEWEST' | translate }}</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'likes'"
+                (click)="onSortChange('likes')">Popular</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'comments'"
+                (click)="onSortChange('comments')">Discussed</button>
+            <button class="filter-chip" [class.active]="sortBy() === 'views'"
+                (click)="onSortChange('views')">Seen</button>
+        </div>
+        <div class="filter-group time-group">
+            <select [ngModel]="timeRange()" (ngModelChange)="onTimeRangeChange($event)" class="time-select">
+                <option value="all">All Time</option>
+                <option value="month">This Month</option>
+                <option value="week">This Week</option>
+                <option value="day">Today</option>
+            </select>
         </div>
     </div>
+</div>
+
+<div class="community-feed no-scrollbar" (scroll)="onScroll($event)">
 
     <!-- Loading -->
-    @if (loading()) {
+    @if (loading() && page() === 1) {
     <div class="loading-state">
         <div class="spinner"></div>
         <p>{{ 'COMMUNITY.LOADING_POSTS' | translate }}</p>
@@ -22,15 +47,17 @@
         <div class="empty-icon">📱</div>
         <h3>{{ 'COMMUNITY.NO_POSTS_YET' | translate }}</h3>
         <p>{{ 'COMMUNITY.BE_FIRST_TO_SHARE' | translate }}</p>
+        <button class="btn-primary" (click)="openCreateModal()">Create Post</button>
     </div>
     }
 
     <!-- Posts Feed -->
     <div class="posts-container">
         @for (post of posts(); track post.id) {
-        <div class="post-card">
+        <div class="post-card" [id]="'post-' + post.id" (click)="handleDoubleTap(post)">
             <div class="post-header">
-                <a [routerLink]="['/dashboard/profile', post.user_id]" class="post-author">
+                <a [routerLink]="['/dashboard/profile', post.user_id]" class="post-author"
+                    (click)="$event.stopPropagation()">
                     <img [src]="getAvatarUrl(post.user_avatar)" class="author-avatar" alt="">
                     <div class="author-info">
                         <span class="author-name">{{ post.user_name }}</span>
@@ -38,7 +65,7 @@
                     </div>
                 </a>
                 @if (currentUser?.id === post.user_id) {
-                <button class="btn-delete-post" (click)="deletePost(post)"
+                <button class="btn-delete-post" (click)="deletePost(post); $event.stopPropagation()"
                     [title]="'COMMUNITY.DELETE' | translate">🗑️</button>
                 }
             </div>
@@ -48,7 +75,8 @@
             <div class="post-text">
                 {{ post.show_translation ? post.translated_text : post.text_content }}
 
-                <button class="translate-btn" (click)="translatePost(post)" [class.active]="post.show_translation">
+                <button class="translate-btn" (click)="translatePost(post); $event.stopPropagation()"
+                    [class.active]="post.show_translation">
                     @if (post.translating) {
                     <span class="spinner-small"></span>
                     } @else {
@@ -72,24 +100,30 @@
 
             @if (post.content_type === 'video' && post.media_path) {
             <div class="post-media">
-                <video [src]="getMediaUrl(post.media_path)" controls preload="metadata"></video>
+                <video [src]="getMediaUrl(post.media_path)" controls preload="metadata"
+                    (click)="$event.stopPropagation()"></video>
             </div>
             }
 
             <div class="post-actions">
-                <button class="action-btn" [class.liked]="post.user_liked" (click)="likePost(post)">
+                <button class="action-btn" [class.liked]="post.user_liked"
+                    (click)="likePost(post); $event.stopPropagation()">
                     <span class="action-icon">{{ post.user_liked ? '❤️' : '🤍' }}</span>
                     <span class="action-count">{{ post.likes_count }}</span>
                 </button>
-                <button class="action-btn" (click)="openComments(post)">
+                <button class="action-btn" (click)="openComments(post); $event.stopPropagation()">
                     <span class="action-icon">💬</span>
                     <span class="action-count">{{ post.comments_count }}</span>
                 </button>
+                <div class="view-count">
+                    <span class="action-icon">👁️</span>
+                    <span class="action-count">{{ post.views_count || 0 }}</span>
+                </div>
             </div>
 
             <!-- Recent Comments Preview -->
             @if (post.recent_comments && post.recent_comments.length > 0) {
-            <div class="comments-preview">
+            <div class="comments-preview" (click)="openComments(post); $event.stopPropagation()">
                 @for (comment of post.recent_comments.slice(0, 2); track comment.id) {
                 <div class="comment-item">
                     <span class="comment-author">{{ comment.user_name }}</span>
@@ -97,12 +131,18 @@
                 </div>
                 }
                 @if (post.comments_count > 2) {
-                <button class="view-all-comments" (click)="openComments(post)">
+                <button class="view-all-comments">
                     {{ 'COMMUNITY.VIEW_ALL_COMMENTS' | translate: {count: post.comments_count} }}
                 </button>
                 }
             </div>
             }
+        </div>
+        }
+
+        @if(isLoadingMore()) {
+        <div class="loading-more">
+            <div class="spinner-small"></div>
         </div>
         }
     </div>

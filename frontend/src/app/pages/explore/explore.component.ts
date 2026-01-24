@@ -58,7 +58,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     updateAvailable = signal<any>(null);
 
     // Tab Navigation
-    activeTab: 'users' | 'community' = 'users';
+    activeTab: 'users' | 'community' = 'community';
 
     // Filters
     filterStatus: string = 'any';

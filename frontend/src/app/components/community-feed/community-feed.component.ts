@@ -42,13 +42,26 @@ export class CommunityFeedComponent implements OnInit {
     uploadProgress = signal(false);
     uploadPercent = signal(0);
 
+    // Filter Signals
+    sortBy = signal<'newest' | 'likes' | 'comments' | 'views'>('newest');
+    timeRange = signal<'all' | 'day' | 'week' | 'month'>('all');
+
+    // Pagination
+    page = signal(1);
+    hasMore = signal(true);
+    isLoadingMore = signal(false);
+
     private apiUrl = environment.phpBaseUrl;
+
+    // Double tap constraints
+    private lastTap: number = 0;
+    private readonly DOUBLE_TAP_DELAY = 300;
 
     ngOnInit() {
         if (this.currentUser?.id) {
             this.communityStorage.openDb(this.currentUser.id).then(() => {
                 this.loadLocalFeed();
-                this.loadFeed();
+                this.loadFeed(true);
             });
         }
     }
@@ -61,19 +74,97 @@ export class CommunityFeedComponent implements OnInit {
         });
     }
 
-    loadFeed() {
-        this.loading.set(true);
-        this.communityService.getFeed(this.currentUser?.id).subscribe({
-            next: (posts) => {
-                this.posts.set(posts);
+    loadFeed(reset: boolean = false) {
+        if (this.loading() || (this.isLoadingMore() && !reset)) return;
+
+        if (reset) {
+            this.page.set(1);
+            this.hasMore.set(true);
+            this.loading.set(true);
+        } else {
+            this.isLoadingMore.set(true);
+        }
+
+        this.communityService.getFeed(
+            this.currentUser?.id,
+            this.page(),
+            10,
+            this.sortBy(),
+            this.timeRange()
+        ).subscribe({
+            next: (newPosts) => {
+                if (newPosts.length < 10) {
+                    this.hasMore.set(false);
+                }
+
+                if (reset) {
+                    this.posts.set(newPosts);
+                } else {
+                    this.posts.update(current => [...current, ...newPosts]);
+                }
+
                 this.loading.set(false);
-                this.communityStorage.savePosts(posts);
+                this.isLoadingMore.set(false);
+
+                if (reset) {
+                    this.communityStorage.savePosts(newPosts);
+                }
             },
             error: (err) => {
                 console.error('Failed to load feed', err);
                 this.loading.set(false);
+                this.isLoadingMore.set(false);
             }
         });
+    }
+
+    onSortChange(sort: string) {
+        this.sortBy.set(sort as any);
+        this.loadFeed(true);
+    }
+
+    onTimeRangeChange(range: string) {
+        this.timeRange.set(range as any);
+        this.loadFeed(true);
+    }
+
+    onScroll(event: any) {
+        const element = event.target;
+        if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
+            if (this.hasMore() && !this.isLoadingMore()) {
+                this.page.update(p => p + 1);
+                this.loadFeed();
+            }
+        }
+    }
+
+    handleDoubleTap(post: CommunityPost) {
+        const now = Date.now();
+        if (now - this.lastTap < this.DOUBLE_TAP_DELAY) {
+            this.likePost(post);
+            this.showHeartAnimation(post);
+        }
+        this.lastTap = now;
+
+        // Also track view
+        this.trackView(post);
+    }
+
+    trackView(post: CommunityPost) {
+        // Debounce view tracking or check if already seen in session if needed
+        // For now, just fire and forget
+        this.communityService.viewPost(post.id).subscribe();
+    }
+
+    showHeartAnimation(post: CommunityPost) {
+        const card = document.getElementById(`post-${post.id}`);
+        if (card) {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-animation');
+            heart.innerHTML = '❤️';
+            card.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
     }
 
     openCreateModal() {

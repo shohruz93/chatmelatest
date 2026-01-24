@@ -128,6 +128,32 @@ class CommunityController {
      */
     public function getFeed($viewerId = null, $page = 1, $limit = 20) {
         $offset = ($page - 1) * $limit;
+
+        $sort = $_GET['sort'] ?? 'newest';
+        $timeRange = $_GET['time_range'] ?? 'all';
+
+        $orderBy = "ORDER BY cp.created_at DESC";
+        if ($sort === 'likes') {
+            $orderBy = "ORDER BY cp.likes_count DESC, cp.created_at DESC";
+        } elseif ($sort === 'comments') {
+            $orderBy = "ORDER BY cp.comments_count DESC, cp.created_at DESC";
+        } elseif ($sort === 'views') {
+            $orderBy = "ORDER BY cp.views_count DESC, cp.created_at DESC";
+        }
+
+        $whereClause = "";
+        if ($timeRange !== 'all') {
+            $now = TimestampHelper::now();
+            $startTime = 0;
+            if ($timeRange === 'day') {
+                $startTime = $now - (24 * 60 * 60);
+            } elseif ($timeRange === 'week') {
+                $startTime = $now - (7 * 24 * 60 * 60);
+            } elseif ($timeRange === 'month') {
+                $startTime = $now - (30 * 24 * 60 * 60);
+            }
+            $whereClause = "WHERE cp.created_at >= " . $startTime;
+        }
         
         $stmt = $this->db->prepare("
             SELECT cp.*, 
@@ -137,7 +163,8 @@ class CommunityController {
             FROM community_posts cp
             JOIN users u ON cp.user_id = u.id
             LEFT JOIN community_reactions cr ON cp.id = cr.post_id AND cr.user_id = ?
-            ORDER BY cp.created_at DESC
+            $whereClause
+            $orderBy
             LIMIT ? OFFSET ?
         ");
         $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
@@ -162,6 +189,7 @@ class CommunityController {
 
         echo json_encode($posts);
     }
+
 
     /**
      * Get user's posts
@@ -351,6 +379,24 @@ class CommunityController {
 
         // Delete from database (cascades to reactions and comments)
         $stmt = $this->db->prepare("DELETE FROM community_posts WHERE id = ?");
+        $stmt->execute([$postId]);
+
+        echo json_encode(['success' => true]);
+    }
+    /**
+     * Increment view count for a post
+     */
+    public function viewPost() {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $postId = $data['postId'] ?? null;
+
+        if (!$postId) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Post ID required']);
+            return;
+        }
+
+        $stmt = $this->db->prepare("UPDATE community_posts SET views_count = views_count + 1 WHERE id = ?");
         $stmt->execute([$postId]);
 
         echo json_encode(['success' => true]);

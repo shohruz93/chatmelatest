@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS community_posts (
     video_duration INT DEFAULT 0 COMMENT 'Duration in seconds, max 60',
     likes_count INT DEFAULT 0,
     comments_count INT DEFAULT 0,
+    views_count INT DEFAULT 0,
     created_at INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_community_feed (created_at DESC),

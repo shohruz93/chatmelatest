@@ -15,6 +15,7 @@ export interface CommunityPost {
     video_duration: number;
     likes_count: number;
     comments_count: number;
+    views_count?: number;
     user_liked: boolean;
     recent_comments: CommunityComment[];
     created_at: number;
@@ -91,8 +92,8 @@ export class CommunityService {
         );
     }
 
-    getFeed(viewerId?: number, page: number = 1, limit: number = 20): Observable<CommunityPost[]> {
-        let url = `${this.apiUrl}/community/feed?page=${page}&limit=${limit}`;
+    getFeed(viewerId?: number, page: number = 1, limit: number = 20, sort: string = 'newest', timeRange: string = 'all'): Observable<CommunityPost[]> {
+        let url = `${this.apiUrl}/community/feed?page=${page}&limit=${limit}&sort=${sort}&time_range=${timeRange}`;
         if (viewerId) {
             url += `&viewerId=${viewerId}`;
         }
@@ -110,6 +111,14 @@ export class CommunityService {
     likePost(userId: number, postId: number): Observable<any> {
         return this.http.post(
             `${this.apiUrl}/community/react?userId=${userId}`,
+            { postId },
+            { headers: this.getHeaders() }
+        );
+    }
+
+    viewPost(postId: number): Observable<any> {
+        return this.http.post(
+            `${this.apiUrl}/community/view`,
             { postId },
             { headers: this.getHeaders() }
         );
