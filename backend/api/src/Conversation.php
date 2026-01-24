@@ -20,6 +20,8 @@ class Conversation {
                 u.avatar as partner_avatar, 
                 m.content as last_message, 
                 m.created_at as last_message_time,
+                m.sender_id as last_message_sender_id,
+                m.is_read as last_message_is_read,
                 (SELECT COUNT(*) FROM messages WHERE sender_id = u.id AND receiver_id = :user_id AND is_read = 0) as unread_count
             FROM users u
             JOIN (

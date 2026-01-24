@@ -462,3 +462,23 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
+
+.status-ticks {
+    display: inline-block;
+    margin-right: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.status-ticks .tick {
+    color: var(--text-muted);
+}
+
+.status-ticks .tick.double {
+    color: var(--primary-color, #8b5cf6);
+    letter-spacing: -2px;
+}
+
+.status-ticks .tick.single {
+    color: var(--text-muted);
+}

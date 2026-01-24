@@ -411,6 +411,17 @@ export class ChatService {
             };
         }
 
+        // Determine status: Prioritize explicit status, then is_read from DB, then fallback
+        let status = data.status;
+        if (!status) {
+            if (data.is_read !== undefined && data.is_read !== null) {
+                const isRead = data.is_read == 1 || data.is_read === true || data.is_read === '1';
+                status = isRead ? 'read' : (isSent ? 'sent' : 'read');
+            } else {
+                status = isSent ? 'sent' : 'read';
+            }
+        }
+
         return {
             id: String(data.id),
             roomId: data.roomId,
@@ -418,7 +429,7 @@ export class ChatService {
             content: content,
             createdAt: createdAt,
             type: isSent ? 'sent' : 'received',
-            status: data.status || 'read', // Default to 'read' for loaded messages
+            status: status,
             messageType: msgType,
             replyTo: processedReplyTo,
             originalLang: data.originalLang || data.original_lang,

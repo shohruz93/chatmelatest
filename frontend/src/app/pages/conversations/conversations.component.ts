@@ -83,6 +83,8 @@ export class ConversationsComponent implements OnInit, OnDestroy {
             const conv = this.conversations[index];
             conv.last_message = msg.content;
             conv.last_message_time = msg.createdAt || msg.created_at || Date.now();
+            conv.last_message_sender_id = msg.senderId || msg.sender_id;
+            conv.last_message_is_read = msg.is_read || (msg.status === 'read' ? 1 : 0);
 
             // Handle unread count:
             if (isSent) {

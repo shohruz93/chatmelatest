@@ -34,6 +34,15 @@
                     </div>
                     <div class="conversation-preview">
                         <p class="last-message" [class.unread]="conv.unread_count > 0">
+                            @if (conv.last_message_sender_id == currentUser?.id) {
+                            <span class="status-ticks">
+                                @if (conv.last_message_is_read == 1) {
+                                <span class="tick double">✓✓</span>
+                                } @else {
+                                <span class="tick single">✓</span>
+                                }
+                            </span>
+                            }
                             {{ getMessagePreview(conv.last_message) }}
                         </p>
                         @if (conv.unread_count > 0) {
