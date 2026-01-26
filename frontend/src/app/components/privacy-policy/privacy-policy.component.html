@@ -1,0 +1,35 @@
+<div class="privacy-policy-container">
+    <div class="privacy-policy-header">
+        <h1>{{ 'privacy.title' | translate }}</h1>
+        <p class="last-updated">{{ 'privacy.last_updated' | translate }}: January 26, 2026</p>
+    </div>
+
+    <div class="privacy-policy-content">
+        <div *ngFor="let section of sections" class="policy-section">
+            <h2>{{ section.title | translate }}</h2>
+            <p>{{ section.content | translate }}</p>
+        </div>
+
+        <div class="policy-section important-notice">
+            <h2>{{ 'privacy.important_notice' | translate }}</h2>
+            <p>{{ 'privacy.important_notice_desc' | translate }}</p>
+        </div>
+
+        <div class="policy-section contact-section">
+            <h2>{{ 'privacy.contact_us' | translate }}</h2>
+            <p>{{ 'privacy.contact_us_desc' | translate }}</p>
+            <p>
+                <strong>{{ 'privacy.email' | translate }}:</strong>
+                <a href="mailto:privacy@chatme.com">privacy@chatme.com</a>
+            </p>
+            <p>
+                <strong>{{ 'privacy.phone' | translate }}:</strong>
+                <a href="tel:+1234567890">+1 (234) 567-890</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="privacy-policy-footer">
+        <p>{{ 'privacy.footer_text' | translate }}</p>
+    </div>
+</div>

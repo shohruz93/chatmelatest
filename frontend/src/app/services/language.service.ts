@@ -518,6 +518,28 @@ export class LanguageService {
                 'NEW_REQUEST': 'New Chat Request',
                 'WANTS_TO_CHAT': 'Wants to chat with you',
                 'ACCEPT_QUESTION': 'Would you like to accept this chat request?'
+            },
+            'privacy': {
+                'title': 'Privacy Policy',
+                'intro': 'At Chatme, your privacy is our top priority. This Privacy Policy explains how we collect, use, and protect your personal information.',
+                'data_collection': 'Data Collection',
+                'data_collection_desc': 'We collect information you provide directly, such as your profile details, messages, and preferences. We also automatically collect certain information about your device and usage patterns to improve our service.',
+                'data_usage': 'Data Usage',
+                'data_usage_desc': 'Your data is used to provide and improve our services, personalize your experience, and communicate with you about updates and features. We never sell your personal information to third parties.',
+                'data_protection': 'Data Protection',
+                'data_protection_desc': 'We implement industry-standard security measures to protect your information from unauthorized access, alteration, and destruction. Your messages are encrypted to ensure your conversations remain private.',
+                'children_privacy': 'Children\'s Privacy',
+                'children_privacy_desc': 'Chatme is not intended for users under 13 years old. We do not knowingly collect personal information from children under 13. If we become aware of such collection, we will take steps to delete such information promptly.',
+                'user_rights': 'Your Rights',
+                'user_rights_desc': 'You have the right to access, update, or delete your personal information at any time. You can manage your privacy settings and control what information is shared with other users.',
+                'important_notice': 'Important Notice',
+                'important_notice_desc': 'Please read this Privacy Policy carefully. By using Chatme, you consent to the practices described in this policy. If you do not agree with our privacy practices, please do not use our service.',
+                'contact': 'Contact Us',
+                'contact_desc': 'If you have any questions about this Privacy Policy or our privacy practices, please contact us at privacy@chatme.app or through our support portal.',
+                'contact_us': 'Get in Touch',
+                'contact_us_desc': 'Have concerns about your privacy or want to exercise your rights? Reach out to our privacy team anytime. We are committed to responding to your requests within 30 days.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'ru': {
@@ -824,6 +846,28 @@ export class LanguageService {
             },
             'GAMIFICATION': {
                 'LEVEL_SHORT': 'Ур.'
+            },
+            'privacy': {
+                'title': 'Политика конфиденциальности',
+                'intro': 'В Chatme ваша приватность - наш главный приоритет. Эта Политика конфиденциальности объясняет, как мы собираем, используем и защищаем вашу личную информацию.',
+                'data_collection': 'Сбор данных',
+                'data_collection_desc': 'Мы собираем информацию, которую вы предоставляете напрямую, такую как детали профиля, сообщения и предпочтения. Мы также автоматически собираем определенную информацию о вашем устройстве и шаблонах использования для улучшения нашего сервиса.',
+                'data_usage': 'Использование данных',
+                'data_usage_desc': 'Ваши данные используются для предоставления и улучшения наших услуг, персонализации вашего опыта и общения с вами об обновлениях и функциях. Мы никогда не продаем вашу личную информацию третьим лицам.',
+                'data_protection': 'Защита данных',
+                'data_protection_desc': 'Мы применяем стандартные отраслевые меры безопасности для защиты вашей информации от несанкционированного доступа, изменения и уничтожения. Ваши сообщения зашифрованы, чтобы обеспечить конфиденциальность ваших беседы.',
+                'children_privacy': 'Приватность детей',
+                'children_privacy_desc': 'Chatme не предназначен для пользователей младше 13 лет. Мы не сознательно собираем личную информацию детей младше 13 лет. Если мы узнаем о такой информации, мы предпримем шаги по ее немедленному удалению.',
+                'user_rights': 'Ваши права',
+                'user_rights_desc': 'У вас есть право в любое время получать доступ, обновлять или удалять вашу личную информацию. Вы можете управлять настройками конфиденциальности и контролировать, какая информация передается другим пользователям.',
+                'important_notice': 'Важное уведомление',
+                'important_notice_desc': 'Пожалуйста, внимательно прочитайте эту Политику конфиденциальности. Используя Chatme, вы соглашаетесь с описанными здесь практиками. Если вы не согласны с нашей практикой конфиденциальности, пожалуйста, не используйте наш сервис.',
+                'contact': 'Свяжитесь с нами',
+                'contact_desc': 'Если у вас есть вопросы об этой Политике конфиденциальности или нашей практике конфиденциальности, свяжитесь с нами по адресу privacy@chatme.app или через наш портал поддержки.',
+                'contact_us': 'Свяжитесь с нами',
+                'contact_us_desc': 'Есть вопросы о конфиденциальности или хотите воспользоваться своими правами? Напишите в нашу команду конфиденциальности в любой момент. Мы обязуемся ответить на ваши запросы в течение 30 дней.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'tj': {
@@ -1128,6 +1172,28 @@ export class LanguageService {
             },
             'GAMIFICATION': {
                 'LEVEL_SHORT': 'Сатҳ'
+            },
+            'privacy': {
+                'title': 'Сиёсати махфият',
+                'intro': 'Дар Chatme махфияти шумо - аҳамияти бошави мо ест. Ин Сиёсати махфият мефаҳмонад, ки чӣ тавр мо маълумоти шахсии шуморо ҷамъ, истифода ва мусин мекунем.',
+                'data_collection': 'Ҷамъоварии маълумот',
+                'data_collection_desc': 'Мо маълумотеро ҷамъ мекунем, ки шумо бевосита фаҳмидаю, ба монанди тафсилоти профил, паёмҳо ва афзалиятҳо. Мо ҳамчунин маълумотро дар бораи дастгоҳ ва намунаҳои истифодаи худро ҷамъ мекунем, то хидматҳои худро бетар кунем.',
+                'data_usage': 'Истифодаи маълумот',
+                'data_usage_desc': 'Маълумоти шумо барои фаҳмидан ва бетар кардани хидматҳо, персоналсозии таҷрибаи шумо ва муносибатҳо бо шумо дар бораи ягон тавсияҳо истифода мешаванд. Мо ҳеҷгоҳ маълумоти шахсии шуморо ба шахсҳои сеюм намифурӯшем.',
+                'data_protection': 'Мусонаи маълумот',
+                'data_protection_desc': 'Мо тадбирҳои истифодаи анҷомҳоро амал мекунем, то маълумоти шуморо аз дастрасии беқонун, тағйир ва фасодҳо мусун кунем. Паёмҳои шумо рамзгузорӣ шудаанд, то махфияти сӯҳбатҳои шумо таъмин шавад.',
+                'children_privacy': 'Махфияти кӯдакон',
+                'children_privacy_desc': 'Chatme барои истифодаи кӯдакон зер 13 сол назад шудааст. Мо маълумоти шахсии кӯдакон зер 13 сол ҷамъ намекунем. Агар мо дарбораи чунин ҷамъоварӣ фаҳм кунем, мо қадамҳои нест кардани зуд таваккурон гиҳем.',
+                'user_rights': 'Ҳуқуқҳои шумо',
+                'user_rights_desc': 'Шумо ҳуқуқ доред, ки ҳар вақт маълумоти шахсии худро дастрас кунед, беҳтар кунед ё нест кунед. Шумо метавонед танзимоти махфиятро идора кунед ва назорат кунед, ки кадом маълумот бо корбарони дигар мубодила шавад.',
+                'important_notice': 'Огоҳии Муҳим',
+                'important_notice_desc': 'Лутфан ин Сиёсати махфиятро бидқиқӣ хонед. Бо истифодаи Chatme, шумо розӣ мешавед бо амалҳои дар ин сиёсат аз ҳама натиҷаҳо. Агар шумо бо амалҳои махфияти мо розӣ нашавед, лутфан хидматҳои мо-ро истифода намебаред.',
+                'contact': 'Бо мо робита гиред',
+                'contact_desc': 'Агар шумо дарбораи ин Сиёсати махфият ё амалҳои махфияти мо саволҳо доред, лутфан бо мо di privacy@chatme.app ё дар раҳи дастгирии мо робита гиред.',
+                'contact_us': 'Бо мо робита гиред',
+                'contact_us_desc': 'Оё шумо муштари-рӯбарӯ дар бораи махфияти худ доред ё мехоҳед ҳуқуқҳои худро амал гиред? Дар бармаҳал бо гурӯҳи махфияти мо робита гиред. Мо мутаҳаммил муроҷиатҳои худро дар доираи 30 рӯз мӯрди ҷавоб қарор дарок хоҳем.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'es': {
@@ -1402,6 +1468,28 @@ export class LanguageService {
             },
             'GAMIFICATION': {
                 'LEVEL_SHORT': 'Nvl'
+            },
+            'privacy': {
+                'title': 'Política de Privacidad',
+                'intro': 'En Chatme, tu privacidad es nuestra prioridad principal. Esta Política de Privacidad explica cómo recopilamos, utilizamos y protegemos tu información personal.',
+                'data_collection': 'Recopilación de Datos',
+                'data_collection_desc': 'Recopilamos información que proporcionas directamente, como detalles de perfil, mensajes y preferencias. También recopilamos automáticamente cierta información sobre tu dispositivo y patrones de uso para mejorar nuestro servicio.',
+                'data_usage': 'Uso de Datos',
+                'data_usage_desc': 'Tus datos se utilizan para proporcionar y mejorar nuestros servicios, personalizar tu experiencia y comunicarnos contigo sobre actualizaciones y características. Nunca vendemos tu información personal a terceros.',
+                'data_protection': 'Protección de Datos',
+                'data_protection_desc': 'Implementamos medidas de seguridad estándar de la industria para proteger tu información del acceso no autorizado, alteración y destrucción. Tus mensajes están encriptados para garantizar que tus conversaciones permanezcan privadas.',
+                'children_privacy': 'Privacidad de Menores',
+                'children_privacy_desc': 'Chatme no está destinado a usuarios menores de 13 años. No recopilamos intencionalmente información personal de menores de 13 años. Si nos enteramos de tal recopilación, tomaremos medidas para eliminar dicha información de inmediato.',
+                'user_rights': 'Tus Derechos',
+                'user_rights_desc': 'Tienes derecho a acceder, actualizar o eliminar tu información personal en cualquier momento. Puedes gestionar tu configuración de privacidad y controlar qué información se comparte con otros usuarios.',
+                'important_notice': 'Aviso Importante',
+                'important_notice_desc': 'Por favor, lee esta Política de Privacidad cuidadosamente. Al usar Chatme, consientes las prácticas descritas en esta política. Si no estás de acuerdo con nuestras prácticas de privacidad, por favor no uses nuestro servicio.',
+                'contact': 'Contáctanos',
+                'contact_desc': 'Si tienes alguna pregunta sobre esta Política de Privacidad o nuestras prácticas de privacidad, contáctanos en privacy@chatme.app o a través de nuestro portal de soporte.',
+                'contact_us': 'Ponte en Contacto',
+                'contact_us_desc': '¿Tienes preocupaciones sobre tu privacidad o quieres ejercer tus derechos? Comunícate con nuestro equipo de privacidad en cualquier momento. Nos comprometemos a responder tus solicitudes dentro de 30 días.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'ar': {
@@ -1602,6 +1690,28 @@ export class LanguageService {
                 'SEND': 'إرسال',
                 'VIEW_ALL_COMMENTS': 'عرض جميع التعليقات {{count}}',
                 'DELETE': 'حذف'
+            },
+            'privacy': {
+                'title': 'سياسة الخصوصية',
+                'intro': 'في Chatme، خصوصيتك هي أولويتنا الأساسية. توضح سياسة الخصوصية هذه كيفية جمع واستخدام وحماية معلوماتك الشخصية.',
+                'data_collection': 'جمع البيانات',
+                'data_collection_desc': 'نجمع المعلومات التي تقدمها مباشرة، مثل تفاصيل الملف الشخصي والرسائل والتفضيلات. نجمع أيضًا تلقائيًا معلومات معينة عن جهازك وأنماط الاستخدام لتحسين خدمتنا.',
+                'data_usage': 'استخدام البيانات',
+                'data_usage_desc': 'يتم استخدام بياناتك لتوفير وتحسين خدماتنا وتخصيص تجربتك والتواصل معك حول التحديثات والميزات. لا نبيع معلوماتك الشخصية أبدًا لأطراف ثالثة.',
+                'data_protection': 'حماية البيانات',
+                'data_protection_desc': 'نطبق تدابير أمان معايير الصناعة لحماية معلوماتك من الوصول والتعديل والتدمير غير المصرح به. يتم تشفير رسائلك لضمان بقاء محادثاتك خاصة.',
+                'children_privacy': 'خصوصية الأطفال',
+                'children_privacy_desc': 'Chatme غير مخصص لمستخدمي دون سن 13 سنة. نحن لا نجمع معلومات شخصية من الأطفال دون سن 13 سنة عن علم. إذا أدركنا هذا الجمع، سنتخذ خطوات لحذف هذه المعلومات على الفور.',
+                'user_rights': 'حقوقك',
+                'user_rights_desc': 'لديك الحق في الوصول إلى معلوماتك الشخصية أو تحديثها أو حذفها في أي وقت. يمكنك إدارة إعدادات الخصوصية والتحكم في المعلومات المشتركة مع المستخدمين الآخرين.',
+                'important_notice': 'إشعار مهم',
+                'important_notice_desc': 'يرجى قراءة سياسة الخصوصية هذه بعناية. باستخدام Chatme، فإنك توافق على الممارسات الموضحة في هذه السياسة. إذا كنت لا توافق على ممارسات الخصوصية لدينا، فيرجى عدم استخدام خدمتنا.',
+                'contact': 'اتصل بنا',
+                'contact_desc': 'إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه أو ممارسات الخصوصية لدينا، يرجى الاتصال بنا على privacy@chatme.app أو من خلال بوابة الدعم الخاصة بنا.',
+                'contact_us': 'تواصل معنا',
+                'contact_us_desc': 'هل لديك مخاوف بشأن خصوصيتك أو تريد ممارسة حقوقك؟ اتصل بفريق الخصوصية لدينا في أي وقت. نحن ملتزمون بالرد على طلباتك خلال 30 يومًا.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'fr': {
@@ -1802,6 +1912,28 @@ export class LanguageService {
                 'SEND': 'Envoyer',
                 'VIEW_ALL_COMMENTS': 'Voir tous les {{count}} commentaires',
                 'DELETE': 'Supprimer'
+            },
+            'privacy': {
+                'title': 'Politique de Confidentialité',
+                'intro': 'Chez Chatme, votre confidentialité est notre priorité absolue. Cette Politique de Confidentialité explique comment nous collectons, utilisons et protégeons vos informations personnelles.',
+                'data_collection': 'Collecte de Données',
+                'data_collection_desc': 'Nous collectons les informations que vous fournissez directement, telles que les détails de profil, les messages et les préférences. Nous collectons également automatiquement certaines informations sur votre appareil et vos modèles d\'utilisation pour améliorer notre service.',
+                'data_usage': 'Utilisation des Données',
+                'data_usage_desc': 'Vos données sont utilisées pour fournir et améliorer nos services, personnaliser votre expérience et communiquer avec vous concernant les mises à jour et les fonctionnalités. Nous ne vendons jamais vos informations personnelles à des tiers.',
+                'data_protection': 'Protection des Données',
+                'data_protection_desc': 'Nous mettons en œuvre des mesures de sécurité standard de l\'industrie pour protéger vos informations contre l\'accès, la modification et la destruction non autorisés. Vos messages sont chiffrés pour assurer la confidentialité de vos conversations.',
+                'children_privacy': 'Confidentialité des Enfants',
+                'children_privacy_desc': 'Chatme n\'est pas destiné aux utilisateurs de moins de 13 ans. Nous ne collectons pas intentionnellement d\'informations personnelles auprès des enfants de moins de 13 ans. Si nous en prenons connaissance, nous prendrons des mesures pour supprimer ces informations rapidement.',
+                'user_rights': 'Vos Droits',
+                'user_rights_desc': 'Vous avez le droit d\'accéder, de mettre à jour ou de supprimer vos informations personnelles à tout moment. Vous pouvez gérer vos paramètres de confidentialité et contrôler les informations partagées avec d\'autres utilisateurs.',
+                'important_notice': 'Avis Important',
+                'important_notice_desc': 'Veuillez lire attentivement cette Politique de Confidentialité. En utilisant Chatme, vous consentez aux pratiques décrites dans cette politique. Si vous ne convenez pas de nos pratiques en matière de confidentialité, veuillez ne pas utiliser notre service.',
+                'contact': 'Nous Contacter',
+                'contact_desc': 'Si vous avez des questions sur cette Politique de Confidentialité ou sur nos pratiques en matière de confidentialité, veuillez nous contacter à privacy@chatme.app ou via notre portail de support.',
+                'contact_us': 'Entrez en Contact',
+                'contact_us_desc': 'Avez-vous des préoccupations concernant votre confidentialité ou souhaitez-vous exercer vos droits ? Contactez notre équipe de confidentialité à tout moment. Nous nous engageons à répondre à vos demandes dans les 30 jours.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'de': {
@@ -1975,6 +2107,28 @@ export class LanguageService {
                 'SEND': 'Senden',
                 'VIEW_ALL_COMMENTS': 'Alle {{count}} Kommentare ansehen',
                 'DELETE': 'Löschen'
+            },
+            'privacy': {
+                'title': 'Datenschutzrichtlinie',
+                'intro': 'Bei Chatme ist deine Privatsphäre unsere oberste Priorität. Diese Datenschutzrichtlinie erklärt, wie wir deine persönlichen Daten sammeln, nutzen und schützen.',
+                'data_collection': 'Datenerfassung',
+                'data_collection_desc': 'Wir erfassen Informationen, die du direkt bereitstellst, wie Profildetails, Nachrichten und Voreinstellungen. Wir erfassen auch automatisch bestimmte Informationen über dein Gerät und Nutzungsmuster, um unseren Service zu verbessern.',
+                'data_usage': 'Datennutzung',
+                'data_usage_desc': 'Deine Daten werden verwendet, um unsere Services bereitzustellen und zu verbessern, dein Erlebnis zu personalisieren und dich über Updates und Features zu informieren. Wir verkaufen deine persönlichen Daten niemals an Dritte.',
+                'data_protection': 'Datenschutz',
+                'data_protection_desc': 'Wir setzen branchenübliche Sicherheitsmaßnahmen um, um deine Informationen vor unbefugtem Zugriff, Änderung und Zerstörung zu schützen. Deine Nachrichten sind verschlüsselt, um sicherzustellen, dass deine Konversationen privat bleiben.',
+                'children_privacy': 'Datenschutz von Kindern',
+                'children_privacy_desc': 'Chatme ist nicht für Nutzer unter 13 Jahren bestimmt. Wir erfassen bewusst keine persönlichen Daten von Kindern unter 13 Jahren. Sollten wir dies erfahren, werden wir Maßnahmen ergreifen, um diese Daten umgehend zu löschen.',
+                'user_rights': 'Deine Rechte',
+                'user_rights_desc': 'Du hast das Recht, jederzeit auf deine persönlichen Daten zuzugreifen, diese zu aktualisieren oder zu löschen. Du kannst deine Datenschutzeinstellungen verwalten und kontrollieren, welche Informationen mit anderen Nutzern geteilt werden.',
+                'important_notice': 'Wichtiger Hinweis',
+                'important_notice_desc': 'Bitte lies diese Datenschutzrichtlinie sorgfältig. Indem du Chatme nutzt, stimmst du den in dieser Richtlinie beschriebenen Praktiken zu. Wenn du unseren Datenschutzpraktiken nicht zustimmst, nutze bitte unseren Service nicht.',
+                'contact': 'Kontaktiere uns',
+                'contact_desc': 'Wenn du Fragen zu dieser Datenschutzrichtlinie oder unseren Datenschutzpraktiken hast, kontaktiere uns bitte unter privacy@chatme.app oder über unser Support-Portal.',
+                'contact_us': 'Nimm Kontakt mit uns auf',
+                'contact_us_desc': 'Hast du Bedenken zu deinem Datenschutz oder möchtest deine Rechte ausüben? Kontaktiere unser Datenschutzteam jederzeit. Wir verpflichten uns, auf deine Anfragen innerhalb von 30 Tagen zu antworten.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'zh': {
@@ -2146,6 +2300,28 @@ export class LanguageService {
                 'SEND': '发送',
                 'VIEW_ALL_COMMENTS': '查看所有{{count}}条评论',
                 'DELETE': '删除'
+            },
+            'privacy': {
+                'title': '隐私政策',
+                'intro': '在 Chatme，您的隐私是我们的首要任务。本隐私政策解释了我们如何收集、使用和保护您的个人信息。',
+                'data_collection': '数据收集',
+                'data_collection_desc': '我们收集您直接提供的信息，例如个人资料详情、消息和偏好设置。我们还自动收集关于您的设备和使用模式的某些信息，以改进我们的服务。',
+                'data_usage': '数据使用',
+                'data_usage_desc': '您的数据用于提供和改进我们的服务、个性化您的体验以及就更新和功能与您沟通。我们从不向第三方出售您的个人信息。',
+                'data_protection': '数据保护',
+                'data_protection_desc': '我们实施行业标准的安全措施，保护您的信息免受未经授权的访问、更改和破坏。您的消息是加密的，以确保您的对话保持私密。',
+                'children_privacy': '儿童隐私',
+                'children_privacy_desc': 'Chatme 不适用于 13 岁以下的用户。我们不会故意收集 13 岁以下儿童的个人信息。如果我们发现此类收集，我们将立即采取措施删除这些信息。',
+                'user_rights': '您的权利',
+                'user_rights_desc': '您有权随时访问、更新或删除您的个人信息。您可以管理您的隐私设置并控制与其他用户共享哪些信息。',
+                'important_notice': '重要声明',
+                'important_notice_desc': '请仔细阅读本隐私政策。使用 Chatme，即表示您同意本政策中描述的做法。如果您不同意我们的隐私做法，请不要使用我们的服务。',
+                'contact': '联系我们',
+                'contact_desc': '如果您对本隐私政策或我们的隐私实践有任何疑问，请通过 privacy@chatme.app 或我们的支持门户与我们联系。',
+                'contact_us': '取得联系',
+                'contact_us_desc': '对您的隐私有疑虑或想行使您的权利？请随时与我们的隐私团队联系。我们承诺在 30 天内回复您的请求。',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'hi': {
@@ -2317,6 +2493,28 @@ export class LanguageService {
                 'SEND': 'भेजें',
                 'VIEW_ALL_COMMENTS': 'सभी {{count}} टिप्पणियाँ देखें',
                 'DELETE': 'हटाएं'
+            },
+            'privacy': {
+                'title': 'गोपनीयता नीति',
+                'intro': 'Chatme में, आपकी गोपनीयता हमारी सर्वोच्च प्राथमिकता है। यह गोपनीयता नीति बताती है कि हम आपकी व्यक्तिगत जानकारी कैसे एकत्र, उपयोग और सुरक्षित करते हैं।',
+                'data_collection': 'डेटा संग्रह',
+                'data_collection_desc': 'हम वह जानकारी एकत्र करते हैं जो आप सीधे प्रदान करते हैं, जैसे कि प्रोफाइल विवरण, संदेश और प्राथमिकताएं। हम आपकी डिवाइस और उपयोग पैटर्न की कुछ जानकारी भी स्वचालित रूप से एकत्र करते हैं ताकि हम अपनी सेवा में सुधार कर सकें।',
+                'data_usage': 'डेटा का उपयोग',
+                'data_usage_desc': 'आपका डेटा हमारी सेवाएं प्रदान और सुधारने, आपके अनुभव को व्यक्तिगत बनाने और आपको अपडेट और सुविधाओं के बारे में संचार करने के लिए उपयोग किया जाता है। हम कभी भी आपकी व्यक्तिगत जानकारी तीसरे पक्ष को नहीं बेचते।',
+                'data_protection': 'डेटा सुरक्षा',
+                'data_protection_desc': 'हम आपकी जानकारी को अनधिकृत पहुंच, परिवर्तन और विनाश से सुरक्षित रखने के लिए उद्योग-मानक सुरक्षा उपाय लागू करते हैं। आपके संदेशों को एन्क्रिप्ट किया जाता है ताकि आपकी बातचीत निजी रहे।',
+                'children_privacy': 'बच्चों की गोपनीयता',
+                'children_privacy_desc': 'Chatme 13 वर्ष से कम आयु के उपयोगकर्ताओं के लिए नहीं है। हम जानबूझकर 13 वर्ष से कम आयु के बच्चों से व्यक्तिगत जानकारी एकत्र नहीं करते। यदि हमें ऐसी जानकारी मिलती है, तो हम उसे तुरंत हटाने के लिए कदम उठाएंगे।',
+                'user_rights': 'आपके अधिकार',
+                'user_rights_desc': 'आपको किसी भी समय अपनी व्यक्तिगत जानकारी तक पहुंचने, इसे अपडेट करने या इसे हटाने का अधिकार है। आप अपनी गोपनीयता सेटिंग्स प्रबंधित कर सकते हैं और नियंत्रित कर सकते हैं कि अन्य उपयोगकर्ताओं के साथ कौन सी जानकारी साझा की जाती है।',
+                'important_notice': 'महत्वपूर्ण सूचना',
+                'important_notice_desc': 'कृपया इस गोपनीयता नीति को सावधानीपूर्वक पढ़ें। Chatme का उपयोग करके, आप इस नीति में वर्णित प्रथाओं से सहमत होते हैं। यदि आप हमारी गोपनीयता प्रथाओं से सहमत नहीं हैं, तो कृपया हमारी सेवा का उपयोग न करें।',
+                'contact': 'हमसे संपर्क करें',
+                'contact_desc': 'यदि आपको इस गोपनीयता नीति के बारे में या हमारी गोपनीयता प्रथाओं के बारे में कोई प्रश्न है, तो कृपया हमसे privacy@chatme.app पर या हमारे सहायता पोर्टल के माध्यम से संपर्क करें।',
+                'contact_us': 'हमसे जुड़ें',
+                'contact_us_desc': 'क्या आपको अपनी गोपनीयता को लेकर चिंताएं हैं या अपने अधिकारों का प्रयोग करना चाहते हैं? किसी भी समय हमारी गोपनीयता टीम से संपर्क करें। हम 30 दिनों के भीतर आपके अनुरोधों का जवाब देने के लिए प्रतिबद्ध हैं।',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         },
         'fa': {
@@ -2482,6 +2680,28 @@ export class LanguageService {
                 'SEND': 'ارسال',
                 'VIEW_ALL_COMMENTS': 'مشاهده همه {{count}} نظر',
                 'DELETE': 'حذف'
+            },
+            'privacy': {
+                'title': 'سیاست حفظ حریم خصوصی',
+                'intro': 'در چت‌می، حریم خصوصی شما اولویت ما است. این سیاست حفظ حریم خصوصی نحوه جمع‌آوری، استفاده و محافظت از اطلاعات شخصی شما را توضیح می‌دهد.',
+                'data_collection': 'جمع‌آوری داده‌ها',
+                'data_collection_desc': 'ما اطلاعاتی را که مستقیماً ارائه می‌دهید جمع‌آوری می‌کنیم، مثل جزئیات پروفایل، پیام‌ها و ترجیحات. ما همچنین به طور خودکار اطلاعات معینی درباره دستگاه و الگوهای استفاده شما را جمع‌آوری می‌کنیم تا سرویس خود را بهبود دهیم.',
+                'data_usage': 'استفاده از داده‌ها',
+                'data_usage_desc': 'اطلاعات شما برای ارائه و بهبود سرویس‌های ما، شخصی‌سازی تجربه شما و تماس با شما در مورد به‌روز رسانی‌ها و ویژگی‌ها استفاده می‌شود. ما هرگز اطلاعات شخصی شما را به طرف ثالث نمی‌فروشیم.',
+                'data_protection': 'محافظت از داده‌ها',
+                'data_protection_desc': 'ما از اقدامات امنیتی استاندارد صنعت استفاده می‌کنیم تا اطلاعات شما را از دسترسی غیرمجاز، تغییر و تخریب محافظت کنیم. پیام‌های شما رمزگذاری شده‌اند تا گفتگوهای شما خصوصی بمانند.',
+                'children_privacy': 'حریم خصوصی کودکان',
+                'children_privacy_desc': 'چت‌می برای کاربران زیر 13 سال نیست. ما عمداً اطلاعات شخصی کودکان زیر 13 سال را جمع‌آوری نمی‌کنیم. اگر متوجه چنین جمع‌آوری‌ای شویم، فوری آن اطلاعات را حذف خواهیم کرد.',
+                'user_rights': 'حقوق شما',
+                'user_rights_desc': 'شما حق دارید در هر زمان به اطلاعات شخصی خود دسترسی پیدا کنید، آن را به‌روز کنید یا حذف کنید. شما می‌توانید تنظیمات حریم خصوصی خود را مدیریت کنید و کنترل کنید که کدام اطلاعات با کاربران دیگر به اشتراک گذاشته می‌شود.',
+                'important_notice': 'اطلاعیه مهم',
+                'important_notice_desc': 'لطفاً این سیاست حفظ حریم خصوصی را با دقت بخوانید. با استفاده از Chatme، شما با شیوه‌های توضیح داده شده در این سیاست موافق هستید. اگر با شیوه‌های حفاظت از حریم خصوصی ما موافق نیستید، لطفاً از سرویس ما استفاده نکنید.',
+                'contact': 'تماس با ما',
+                'contact_desc': 'اگر سؤالی درباره این سیاست حفظ حریم خصوصی یا شیوه‌های حفاظت از حریم خصوصی ما دارید، لطفاً با ما از طریق privacy@chatme.app یا درگاه پشتیبانی ما تماس بگیرید.',
+                'contact_us': 'تماس بگیرید',
+                'contact_us_desc': 'آیا نگرانی های درباره حریم خصوصی خود دارید یا می‌خواهید از حقوق خود استفاده کنید؟ با تیم حریم خصوصی ما در هر زمان تماس بگیرید. ما متعهد هستیم که در طی 30 روز به درخواست‌های شما پاسخ دهیم.',
+                'email': 'privacy@chatme.com',
+                'phone': '+1 (234) 567-890'
             }
         }
     };
