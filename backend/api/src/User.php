@@ -98,7 +98,7 @@ class User {
             $this->id = $row['id'];
             return $this->id;
         } else {
-            $query = "INSERT INTO " . $this->table_name . " (email, name, created_at, last_active) VALUES (:email, :name, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())";
+            $query = "INSERT INTO " . $this->table_name . " (email, name, google_id, created_at, last_active) VALUES (:email, :name, NULL, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())";
             $stmt = $this->conn->prepare($query);
             $defaultName = 'User';
             $stmt->bindParam(":email", $email);

@@ -1,0 +1,604 @@
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [POST /heartbeat] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /conversations?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [POST /gamification/track] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:51] [EXCEPTION] [GET /users/random?userId=2&limit=50] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:52] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:52] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:52] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:52] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:32:53] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:10] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [POST /heartbeat] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /conversations?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /users/random?userId=2&limit=50] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [POST /gamification/track] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:12] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:13] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:15] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:15] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:15] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:15] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:16] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:33:16] [EXCEPTION] [GET /profile/guests/new?userId=2] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:35:14] [EXCEPTION] [POST /heartbeat] [95.142.83.3]
+Message: Call to undefined method Database::getInstance()
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GalleryController.php (Line: 9)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(58): GalleryController->__construct()
+#1 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:37:08] [EXCEPTION] [GET /community/feed?page=1&limit=20&viewerId=2] [95.142.83.3]
+Message: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''20' OFFSET '0'' at line 9
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php (Line: 143)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php(143): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(508): CommunityController->getFeed()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#4 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:37:17] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:37:17] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:40:41] [EXCEPTION] [GET /community/feed?page=1&limit=20&viewerId=2] [95.142.83.3]
+Message: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''20' OFFSET '0'' at line 9
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php (Line: 143)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php(143): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(508): CommunityController->getFeed()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#4 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 12:42:16] [EXCEPTION] [GET /community/feed?page=1&limit=20&viewerId=2] [95.142.83.3]
+Message: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ''20' OFFSET '0'' at line 9
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php (Line: 143)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php(143): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(508): CommunityController->getFeed()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#4 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 13:21:12] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-16 13:21:12] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:54] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:54] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:56] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:56] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:57] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-16 14:11:57] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-16 23:41:08] [EXCEPTION] [POST /auth/verify-code] [102.89.23.124]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-16 23:41:49] [EXCEPTION] [POST /auth/verify-code] [102.89.23.124]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-18 02:23:59] [WARNING] [POST /gamification/claim] [2601:447:ca02:4c80:6ed9:38c4:8c35:bc72]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-18 02:23:59] [WARNING] [POST /gamification/claim] [2601:447:ca02:4c80:6ed9:38c4:8c35:bc72]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-18 07:50:29] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-18 13:08:59] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "condition_value"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 116)
+--------------------------------------------------------------------------------
+
+[2026-01-18 13:08:59] [WARNING] [POST /gamification/claim] [95.142.83.3]
+Message: Undefined array key "title"
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/GamificationController.php (Line: 150)
+--------------------------------------------------------------------------------
+
+[2026-01-20 23:08:25] [EXCEPTION] [POST /auth/verify-code] [84.239.10.3]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-20 23:08:37] [EXCEPTION] [POST /auth/verify-code] [84.239.10.3]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-21 13:38:26] [EXCEPTION] [POST /auth/verify-code] [2a0b:f4c0:16c:6::1]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-21 13:38:41] [EXCEPTION] [POST /auth/verify-code] [2a0b:f4c0:16c:6::1]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-21 13:39:20] [EXCEPTION] [POST /auth/verify-code] [2a0b:f4c0:16c:6::1]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-21 13:46:50] [EXCEPTION] [POST /auth/verify-code] [2001:67c:e60:c0c:192:42:116:186]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(572): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-24 14:00:10] [EXCEPTION] [POST /auth/verify-code] [78.138.24.242]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(582): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-24 14:00:18] [EXCEPTION] [POST /auth/verify-code] [78.138.24.242]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(582): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-24 14:00:25] [EXCEPTION] [POST /auth/verify-code] [240e:360:d315:e410:8d94:66fd:38e5:4817]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'google_id'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php (Line: 106)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/User.php(106): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Auth.php(263): User->createOrGetByEmail()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(71): Auth->verifyCode()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#4 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(582): Router->dispatch()
+#5 {main}
+--------------------------------------------------------------------------------
+
+[2026-01-26 17:06:56] [EXCEPTION] [POST /community/react?userId=3] [104.28.155.78]
+Message: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '3-3' for key 'unique_post_like'
+File: /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php (Line: 264)
+Stack Trace:
+#0 /home/s1028897/domains/shphbjeio23.chatme.tj/src/CommunityController.php(264): PDOStatement->execute()
+#1 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(541): CommunityController->react()
+#2 /home/s1028897/domains/shphbjeio23.chatme.tj/src/Router.php(22): {closure}()
+#3 /home/s1028897/domains/shphbjeio23.chatme.tj/public_html/index.php(582): Router->dispatch()
+#4 {main}
+--------------------------------------------------------------------------------
+

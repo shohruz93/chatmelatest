@@ -113,7 +113,10 @@ class GamificationController {
             return;
         }
 
-        if ($mission['progress'] < $mission['condition_value'] && $mission['status'] != 'completed') {
+        $conditionValue = $mission['condition_value'] ?? 0;
+        $missionTitle = $mission['title'] ?? 'Unknown Mission';
+
+        if ($mission['progress'] < $conditionValue && $mission['status'] != 'completed') {
              // Verification double check (server-side progress check should trigger 'completed' status, but we can allow implicit complete if progress is enough)
              // For now, let's assume specific actions update progress and set status to 'completed'.
              // Or we can just check progress here.

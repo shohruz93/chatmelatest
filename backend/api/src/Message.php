@@ -49,6 +49,7 @@ class Message {
                   LIMIT :limit OFFSET :offset";
         
         $stmt = $this->db->prepare($query);
+        $roomId = trim((string)$roomId);
         $stmt->bindParam(":room", $roomId);
         $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
         $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);

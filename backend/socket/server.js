@@ -6,8 +6,56 @@ const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
-const API_URL = "https://shphbjeio23.chatme.tj";
+const API_URL = process.env.PHP_API_URL || "https://shphbjeio23.chatme.tj";
 console.log('Using API_URL:', API_URL);
+
+/**
+ * Generic fetch with retry logic and timeout
+ */
+async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1000) {
+    const timeout = options.timeout || 10000; // Default 10s timeout
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    const requestOptions = {
+        ...options,
+        signal: controller.signal
+    };
+
+    try {
+        const response = await fetch(url, requestOptions);
+        clearTimeout(id);
+
+        if (response.ok) {
+            if (retries < 3) {
+                console.info(`[FETCH] Success on ${url} after retries!`);
+            }
+            return response;
+        }
+
+        if (retries > 0 && (response.status >= 500 || response.status === 429)) {
+            console.warn(`[FETCH] Retrying ${url} due to status ${response.status}. Retries left: ${retries}`);
+            await new Promise(resolve => setTimeout(resolve, backoff));
+            return fetchWithRetry(url, options, retries - 1, backoff * 2);
+        }
+
+        return response;
+    } catch (err) {
+        clearTimeout(id);
+        const errorDetail = err.code ? `[${err.code}] ${err.message}` : err.message || 'Unknown Error';
+
+        if (retries > 0) {
+            console.warn(`[FETCH] Retrying ${url} due to error: ${errorDetail}. Retries left: ${retries}`);
+            if (!err.code && !err.message) {
+                console.error('[FETCH] Full error object:', err);
+            }
+            await new Promise(resolve => setTimeout(resolve, backoff));
+            return fetchWithRetry(url, options, retries - 1, backoff * 2);
+        }
+        console.error(`[FETCH] Final failure for ${url}: ${errorDetail}`);
+        throw err;
+    }
+}
 
 const app = express();
 app.use(cors());
@@ -124,8 +172,9 @@ io.on('connection', (socket) => {
             const locationParam = filters?.location || 'any';
 
             // Use advanced compatibility matching
-            const response = await fetch(
-                `${API_URL}/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`
+            const response = await fetchWithRetry(
+                `${API_URL}/match/compatible?userId=${userId}&gender=${genderParam}&location=${locationParam}&limit=10${onlineIdsParam}`,
+                { timeout: 5000 }
             );
             const compatibleUsers = await response.json();
 
@@ -243,7 +292,7 @@ io.on('connection', (socket) => {
     // Check mutual compatibility
     async function checkMutualCompatibility(userId1, userId2) {
         try {
-            const response = await fetch(`${API_URL}/match/compatible?userId=${userId2}&limit=20`);
+            const response = await fetchWithRetry(`${API_URL}/match/compatible?userId=${userId2}&limit=20`, { timeout: 5000 });
             const matches = await response.json();
 
             // Check if userId1 is in userId2's compatible matches
@@ -270,7 +319,7 @@ io.on('connection', (socket) => {
     // Record match history
     async function recordMatchHistory(user1Id, user2Id, score, reasons) {
         try {
-            await fetch(`${API_URL}/match/history`, {
+            await fetchWithRetry(`${API_URL}/match/history`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -457,7 +506,7 @@ io.on('connection', (socket) => {
 
         // Save message via PHP API
         try {
-            const response = await fetch(`${API_URL}/messages`, {
+            const response = await fetchWithRetry(`${API_URL}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -468,7 +517,8 @@ io.on('connection', (socket) => {
                     originalLang: originalLang,
                     type: type || 'text',
                     replyToMessageId: replyToMessageId
-                })
+                }),
+                timeout: 8000 // 8s timeout for message saving
             });
 
             const responseText = await response.text();
@@ -510,10 +560,11 @@ io.on('connection', (socket) => {
     socket.on('edit_message', async ({ roomId, messageId, content }) => {
         console.log(`[EDIT_MESSAGE] Message ${messageId} in room ${roomId}: ${content}`);
         try {
-            const response = await fetch(`${API_URL}/messages`, {
+            const response = await fetchWithRetry(`${API_URL}/messages`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: messageId, content })
+                body: JSON.stringify({ id: messageId, content }),
+                timeout: 5000
             });
             if (response.ok) {
                 socket.to(roomId).emit('message_edited', { messageId, content });
@@ -526,10 +577,11 @@ io.on('connection', (socket) => {
     socket.on('delete_message', async ({ roomId, messageId }) => {
         console.log(`[DELETE_MESSAGE] Message ${messageId} in room ${roomId}`);
         try {
-            const response = await fetch(`${API_URL}/messages`, {
+            const response = await fetchWithRetry(`${API_URL}/messages`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: messageId })
+                body: JSON.stringify({ id: messageId }),
+                timeout: 5000
             });
             if (response.ok) {
                 socket.to(roomId).emit('message_deleted', { messageId });
@@ -541,7 +593,7 @@ io.on('connection', (socket) => {
 
     socket.on('load_messages', async ({ roomId, limit = 50, offset = 0 }) => {
         try {
-            const response = await fetch(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`);
+            const response = await fetchWithRetry(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=${offset}`, { timeout: 7000 });
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
@@ -581,7 +633,7 @@ io.on('connection', (socket) => {
             // Fetch recent messages to check for updates/new items
             // We fetch 50 to cover a reasonable gap
             const limit = 20;
-            const response = await fetch(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=0`);
+            const response = await fetchWithRetry(`${API_URL}/messages/room?roomId=${roomId}&limit=${limit}&offset=0`, { timeout: 7000 });
             const messages = await response.json();
 
             if (Array.isArray(messages)) {
@@ -670,8 +722,8 @@ io.on('connection', (socket) => {
 
             // Fetch profiles
             const [profile1Res, profile2Res] = await Promise.all([
-                fetch(`${API_URL}/profile?userId=${user1}`),
-                fetch(`${API_URL}/profile?userId=${user2}`)
+                fetchWithRetry(`${API_URL}/profile?userId=${user1}`, { timeout: 5000 }),
+                fetchWithRetry(`${API_URL}/profile?userId=${user2}`, { timeout: 5000 })
             ]);
 
             const profile1 = await profile1Res.json();
@@ -693,13 +745,14 @@ io.on('connection', (socket) => {
 
         try {
             // Call PHP API to mark messages as read
-            const response = await fetch(`${API_URL}/conversations/read`, {
+            const response = await fetchWithRetry(`${API_URL}/conversations/read`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId: userId,
                     otherUserId: senderId
-                })
+                }),
+                timeout: 5000
             });
 
             if (response.ok) {
@@ -744,7 +797,7 @@ io.on('connection', (socket) => {
                 const primaryUrl = `https://ftapi.pythonanywhere.com/translate?sl=auto&dl=${dl}&text=${encodeURIComponent(text)}`;
                 console.log('[TRANSLATE] Attempting Primary API:', primaryUrl);
 
-                const response = await fetch(primaryUrl);
+                const response = await fetchWithRetry(primaryUrl, { timeout: 5000 });
                 if (response.ok) {
                     const data = await response.json();
                     if (data && data['destination-text']) {
@@ -763,7 +816,7 @@ io.on('connection', (socket) => {
                     const fallbackUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${dl}&dt=t&q=${encodeURIComponent(text)}`;
                     console.log('[TRANSLATE] Attempting Fallback API:', fallbackUrl);
 
-                    const response = await fetch(fallbackUrl);
+                    const response = await fetchWithRetry(fallbackUrl, { timeout: 5000 });
                     if (response.ok) {
                         const data = await response.json();
                         // Google Translate response is a nested array: [[["translated", "orig", ...]]]
@@ -786,13 +839,14 @@ io.on('connection', (socket) => {
                 // Track Polyglot mission (translate_message)
                 const userId = userSocketMap.get(socket.id);
                 if (userId) {
-                    fetch(`${API_URL}/gamification/track`, {
+                    fetchWithRetry(`${API_URL}/gamification/track`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             userId: userId,
                             conditionKey: 'translate_message'
-                        })
+                        }),
+                        timeout: 3000
                     }).catch(err => console.error('Error tracking translation progress:', err));
                 }
             } else {

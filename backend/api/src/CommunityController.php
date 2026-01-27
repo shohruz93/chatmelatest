@@ -260,12 +260,18 @@ class CommunityController {
             $liked = false;
         } else {
             // Add like
-            $stmt = $this->db->prepare("INSERT INTO community_reactions (post_id, user_id, created_at) VALUES (?, ?, ?)");
+            $stmt = $this->db->prepare("INSERT IGNORE INTO community_reactions (post_id, user_id, created_at) VALUES (?, ?, ?)");
             $stmt->execute([$postId, $userId, $now]);
             
-            $stmt = $this->db->prepare("UPDATE community_posts SET likes_count = likes_count + 1 WHERE id = ?");
-            $stmt->execute([$postId]);
-            $liked = true;
+            if ($stmt->rowCount() > 0) {
+                $stmt = $this->db->prepare("UPDATE community_posts SET likes_count = likes_count + 1 WHERE id = ?");
+                $stmt->execute([$postId]);
+                $liked = true;
+            } else {
+                // If it already existed but for some reason wasn't caught by the previous check, 
+                // we treat it as already liked.
+                $liked = true;
+            }
         }
 
         // Get updated count
