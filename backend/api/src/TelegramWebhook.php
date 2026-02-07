@@ -10,6 +10,10 @@ class TelegramWebhook {
         $this->botToken = getenv('TELEGRAM_BOT_TOKEN') ?: '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
     }
 
+    private function escapeHtml($text) {
+        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
     public function handleUpdate() {
         $rawInput = file_get_contents('php://input');
         error_log("Telegram webhook received: " . $rawInput);
@@ -62,7 +66,7 @@ class TelegramWebhook {
 
         if (empty($code)) {
             error_log("No connection code provided in /start command");
-            $this->sendMessage($chatId, "Welcome to ChatMe!\n\nTo connect your account, please use the link from your ChatMe app profile settings.");
+            $this->sendMessage($chatId, "Welcome to ChatMe!\n\nTo connect your account, please use the link from your ChatMe app profile settings.", false);
             return;
         }
 
@@ -75,7 +79,7 @@ class TelegramWebhook {
 
         if ($stmt->rowCount() === 0) {
             error_log("Invalid or expired code: $code");
-            $this->sendMessage($chatId, "Invalid or expired connection code. Please generate a new code in your ChatMe app.");
+            $this->sendMessage($chatId, "Invalid or expired connection code. Please generate a new code in your ChatMe app.", false);
             return;
         }
 
@@ -107,22 +111,25 @@ class TelegramWebhook {
             
             error_log("Pending code deleted: $code");
 
-            $this->sendMessage($chatId, "✅ Your ChatMe account has been successfully connected!\n\nYou will now receive notifications about new messages, guests, and comments here on Telegram.");
+            $this->sendMessage($chatId, "✅ Your ChatMe account has been successfully connected!\n\nYou will now receive notifications about new messages, guests, and comments here on Telegram.", false);
         } else {
             error_log("Failed to create Telegram connection for user ID: $userId");
-            $this->sendMessage($chatId, "Connection failed. Please try again.");
+            $this->sendMessage($chatId, "Connection failed. Please try again.", false);
         }
     }
 
-    public function sendMessage($chatId, $message) {
+    public function sendMessage($chatId, $message, $parseHtml = true) {
         try {
             $url = $this->apiBaseUrl . $this->botToken . '/sendMessage';
 
             $postData = [
                 'chat_id' => $chatId,
-                'text' => $message,
-                'parse_mode' => 'HTML'
+                'text' => $message
             ];
+            
+            if ($parseHtml) {
+                $postData['parse_mode'] = 'HTML';
+            }
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

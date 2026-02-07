@@ -265,14 +265,19 @@ $router->add('GET', '/users/random', function() use ($db) {
     $gender = $_GET['gender'] ?? 'any';
     $location = $_GET['location'] ?? 'any';
     $limit = $_GET['limit'] ?? 10;
+    $offset = $_GET['offset'] ?? 0;
     $onlineIdsParam = $_GET['online_ids'] ?? '';
+    $nativeLanguage = $_GET['native_language'] ?? '';
+    $learningLanguage = $_GET['learning_language'] ?? '';
     
     require_once __DIR__ . '/../src/User.php';
     $user = new User($db);
     
     $filters = [
         'gender' => $gender,
-        'location' => $location
+        'location' => $location,
+        'native_language' => $nativeLanguage,
+        'learning_language' => $learningLanguage
     ];
     
     $includeIds = [];
@@ -280,7 +285,7 @@ $router->add('GET', '/users/random', function() use ($db) {
         $includeIds = explode(',', $onlineIdsParam);
     }
     
-    $users = $user->getRandomUsers($currentUserId, $filters, $limit, $includeIds);
+    $users = $user->getRandomUsers($currentUserId, $filters, $limit, $includeIds, $offset);
     echo json_encode($users);
 });
 

@@ -162,7 +162,8 @@ export class LanguageService {
                 'CLOSE_FILTERS': 'Close',
                 'TITLE': 'Explore Users',
                 'USERS_FOUND': '{{count}} users found',
-                'USER_FOUND': '{{count}} user found'
+                'USER_FOUND': '{{count}} user found',
+                'LOADING_MORE': 'Loading more users...'
             },
 
             'CHAT': {
@@ -629,7 +630,8 @@ export class LanguageService {
                 'CLOSE_FILTERS': 'Закрыть',
                 'TITLE': 'Поиск пользователей',
                 'USERS_FOUND': '{{count}} пользователей найдено',
-                'USER_FOUND': '{{count}} пользователь найден'
+                'USER_FOUND': '{{count}} пользователь найден',
+                'LOADING_MORE': 'Загрузка...'
             },
             'NAV': {
                 'DASHBOARD': 'Панель',

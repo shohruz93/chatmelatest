@@ -1,5 +1,5 @@
 
-import { Component, OnInit, OnDestroy, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, effect, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -54,11 +54,17 @@ export class ExploreComponent implements OnInit, OnDestroy {
     filteredUsers: UserProfile[] = [];
     currentUser: any;
     isLoading = signal(false);
+    isLoadingMore = signal(false);
     selectedUser: UserProfile | null = null;
+    totalUsers = signal(0);
     updateAvailable = signal<any>(null);
 
+    // Pagination state
+    currentOffset: number = 0;
+    hasMoreUsers: boolean = true;
+
     // Tab Navigation
-    activeTab: 'users' | 'community' = 'community';
+    activeTab: 'users' | 'community' = 'users';
 
     // Filters
     filterStatus: string = 'any';
@@ -260,21 +266,57 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // Cleanup subscriptions if needed
     }
 
     async loadUsers() {
         this.isLoading.set(true);
+        this.currentOffset = 0;
+        this.hasMoreUsers = true;
         try {
-            const params = {
+            const params: any = {
                 userId: this.currentUser?.id?.toString() || '0',
-                limit: '50'
+                limit: '40',
+                offset: '0'
             };
 
-            const users = await lastValueFrom(this.api.get('/users/random', params));
+            // Add server-side filters
+            if (this.filterGender !== 'any') {
+                params.gender = this.filterGender;
+            }
+            if (this.filterLocation !== 'any') {
+                params.location = this.filterLocation;
+            }
+
+            // Pass language preferences for smarter matching
+            if (this.currentUser?.native_language) {
+                const native = this.extractFirstLanguage(this.currentUser.native_language);
+                if (native) params.native_language = native;
+            }
+            if (this.currentUser?.learning_language) {
+                const learning = this.extractFirstLanguage(this.currentUser.learning_language);
+                if (learning) params.learning_language = learning;
+            }
+
+            const response: any = await lastValueFrom(this.api.get('/users/random', params));
+            let newUsers: UserProfile[] = [];
+
+            if (response && response.users) {
+                newUsers = response.users;
+                // Only update total users if we are on the first page or it's explicitly returned
+                this.totalUsers.set(response.total_count || 0);
+            } else if (Array.isArray(response)) {
+                // Fallback if backend hasn't updated or returns array
+                newUsers = response;
+                this.totalUsers.set(newUsers.length);
+            }
+
+            // If we got fewer users than the limit, we've reached the end
+            if (newUsers.length < 40) {
+                this.hasMoreUsers = false;
+            }
 
             // Normalize user data
-            this.users = users.map((user: any) => {
+            this.users = newUsers.map((user: any) => {
                 // Normalize avatar URL
                 if (user.avatar && !user.avatar.startsWith('http')) {
                     user.avatar = `${this.api.phpBaseUrl}${user.avatar}`;
@@ -291,6 +333,8 @@ export class ExploreComponent implements OnInit, OnDestroy {
                 return user;
             });
 
+            this.currentOffset = 40;
+
             // Update statuses now that we have users
             this.updateUserStatuses();
             this.applyFilters();
@@ -298,6 +342,99 @@ export class ExploreComponent implements OnInit, OnDestroy {
             console.error('Error loading users:', error);
         } finally {
             this.isLoading.set(false);
+        }
+    }
+
+    async loadMoreUsers() {
+        if (!this.hasMoreUsers || this.isLoadingMore()) {
+            return;
+        }
+
+        this.isLoadingMore.set(true);
+        try {
+            const params: any = {
+                userId: this.currentUser?.id?.toString() || '0',
+                limit: '40',
+                offset: this.currentOffset.toString()
+            };
+
+            // Add server-side filters
+            if (this.filterGender !== 'any') {
+                params.gender = this.filterGender;
+            }
+            if (this.filterLocation !== 'any') {
+                params.location = this.filterLocation;
+            }
+
+            // Pass language preferences for smarter matching
+            if (this.currentUser?.native_language) {
+                const native = this.extractFirstLanguage(this.currentUser.native_language);
+                if (native) params.native_language = native;
+            }
+            if (this.currentUser?.learning_language) {
+                const learning = this.extractFirstLanguage(this.currentUser.learning_language);
+                if (learning) params.learning_language = learning;
+            }
+
+            const response: any = await lastValueFrom(this.api.get('/users/random', params));
+            let newUsers: UserProfile[] = [];
+
+            if (response && response.users) {
+                newUsers = response.users;
+                // Update total count if it changed
+                if (response.total_count) this.totalUsers.set(response.total_count);
+            } else if (Array.isArray(response)) {
+                newUsers = response;
+            }
+
+            // If we got fewer users than the limit, we've reached the end
+            if (newUsers.length < 40) {
+                this.hasMoreUsers = false;
+            }
+
+            // Normalize user data
+            const normalizedUsers = newUsers.map((user: any) => {
+                // Normalize avatar URL
+                if (user.avatar && !user.avatar.startsWith('http')) {
+                    user.avatar = `${this.api.phpBaseUrl}${user.avatar}`;
+                }
+
+                // Parse languages if they're strings
+                if (typeof user.native_language === 'string') {
+                    user.native_language = user.native_language.split(',').filter((l: string) => l.trim());
+                }
+                if (typeof user.learning_language === 'string') {
+                    user.learning_language = user.learning_language.split(',').filter((l: string) => l.trim());
+                }
+
+                return user;
+            });
+
+            // Append to existing users
+            this.users = [...this.users, ...normalizedUsers];
+            this.currentOffset += normalizedUsers.length;
+
+            // Update statuses and reapply filters
+            this.updateUserStatuses();
+            this.applyFilters();
+        } catch (error) {
+            console.error('Error loading more users:', error);
+        } finally {
+            this.isLoadingMore.set(false);
+        }
+    }
+
+    @HostListener('window:scroll', [])
+    onWindowScroll() {
+        if (this.activeTab !== 'users') return;
+
+        // Check window scroll position
+        const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+        const max = document.documentElement.scrollHeight || document.body.scrollHeight;
+
+        // Load more when near bottom (100px threshold)
+        if (pos >= max - 100) {
+            this.loadMoreUsers();
         }
     }
 
@@ -382,7 +519,11 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     onFilterChange() {
-        this.applyFilters();
+        // Reset pagination when filters change
+        this.currentOffset = 0;
+        this.users = [];
+        this.hasMoreUsers = true;
+        this.loadUsers();
     }
 
     toggleFilterPanel() {
@@ -398,7 +539,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
         this.filterLocation = 'any';
         this.filterNativeLanguage = 'any';
         this.filterLearningLanguage = 'any';
-        this.applyFilters();
+        this.onFilterChange();
     }
 
     getFlagIcon(location: string): string {
@@ -502,6 +643,12 @@ export class ExploreComponent implements OnInit, OnDestroy {
     getLanguagesArray(languages: string | string[]): string[] {
         if (!languages) return [];
         return Array.isArray(languages) ? languages : [languages];
+    }
+
+    extractFirstLanguage(languages: string | string[]): string {
+        if (!languages) return '';
+        const langArray = Array.isArray(languages) ? languages : [languages];
+        return langArray.length > 0 ? langArray[0] : '';
     }
 
     getLanguageFlagUrl(langCode: string): string {

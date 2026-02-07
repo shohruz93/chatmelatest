@@ -5,11 +5,46 @@ require_once 'User.php';
 class Telegram {
     private $db;
     private $botToken;
+    private $botUsername;
     private $apiBaseUrl = 'https://api.telegram.org/bot';
 
     public function __construct($db) {
         $this->db = $db;
         $this->botToken = getenv('TELEGRAM_BOT_TOKEN') ?: '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
+        $this->botUsername = getenv('TELEGRAM_BOT_USERNAME');
+    }
+
+    private function getBotUsername() {
+        if ($this->botUsername) {
+            return $this->botUsername;
+        }
+
+        // Try to fetch from Telegram API if not in env
+        try {
+            $url = $this->apiBaseUrl . $this->botToken . '/getMe';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            
+            $response = curl_exec($ch);
+            curl_close($ch);
+            
+            $data = json_decode($response, true);
+            if ($data && isset($data['result']['username'])) {
+                $this->botUsername = $data['result']['username'];
+                return $this->botUsername;
+            }
+        } catch (Exception $e) {
+            error_log("Failed to fetch bot username: " . $e->getMessage());
+        }
+
+        // Fallback
+        return 'ChatMeBot';
+    }
+
+    private function escapeHtml($text) {
+        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     public function generateConnectionCode() {
@@ -28,19 +63,22 @@ class Telegram {
 
             $query = "INSERT INTO telegram_pending_codes (user_id, code, expires_at) 
                       VALUES (:user_id, :code, FROM_UNIXTIME(:expires_at))
-                      ON DUPLICATE KEY UPDATE code = :code, expires_at = FROM_UNIXTIME(:expires_at)";
+                      ON DUPLICATE KEY UPDATE code = :code2, expires_at = FROM_UNIXTIME(:expires_at2)";
 
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':user_id', $userId);
             $stmt->bindParam(':code', $code);
             $stmt->bindParam(':expires_at', $expiresAt);
+            $stmt->bindParam(':code2', $code);
+            $stmt->bindParam(':expires_at2', $expiresAt);
 
             if ($stmt->execute()) {
+                $botName = $this->getBotUsername();
                 echo json_encode([
                     'success' => true,
                     'code' => $code,
-                    'botUsername' => 'ChatMeBot',
-                    'deepLink' => "https://t.me/ChatMeBot?start=$code"
+                    'botUsername' => $botName,
+                    'deepLink' => "https://t.me/$botName?start=$code"
                 ]);
             } else {
                 http_response_code(500);
@@ -250,7 +288,10 @@ class Telegram {
                 $connection = $stmt->fetch(PDO::FETCH_ASSOC);
                 $chatId = $connection['telegram_chat_id'];
 
-                $message = "<b>New message from $senderName</b>\n\n$messagePreview";
+                $safeSenderName = $this->escapeHtml($senderName);
+                $safeMessagePreview = $this->escapeHtml($messagePreview);
+
+                $message = "<b>New message from $safeSenderName</b>\n\n$safeMessagePreview";
                 $this->sendMessage($chatId, $message);
             }
         } catch (Exception $e) {
@@ -271,7 +312,9 @@ class Telegram {
                 $connection = $stmt->fetch(PDO::FETCH_ASSOC);
                 $chatId = $connection['telegram_chat_id'];
 
-                $message = "<b>New guest visit!</b>\n\n$guestName viewed your profile.";
+                $safeGuestName = $this->escapeHtml($guestName);
+
+                $message = "<b>New guest visit!</b>\n\n$safeGuestName viewed your profile.";
                 $this->sendMessage($chatId, $message);
             }
         } catch (Exception $e) {
@@ -292,7 +335,10 @@ class Telegram {
                 $connection = $stmt->fetch(PDO::FETCH_ASSOC);
                 $chatId = $connection['telegram_chat_id'];
 
-                $message = "<b>New comment from $commenterName</b>\n\n$commentPreview";
+                $safeCommenterName = $this->escapeHtml($commenterName);
+                $safeCommentPreview = $this->escapeHtml($commentPreview);
+
+                $message = "<b>New comment from $safeCommenterName</b>\n\n$safeCommentPreview";
                 $this->sendMessage($chatId, $message);
             }
         } catch (Exception $e) {

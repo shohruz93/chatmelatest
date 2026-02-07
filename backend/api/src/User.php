@@ -126,10 +126,52 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function getRandomUsers($currentUserId, $filters = [], $limit = 10, $includeIds = []) {
-        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active FROM " . $this->table_name . " WHERE id != :current_user_id";
+    public function getRandomUsers($currentUserId, $filters = [], $limit = 10, $includeIds = [], $offset = 0) {
+        // Extract language preferences from filters and ensure we only use the first one if multiple are passed
+        $rawNative = $filters['native_language'] ?? '';
+        $rawLearning = $filters['learning_language'] ?? '';
+        
+        // Helper to get first language
+        $getFirstLang = function($val) {
+            if (empty($val)) return '';
+            $parts = explode(',', $val);
+            return trim($parts[0]);
+        };
+
+        $myNative = $getFirstLang($rawNative);
+        $myLearning = $getFirstLang($rawLearning);
         
         $params = [':current_user_id' => $currentUserId];
+
+        // Build language compatibility scoring
+        $languageScore = "0";
+        if (!empty($myLearning) || !empty($myNative)) {
+            $languageScore = "CASE";
+            
+            // Best match: Their native = My learning (I can learn from them)
+            if (!empty($myLearning)) {
+                $languageScore .= " WHEN FIND_IN_SET(:lang_match_learning, native_language) > 0 THEN 3";
+                $params[':lang_match_learning'] = $myLearning;
+            }
+            
+            // Good match: Their learning = My native (They can learn from me)
+            if (!empty($myNative)) {
+                $languageScore .= " WHEN FIND_IN_SET(:lang_match_native, learning_language) > 0 THEN 2";
+                $params[':lang_match_native'] = $myNative;
+            }
+            
+            // Mutual learning: We're learning the same language
+            if (!empty($myLearning)) {
+                $languageScore .= " WHEN FIND_IN_SET(:lang_match_mutual, learning_language) > 0 THEN 1";
+                $params[':lang_match_mutual'] = $myLearning;
+            }
+            
+            $languageScore .= " ELSE 0 END";
+        }
+        
+        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active, 
+                  ($languageScore) as lang_score 
+                  FROM " . $this->table_name . " WHERE id != :current_user_id";
         
         // Apply gender filter
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -155,13 +197,16 @@ class User {
             $query .= " AND id IN (" . implode(',', $placeholders) . ")";
         }
         
-        $query .= " ORDER BY RAND() LIMIT :limit";
+        // Order by language compatibility score (DESC), then by last active timestamp (DESC) and ID (DESC) for stable pagination
+        // Using RAND() with OFFSET causes pagination issues (duplicates/missing users)
+        $query .= " ORDER BY lang_score DESC, last_active DESC, id DESC LIMIT :limit OFFSET :offset";
         
         $stmt = $this->conn->prepare($query);
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
         $stmt->execute();
         
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -188,7 +233,42 @@ class User {
             $user['rating_count'] = $ratingData['rating_count'] ?: 0;
         }
 
-        return $users;
+        // Calculate Total Count (ignoring limit/offset but keeping filters)
+        $countQuery = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE id != :current_user_id";
+        $countParams = [':current_user_id' => $currentUserId];
+        
+        if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
+            $countQuery .= " AND gender = :gender";
+            $countParams[':gender'] = $filters['gender'];
+        }
+        
+        if (!empty($filters['location']) && $filters['location'] !== 'any') {
+            $countQuery .= " AND location = :location";
+            $countParams[':location'] = $filters['location'];
+        }
+
+        if (!empty($includeIds)) {
+            $placeholders = [];
+            foreach ($includeIds as $i => $id) {
+                $key = ":include_id_$i";
+                $placeholders[] = $key;
+                $countParams[$key] = $id;
+            }
+            $countQuery .= " AND id IN (" . implode(',', $placeholders) . ")";
+        }
+
+        $countStmt = $this->conn->prepare($countQuery);
+        foreach ($countParams as $key => $value) {
+            $countStmt->bindValue($key, $value);
+        }
+        $countStmt->execute();
+        $totalResult = $countStmt->fetch(PDO::FETCH_ASSOC);
+        $totalCount = $totalResult['total'] ?? 0;
+
+        return [
+            'users' => $users,
+            'total_count' => $totalCount
+        ];
     }
 
     public function getSmartMatch($currentUserId, $filters = []) {
@@ -320,7 +400,8 @@ class User {
         }
 
         // Fallback to random
-        return $this->getRandomUsers($currentUserId, [], 1)[0] ?? null;
+        $randomResult = $this->getRandomUsers($currentUserId, [], 1);
+        return $randomResult['users'][0] ?? null;
     }
 
     public function getAdminUser() {

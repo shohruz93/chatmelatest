@@ -135,8 +135,8 @@
     <div class="explore-header">
       <div class="header-content">
         <h1>{{ 'EXPLORE_PAGE.TITLE' | translate }}</h1>
-        <p class="user-count">{{ filteredUsers.length === 1 ? ('EXPLORE_PAGE.USER_FOUND' | translate: {count:
-          filteredUsers.length}) : ('EXPLORE_PAGE.USERS_FOUND' | translate: {count: filteredUsers.length}) }}</p>
+        <p class="user-count">{{ totalUsers() === 1 ? ('EXPLORE_PAGE.USER_FOUND' | translate: {count: totalUsers()}) :
+          ('EXPLORE_PAGE.USERS_FOUND' | translate: {count: totalUsers()}) }}</p>
       </div>
       <button class="connect-random-btn" (click)="connectRandomly()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -352,6 +352,14 @@
       </div>
       }
     </div>
+
+    <!-- Pagination Loading Indicator -->
+    @if (isLoadingMore()) {
+    <div class="loading-more">
+      <div class="spinner-small"></div>
+      <p>{{ 'EXPLORE_PAGE.LOADING_MORE' | translate }}</p>
+    </div>
+    }
     }
   </main>
   }
