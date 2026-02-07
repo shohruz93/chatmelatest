@@ -163,7 +163,8 @@ export class LanguageService {
                 'TITLE': 'Explore Users',
                 'USERS_FOUND': '{{count}} users found',
                 'USER_FOUND': '{{count}} user found',
-                'LOADING_MORE': 'Loading more users...'
+                'LOADING_MORE': 'Loading more users...',
+                'LOAD_MORE': 'Load More'
             },
 
             'CHAT': {
@@ -238,7 +239,9 @@ export class LanguageService {
                 'CONFIRM': 'Confirm',
                 'ANONYMOUS': 'Anonymous',
                 'COINS': 'Coins',
-                'XP': 'XP'
+                'XP': 'XP',
+                'CONTINUE': 'Continue',
+                'SAVING': 'Saving...'
             },
             'NAV': {
                 'DASHBOARD': 'Dashboard',
@@ -314,8 +317,8 @@ export class LanguageService {
                 'DAILY_MISSIONS': 'Daily Missions',
                 'RATES': 'Rates',
                 'GALLERY': 'Gallery',
-                'COMPLETE_PROFILE': 'Complete your profile',
-                'COMPLETE_PROFILE_DESC': 'Tell us about yourself to find better matches.',
+                'COMPLETE_PROFILE': 'Complete Your Profile',
+                'COMPLETE_PROFILE_DESC': 'Please select your gender and languages to continue. This helps us match you with the right people.',
                 'ABOUT': 'About',
                 'LANGUAGES': 'Languages',
                 'NATIVE': 'Native',
@@ -631,7 +634,8 @@ export class LanguageService {
                 'TITLE': 'Поиск пользователей',
                 'USERS_FOUND': '{{count}} пользователей найдено',
                 'USER_FOUND': '{{count}} пользователь найден',
-                'LOADING_MORE': 'Загрузка...'
+                'LOADING_MORE': 'Загрузка...',
+                'LOAD_MORE': 'Загрузить ещё'
             },
             'NAV': {
                 'DASHBOARD': 'Панель',
@@ -673,7 +677,9 @@ export class LanguageService {
                 'LAST_ONLINE': 'Был(а) в сети',
                 'REVIEWS': 'отзывов',
                 'USER_PREFIX': 'Польз. #',
-                'PLAYER_PREFIX': 'Игрок #'
+                'PLAYER_PREFIX': 'Игрок #',
+                'COMPLETE_PROFILE': 'Заполните профиль',
+                'COMPLETE_PROFILE_DESC': 'Пожалуйста, выберите ваш пол и языки для продолжения. Это поможет нам подобрать вам подходящих людей.'
             },
             'VOICE': {
                 'CONNECTING': 'Подключение...',
@@ -759,7 +765,9 @@ export class LanguageService {
                 'SEARCH_PLACEHOLDER': 'Поиск...',
                 'NO_RESULTS': 'Результаты не найдены',
                 'RETRY': 'Повторить',
-                'CONFIRM': 'Подтвердить'
+                'CONFIRM': 'Подтвердить',
+                'CONTINUE': 'Продолжить',
+                'SAVING': 'Сохранение...'
             },
             'DIALOG': {
                 'TITLE_DEFAULT': 'Подтверждение',

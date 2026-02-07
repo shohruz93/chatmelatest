@@ -2,13 +2,13 @@
   <!-- Tab Navigation -->
   <div class="explore-tabhost">
     <div class="tab-navigation">
-      <button class="tab-btn" [class.active]="activeTab === 'community'" (click)="activeTab = 'community'">
-        <span class="tab-icon">📱</span>
-        <span>{{ 'EXPLORE_PAGE.COMMUNITY' | translate }}</span>
-      </button>
       <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
         <span class="tab-icon">👥</span>
         <span>{{ 'EXPLORE_PAGE.USERS' | translate }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'community'" (click)="activeTab = 'community'">
+        <span class="tab-icon">📱</span>
+        <span>{{ 'EXPLORE_PAGE.COMMUNITY' | translate }}</span>
       </button>
     </div>
   </div>
@@ -353,7 +353,21 @@
       }
     </div>
 
-    <!-- Pagination Loading Indicator -->
+    <!-- Load More Button -->
+    @if (hasMoreUsers && !isLoadingMore()) {
+    <div class="load-more-container">
+      <button class="load-more-btn" (click)="loadMoreUsers()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+        <span>{{ 'EXPLORE_PAGE.LOAD_MORE' | translate }}</span>
+      </button>
+    </div>
+    }
+
+    <!-- Loading Indicator -->
     @if (isLoadingMore()) {
     <div class="loading-more">
       <div class="spinner-small"></div>
@@ -375,5 +389,11 @@
   @if (selectedUser) {
   <app-user-profile-modal [user]="selectedUser" (closeEvent)="closeProfile()">
   </app-user-profile-modal>
+  }
+
+  <!-- Profile Completion Modal -->
+  @if (showProfileCompletionModal()) {
+  <app-profile-completion-modal (completionEvent)="onProfileCompleted()">
+  </app-profile-completion-modal>
   }
 </div>

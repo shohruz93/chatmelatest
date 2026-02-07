@@ -1,0 +1,94 @@
+<div class="modal-overlay">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ 'PROFILE.COMPLETE_PROFILE' | translate }}</h2>
+            <p class="modal-subtitle">{{ 'PROFILE.COMPLETE_PROFILE_DESC' | translate }}</p>
+        </div>
+
+        <div class="modal-body">
+            <!-- Gender Selection -->
+            <div class="form-section">
+                <label class="form-label">{{ 'EXPLORE_PAGE.GENDER' | translate }}</label>
+                <div class="gender-buttons">
+                    @for (option of genderOptions; track option.value) {
+                    <button type="button" class="gender-btn" [class.selected]="selectedGender === option.value"
+                        (click)="selectedGender = option.value">
+                        {{ option.label | translate }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Native Language Selection -->
+            <div class="form-section">
+                <label class="form-label">{{ 'EXPLORE_PAGE.NATIVE_LANGUAGE' | translate }}</label>
+                <div class="custom-select-container">
+                    <div class="custom-select" (click)="toggleNativeLanguageDropdown()">
+                        @if (selectedNativeLanguage) {
+                        <img class="select-flag" [src]="getSelectedNativeLanguageFlag()" alt="" />
+                        }
+                        <span>{{ getSelectedNativeLanguageLabel() }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    @if (showNativeLanguageDropdown) {
+                    <div class="custom-dropdown">
+                        @for (option of languageOptions; track option.value) {
+                        <div class="dropdown-option" [class.selected]="selectedNativeLanguage === option.value"
+                            (click)="selectNativeLanguage(option.value)">
+                            @if (option.flagUrl) {
+                            <img class="option-flag" [src]="option.flagUrl" alt="" />
+                            }
+                            <span>{{ option.label }}</span>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Learning Language Selection -->
+            <div class="form-section">
+                <label class="form-label">{{ 'EXPLORE_PAGE.LEARNING_LANGUAGE' | translate }}</label>
+                <div class="custom-select-container">
+                    <div class="custom-select" (click)="toggleLearningLanguageDropdown()">
+                        @if (selectedLearningLanguage) {
+                        <img class="select-flag" [src]="getSelectedLearningLanguageFlag()" alt="" />
+                        }
+                        <span>{{ getSelectedLearningLanguageLabel() }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    @if (showLearningLanguageDropdown) {
+                    <div class="custom-dropdown">
+                        @for (option of languageOptions; track option.value) {
+                        <div class="dropdown-option" [class.selected]="selectedLearningLanguage === option.value"
+                            (click)="selectLearningLanguage(option.value)">
+                            @if (option.flagUrl) {
+                            <img class="option-flag" [src]="option.flagUrl" alt="" />
+                            }
+                            <span>{{ option.label }}</span>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            @if (errorMessage()) {
+            <div class="error-message">
+                {{ errorMessage() }}
+            </div>
+            }
+
+            <!-- Submit Button -->
+            <button class="submit-btn" [disabled]="!isFormValid || isSubmitting()" (click)="submitProfile()">
+                @if (isSubmitting()) {
+                <span class="spinner-small"></span>
+                {{ 'COMMON.SAVING' | translate }}
+                } @else {
+                {{ 'COMMON.CONTINUE' | translate }}
+                }
+            </button>
+        </div>
+    </div>
+</div>

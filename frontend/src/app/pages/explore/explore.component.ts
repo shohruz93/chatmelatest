@@ -1,5 +1,5 @@
 
-import { Component, OnInit, OnDestroy, inject, signal, effect, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, effect, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
+import { ProfileCompletionModalComponent } from '../../components/profile-completion-modal/profile-completion-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
 import { AppVersionService } from '../../services/app-version.service';
@@ -36,7 +37,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, CommunityFeedComponent, UserProfileModalComponent],
+    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, CommunityFeedComponent, UserProfileModalComponent, ProfileCompletionModalComponent],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -175,6 +176,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     Array = Array;
 
     showValidationMessage = signal(false);
+    showProfileCompletionModal = signal(false);
 
     hasIncompleteProfile() {
         if (!this.currentUser) return false;
@@ -218,7 +220,11 @@ export class ExploreComponent implements OnInit, OnDestroy {
             }
         }
 
-        if (this.hasIncompleteProfile()) {
+        // Check if user needs to complete profile (missing gender or languages)
+        const needsProfileCompletion = this.needsProfileCompletion();
+        if (needsProfileCompletion) {
+            this.showProfileCompletionModal.set(true);
+        } else if (this.hasIncompleteProfile()) {
             this.showValidationMessage.set(true);
         }
 
@@ -424,19 +430,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
         }
     }
 
-    @HostListener('window:scroll', [])
-    onWindowScroll() {
-        if (this.activeTab !== 'users') return;
 
-        // Check window scroll position
-        const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
-        const max = document.documentElement.scrollHeight || document.body.scrollHeight;
-
-        // Load more when near bottom (100px threshold)
-        if (pos >= max - 100) {
-            this.loadMoreUsers();
-        }
-    }
 
     updateUserStatuses() {
         const onlineUsers = this.socketService.onlineUsers();
@@ -698,6 +692,29 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
     trackByLanguage(index: number, lang: string): string {
         return lang;
+    }
+
+    needsProfileCompletion(): boolean {
+        if (!this.currentUser) return false;
+        const hasGender = !!this.currentUser?.gender && this.currentUser.gender !== '';
+        const hasNative = !!this.currentUser?.native_language &&
+            this.currentUser.native_language !== '' &&
+            this.currentUser.native_language !== 'any';
+        const hasLearning = !!this.currentUser?.learning_language &&
+            this.currentUser.learning_language !== '' &&
+            this.currentUser.learning_language !== 'any';
+        return !hasGender || !hasNative || !hasLearning;
+    }
+
+    onProfileCompleted() {
+        this.showProfileCompletionModal.set(false);
+        // Refresh current user data
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            this.currentUser = JSON.parse(userStr);
+        }
+        // Reload users with updated profile
+        this.loadUsers();
     }
 
     formatLastActive(lastActive: string | number | undefined): string {
