@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,6 +28,7 @@ export class UserProfileModalComponent implements OnInit {
     private countryService = inject(CountryService);
     public languageService = inject(LanguageService);
     private galleryService = inject(GalleryService);
+    private cdr = inject(ChangeDetectorRef);
 
     currentUser: any;
     ratings: any = { average: 0, count: 0 };
@@ -103,8 +104,12 @@ export class UserProfileModalComponent implements OnInit {
                     average: data.rating || 0,
                     count: data.rating_count || 0
                 };
+                this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading ratings', err)
+            error: (err) => {
+                console.error('Error loading ratings', err);
+                this.cdr.detectChanges();
+            }
         });
 
         // Load comments
@@ -137,8 +142,12 @@ export class UserProfileModalComponent implements OnInit {
                     );
                     this.hasRated = !!this.userRating;
                 }
+                this.cdr.detectChanges();
             },
-            error: (err) => console.error('Error loading comments', err)
+            error: (err) => {
+                console.error('Error loading comments', err);
+                this.cdr.detectChanges();
+            }
         });
     }
 
@@ -240,10 +249,13 @@ export class UserProfileModalComponent implements OnInit {
             next: (images) => {
                 this.galleryImages = images;
                 this.galleryLoading = false;
+                // Manually trigger change detection to ensure view updates
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Failed to load gallery', err);
                 this.galleryLoading = false;
+                this.cdr.detectChanges();
             }
         });
     }
