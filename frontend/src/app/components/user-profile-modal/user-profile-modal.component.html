@@ -90,13 +90,17 @@
                         <h3>{{ 'PROFILE.INTERESTS' | translate }}</h3>
                         @if (user.interests && user.interests.length) {
                         <div class="interests-list">
-                            @for (interest of user.interests; track interest.id) {
-                            <span class="interest-tag">{{ interest.name || interest }}</span>
+                            @for (interest of user.interests; track interest) {
+                            <span class="interest-tag">
+                                {{ getInterestIcon(interest) }}
+                                {{ 'INTERESTS.' + getInterestKey(interest) | translate }}
+                            </span>
                             }
                         </div>
                         } @else {
                         <p class="no-interests">{{ 'PROFILE.NO_INTERESTS' | translate }}</p>
                         }
+
                     </div>
 
                     <button class="btn-message" (click)="sendMessage()">

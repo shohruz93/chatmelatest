@@ -5,6 +5,7 @@ require_once 'Notification.php';
 require_once 'TimestampHelper.php';
 require_once 'Telegram.php';
 require_once 'GamificationController.php';
+require_once 'InterestConstants.php';
 
 class Profile {
     private $db;
@@ -119,34 +120,45 @@ class Profile {
         }
 
         if (isset($data['interests']) && is_array($data['interests'])) {
+            // Validate all interest keys before processing
+            $validation = InterestConstants::validateKeys($data['interests']);
+            if (!$validation['valid']) {
+                http_response_code(400);
+                echo json_encode([
+                    "error" => "Invalid interest keys",
+                    "invalid_keys" => $validation['invalid_keys']
+                ]);
+                return;
+            }
+            
             // Clear existing interests
             $query = "DELETE FROM user_interests WHERE user_id = :user_id";
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(":user_id", $userId);
             $stmt->execute();
 
-            // Add new interests
-            foreach ($data['interests'] as $interest) {
+            // Add new interests (now validated as keys)
+            foreach ($data['interests'] as $interestKey) {
                 $interestId = null;
                 
-                // Check if it's already an ID (numeric) or a name (string)
-                if (is_numeric($interest)) {
-                    $interestId = $interest;
+                // Check if it's already an ID (numeric) or a key (string)
+                if (is_numeric($interestKey)) {
+                    $interestId = $interestKey;
                 } else {
-                    // Try to find existing interest by name
+                    // Try to find existing interest by name (key)
                     $query = "SELECT id FROM interests WHERE name = :name LIMIT 1";
                     $stmt = $this->db->prepare($query);
-                    $stmt->bindParam(":name", $interest);
+                    $stmt->bindParam(":name", $interestKey);
                     $stmt->execute();
                     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
                     
                     if ($existing) {
                         $interestId = $existing['id'];
                     } else {
-                        // Create new interest
+                        // Create new interest with the key as the name
                         $query = "INSERT INTO interests (name) VALUES (:name)";
                         $stmt = $this->db->prepare($query);
-                        $stmt->bindParam(":name", $interest);
+                        $stmt->bindParam(":name", $interestKey);
                         $stmt->execute();
                         $interestId = $this->db->lastInsertId();
                     }

@@ -544,6 +544,28 @@ export class LanguageService {
                 'contact_us_desc': 'Have concerns about your privacy or want to exercise your rights? Reach out to our privacy team anytime. We are committed to responding to your requests within 30 days.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Travel',
+                'READING': 'Reading',
+                'SPORTS': 'Sports',
+                'MUSIC': 'Music',
+                'MOVIES': 'Movies',
+                'COOKING': 'Cooking',
+                'PHOTOGRAPHY': 'Photography',
+                'GAMING': 'Gaming',
+                'ART': 'Art',
+                'TECHNOLOGY': 'Technology',
+                'FITNESS': 'Fitness',
+                'NATURE': 'Nature',
+                'FASHION': 'Fashion',
+                'WRITING': 'Writing',
+                'DANCING': 'Dancing',
+                'LEARNING_LANGUAGES': 'Learning Languages',
+                'VOLUNTEERING': 'Volunteering',
+                'MEDITATION': 'Meditation',
+                'PETS': 'Pets',
+                'FOOD': 'Food'
             }
         },
         'ru': {
@@ -878,6 +900,28 @@ export class LanguageService {
                 'contact_us_desc': 'Есть вопросы о конфиденциальности или хотите воспользоваться своими правами? Напишите в нашу команду конфиденциальности в любой момент. Мы обязуемся ответить на ваши запросы в течение 30 дней.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Путешествия',
+                'READING': 'Чтение',
+                'SPORTS': 'Спорт',
+                'MUSIC': 'Музыка',
+                'MOVIES': 'Фильмы',
+                'COOKING': 'Кулинария',
+                'PHOTOGRAPHY': 'Фотография',
+                'GAMING': 'Игры',
+                'ART': 'Искусство',
+                'TECHNOLOGY': 'Технологии',
+                'FITNESS': 'Фитнес',
+                'NATURE': 'Природа',
+                'FASHION': 'Мода',
+                'WRITING': 'Писательство',
+                'DANCING': 'Танцы',
+                'LEARNING_LANGUAGES': 'Изучение языков',
+                'VOLUNTEERING': 'Волонтёрство',
+                'MEDITATION': 'Медитация',
+                'PETS': 'Домашние животные',
+                'FOOD': 'Еда'
             }
         },
         'tj': {
@@ -1204,6 +1248,28 @@ export class LanguageService {
                 'contact_us_desc': 'Оё шумо муштари-рӯбарӯ дар бораи махфияти худ доред ё мехоҳед ҳуқуқҳои худро амал гиред? Дар бармаҳал бо гурӯҳи махфияти мо робита гиред. Мо мутаҳаммил муроҷиатҳои худро дар доираи 30 рӯз мӯрди ҷавоб қарор дарок хоҳем.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Сафар',
+                'READING': 'Хондан',
+                'SPORTS': 'Варзиш',
+                'MUSIC': 'Мусиқӣ',
+                'MOVIES': 'Филмҳо',
+                'COOKING': 'Ошпазӣ',
+                'PHOTOGRAPHY': 'Аксбардорӣ',
+                'GAMING': 'Бозиҳо',
+                'ART': 'Санъат',
+                'TECHNOLOGY': 'Технология',
+                'FITNESS': 'Фитнес',
+                'NATURE': 'Табиат',
+                'FASHION': 'Мода',
+                'WRITING': 'Навиштан',
+                'DANCING': 'Рақс',
+                'LEARNING_LANGUAGES': 'Омӯзиши забонҳо',
+                'VOLUNTEERING': 'Ихтиёрӣ',
+                'MEDITATION': 'Медитатсия',
+                'PETS': 'Ҳайвонҳои хонагӣ',
+                'FOOD': 'Хӯрок'
             }
         },
         'es': {
@@ -1500,6 +1566,28 @@ export class LanguageService {
                 'contact_us_desc': '¿Tienes preocupaciones sobre tu privacidad o quieres ejercer tus derechos? Comunícate con nuestro equipo de privacidad en cualquier momento. Nos comprometemos a responder tus solicitudes dentro de 30 días.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Viajes',
+                'READING': 'Lectura',
+                'SPORTS': 'Deportes',
+                'MUSIC': 'Música',
+                'MOVIES': 'Películas',
+                'COOKING': 'Cocina',
+                'PHOTOGRAPHY': 'Fotografía',
+                'GAMING': 'Videojuegos',
+                'ART': 'Arte',
+                'TECHNOLOGY': 'Tecnología',
+                'FITNESS': 'Fitness',
+                'NATURE': 'Naturaleza',
+                'FASHION': 'Moda',
+                'WRITING': 'Escritura',
+                'DANCING': 'Baile',
+                'LEARNING_LANGUAGES': 'Aprender idiomas',
+                'VOLUNTEERING': 'Voluntariado',
+                'MEDITATION': 'Meditación',
+                'PETS': 'Mascotas',
+                'FOOD': 'Comida'
             }
         },
         'ar': {
@@ -1722,6 +1810,28 @@ export class LanguageService {
                 'contact_us_desc': 'هل لديك مخاوف بشأن خصوصيتك أو تريد ممارسة حقوقك؟ اتصل بفريق الخصوصية لدينا في أي وقت. نحن ملتزمون بالرد على طلباتك خلال 30 يومًا.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'السفر',
+                'READING': 'القراءة',
+                'SPORTS': 'الرياضة',
+                'MUSIC': 'الموسيقى',
+                'MOVIES': 'الأفلام',
+                'COOKING': 'الطبخ',
+                'PHOTOGRAPHY': 'التصوير',
+                'GAMING': 'الألعاب',
+                'ART': 'الفن',
+                'TECHNOLOGY': 'التكنولوجيا',
+                'FITNESS': 'اللياقة',
+                'NATURE': 'الطبيعة',
+                'FASHION': 'الموضة',
+                'WRITING': 'الكتابة',
+                'DANCING': 'الرقص',
+                'LEARNING_LANGUAGES': 'تعلم اللغات',
+                'VOLUNTEERING': 'التطوع',
+                'MEDITATION': 'التأمل',
+                'PETS': 'الحيوانات الأليفة',
+                'FOOD': 'الطعام'
             }
         },
         'fr': {
@@ -1944,6 +2054,28 @@ export class LanguageService {
                 'contact_us_desc': 'Avez-vous des préoccupations concernant votre confidentialité ou souhaitez-vous exercer vos droits ? Contactez notre équipe de confidentialité à tout moment. Nous nous engageons à répondre à vos demandes dans les 30 jours.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Voyage',
+                'READING': 'Lecture',
+                'SPORTS': 'Sports',
+                'MUSIC': 'Musique',
+                'MOVIES': 'Films',
+                'COOKING': 'Cuisine',
+                'PHOTOGRAPHY': 'Photographie',
+                'GAMING': 'Jeux vidéo',
+                'ART': 'Art',
+                'TECHNOLOGY': 'Technologie',
+                'FITNESS': 'Fitness',
+                'NATURE': 'Nature',
+                'FASHION': 'Mode',
+                'WRITING': 'Écriture',
+                'DANCING': 'Danse',
+                'LEARNING_LANGUAGES': 'Apprendre des langues',
+                'VOLUNTEERING': 'Bénévolat',
+                'MEDITATION': 'Méditation',
+                'PETS': 'Animaux',
+                'FOOD': 'Nourriture'
             }
         },
         'de': {
@@ -2139,6 +2271,28 @@ export class LanguageService {
                 'contact_us_desc': 'Hast du Bedenken zu deinem Datenschutz oder möchtest deine Rechte ausüben? Kontaktiere unser Datenschutzteam jederzeit. Wir verpflichten uns, auf deine Anfragen innerhalb von 30 Tagen zu antworten.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'Reisen',
+                'READING': 'Lesen',
+                'SPORTS': 'Sport',
+                'MUSIC': 'Musik',
+                'MOVIES': 'Filme',
+                'COOKING': 'Kochen',
+                'PHOTOGRAPHY': 'Fotografie',
+                'GAMING': 'Gaming',
+                'ART': 'Kunst',
+                'TECHNOLOGY': 'Technologie',
+                'FITNESS': 'Fitness',
+                'NATURE': 'Natur',
+                'FASHION': 'Mode',
+                'WRITING': 'Schreiben',
+                'DANCING': 'Tanzen',
+                'LEARNING_LANGUAGES': 'Sprachen lernen',
+                'VOLUNTEERING': 'Freiwilligenarbeit',
+                'MEDITATION': 'Meditation',
+                'PETS': 'Haustiere',
+                'FOOD': 'Essen'
             }
         },
         'zh': {
@@ -2332,6 +2486,28 @@ export class LanguageService {
                 'contact_us_desc': '对您的隐私有疑虑或想行使您的权利？请随时与我们的隐私团队联系。我们承诺在 30 天内回复您的请求。',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': '旅行',
+                'READING': '阅读',
+                'SPORTS': '运动',
+                'MUSIC': '音乐',
+                'MOVIES': '电影',
+                'COOKING': '烹饪',
+                'PHOTOGRAPHY': '摄影',
+                'GAMING': '游戏',
+                'ART': '艺术',
+                'TECHNOLOGY': '科技',
+                'FITNESS': '健身',
+                'NATURE': '自然',
+                'FASHION': '时尚',
+                'WRITING': '写作',
+                'DANCING': '舞蹈',
+                'LEARNING_LANGUAGES': '学习语言',
+                'VOLUNTEERING': '志愿服务',
+                'MEDITATION': '冥想',
+                'PETS': '宠物',
+                'FOOD': '美食'
             }
         },
         'hi': {
@@ -2525,6 +2701,28 @@ export class LanguageService {
                 'contact_us_desc': 'क्या आपको अपनी गोपनीयता को लेकर चिंताएं हैं या अपने अधिकारों का प्रयोग करना चाहते हैं? किसी भी समय हमारी गोपनीयता टीम से संपर्क करें। हम 30 दिनों के भीतर आपके अनुरोधों का जवाब देने के लिए प्रतिबद्ध हैं।',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'यात्रा',
+                'READING': 'पढ़ना',
+                'SPORTS': 'खेल',
+                'MUSIC': 'संगीत',
+                'MOVIES': 'फिल्में',
+                'COOKING': 'खाना बनाना',
+                'PHOTOGRAPHY': 'फोटोग्राफी',
+                'GAMING': 'गेमिंग',
+                'ART': 'कला',
+                'TECHNOLOGY': 'प्रौद्योगिकी',
+                'FITNESS': 'फिटनेस',
+                'NATURE': 'प्रकृति',
+                'FASHION': 'फैशन',
+                'WRITING': 'लेखन',
+                'DANCING': 'नृत्य',
+                'LEARNING_LANGUAGES': 'भाषाएं सीखना',
+                'VOLUNTEERING': 'स्वयंसेवा',
+                'MEDITATION': 'ध्यान',
+                'PETS': 'पालतू जानवर',
+                'FOOD': 'खाना'
             }
         },
         'fa': {
@@ -2712,6 +2910,28 @@ export class LanguageService {
                 'contact_us_desc': 'آیا نگرانی های درباره حریم خصوصی خود دارید یا می‌خواهید از حقوق خود استفاده کنید؟ با تیم حریم خصوصی ما در هر زمان تماس بگیرید. ما متعهد هستیم که در طی 30 روز به درخواست‌های شما پاسخ دهیم.',
                 'email': 'privacy@chatme.com',
                 'phone': '+1 (234) 567-890'
+            },
+            'INTERESTS': {
+                'TRAVEL': 'سفر',
+                'READING': 'خواندن',
+                'SPORTS': 'ورزش',
+                'MUSIC': 'موسیقی',
+                'MOVIES': 'فیلم',
+                'COOKING': 'آشپزی',
+                'PHOTOGRAPHY': 'عکاسی',
+                'GAMING': 'بازی',
+                'ART': 'هنر',
+                'TECHNOLOGY': 'فناوری',
+                'FITNESS': 'تناسب اندام',
+                'NATURE': 'طبیعت',
+                'FASHION': 'مد',
+                'WRITING': 'نویسندگی',
+                'DANCING': 'رقص',
+                'LEARNING_LANGUAGES': 'یادگیری زبان‌ها',
+                'VOLUNTEERING': 'داوطلبی',
+                'MEDITATION': 'مدیتیشن',
+                'PETS': 'حیوانات خانگی',
+                'FOOD': 'غذا'
             }
         }
     };

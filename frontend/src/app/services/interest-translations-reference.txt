@@ -1,0 +1,217 @@
+// Interest translations to be added to language.service.ts
+
+// Russian (after line 903)
+'INTERESTS': {
+    'TRAVEL': 'Путешествия',
+    'READING': 'Чтение',
+    'SPORTS': 'Спорт',
+    'MUSIC': 'Музыка',
+    'MOVIES': 'Фильмы',
+    'COOKING': 'Кулинария',
+    'PHOTOGRAPHY': 'Фотография',
+    'GAMING': 'Игры',
+    'ART': 'Искусство',
+    'TECHNOLOGY': 'Технологии',
+    'FITNESS': 'Фитнес',
+    'NATURE': 'Природа',
+    'FASHION': 'Мода',
+    'WRITING': 'Писательство',
+    'DANCING': 'Танцы',
+    'LEARNING_LANGUAGES': 'Изучение языков',
+    'VOLUNTEERING': 'Волонтёрство',
+    'MEDITATION': 'Медитация',
+    'PETS': 'Домашние животные',
+    'FOOD': 'Еда'
+}
+
+// Tajik
+'INTERESTS': {
+    'TRAVEL': 'Сафар',
+    'READING': 'Хондан',
+    'SPORTS': 'Варзиш',
+    'MUSIC': 'Мусиқӣ',
+    'MOVIES': 'Филмҳо',
+    'COOKING': 'Ошpazӣ',
+    'PHOTOGRAPHY': 'Аксбардорӣ',
+    'GAMING': 'Бозиҳо',
+    'ART': 'Санъат',
+    'TECHNOLOGY': 'Технология',
+    'FITNESS': 'Фитнес',
+    'NATURE': 'Табиат',
+    'FASHION': 'Мода',
+    'WRITING': 'Навиштан',
+    'DANCING': 'Рақс',
+    'LEARNING_LANGUAGES': 'номӯзии забонҳо',
+    'VOLUNTEERING': 'Ихтиёрӣ',
+    'MEDITATION': 'Медитатсия',
+    'PETS': 'Ҳайвонҳои хонагӣ',
+    'FOOD': 'Хӯрок'
+}
+
+// Spanish
+'INTERESTS': {
+    'TRAVEL': 'Viajes',
+    'READING': 'Lectura',
+    'SPORTS': 'Deportes',
+    'MUSIC': 'Música',
+    'MOVIES': 'Películas',
+    'COOKING': 'Cocina',
+    'PHOTOGRAPHY': 'Fotografía',
+    'GAMING': 'Videojuegos',
+    'ART': 'Arte',
+    'TECHNOLOGY': 'Tecnología',
+    'FITNESS': 'Fitness',
+    'NATURE': 'Naturaleza',
+    'FASHION': 'Moda',
+    'WRITING': 'Escritura',
+    'DANCING': 'Baile',
+    'LEARNING_LANGUAGES': 'Aprender idiomas',
+    'VOLUNTEERING': 'Voluntariado',
+    'MEDITATION': 'Meditación',
+    'PETS': 'Mascotas',
+    'FOOD': 'Comida'
+}
+
+// Arabic
+'INTERESTS': {
+    'TRAVEL': 'السفر',
+    'READING': 'القراءة',
+    'SPORTS': 'الرياضة',
+    'MUSIC': 'الموسيقى',
+    'MOVIES': 'الأفلام',
+    'COOKING': 'الطبخ',
+    'PHOTOGRAPHY': 'التصوير',
+    'GAMING': 'الألعاب',
+    'ART': 'الفن',
+    'TECHNOLOGY': 'التكنولوجيا',
+    'FITNESS': 'اللياقة',
+    'NATURE': 'الطبيعة',
+    'FASHION': 'الموضة',
+    'WRITING': 'الكتابة',
+    'DANCING': 'الرقص',
+    'LEARNING_LANGUAGES': 'تعلم اللغات',
+    'VOLUNTEERING': 'التطوع',
+    'MEDITATION': 'التأمل',
+    'PETS': 'الحيوانات الأليفة',
+    'FOOD': 'الطعام'
+}
+
+// French
+'INTERESTS': {
+    'TRAVEL': 'Voyage',
+    'READING': 'Lecture',
+    'SPORTS': 'Sports',
+    'MUSIC': 'Musique',
+    'MOVIES': 'Films',
+    'COOKING': 'Cuisine',
+    'PHOTOGRAPHY': 'Photographie',
+    'GAMING': 'Jeux vidéo',
+    'ART': 'Art',
+    'TECHNOLOGY': 'Technologie',
+    'FITNESS': 'Fitness',
+    'NATURE': 'Nature',
+    'FASHION': 'Mode',
+    'WRITING': 'Écriture',
+    'DANCING': 'Danse',
+    'LEARNING_LANGUAGES': 'Apprendre des langues',
+    'VOLUNTEERING': 'Bénévolat',
+    'MEDITATION': 'Méditation',
+    'PETS': 'Animaux',
+    'FOOD': 'Nourriture'
+}
+
+// German
+'INTERESTS': {
+    'TRAVEL': 'Reisen',
+    'READING': 'Lesen',
+    'SPORTS': 'Sport',
+    'MUSIC': 'Musik',
+    'MOVIES': 'Filme',
+    'COOKING': 'Kochen',
+    'PHOTOGRAPHY': 'Fotografie',
+    'GAMING': 'Gaming',
+    'ART': 'Kunst',
+    'TECHNOLOGY': 'Technologie',
+    'FITNESS': 'Fitness',
+    'NATURE': 'Natur',
+    'FASHION': 'Mode',
+    'WRITING': 'Schreiben',
+    'DANCING': 'Tanzen',
+    'LEARNING_LANGUAGES': 'Sprachen lernen',
+    'VOLUNTEERING': 'Freiwilligenarbeit',
+    'MEDITATION': 'Meditation',
+    'PETS': 'Haustiere',
+    'FOOD': 'Essen'
+}
+
+// Chinese
+'INTERESTS': {
+    'TRAVEL': '旅行',
+    'READING': '阅读',
+    'SPORTS': '运动',
+    'MUSIC': '音乐',
+    'MOVIES': '电影',
+    'COOKING': '烹饪',
+    'PHOTOGRAPHY': '摄影',
+    'GAMING': '游戏',
+    'ART': '艺术',
+    'TECHNOLOGY': '科技',
+    'FITNESS': '健身',
+    'NATURE': '自然',
+    'FASHION': '时尚',
+    'WRITING': '写作',
+    'DANCING': '舞蹈',
+    'LEARNING_LANGUAGES': '学习语言',
+    'VOLUNTEERING': '志愿服务',
+    'MEDITATION': '冥想',
+    'PETS': '宠物',
+    'FOOD': '美食'
+}
+
+// Hindi
+'INTERESTS': {
+    'TRAVEL': 'यात्रा',
+    'READING': 'पढ़ना',
+    'SPORTS': 'खेल',
+    'MUSIC': 'संगीत',
+    'MOVIES': 'फिल्में',
+    'COOKING': 'खाना बनाना',
+    'PHOTOGRAPHY': 'फोटोग्राफी',
+    'GAMING': 'गेमिंग',
+    'ART': 'कला',
+    'TECHNOLOGY': 'प्रौद्योगिकी',
+    'FITNESS': 'फिटनेस',
+    'NATURE': 'प्रकृति',
+    'FASHION': 'फैशन',
+    'WRITING': 'लेखन',
+    'DANCING': 'नृत्य',
+    'LEARNING_LANGUAGES': 'भाषाएं सीखना',
+    'VOLUNTEERING': 'स्वयंसेवा',
+    'MEDITATION': 'ध्यान',
+    'PETS': 'पालतू जानवर',
+    'FOOD': 'खाना'
+}
+
+// Persian (Farsi)
+'INTERESTS': {
+    'TRAVEL': 'سفر',
+    'READING': 'خواندن',
+    'SPORTS': 'ورزش',
+    'MUSIC': 'موسیقی',
+    'MOVIES': 'فیلم',
+    'COOKING': 'آشپزی',
+    'PHOTOGRAPHY': 'عکاسی',
+    'GAMING': 'بازی',
+    'ART': 'هنر',
+    'TECHNOLOGY': 'فناوری',
+    'FITNESS': 'تناسب اندام',
+    'NATURE': 'طبیعت',
+    'FASHION': 'مد',
+    'WRITING': 'نویسندگی',
+    'DANCING': 'رقص',
+    'LEARNING_LANGUAGES': 'یادگیری زبان‌ها',
+    'VOLUNTEERING': 'داوطلبی',
+    'MEDITATION': 'مدیتیشن',
+    'PETS': 'حیوانات خانگی',
+    'FOOD': 'غذا'
+}

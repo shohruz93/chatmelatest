@@ -41,6 +41,30 @@ export class UserProfileModalComponent implements OnInit {
     showReplyInput: { [key: number]: boolean } = {};
     showReplies: { [key: number]: boolean } = {};
 
+    // Available interests with keys and icons (Same as ProfileComponent)
+    availableInterests = [
+        { key: 'TRAVEL', icon: '✈️' },
+        { key: 'READING', icon: '📚' },
+        { key: 'SPORTS', icon: '⚽' },
+        { key: 'MUSIC', icon: '🎵' },
+        { key: 'MOVIES', icon: '🎬' },
+        { key: 'COOKING', icon: '🍳' },
+        { key: 'PHOTOGRAPHY', icon: '📷' },
+        { key: 'GAMING', icon: '🎮' },
+        { key: 'ART', icon: '🎨' },
+        { key: 'TECHNOLOGY', icon: '💻' },
+        { key: 'FITNESS', icon: '💪' },
+        { key: 'NATURE', icon: '🌿' },
+        { key: 'FASHION', icon: '👗' },
+        { key: 'WRITING', icon: '✍️' },
+        { key: 'DANCING', icon: '💃' },
+        { key: 'LEARNING_LANGUAGES', icon: '🗣️' },
+        { key: 'VOLUNTEERING', icon: '🤝' },
+        { key: 'MEDITATION', icon: '🧘' },
+        { key: 'PETS', icon: '🐾' },
+        { key: 'FOOD', icon: '🍕' }
+    ];
+
     // Tab Navigation
     activeTab: 'rates' | 'gallery' = 'rates';
 
@@ -64,6 +88,63 @@ export class UserProfileModalComponent implements OnInit {
             this.loadRatingsAndComments();
         }
     }
+
+    // Legacy interest name to key mapping for backward compatibility
+    private legacyInterestMapping: { [key: string]: string } = {
+        'Travel': 'TRAVEL',
+        'Traveling': 'TRAVEL',
+        'Reading': 'READING',
+        'Sports': 'SPORTS',
+        'Music': 'MUSIC',
+        'Movies': 'MOVIES',
+        'Cooking': 'COOKING',
+        'Photography': 'PHOTOGRAPHY',
+        'Gaming': 'GAMING',
+        'Game': 'GAMING',
+        'Games': 'GAMING',
+        'Art': 'ART',
+        'Technology': 'TECHNOLOGY',
+        'Tech': 'TECHNOLOGY',
+        'Coding': 'TECHNOLOGY',
+        'Programming': 'TECHNOLOGY',
+        'Fitness': 'FITNESS',
+        'Nature': 'NATURE',
+        'Fashion': 'FASHION',
+        'Writing': 'WRITING',
+        'Dancing': 'DANCING',
+        'Dance': 'DANCING',
+        'Learning Languages': 'LEARNING_LANGUAGES',
+        'Languages': 'LEARNING_LANGUAGES',
+        'Volunteering': 'VOLUNTEERING',
+        'Volunteer': 'VOLUNTEERING',
+        'Meditation': 'MEDITATION',
+        'Pets': 'PETS',
+        'Food': 'FOOD',
+        'Watch Movies': 'MOVIES',
+        'Cinema': 'MOVIES',
+        'Books': 'READING',
+        'Read': 'READING',
+        'Reading Books': 'READING'
+    };
+
+    getInterestIcon(key: string): string {
+        const interestKey = this.getInterestKey(key);
+        return this.availableInterests.find(i => i.key === interestKey)?.icon || '🏷️';
+    }
+
+    getInterestKey(interest: any): string {
+        // Handle object or string
+        let name = (typeof interest === 'string' ? interest : (interest.name || interest.key || ''));
+
+        // Check if it's already a valid key
+        if (this.availableInterests.some(ai => ai.key === name)) {
+            return name;
+        }
+
+        // Try mapping
+        return this.legacyInterestMapping[name] || name.toUpperCase().replace(/ /g, '_');
+    }
+
 
     // Simplified location and language display methods using CountryService
     getFlagIcon(location: string): string {

@@ -54,7 +54,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     bio: string = '';
     userName: string = '';
-    interests: any[] = [];
+    interests: string[] = []; // Now stores keys like ['TRAVEL', 'READING']
     ratings: any = { average: 0, count: 0 };
     comments: any[] = [];
     loading: boolean = false;
@@ -70,6 +70,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     location: string = '';
     nativeLanguages: string[] = [];
     learningLanguages: string[] = [];
+
+    // Bio character limit
+    bioMaxLength: number = 500;
 
     // Telegram Integration
     telegramConnected: boolean = false;
@@ -110,6 +113,69 @@ export class ProfileComponent implements OnInit, OnDestroy {
         { value: 'female', label: 'Female' },
         { value: 'other', label: 'Other' }
     ];
+
+    // Predefined interests list
+    // Available interests with keys and icons
+    availableInterests = [
+        { key: 'TRAVEL', icon: '✈️' },
+        { key: 'READING', icon: '📚' },
+        { key: 'SPORTS', icon: '⚽' },
+        { key: 'MUSIC', icon: '🎵' },
+        { key: 'MOVIES', icon: '🎬' },
+        { key: 'COOKING', icon: '🍳' },
+        { key: 'PHOTOGRAPHY', icon: '📷' },
+        { key: 'GAMING', icon: '🎮' },
+        { key: 'ART', icon: '🎨' },
+        { key: 'TECHNOLOGY', icon: '💻' },
+        { key: 'FITNESS', icon: '💪' },
+        { key: 'NATURE', icon: '🌿' },
+        { key: 'FASHION', icon: '👗' },
+        { key: 'WRITING', icon: '✍️' },
+        { key: 'DANCING', icon: '💃' },
+        { key: 'LEARNING_LANGUAGES', icon: '🗣️' },
+        { key: 'VOLUNTEERING', icon: '🤝' },
+        { key: 'MEDITATION', icon: '🧘' },
+        { key: 'PETS', icon: '🐾' },
+        { key: 'FOOD', icon: '🍕' }
+    ];
+
+    // Legacy interest name to key mapping for backward compatibility
+    private legacyInterestMapping: { [key: string]: string } = {
+        'Travel': 'TRAVEL',
+        'Traveling': 'TRAVEL',
+        'Reading': 'READING',
+        'Sports': 'SPORTS',
+        'Music': 'MUSIC',
+        'Movies': 'MOVIES',
+        'Cooking': 'COOKING',
+        'Photography': 'PHOTOGRAPHY',
+        'Gaming': 'GAMING',
+        'Game': 'GAMING',
+        'Games': 'GAMING',
+        'Art': 'ART',
+        'Technology': 'TECHNOLOGY',
+        'Tech': 'TECHNOLOGY',
+        'Coding': 'TECHNOLOGY',
+        'Programming': 'TECHNOLOGY',
+        'Fitness': 'FITNESS',
+        'Nature': 'NATURE',
+        'Fashion': 'FASHION',
+        'Writing': 'WRITING',
+        'Dancing': 'DANCING',
+        'Dance': 'DANCING',
+        'Learning Languages': 'LEARNING_LANGUAGES',
+        'Languages': 'LEARNING_LANGUAGES',
+        'Volunteering': 'VOLUNTEERING',
+        'Volunteer': 'VOLUNTEERING',
+        'Meditation': 'MEDITATION',
+        'Pets': 'PETS',
+        'Food': 'FOOD',
+        'Watch Movies': 'MOVIES',
+        'Cinema': 'MOVIES',
+        'Books': 'READING',
+        'Read': 'READING',
+        'Reading Books': 'READING'
+    };
 
     // Simplified language list using CountryService
     get languageOptions() {
@@ -175,7 +241,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 this.profileUser = { ...data }; // Create a copy
                 this.bio = data.bio || '';
                 this.userName = data.name || '';
-                this.interests = data.interests || [];
+                // Convert interests from objects to keys with legacy support
+                if (data.interests && Array.isArray(data.interests)) {
+                    this.interests = data.interests.map((i: any) => {
+                        // Extract name from object or use string directly
+                        let name = typeof i === 'string' ? i : (i.name || i.key || '');
+                        // Check if it's already a valid key (all uppercase)
+                        if (name === name.toUpperCase() && this.availableInterests.some(ai => ai.key === name)) {
+                            return name;
+                        }
+                        // Try to map legacy name to key
+                        return this.legacyInterestMapping[name] || name.toUpperCase().replace(/ /g, '_');
+                    }).filter((k: string) => k && this.availableInterests.some(ai => ai.key === k));
+                } else {
+                    this.interests = [];
+                }
                 this.gender = data.gender || '';
                 this.location = data.location || '';
 
@@ -259,11 +339,30 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     addInterest() {
+        // This method is no longer used with selectable chips
+        // Keeping for backwards compatibility
         const trimmed = this.newInterest.trim();
-        if (trimmed && !this.interests.find(i => (i.name || i) === trimmed)) {
-            this.interests.push({ name: trimmed });
+        if (trimmed && !this.interests.includes(trimmed)) {
+            this.interests.push(trimmed);
             this.newInterest = '';
         }
+    }
+
+    toggleInterest(interest: { key: string, icon: string }) {
+        const index = this.interests.indexOf(interest.key);
+        if (index > -1) {
+            this.interests.splice(index, 1);
+        } else {
+            this.interests.push(interest.key);
+        }
+    }
+
+    isInterestSelected(interest: { key: string, icon: string }): boolean {
+        return this.interests.includes(interest.key);
+    }
+
+    getInterestIcon(key: string): string {
+        return this.availableInterests.find(i => i.key === key)?.icon || '🏷️';
     }
 
     removeInterest(index: number) {
@@ -309,8 +408,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
         formData.append('learning_language', this.learningLanguages.join(','));
 
         this.interests.forEach((interest, index) => {
-            const interestValue = interest.id || interest.name || interest;
-            formData.append(`interests[${index}]`, interestValue);
+            // Now interests are just string keys like 'TRAVEL', 'READING'
+            formData.append(`interests[${index}]`, interest);
         });
 
         if (this.selectedFile) {
