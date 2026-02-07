@@ -491,6 +491,7 @@ io.on('connection', (socket) => {
 
         console.log(`Final receiverId: ${receiverId}`);
         const replyToMessageId = replyTo ? replyTo.id : null;
+        const isCorrection = replyTo?.isCorrection || false;
 
         const messageData = {
             senderId: senderId,
@@ -501,6 +502,7 @@ io.on('connection', (socket) => {
             type: type || 'text',
             timestamp: Math.floor(Date.now() / 1000),
             replyTo: replyTo,
+            isCorrection: isCorrection,
             tempId: tempId // Include tempId for optimistic UI updates
         };
 
@@ -516,7 +518,8 @@ io.on('connection', (socket) => {
                     content: content,
                     originalLang: originalLang,
                     type: type || 'text',
-                    replyToMessageId: replyToMessageId
+                    replyToMessageId: replyToMessageId,
+                    isCorrection: isCorrection
                 }),
                 timeout: 8000 // 8s timeout for message saving
             });

@@ -392,12 +392,13 @@
 .history-loading-bar {
     height: 6px;
     width: 100%;
-    background: linear-gradient(90deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.02));
     position: relative;
     overflow: hidden;
     border-radius: 4px;
     margin: 8px 12px;
 }
+
 .history-loading-bar .history-progress {
     position: absolute;
     left: -40%;
@@ -409,9 +410,17 @@
 }
 
 @keyframes historyProgress {
-    0% { left: -40%; }
-    50% { left: 60%; }
-    100% { left: 120%; }
+    0% {
+        left: -40%;
+    }
+
+    50% {
+        left: 60%;
+    }
+
+    100% {
+        left: 120%;
+    }
 }
 
 .message-bubble[data-status="sending"] {
@@ -444,5 +453,160 @@
 
     50% {
         opacity: 1;
+    }
+}
+
+/* Context Menu */
+.message-actions-menu {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 10;
+    opacity: 1;
+    /* Always visible */
+}
+
+/* Ensure message bubble has space for the icon if needed, or icon sits on top */
+.message-bubble {
+    position: relative;
+    padding-right: 24px;
+    /* Space for the menu icon */
+}
+
+.btn-msg-options {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-msg-options:hover {
+    color: var(--primary-color);
+    opacity: 1;
+}
+
+.msg-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    min-width: 150px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Partner messages: Menu opens to the right (anchor left) */
+.message-received .msg-dropdown {
+    right: auto;
+    left: 0;
+}
+
+/* Correction View */
+.correction-display {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.correction-original {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #ef4444;
+    /* Red */
+    text-decoration: line-through;
+    font-size: 0.95em;
+    opacity: 0.9;
+}
+
+.correction-new {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: #22c55e;
+    /* Green */
+    font-weight: 500;
+}
+
+.correction-icon {
+    font-size: 1.1em;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.correction-content {
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* Partner Correction Style */
+.correction-new.partner-correction {
+    color: #f59e0b;
+    /* Amber */
+}
+
+.msg-dropdown.visible {
+    display: flex;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.msg-dropdown button {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.msg-dropdown button:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.msg-dropdown button.delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Edit Mode Input Styles */
+.input-preview-bar.edit-mode {
+    border-left: 3px solid var(--accent-color, #fbbf24);
+    background: rgba(251, 191, 36, 0.05);
+}
+
+.input-preview-bar.edit-mode .preview-label {
+    color: var(--accent-color, #fbbf24);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

@@ -21,6 +21,7 @@ export interface ChatMessage {
         content: string;
         senderName: string;
         messageType?: 'text' | 'image' | 'audio' | 'sticker';
+        isCorrection?: boolean;
     } | null;
     originalLang?: string;
     translatedContent?: string;
@@ -278,7 +279,7 @@ export class ChatService {
         });
     }
 
-    public async sendMessage(content: string, replyToMessage?: ChatMessage, messageType: 'text' | 'image' | 'audio' | 'sticker' = 'text') {
+    public async sendMessage(content: string, replyToMessage?: ChatMessage, messageType: 'text' | 'image' | 'audio' | 'sticker' = 'text', isCorrection: boolean = false) {
         const roomId = this.currentRoomId();
         if (!roomId || !content.trim()) return;
 
@@ -289,7 +290,8 @@ export class ChatService {
             id: replyToMessage.id,
             content: replyToMessage.content,
             senderName: replyToMessage.senderName || 'Partner',
-            messageType: replyToMessage.messageType // Include type for UI
+            messageType: replyToMessage.messageType, // Include type for UI
+            isCorrection: isCorrection
         } : null;
 
         const newMessage: ChatMessage = {
@@ -324,6 +326,30 @@ export class ChatService {
             replyToData,
             tempId
         );
+    }
+
+    public async editMessage(message: ChatMessage, newContent: string) {
+        if (!message || !newContent.trim() || message.type !== 'sent') return;
+
+        // Optimistic update
+        this.messages.update(msgs => msgs.map(m => {
+            if (m.id === message.id) {
+                return { ...m, content: newContent, translatedContent: undefined, showTranslation: false };
+            }
+            return m;
+        }));
+
+        this.socketService.editMessage(message.roomId, message.id, newContent);
+    }
+
+    public async deleteMessage(message: ChatMessage) {
+        if (!message || message.type !== 'sent') return;
+
+        // Optimistic update
+        this.messages.update(msgs => msgs.filter(m => m.id !== message.id));
+
+        this.chatStorage.deleteMessage(message.id);
+        this.socketService.deleteMessage(message.roomId, message.id);
     }
 
     private addMessageToState(msg: ChatMessage) {

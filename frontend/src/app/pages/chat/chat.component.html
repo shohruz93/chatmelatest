@@ -115,7 +115,21 @@
                     </div>
                     }
 
-                    <!-- Content Types -->
+                    <!-- Content Types / Correction -->
+                    @if (msg.replyTo?.isCorrection) {
+                    <div class="correction-display">
+                        <div class="correction-original">
+                            <span class="correction-icon">❌</span>
+                            <span class="correction-content">{{ msg.replyTo?.content }}</span>
+                        </div>
+                        <div class="correction-new" [class.partner-correction]="msg.type !== 'sent'">
+                            <span class="correction-icon">
+                                @if(msg.type === 'sent') { ✅ } @else { 💡 }
+                            </span>
+                            <span class="correction-content">{{ msg.content }}</span>
+                        </div>
+                    </div>
+                    } @else {
                     @switch (msg.messageType) {
                     @case ('image') {
                     <div class="message-image-container">
@@ -135,6 +149,7 @@
                     }
                     @default {
                     <p class="message-text">{{ msg.content }}</p>
+                    }
                     }
                     }
 
@@ -170,22 +185,24 @@
                             }
                             }
                         </span>
-                        } @else {
-                        <!-- Translation Button for partner messages -->
-                        @if (msg.messageType === 'text') {
-                        <button class="btn-translate-icon" (click)="translateMessage(msg)"
-                            [class.active]="msg.showTranslation" [class.rotating]="msg.isTranslating">
-                            🌐
-                        </button>
-                        }
                         }
                     </div>
 
-                    <!-- Actions (Hover) -->
-                    <div class="message-actions-hover">
-                        <div class="message-actions-hover">
-                            @if (msg.type !== 'sent') {
-                            <button (click)="replyTo(msg)">↩️</button>
+                    <!-- Actions (Hover/Menu) -->
+                    <div class="message-actions-menu">
+                        <button class="btn-msg-options" (click)="openMsgMenu($event, msg)">⋮</button>
+
+                        <div class="msg-dropdown glass-panel" [class.visible]="activeMsgMenu === msg.id">
+                            @if (msg.type === 'sent') {
+                            <button (click)="onEdit(msg)">✏️ {{ 'COMMON.EDIT' | translate }}</button>
+                            <button (click)="onDelete(msg)" class="delete-btn">🗑️ {{ 'COMMON.DELETE' | translate
+                                }}</button>
+                            } @else {
+                            <button (click)="replyTo(msg)">↩️ {{ 'CHAT.REPLY' | translate }}</button>
+                            <button (click)="translateMessage(msg)">
+                                {{ msg.showTranslation ? 'Hide Translation' : '🌐 Translate' }}
+                            </button>
+                            <button (click)="onCorrect(msg)">📝 {{ 'CHAT.CORRECT' | translate }}</button>
                             }
                         </div>
                     </div>
@@ -207,20 +224,32 @@
     <!-- Footer / Input -->
     @if (roomId) {
     <footer class="chat-input-area glass-panel">
-        @if (replyingToMessage) {
-        <div class="input-preview-bar glass-panel">
+        <!-- Reply / Edit / Correct Preview -->
+        @if (replyingToMessage || isEditing || isCorrecting) {
+        <div class="input-preview-bar glass-panel" [class.edit-mode]="isEditing || isCorrecting">
             <div class="preview-content">
-                <span>Replying to {{ replyingToMessage.senderName }}</span>
+                @if (isEditing) {
+                <span>✏️ {{ 'COMMON.EDIT_MESSAGE' | translate }}</span>
+                } @else if (isCorrecting) {
+                <span style="color: #22c55e;">📝 {{ 'CHAT.CORRECT' | translate }}</span>
+                } @else {
+                <span>{{ 'CHAT.REPLYING_TO' | translate }} {{ replyingToMessage?.senderName }}</span>
+                }
+
                 <p class="preview-text">
-                    @switch (replyingToMessage.messageType) {
+                    @if (isEditing) {
+                    {{ '...' }}
+                    } @else {
+                    @switch (replyingToMessage?.messageType) {
                     @case ('image') { 📷 Photo }
                     @case ('audio') { 🎤 Voice Message }
                     @case ('sticker') { 😊 Sticker }
-                    @default { {{ replyingToMessage.content }} }
+                    @default { {{ replyingToMessage?.content }} }
+                    }
                     }
                 </p>
             </div>
-            <button class="btn-cancel-reply" (click)="cancelReply()">✕</button>
+            <button class="btn-cancel-reply" (click)="isEditing ? cancelEdit() : cancelReply()">✕</button>
         </div>
         }
 
@@ -251,11 +280,12 @@
 
             <div class="text-input-container">
                 <input id="chatInput" type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()"
-                    (input)="onTyping()" placeholder="{{ 'CHAT.TYPE_MESSAGE' | translate }}" class="message-input"
-                    autocomplete="off">
+                    (input)="onTyping()"
+                    [placeholder]="isEditing ? ('COMMON.EDIT_MESSAGE' | translate) : ('CHAT.TYPE_MESSAGE' | translate)"
+                    class="message-input" autocomplete="off">
 
                 <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
-                    ➤
+                    {{ isEditing ? '✓' : '➤' }}
                 </button>
             </div>
         </div>

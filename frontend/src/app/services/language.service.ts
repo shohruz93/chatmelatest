@@ -217,7 +217,12 @@ export class LanguageService {
                 'ACTIONS': 'Actions',
                 'OFFLINE_MODE': 'Offline Mode',
                 'SEARCHING_PARTNER': 'Searching for partner...',
-                'PLEASE_WAIT': 'Please wait...'
+                'PLEASE_WAIT': 'Please wait...',
+                'CORRECT': 'Correct',
+                'REPLY': 'Reply',
+                'TRANSLATE': 'Translate',
+                'HIDE_TRANSLATE': 'Hide Translation',
+                'CONFIRM_DELETE': 'Are you sure you want to delete this message?'
             },
             'DASHBOARD': {
                 'ONLINE': 'Online',
@@ -241,7 +246,10 @@ export class LanguageService {
                 'COINS': 'Coins',
                 'XP': 'XP',
                 'CONTINUE': 'Continue',
-                'SAVING': 'Saving...'
+                'SAVING': 'Saving...',
+                'EDIT': 'Edit',
+                'DELETE': 'Delete',
+                'EDIT_MESSAGE': 'Edit Message'
             },
             'NAV': {
                 'DASHBOARD': 'Dashboard',
@@ -771,7 +779,12 @@ export class LanguageService {
                 'INVITE_DECLINED': 'Приглашение отклонено',
                 'WAITING_FOR_RESPONSE': 'Ожидание ответа',
                 'WAITING_DESC': 'Ожидание, пока партнёр примет или отклонит приглашение в игру...',
-                'USER_NOT_IN_ROOM': 'Пользователь не находится в этом чате'
+                'USER_NOT_IN_ROOM': 'Пользователь не находится в этом чате',
+                'CORRECT': 'Исправить',
+                'REPLY': 'Ответить',
+                'TRANSLATE': 'Перевести',
+                'HIDE_TRANSLATE': 'Скрыть перевод',
+                'CONFIRM_DELETE': 'Вы уверены, что хотите удалить это сообщение?'
             },
             'DASHBOARD': {
                 'ONLINE': 'В сети',
@@ -789,7 +802,10 @@ export class LanguageService {
                 'RETRY': 'Повторить',
                 'CONFIRM': 'Подтвердить',
                 'CONTINUE': 'Продолжить',
-                'SAVING': 'Сохранение...'
+                'SAVING': 'Сохранение...',
+                'EDIT': 'Редактировать',
+                'DELETE': 'Удалить',
+                'EDIT_MESSAGE': 'Редактировать сообщение'
             },
             'DIALOG': {
                 'TITLE_DEFAULT': 'Подтверждение',

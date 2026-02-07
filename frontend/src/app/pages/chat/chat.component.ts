@@ -178,6 +178,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     retryMessage: string = '';
     compatibilityScore: number = 0;
 
+    // Message Actions
+    activeMsgMenu: string | null = null; // ID of message with open menu
+    isEditing: boolean = false;
+    isCorrecting: boolean = false;
+    editingMsgId: string | null = null;
+
     // Game Invites
     gameInvitation: any = null;
     waitingForGameResponse: boolean = false;
@@ -309,12 +315,91 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     sendMessage() {
         if (!this.newMessage.trim()) return;
 
-        this.chatService.sendMessage(this.newMessage, this.replyingToMessage);
-        this.playSendSound();
+        if (this.isEditing && this.editingMsgId) {
+            const msg = this.messages().find(m => m.id === this.editingMsgId);
+            if (msg) {
+                this.chatService.editMessage(msg, this.newMessage);
+            }
+            this.cancelEdit();
+        } else {
+            this.chatService.sendMessage(this.newMessage, this.replyingToMessage, 'text', this.isCorrecting);
+            this.playSendSound();
+        }
 
         this.newMessage = '';
         this.replyingToMessage = null;
+        this.isCorrecting = false;
         this.socketService.emitTyping(this.roomId!, false);
+    } // end sendMessage
+
+    // Message Actions Menu
+    openMsgMenu(event: Event, msg: any) {
+        event.stopPropagation();
+        if (this.activeMsgMenu === msg.id) {
+            this.activeMsgMenu = null;
+        } else {
+            this.activeMsgMenu = msg.id;
+            // Close on outside click
+            setTimeout(() => {
+                const closeHandler = () => {
+                    this.activeMsgMenu = null;
+                    this.cdr.markForCheck();
+                    document.removeEventListener('click', closeHandler);
+                };
+                document.addEventListener('click', closeHandler);
+            }, 0);
+        }
+    }
+
+    onEdit(msg: any) {
+        this.isEditing = true;
+        this.editingMsgId = msg.id;
+        this.newMessage = msg.content;
+
+        // Focus input
+        setTimeout(() => {
+            const input = document.getElementById('chatInput');
+            if (input) input.focus();
+        }, 100);
+    }
+
+    cancelEdit() {
+        this.isEditing = false;
+        this.editingMsgId = null;
+        this.newMessage = '';
+    }
+
+    onDelete(msg: any) {
+        if (confirm(this.languageService.translate('CHAT.CONFIRM_DELETE'))) {
+            this.chatService.deleteMessage(msg);
+        }
+    }
+
+    onCorrect(msg: any) {
+        // "Correct" is a special reply that prefills the input with the original text
+        this.replyingToMessage = msg;
+        this.newMessage = msg.content; // Prefill
+        this.isCorrecting = true;
+
+        // Focus input
+        setTimeout(() => {
+            const input = document.getElementById('chatInput');
+            if (input) input.focus();
+        }, 100);
+    }
+
+    replyTo(msg: any) {
+        this.replyingToMessage = msg;
+        this.isCorrecting = false;
+        setTimeout(() => {
+            const input = document.getElementById('chatInput');
+            if (input) input.focus();
+        }, 100);
+    }
+
+    cancelReply() {
+        this.replyingToMessage = null;
+        this.isCorrecting = false;
     }
 
     private playSendSound() {
@@ -361,15 +446,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     // ... Keep other UI methods (modals, stickers, etc.) ...
 
-    replyTo(msg: any) {
-        this.replyingToMessage = msg;
-        const input = document.getElementById('chatInput');
-        if (input) input.focus();
-    }
 
-    cancelReply() {
-        this.replyingToMessage = null;
-    }
 
     addSticker(sticker: string) {
         this.newMessage += sticker;

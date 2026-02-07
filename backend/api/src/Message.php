@@ -63,7 +63,8 @@ class Message {
             if ($msg['reply_to_message_id']) {
                 $msg['replyTo'] = [
                     'content' => $msg['reply_content'],
-                    'senderName' => $msg['reply_sender_name']
+                    'senderName' => $msg['reply_sender_name'],
+                    'isCorrection' => (bool)$msg['is_correction']
                 ];
             }
             unset($msg['reply_content'], $msg['reply_sender_name']);
@@ -87,6 +88,7 @@ class Message {
             // --- Validation ---
             $type = $data['type'] ?? 'text';
             $content = $data['content'] ?? '';
+            $isCorrection = isset($data['isCorrection']) && $data['isCorrection'] ? 1 : 0;
             
             // 1. Sanitize content for security (only for text messages)
             if ($type === 'text') {
@@ -110,8 +112,8 @@ class Message {
                 return;
             }
 
-            $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, type, original_lang, reply_to_message_id) 
-                      VALUES (:sid, :rid, :room, :content, :type, :lang, :reply_to)";
+            $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, type, original_lang, reply_to_message_id, is_correction) 
+                      VALUES (:sid, :rid, :room, :content, :type, :lang, :reply_to, :is_correction)";
             
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(":sid", $data['senderId']);
@@ -123,6 +125,7 @@ class Message {
             $stmt->bindParam(":lang", $lang);
             $replyTo = $data['replyToMessageId'] ?? null;
             $stmt->bindParam(":reply_to", $replyTo);
+            $stmt->bindParam(":is_correction", $isCorrection, PDO::PARAM_INT);
 
             if ($stmt->execute()) {
                 $lastInsertId = $this->db->lastInsertId();

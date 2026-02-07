@@ -159,6 +159,14 @@ export class SocketService implements OnDestroy {
         this.socket.emit('translate_message', { messageId, text, targetLang });
     }
 
+    editMessage(roomId: string, messageId: string, content: string) {
+        this.socket.emit('edit_message', { roomId, messageId, content });
+    }
+
+    deleteMessage(roomId: string, messageId: string) {
+        this.socket.emit('delete_message', { roomId, messageId });
+    }
+
     markMessageRead(messageId: string, roomId: string) {
         // Extract partner ID from roomId (format: room_ID1_ID2)
         // Backend expects roomId and senderId (the partner's user ID)

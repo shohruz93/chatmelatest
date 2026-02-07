@@ -579,6 +579,8 @@ $router->add('DELETE', '/community/post', function() use ($communityController) 
     $communityController->deletePost($postId, $userId);
 });
 
+
+
 // Test Route
 $router->add('GET', '/', function() {
     echo json_encode(["message" => "Welcome to Chatme API"]);
