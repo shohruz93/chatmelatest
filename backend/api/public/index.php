@@ -282,7 +282,8 @@ $router->add('GET', '/users/random', function() use ($db) {
         'gender' => $gender,
         'location' => $location,
         'native_language' => $nativeLanguage,
-        'learning_language' => $learningLanguage
+        'learning_language' => $learningLanguage,
+        'search' => $_GET['search'] ?? ''
     ];
     
     $includeIds = [];

@@ -212,6 +212,11 @@ class User {
             $params[':location'] = $filters['location'];
         }
 
+        if (!empty($filters['search'])) {
+            $query .= " AND name LIKE :search";
+            $params[':search'] = "%" . $filters['search'] . "%";
+        }
+
         // Note: We do NOT filter by includeIds exclusively unless requested. 
         // The user wants "Online users have priority", implies they should be top, but others still visible.
         // So we remove the "AND id IN (...)" constraint if it was meant to strictly filter.
