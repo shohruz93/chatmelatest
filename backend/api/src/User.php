@@ -560,6 +560,34 @@ class User {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
+            // Fetch extra data for the matched user
+            
+            // Interests
+            $query = "SELECT i.id, i.name FROM interests i 
+                      JOIN user_interests ui ON i.id = ui.interest_id 
+                      WHERE ui.user_id = :user_id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":user_id", $user['id']);
+            $stmt->execute();
+            $user['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Rating
+            $ratingQuery = "SELECT AVG(rating) as average_rating, COUNT(*) as rating_count 
+                           FROM match_feedback WHERE rated_id = :user_id AND rating IS NOT NULL";
+            $ratingStmt = $this->conn->prepare($ratingQuery);
+            $ratingStmt->bindParam(":user_id", $user['id']);
+            $ratingStmt->execute();
+            $ratingData = $ratingStmt->fetch(PDO::FETCH_ASSOC);
+            $user['rating'] = $ratingData['average_rating'] ? round($ratingData['average_rating'], 1) : 0;
+            $user['rating_count'] = $ratingData['rating_count'] ?: 0;
+            
+            // Photos (Gallery)
+            $photoQuery = "SELECT image_path FROM gallery_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 6";
+            $photoStmt = $this->conn->prepare($photoQuery);
+            $photoStmt->bindParam(":user_id", $user['id']);
+            $photoStmt->execute();
+            $user['photos'] = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
+
             // Record match!
             $this->recordMatch($currentUserId, $user['id']);
             return $user;

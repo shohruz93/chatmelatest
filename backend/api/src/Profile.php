@@ -45,6 +45,13 @@ class Profile {
             $profile['rating'] = $ratingData['average_rating'] ? round($ratingData['average_rating'], 1) : 0;
             $profile['rating_count'] = $ratingData['rating_count'];
 
+            // Get photos (Gallery)
+            $photoQuery = "SELECT image_path FROM gallery_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 6";
+            $photoStmt = $this->db->prepare($photoQuery);
+            $photoStmt->bindParam(":user_id", $userId);
+            $photoStmt->execute();
+            $profile['photos'] = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
+
             echo json_encode($profile);
         } else {
             http_response_code(404);
