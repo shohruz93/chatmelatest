@@ -265,7 +265,12 @@ $router->add('GET', '/users/random', function() use ($db) {
     $gender = $_GET['gender'] ?? 'any';
     $location = $_GET['location'] ?? 'any';
     $limit = $_GET['limit'] ?? 10;
-    $offset = $_GET['offset'] ?? 0;
+    $page = $_GET['page'] ?? 1;
+    $offset = ($page - 1) * $limit;
+    // Allow manual offset override if needed, but prefer page
+    if (isset($_GET['offset'])) {
+        $offset = $_GET['offset'];
+    }
     $onlineIdsParam = $_GET['online_ids'] ?? '';
     $nativeLanguage = $_GET['native_language'] ?? '';
     $learningLanguage = $_GET['learning_language'] ?? '';
