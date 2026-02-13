@@ -475,6 +475,100 @@ class User {
         
         return false;
     }
+    public function findRandomConnectUser($currentUserId, $filters = []) {
+        // Collect filters
+        $genderFilter = $filters['gender'] ?? 'any';
+        $locationFilter = $filters['location'] ?? 'any';
+        $onlineIds = $filters['online_ids'] ?? '';
+
+        // Exclude recent/all matches from history
+        // User asked to "not connect to repeat people".
+        // We exclude anyone in match_history involving this user.
+        $excludeSql = "AND u.id NOT IN (
+            SELECT CASE 
+                WHEN user1_id = :exc_uid1 THEN user2_id 
+                ELSE user1_id 
+            END 
+            FROM match_history 
+            WHERE user1_id = :exc_uid2 OR user2_id = :exc_uid3
+        )";
+
+        // Prepare base params
+        $params = [
+            ':exc_uid1' => $currentUserId,
+            ':exc_uid2' => $currentUserId,
+            ':exc_uid3' => $currentUserId,
+            ':current_user_id' => $currentUserId
+        ];
+
+        // Online filter/priority
+        // If "online_ids" is provided, we can prioritize them.
+        // User wants "Online status priority".
+        // We will build a dynamic score or WHERE clause.
+        
+        $whereClauses = "u.id != :current_user_id " . $excludeSql;
+        
+        if (!empty($genderFilter) && $genderFilter !== 'any') {
+            $whereClauses .= " AND u.gender = :gender";
+            $params[':gender'] = $genderFilter;
+        }
+
+        // Try to find ONLINE users first (if online_ids provided)
+        if (!empty($onlineIds)) {
+             $ids = array_filter(array_map('trim', explode(',', $onlineIds)));
+             if (!empty($ids)) {
+                 // Try finding an online user first
+                 $onlineParams = $params;
+                 // Add IN clause
+                 // To avoid binding distinct params for list, if list is safe/ints we can implode.
+                 // Otherwise use FIND_IN_SET loop.
+                 // Let's assume ids are integers.
+                 $cleanIds = implode(',', array_map('intval', $ids));
+                 //$onlineWhere = $whereClauses . " AND u.id IN ($cleanIds)";
+                 
+                 // Actually, let's just ORDER BY online desc.
+                 // We can use the same trick as getRandomUsers or getSmartMatch.
+             }
+        }
+        
+        // Let's use getSmartMatch logic but with exclusion.
+        // Actually simplest is: Select * from users where ... AND not in history .. ORDER BY online, interest, random LIMIT 1.
+        
+        $onlineScore = "CASE WHEN last_active > (UNIX_TIMESTAMP() - 300) THEN 1 ELSE 0 END";
+        if (!empty($onlineIds)) {
+            // If we have socket IDs, use them for online score too
+            // $onlineScore = ...
+        }
+
+        $query = "SELECT u.id, u.name, u.avatar, u.gender, u.last_active, u.email, u.bio, u.location, u.native_language, u.learning_language,
+                  ($onlineScore) as is_online
+                  FROM " . $this->table_name . " u
+                  WHERE $whereClauses
+                  ORDER BY is_online DESC, RAND()
+                  LIMIT 1";
+
+        $stmt = $this->conn->prepare($query);
+        foreach ($params as $key => $val) {
+             $stmt->bindValue($key, $val);
+        }
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            // Record match!
+            $this->recordMatch($currentUserId, $user['id']);
+            return $user;
+        }
+
+        return null;
+    }
+
+    private function recordMatch($user1Id, $user2Id) {
+        $query = "INSERT INTO match_history (user1_id, user2_id, created_at, status) VALUES (:u1, :u2, NOW(), 'connected')";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':u1' => $user1Id, ':u2' => $user2Id]);
+    }
+
     public function addCurrency($userId, $amount, $type = 'coins') {
         if (!in_array($type, ['coins', 'xp'])) {
             return false;

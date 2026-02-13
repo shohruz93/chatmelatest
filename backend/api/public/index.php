@@ -311,6 +311,27 @@ $router->add('GET', '/users/smart-match', function() use ($db) {
     echo json_encode($match);
 });
 
+$router->add('POST', '/connect/random', function() use ($db) {
+    require_once __DIR__ . '/../src/User.php';
+    $user = new User($db);
+    $data = json_decode(file_get_contents("php://input"), true);
+    
+    $currentUserId = $data['userId'] ?? 0;
+    $filters = [
+        'gender' => $data['gender'] ?? 'any',
+        'location' => $data['location'] ?? 'any',
+        'online_ids' => $data['online_ids'] ?? ''
+    ];
+
+    $matchedUser = $user->findRandomConnectUser($currentUserId, $filters);
+    
+    if ($matchedUser) {
+        echo json_encode(['success' => true, 'user' => $matchedUser]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'No new users found']);
+    }
+});
+
 // Advanced Matching Routes
 $router->add('GET', '/match/compatible', function() use ($advancedMatch) {
     $userId = $_GET['userId'] ?? 0;
