@@ -490,7 +490,7 @@ io.on('connection', (socket) => {
         }
 
         console.log(`Final receiverId: ${receiverId}`);
-        const replyToMessageId = replyTo ? replyTo.id : null;
+        const replyToMessageId = (typeof replyTo === 'object' && replyTo !== null) ? replyTo.id : replyTo;
         const isCorrection = replyTo?.isCorrection || false;
 
         const messageData = {
@@ -763,7 +763,8 @@ io.on('connection', (socket) => {
 
                 // Notify the sender that their messages have been read.
                 // Prefer sending directly to the sender's socket (they may not be joined to the room).
-                const senderSocketId = onlineUsers.get(senderId);
+                // Handle both numerical and string IDs in onlineUsers map
+                let senderSocketId = onlineUsers.get(senderId) || onlineUsers.get(parseInt(senderId));
                 if (senderSocketId) {
                     io.to(senderSocketId).emit('message_read', {
                         roomId: roomId,

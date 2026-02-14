@@ -27,12 +27,18 @@ class Push {
         $exists = $checkStmt->fetchColumn() > 0;
 
         if ($exists) {
-            // Update existing: Delete all old tokens for this user first to ensure 1-to-1 mapping
+            // Update existing: Delete all old tokens for this user first
             $deleteQuery = "DELETE FROM push_subscriptions WHERE user_id = :user_id";
             $deleteStmt = $this->db->prepare($deleteQuery);
             $deleteStmt->bindParam(":user_id", $userId);
             $deleteStmt->execute();
         }
+        
+        // CRITICAL: Delete this token from any other user to avoid Duplicate entry (integrity violation)
+        $deleteTokenQuery = "DELETE FROM push_subscriptions WHERE token = :token";
+        $deleteTokenStmt = $this->db->prepare($deleteTokenQuery);
+        $deleteTokenStmt->bindParam(":token", $token);
+        $deleteTokenStmt->execute();
 
         // Insert new token
         $insertQuery = "INSERT INTO push_subscriptions (user_id, token, platform) VALUES (:user_id, :token, :platform)";
