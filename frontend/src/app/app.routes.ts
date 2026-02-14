@@ -58,6 +58,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/games/checkers/checkers.component').then(m => m.CheckersComponent)
             },
             {
+                path: 'voice-rooms',
+                loadComponent: () => import('./pages/voice-rooms-list/voice-rooms-list.component').then(m => m.VoiceRoomsListComponent)
+            },
+            {
+                path: 'voice-room/:roomId',
+                loadComponent: () => import('./pages/voice-room/voice-room.component').then(m => m.VoiceRoomComponent)
+            },
+            {
                 path: 'coins',
                 loadComponent: () => import('./pages/coins/coins.component').then(m => m.CoinsComponent)
             }

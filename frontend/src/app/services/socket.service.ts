@@ -1,6 +1,6 @@
 import { Injectable, signal, inject, OnDestroy } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { shareReplay, takeUntil } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { LanguageService } from './language.service';
@@ -48,6 +48,14 @@ export class SocketService implements OnDestroy {
     private checkersRejectedSubject = new Subject<any>();
     private roomUsersSubject = new Subject<any>(); // New subject for room users
 
+    // Voice Room Subjects
+    private voiceRoomJoinedSubject = new Subject<any>();
+    private voiceUserJoinedSubject = new Subject<any>();
+    private voiceUserLeftSubject = new Subject<any>();
+    private voiceChatMessageSubject = new Subject<any>();
+    private voiceRoomsListSubject = new Subject<any[]>();
+    private connectionStateSubject = new BehaviorSubject<boolean>(false); // New connection state
+
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
     public messageReceived$ = this.messageReceivedSubject.asObservable().pipe(shareReplay(1)); // Add this
@@ -73,7 +81,15 @@ export class SocketService implements OnDestroy {
     public checkersRejected$ = this.checkersRejectedSubject.asObservable();
     private checkersCancelledSubject = new Subject<any>();
     public checkersCancelled$ = this.checkersCancelledSubject.asObservable();
-    public roomUsers$ = this.roomUsersSubject.asObservable(); // New observable
+    public roomUsers$ = this.roomUsersSubject.asObservable();
+
+    // Voice Room Observables
+    public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable();
+    public voiceUserJoined$ = this.voiceUserJoinedSubject.asObservable();
+    public voiceUserLeft$ = this.voiceUserLeftSubject.asObservable();
+    public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable();
+    public voiceRoomsList$ = this.voiceRoomsListSubject.asObservable();
+    public connectionState$ = this.connectionStateSubject.asObservable();
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -142,7 +158,15 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_error', (data) => this.checkersErrorSubject.next(data));
         this.socket.on('checkers_rejected', (data) => this.checkersRejectedSubject.next(data));
         this.socket.on('checkers_cancelled', (data) => this.checkersCancelledSubject.next(data));
-        this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data)); // New event listener
+        this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data));
+
+        // Voice Room Events
+        this.socket.on('voice_room_joined', (data) => this.voiceRoomJoinedSubject.next(data));
+        this.socket.on('voice_user_joined', (data) => this.voiceUserJoinedSubject.next(data));
+        this.socket.on('voice_user_left', (data) => this.voiceUserLeftSubject.next(data));
+        this.socket.on('voice_chat_message', (data) => this.voiceChatMessageSubject.next(data));
+        this.socket.on('voice_rooms_list', (data) => this.voiceRoomsListSubject.next(data));
+        this.socket.on('voice_rooms_update', (data) => this.voiceRoomsListSubject.next(data));
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
@@ -376,6 +400,27 @@ export class SocketService implements OnDestroy {
         this.socket.emit('checkers_game_over', { roomId, winnerId });
     }
 
+    // Voice Room Methods
+    getVoiceRooms() {
+        this.socket.emit('get_voice_rooms');
+    }
+
+    createVoiceRoom(topic: string) {
+        this.socket.emit('create_voice_room', { topic });
+    }
+
+    joinVoiceRoom(roomId: string) {
+        this.socket.emit('join_voice_room', { roomId });
+    }
+
+    leaveVoiceRoom(roomId: string) {
+        this.socket.emit('leave_voice_room', { roomId });
+    }
+
+    sendVoiceRoomMessage(roomId: string, content: string, senderName?: string, avatar?: string) {
+        this.socket.emit('voice_room_message', { roomId, content, senderName, avatar });
+    }
+
     // Generic methods for raw access
     emit(eventName: string, data: any) {
         if (this.socket.connected) {
@@ -385,12 +430,18 @@ export class SocketService implements OnDestroy {
 
         // Ensure connection and registration, then emit once connected
         this.socket.connect();
-        this.socket.once('connect', () => {
+        this.socket.on('connect', () => {
+            console.log('Socket connected');
+            this.connectionStateSubject.next(true);
             const current = this.auth.currentUserValue;
             if (current && current.id) {
                 this.socket.emit('register', current.id);
             }
-            this.socket.emit(eventName, data);
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+            this.connectionStateSubject.next(false);
         });
     }
 

@@ -1,0 +1,37 @@
+<div class="rooms-container">
+    <div class="rooms-header">
+        <h2>Voice Rooms</h2>
+        <button class="btn-primary" (click)="showCreateModal = true">
+            <span class="material-icons">add</span> Create Room
+        </button>
+    </div>
+
+    <div class="rooms-grid">
+        <div class="room-card glass-panel" *ngFor="let room of rooms()">
+            <div class="room-info">
+                <h3>{{ room.topic }}</h3>
+                <p class="participants-count">
+                    <span class="material-icons">group</span> {{ room.participantsCount || 0 }}
+                </p>
+                <div class="host-info" *ngIf="room.hostId">Host ID: {{ room.hostId }}</div>
+            </div>
+            <button class="btn-join" (click)="joinRoom(room.id)">Join</button>
+        </div>
+
+        <div *ngIf="rooms().length === 0" class="no-rooms">
+            <p>No active voice rooms. Create one to start chatting!</p>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false">
+        <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
+            <h3>Create Voice Room</h3>
+            <input type="text" [(ngModel)]="newRoomTopic" placeholder="Enter room topic" class="modal-input" autofocus>
+            <div class="modal-actions">
+                <button class="btn-secondary" (click)="showCreateModal = false">Cancel</button>
+                <button class="btn-primary" (click)="createRoom()" [disabled]="!newRoomTopic.trim()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>

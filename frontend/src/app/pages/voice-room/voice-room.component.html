@@ -1,0 +1,57 @@
+<div class="voice-room-container">
+    <!-- Header -->
+    <header class="room-header glass-panel">
+        <button class="btn-icon" (click)="leaveRoom()" title="Leave Room">
+            <span class="material-icons">arrow_back</span>
+        </button>
+        <h2 class="room-title">{{ topic }}</h2>
+        <div class="header-controls">
+            <button class="btn-end-call" (click)="leaveRoom()" title="End Call">
+                <span class="material-icons">call_end</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Participants Area (Top Half) -->
+    <div class="participants-grid">
+        <div class="participant-card glass-panel" *ngFor="let p of participants()">
+            <div class="avatar-wrapper">
+                <div class="avatar-placeholder">{{ p | slice:0:1 }}</div> 
+                <!-- If we had avatars, we'd use <img [src]="p.avatar"> -->
+            </div>
+            <span class="participant-name">User {{ p }}</span>
+             <!-- Audio visualization placeholder -->
+            <div class="audio-waves">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        
+        <div *ngIf="participants().length === 0" class="waiting-message">
+            <p>Waiting for others...</p>
+        </div>
+    </div>
+
+    <!-- Chat Area (Bottom Half) -->
+    <div class="chat-section glass-panel">
+        <div class="messages-list" #messagesContainer>
+            <div *ngFor="let msg of messages()" class="message-bubble" 
+                 [class.sent]="isMyMessage(msg)"
+                 [class.received]="!isMyMessage(msg)">
+                
+                <div class="message-content">
+                    <span *ngIf="!isMyMessage(msg)" class="sender-name">{{ msg.senderName || 'User ' + msg.senderId }}</span>
+                    <p>{{ msg.content }}</p>
+                    <span class="timestamp">{{ msg.timestamp * 1000 | date:'shortTime' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-bar">
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" 
+                   placeholder="Type a message..." class="chat-input">
+            <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
+                <span class="material-icons">send</span>
+            </button>
+        </div>
+    </div>
+</div>
