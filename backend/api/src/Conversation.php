@@ -18,6 +18,7 @@ class Conversation {
                 u.id as partner_id, 
                 u.name as partner_name, 
                 u.avatar as partner_avatar, 
+                u.last_active as partner_last_active,
                 m.content as last_message, 
                 m.created_at as last_message_time,
                 m.sender_id as last_message_sender_id,
@@ -52,8 +53,31 @@ class Conversation {
             $stmt->bindValue(":u6", $userId);
             $stmt->execute();
             $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            TimestampHelper::convertRowsToUnix($conversations, ['last_message_time']);
+            TimestampHelper::convertRowsToUnix($conversations, ['last_message_time', 'partner_last_active']);
             echo json_encode($conversations);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["error" => $e->getMessage()]);
+        }
+    }
+
+    public function delete($userId, $partnerId) {
+        $query = "DELETE FROM messages 
+                  WHERE (sender_id = :u1 AND receiver_id = :p1) 
+                     OR (sender_id = :p2 AND receiver_id = :u2)";
+        try {
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":u1", $userId);
+            $stmt->bindParam(":p1", $partnerId);
+            $stmt->bindParam(":p2", $partnerId);
+            $stmt->bindParam(":u2", $userId);
+            
+            if ($stmt->execute()) {
+                echo json_encode(["success" => true, "message" => "Conversation deleted"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["success" => false, "message" => "Failed to delete conversation"]);
+            }
         } catch (PDOException $e) {
             http_response_code(500);
             echo json_encode(["error" => $e->getMessage()]);

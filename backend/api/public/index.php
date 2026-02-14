@@ -259,6 +259,12 @@ $router->add('POST', '/conversations/read', function() use ($conversation) {
     $conversation->markAsRead($userId, $otherUserId);
 });
 
+$router->add('DELETE', '/conversations', function() use ($conversation) {
+    $userId = $_GET['userId'] ?? 0;
+    $partnerId = $_GET['partnerId'] ?? 0;
+    $conversation->delete($userId, $partnerId);
+});
+
 // Random Users for Matching
 $router->add('GET', '/users/random', function() use ($db) {
     $currentUserId = $_GET['userId'] ?? 0;
