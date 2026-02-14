@@ -40,8 +40,10 @@ class Push {
         $deleteTokenStmt->bindParam(":token", $token);
         $deleteTokenStmt->execute();
 
-        // Insert new token
-        $insertQuery = "INSERT INTO push_subscriptions (user_id, token, platform) VALUES (:user_id, :token, :platform)";
+        // Insert or update token (handles duplicate entries safely)
+        $insertQuery = "INSERT INTO push_subscriptions (user_id, token, platform) 
+                        VALUES (:user_id, :token, :platform)
+                        ON DUPLICATE KEY UPDATE platform = VALUES(platform), updated_at = CURRENT_TIMESTAMP";
         $stmt = $this->db->prepare($insertQuery);
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":token", $token);
