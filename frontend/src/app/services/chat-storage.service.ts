@@ -408,4 +408,60 @@ export class ChatStorageService {
       request.onerror = () => resolve(null);
     });
   }
+
+  // Save the entire conversation list to IndexedDB
+  async saveConversations(conversations: any[]): Promise<void> {
+    if (!this.db) {
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(CONVERSATIONS_STORE, 'readwrite');
+      const store = transaction.objectStore(CONVERSATIONS_STORE);
+
+      // We use roomId or a composite key. But for the list, we can just put all.
+      conversations.forEach(conv => {
+        // Ensure roomId exists for the keyPath
+        if (!conv.roomId && conv.id) conv.roomId = conv.id;
+
+        // Get existing to preserve partnerInfo if not present in list
+        const getReq = store.get(conv.roomId);
+        getReq.onsuccess = () => {
+          const existing = getReq.result || {};
+          store.put({
+            ...existing,
+            ...conv,
+            last_updated: Date.now()
+          });
+        };
+      });
+
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
+    });
+  }
+
+  // Get cached conversations from IndexedDB
+  async getConversations(): Promise<any[]> {
+    if (!this.db) {
+      return [];
+    }
+    const store = this.getStore(CONVERSATIONS_STORE, 'readonly');
+    const index = store.index('last_updated');
+    const conversations: any[] = [];
+
+    return new Promise((resolve, reject) => {
+      // Order by last_updated descending
+      const request = index.openCursor(null, 'prev');
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          conversations.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(conversations);
+        }
+      };
+      request.onerror = (event) => reject((event.target as IDBRequest).error);
+    });
+  }
 }

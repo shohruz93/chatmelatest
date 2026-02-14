@@ -7,6 +7,7 @@ import { SocketService } from '../../services/socket.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 import { Subscription } from 'rxjs';
+import { ChatStorageService } from '../../services/chat-storage.service';
 
 @Component({
     selector: 'app-conversations',
@@ -20,6 +21,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     private auth = inject(AuthService);
     private router = inject(Router);
     public socketService = inject(SocketService);
+    private storage = inject(ChatStorageService); // Injected ChatStorageService
     private subs = new Subscription();
 
     conversations: any[] = [];
@@ -30,10 +32,22 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
     isDarkMode = signal(document.documentElement.getAttribute('data-theme') === 'dark');
 
-    ngOnInit() {
-        this.currentUser = this.auth.currentUserValue;
+    async ngOnInit() { // Changed to async
+        this.currentUser = this.auth.currentUserValue as any;
         if (this.currentUser) {
-            // Only load conversations on first init
+            // 1. Initialize DB and Load Cache
+            try {
+                await this.storage.openDb(this.currentUser.id);
+                const cached: any[] = await this.storage.getConversations();
+                if (cached && cached.length > 0) {
+                    this.conversations = cached;
+                    this.loading = false;
+                }
+            } catch (err: any) {
+                console.warn('Storage error', err);
+            }
+
+            // 2. Trigger background refresh
             if (!this.hasLoadedConversations) {
                 this.loadConversations();
                 this.hasLoadedConversations = true;
@@ -87,11 +101,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
             conv.last_message_is_read = msg.is_read || (msg.status === 'read' ? 1 : 0);
 
             // Handle unread count:
-            if (isSent) {
-                // If user sent a message, they're engaging with this chat - reset unread count
-                conv.unread_count = 0;
-            } else if (isInThisChat) {
-                // If user is currently viewing this chat, message is marked as read - reset unread count
+            if (isSent || isInThisChat) { // Modified unread count logic
                 conv.unread_count = 0;
             } else {
                 // Only increment unread count if:
@@ -103,6 +113,9 @@ export class ConversationsComponent implements OnInit, OnDestroy {
             // Move to top
             this.conversations.splice(index, 1);
             this.conversations.unshift(conv);
+
+            // Persist to cache
+            this.storage.saveConversations([conv]); // Save updated conversation to cache
         } else {
             // New conversation? Reload list to get full details properly
             this.loadConversations();
@@ -119,7 +132,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     }
 
     loadConversations() {
-        this.loading = true;
+        if (this.conversations.length === 0) this.loading = true; // Added conditional loading
         this.error = null;
         this.api.get(`/conversations?userId=${this.currentUser.id}`).subscribe({
             next: (data: any) => {
@@ -130,12 +143,18 @@ export class ConversationsComponent implements OnInit, OnDestroy {
                     }
                     return conv;
                 });
+
+                // Save to cache
+                this.storage.saveConversations(this.conversations); // Save all conversations to cache
+
                 this.loading = false;
             },
             error: (err) => {
                 console.error('Error loading conversations', err);
-                this.error = 'Failed to load conversations. Please try again later.';
-                this.loading = false;
+                if (this.conversations.length === 0) { // Added conditional error/loading
+                    this.error = 'Failed to load conversations. Please try again later.';
+                    this.loading = false;
+                }
             }
         });
     }
