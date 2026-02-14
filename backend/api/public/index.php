@@ -231,7 +231,8 @@ $router->add('GET', '/messages/room', function() use ($message) {
     $roomId = $_GET['roomId'] ?? '';
     $limit = $_GET['limit'] ?? 50;
     $offset = $_GET['offset'] ?? 0;
-    $message->getByRoom($roomId, $limit, $offset);
+    $lastId = $_GET['lastId'] ?? null;
+    $message->getByRoom($roomId, $limit, $offset, $lastId);
 });
 
 $router->add('POST', '/messages', function() use ($message) {

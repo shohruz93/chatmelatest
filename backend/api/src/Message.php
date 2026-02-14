@@ -34,7 +34,12 @@ class Message {
         echo json_encode($messages);
     }
 
-    public function getByRoom($roomId, $limit = 50, $offset = 0) {
+    public function getByRoom($roomId, $limit = 50, $offset = 0, $lastId = null) {
+        $lastIdFilter = "";
+        if ($lastId !== null && is_numeric($lastId)) {
+            $lastIdFilter = " AND m.id > :lastId ";
+        }
+
         $query = "SELECT
                     m.*,
                     u.name as senderName,
@@ -44,7 +49,7 @@ class Message {
                   JOIN users u ON u.id = m.sender_id
                   LEFT JOIN messages replied ON m.reply_to_message_id = replied.id
                   LEFT JOIN users reply_sender ON replied.sender_id = reply_sender.id
-                  WHERE m.room_id = :room 
+                  WHERE m.room_id = :room $lastIdFilter
                   ORDER BY m.created_at DESC 
                   LIMIT :limit OFFSET :offset";
         
@@ -53,6 +58,10 @@ class Message {
         $stmt->bindParam(":room", $roomId);
         $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
         $stmt->bindParam(":offset", $offset, PDO::PARAM_INT);
+        if ($lastId !== null && is_numeric($lastId)) {
+            $stmt->bindParam(":lastId", $lastId, PDO::PARAM_INT);
+        }
+
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -114,6 +123,7 @@ class Message {
 
             $query = "INSERT INTO messages (sender_id, receiver_id, room_id, content, type, original_lang, reply_to_message_id, is_correction) 
                       VALUES (:sid, :rid, :room, :content, :type, :lang, :reply_to, :is_correction)";
+
             
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(":sid", $data['senderId']);
@@ -215,7 +225,7 @@ class Message {
             return;
         }
 
-        $query = "UPDATE messages SET content = :content WHERE id = :id";
+        $query = "UPDATE messages SET content = :content, is_edited = 1 WHERE id = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":content", $data['content']);
         $stmt->bindParam(":id", $data['id']);
@@ -236,7 +246,7 @@ class Message {
             return;
         }
 
-        $query = "DELETE FROM messages WHERE id = :id";
+        $query = "UPDATE messages SET is_deleted = 1 WHERE id = :id";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":id", $data['id']);
 
