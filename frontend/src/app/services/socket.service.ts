@@ -222,11 +222,11 @@ export class SocketService implements OnDestroy {
         this.socket.emit('send_chat_request', { targetUserId, myProfile });
     }
 
-    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null, tempId?: string) {
+    sendMessage(roomId: string, content: string, originalLang: string, type: string = 'text', replyTo: any = null, tempId?: string, senderName: string | null = null, avatar: string | null = null) {
         const normalizedLang = originalLang === 'tj' ? 'tg' : originalLang;
         const currentUser = this.auth.currentUserValue;
-        const senderName = currentUser?.name;
-        const avatar = currentUser?.avatar;
+        const finalSenderName = senderName || currentUser?.name;
+        const finalAvatar = avatar || currentUser?.avatar;
 
         this.socket.emit('private_message', {
             roomId,
@@ -235,8 +235,8 @@ export class SocketService implements OnDestroy {
             type,
             replyTo,
             tempId,
-            senderName,
-            avatar
+            senderName: finalSenderName,
+            avatar: finalAvatar
         });
     }
 

@@ -324,7 +324,9 @@ export class ChatService {
             this.socketService.selectedLanguage(),
             messageType,
             replyToData,
-            tempId
+            tempId,
+            currentUser.name,
+            currentUser.photo_url || currentUser.photoUrl || currentUser.avatar
         );
     }
 
@@ -417,7 +419,7 @@ export class ChatService {
 
         // Process replyTo data to ensure messageType exists
         let processedReplyTo = data.replyTo;
-        if (processedReplyTo) {
+        if (processedReplyTo && typeof processedReplyTo === 'object') {
             let replyType = processedReplyTo.messageType;
             const replyContent = processedReplyTo.content || '';
 
@@ -434,6 +436,14 @@ export class ChatService {
             processedReplyTo = {
                 ...processedReplyTo,
                 messageType: replyType
+            };
+        } else if (typeof processedReplyTo === 'string' || typeof processedReplyTo === 'number') {
+            // It's just an ID
+            processedReplyTo = {
+                id: String(processedReplyTo),
+                content: 'Message reply', // Fallback if content missing
+                senderName: 'User',
+                messageType: 'text'
             };
         }
 

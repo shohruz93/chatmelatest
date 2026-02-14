@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
     selector: 'app-tab-nav',
@@ -17,6 +18,7 @@ export class TabNavComponent {
     private router = inject(Router);
     private api = inject(ApiService);
     private auth = inject(AuthService);
+    private socketService = inject(SocketService);
     protected unreadCount = signal(0);
     currentRoute = '';
 
@@ -27,6 +29,12 @@ export class TabNavComponent {
             this.currentRoute = event.urlAfterRedirects;
             this.checkUnread();
         });
+
+        // Real-time unread updates
+        this.socketService.on('message').subscribe({
+            next: () => this.checkUnread()
+        });
+
         this.checkUnread();
     }
 
