@@ -447,6 +447,11 @@ export class ChatService {
             };
         }
 
+        // Ensure isCorrection flag is propagated into replyTo for UI logic
+        if (data.isCorrection && processedReplyTo) {
+            processedReplyTo.isCorrection = true;
+        }
+
         // Determine status: Prioritize explicit status, then is_read from DB, then fallback
         let status = data.status;
         if (!status) {
