@@ -152,6 +152,12 @@ class Auth {
             return;
         }
 
+        // Test account bypass for Google Play Store review
+        if ($email === 'tester@chatme.tj') {
+            echo json_encode(["message" => "code_sent"]);
+            return;
+        }
+
         $code = rand(100000, 999999);
         $expires = time() + (10 * 60); // 10 minutes
 
@@ -232,6 +238,47 @@ class Auth {
         if (file_exists($storeFile)) {
             $raw = file_get_contents($storeFile);
             $codes = $raw ? json_decode($raw, true) : [];
+        }
+
+        // Test account bypass for Google Play Store review
+        if ($email === 'tester@chatme.tj' && (string)$code === '123456') {
+            $userId = $this->user->createOrGetByEmail($email);
+            if (!$userId) {
+                http_response_code(500);
+                echo json_encode(["message" => "Failed to create user"]);
+                return;
+            }
+
+            // Fetch user profile
+            $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":id", $userId);
+            $stmt->execute();
+            $userProfile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $sessionToken = base64_encode(json_encode([
+                "id" => $userId,
+                "email" => $email,
+                "exp" => time() + (30 * 24 * 60 * 60) // 30 days
+            ]));
+
+            echo json_encode([
+                "message" => "Login successful",
+                "token" => $sessionToken,
+                "user" => [
+                    "id" => $userId,
+                    "name" => $userProfile['name'],
+                    "first_name" => $userProfile['first_name'] ?? '',
+                    "family_name" => $userProfile['family_name'] ?? '',
+                    "email" => $userProfile['email'],
+                    "avatar" => $userProfile['avatar'] ?? null,
+                    "bio" => $userProfile['bio'] ?? null,
+                    "gender" => $userProfile['gender'] ?? null,
+                    "location" => $userProfile['location'] ?? null,
+                    "is_admin" => (int)($userProfile['is_admin'] ?? 0)
+                ]
+            ]);
+            return;
         }
 
         if (!isset($codes[$email])) {
