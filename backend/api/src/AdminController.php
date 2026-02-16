@@ -30,15 +30,15 @@ class AdminController {
         $stats['total_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
         
         // Active Users (last 24h)
-        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE last_active > DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE last_active > (UNIX_TIMESTAMP() - 86400)");
         $stats['active_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
         
         // Online Users (last 5 min)
-        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE last_active > DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE last_active > (UNIX_TIMESTAMP() - 300)");
         $stats['online_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
         
         // New Users (last 7 days)
-        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)");
+        $stmt = $this->db->query("SELECT COUNT(*) as count FROM users WHERE created_at > (UNIX_TIMESTAMP() - 604800)");
         $stats['new_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
         
         // Gender Distribution
@@ -266,13 +266,16 @@ class AdminController {
 
         // Get stats for this user
         $statsQuery = "SELECT 
-            (SELECT COUNT(*) FROM messages WHERE sender_id = :uid) as messages_sent,
-            (SELECT COUNT(DISTINCT CASE WHEN sender_id = :uid THEN receiver_id ELSE sender_id END) 
+            (SELECT COUNT(*) FROM messages WHERE sender_id = :uid1) as messages_sent,
+            (SELECT COUNT(DISTINCT CASE WHEN sender_id = :uid2 THEN receiver_id ELSE sender_id END) 
              FROM messages 
-             WHERE sender_id = :uid OR receiver_id = :uid) as total_conversations
+             WHERE sender_id = :uid3 OR receiver_id = :uid4) as total_conversations
         ";
         $statsStmt = $this->db->prepare($statsQuery);
-        $statsStmt->bindParam(":uid", $userId);
+        $statsStmt->bindValue(":uid1", $userId);
+        $statsStmt->bindValue(":uid2", $userId);
+        $statsStmt->bindValue(":uid3", $userId);
+        $statsStmt->bindValue(":uid4", $userId);
         $statsStmt->execute();
         $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
         
@@ -307,28 +310,33 @@ class AdminController {
                 u.email,
                 m.content as last_message,
                 m.created_at as last_message_time,
-                (SELECT COUNT(*) FROM messages m2 WHERE m2.sender_id = u.id AND m2.receiver_id = :admin_id AND m2.is_read = 0) as unread_count
+                (SELECT COUNT(*) FROM messages m2 WHERE m2.sender_id = u.id AND m2.receiver_id = :admin_id1 AND m2.is_read = 0) as unread_count
             FROM users u
             JOIN (
                 SELECT 
                     CASE 
-                        WHEN sender_id = :admin_id THEN receiver_id 
+                        WHEN sender_id = :admin_id2 THEN receiver_id 
                         ELSE sender_id 
                     END as other_user_id,
                     MAX(created_at) as max_created_at
                 FROM messages
-                WHERE sender_id = :admin_id OR receiver_id = :admin_id
+                WHERE sender_id = :admin_id3 OR receiver_id = :admin_id4
                 GROUP BY other_user_id
             ) latest_msg ON u.id = latest_msg.other_user_id
             JOIN messages m ON (
-                (m.sender_id = :admin_id AND m.receiver_id = u.id) OR 
-                (m.sender_id = u.id AND m.receiver_id = :admin_id)
+                (m.sender_id = :admin_id5 AND m.receiver_id = u.id) OR 
+                (m.sender_id = u.id AND m.receiver_id = :admin_id6)
             ) AND m.created_at = latest_msg.max_created_at
             ORDER BY m.created_at DESC
         ";
 
         $stmt = $this->db->prepare($query);
-        $stmt->bindValue(':admin_id', $adminId);
+        $stmt->bindValue(':admin_id1', $adminId);
+        $stmt->bindValue(':admin_id2', $adminId);
+        $stmt->bindValue(':admin_id3', $adminId);
+        $stmt->bindValue(':admin_id4', $adminId);
+        $stmt->bindValue(':admin_id5', $adminId);
+        $stmt->bindValue(':admin_id6', $adminId);
         $stmt->execute();
         $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
