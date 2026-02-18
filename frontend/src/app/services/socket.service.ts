@@ -90,6 +90,8 @@ export class SocketService implements OnDestroy {
     public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable();
     public voiceRoomsList$ = this.voiceRoomsListSubject.asObservable();
     public connectionState$ = this.connectionStateSubject.asObservable();
+    private voiceErrorSubject = new Subject<any>();
+    public voiceError$ = this.voiceErrorSubject.asObservable();
 
     constructor(private auth: AuthService) {
         this.socket = io(this.url, { autoConnect: false });
@@ -161,12 +163,18 @@ export class SocketService implements OnDestroy {
         this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data));
 
         // Voice Room Events
+        this.socket.on('voice_room_created', (data) => console.log('Room created:', data));
         this.socket.on('voice_room_joined', (data) => this.voiceRoomJoinedSubject.next(data));
         this.socket.on('voice_user_joined', (data) => this.voiceUserJoinedSubject.next(data));
         this.socket.on('voice_user_left', (data) => this.voiceUserLeftSubject.next(data));
         this.socket.on('voice_chat_message', (data) => this.voiceChatMessageSubject.next(data));
         this.socket.on('voice_rooms_list', (data) => this.voiceRoomsListSubject.next(data));
         this.socket.on('voice_rooms_update', (data) => this.voiceRoomsListSubject.next(data));
+        this.socket.on('voice_error', (data) => {
+            console.error('Voice Error:', data);
+            this.voiceErrorSubject.next(data);
+        });
+        this.socket.on('voice_room_host_changed', (data) => console.log('Host changed:', data));
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
@@ -174,7 +182,13 @@ export class SocketService implements OnDestroy {
                 this.socket.emit('register', current.id);
                 this.socket.emit('get_online_users');
             }
+            this.connectionStateSubject.next(true);
             this.connectedSubject.next();
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+            this.connectionStateSubject.next(false);
         });
     }
 
@@ -409,8 +423,8 @@ export class SocketService implements OnDestroy {
         this.socket.emit('create_voice_room', { topic });
     }
 
-    joinVoiceRoom(roomId: string) {
-        this.socket.emit('join_voice_room', { roomId });
+    joinVoiceRoom(roomId: string, profile?: { name: string, avatar: string }) {
+        this.socket.emit('join_voice_room', { roomId, profile });
     }
 
     leaveVoiceRoom(roomId: string) {

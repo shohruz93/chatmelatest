@@ -40,26 +40,40 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         });
     }
 
+    connected = signal(false);
+    isJoined = false;
+
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
 
         this.subs.add(this.route.paramMap.subscribe(params => {
             this.roomId = params.get('roomId');
-            // Don't join immediately here, wait for connection
+            this.isJoined = false; // Reset joined state on room change
+            this.attemptJoin();
         }));
 
         this.subs.add(this.socketService.connectionState$.subscribe(connected => {
-            if (connected && this.roomId) {
-                this.joinRoom();
+            this.connected.set(connected);
+            if (!connected) {
+                this.isJoined = false; // Reset on disconnect so we rejoin
+            }
+            if (connected) {
+                this.attemptJoin();
             }
         }));
 
         this.setupSocketEvents();
     }
 
-    joinRoom() {
-        if (this.roomId) {
-            this.socketService.joinVoiceRoom(this.roomId);
+    attemptJoin() {
+        if (this.roomId && this.connected() && !this.isJoined) {
+            console.log('[VoiceRoom] Joining room:', this.roomId);
+            const profile = {
+                name: this.currentUser?.name || `User ${this.currentUser?.id}`,
+                avatar: this.currentUser?.avatar || ''
+            };
+            this.socketService.joinVoiceRoom(this.roomId, profile);
+            this.isJoined = true; // Prevent duplicate joins
         }
     }
 
@@ -103,9 +117,12 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
 
         // Chat Message
         this.subs.add(this.socketService.voiceChatMessage$.subscribe((message: any) => {
+            console.log('[VoiceRoom] Message received:', message);
             if (message.roomId === this.roomId) {
                 this.messages.update(msgs => [...msgs, message]);
                 this.cdr.markForCheck();
+            } else {
+                console.warn('[VoiceRoom] Message ignored - roomId mismatch:', message.roomId, this.roomId);
             }
         }));
     }

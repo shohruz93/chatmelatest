@@ -16,16 +16,17 @@
     <div class="participants-grid">
         <div class="participant-card glass-panel" *ngFor="let p of participants()">
             <div class="avatar-wrapper">
-                <div class="avatar-placeholder">{{ p | slice:0:1 }}</div> 
-                <!-- If we had avatars, we'd use <img [src]="p.avatar"> -->
+                <img *ngIf="p.avatar" [src]="p.avatar" class="avatar-img" [alt]="p.name">
+                <div *ngIf="!p.avatar" class="avatar-placeholder">{{ (p.name ? p.name.charAt(0) : '' + p.id).slice(0, 1)
+                    }}</div>
             </div>
-            <span class="participant-name">User {{ p }}</span>
-             <!-- Audio visualization placeholder -->
+            <span class="participant-name">{{ p.name || 'User ' + p.id }}</span>
+            <!-- Audio visualization placeholder -->
             <div class="audio-waves">
                 <span></span><span></span><span></span>
             </div>
         </div>
-        
+
         <div *ngIf="participants().length === 0" class="waiting-message">
             <p>Waiting for others...</p>
         </div>
@@ -34,12 +35,12 @@
     <!-- Chat Area (Bottom Half) -->
     <div class="chat-section glass-panel">
         <div class="messages-list" #messagesContainer>
-            <div *ngFor="let msg of messages()" class="message-bubble" 
-                 [class.sent]="isMyMessage(msg)"
-                 [class.received]="!isMyMessage(msg)">
-                
+            <div *ngFor="let msg of messages()" class="message-bubble" [class.sent]="isMyMessage(msg)"
+                [class.received]="!isMyMessage(msg)">
+
                 <div class="message-content">
-                    <span *ngIf="!isMyMessage(msg)" class="sender-name">{{ msg.senderName || 'User ' + msg.senderId }}</span>
+                    <span *ngIf="!isMyMessage(msg)" class="sender-name">{{ msg.senderName || 'User ' + msg.senderId
+                        }}</span>
                     <p>{{ msg.content }}</p>
                     <span class="timestamp">{{ msg.timestamp * 1000 | date:'shortTime' }}</span>
                 </div>
@@ -47,8 +48,8 @@
         </div>
 
         <div class="chat-input-bar">
-            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" 
-                   placeholder="Type a message..." class="chat-input">
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Type a message..."
+                class="chat-input">
             <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
                 <span class="material-icons">send</span>
             </button>

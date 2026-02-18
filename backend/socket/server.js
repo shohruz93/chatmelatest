@@ -1134,6 +1134,30 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Voice Room Chat (Ephemeral - No DB)
+    socket.on('voice_room_message', (payload) => {
+        if (!payload) return;
+        const { roomId, content, senderName, avatar } = payload;
+        const senderId = userSocketMap.get(socket.id);
+
+        if (!senderId || !roomId || !content) return;
+
+        const messageData = {
+            id: `ephemeral_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            senderId: senderId,
+            roomId: roomId,
+            content: content,
+            type: 'text',
+            timestamp: Math.floor(Date.now() / 1000),
+            senderName: senderName || 'User',
+            avatar: avatar || null,
+            isEphemeral: true
+        };
+
+        io.to(roomId).emit('voice_chat_message', messageData);
+        console.log(`[VOICE_CHAT] Message from ${senderId} in ${roomId}: ${content}`);
+    });
+
     // Voice Chat Signaling (Updated for Rooms)
     socket.on('voice_offer', ({ targetUserId, offer }) => {
         const senderId = userSocketMap.get(socket.id);
