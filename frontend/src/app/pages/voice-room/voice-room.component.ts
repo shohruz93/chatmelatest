@@ -82,21 +82,7 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         this.subs.add(this.socketService.voiceRoomJoined$.subscribe((data: any) => {
             if (data.roomId === this.roomId) {
                 this.topic = data.topic || 'Voice Room';
-                // Participants are sent as array of IDs usually, or objects?
-                // Android code: participants = participantsList (List<Int>)
-                // We might need to fetch user details or if server sends full objects.
-                // Let's assume server sends what Android expects.
-                // Wait, Android `SocketManager` calls `voice_room_joined` parsing `participants` as `JSONArray` of INTs.
-                // So we only get IDs. We might need to fetch profiles or just show placeholders.
-                // For now, let's map IDs to dummy objects if they are just IDs.
-                // Actually, `activeRooms` in server.js doesn't seem to have a `get_voice_room_details`.
-                // But `voice_room_joined` event payload in `WebRTCManager` (Android) has `participants`.
-                // Let's use what we get.
-
-                // If data.participants is array of IDs, we need to fetch them? 
-                // Or maybe we can't easily fetch them all yet without a specific endpoint.
-                // Let's just store them for now.
-                this.participants.set(data.participants || []); // Placeholder
+                this.participants.set(data.participants || []);
                 this.cdr.markForCheck();
             }
         }));
@@ -104,15 +90,16 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         // User Joined
         this.subs.add(this.socketService.voiceUserJoined$.subscribe((data: any) => {
             const current = this.participants();
-            if (!current.includes(data.userId)) {
-                this.participants.set([...current, data.userId]);
+            const user = data.user || { id: data.userId, name: 'User ' + data.userId }; // Fallback
+            if (!current.find(p => p.id === user.id)) {
+                this.participants.set([...current, user]);
             }
         }));
 
         // User Left
         this.subs.add(this.socketService.voiceUserLeft$.subscribe((data: any) => {
             const current = this.participants();
-            this.participants.set(current.filter(p => p !== data.userId));
+            this.participants.set(current.filter(p => p.id !== data.userId));
         }));
 
         // Chat Message

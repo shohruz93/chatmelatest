@@ -1014,8 +1014,13 @@ io.on('connection', (socket) => {
             hostId: userId,
             participants: new Set([userId]),
             speakers: new Set([userId]),
+            profiles: new Map(), // Initialize profiles map
             listenersCount: 0
         };
+
+        // Initialize host profile (fallback until join sends it or we fetch it)
+        // Ideally host should join properly, but create implies join
+        newRoom.profiles.set(userId, { id: userId, name: `User ${userId}`, avatar: '' });
 
         voiceRooms.set(roomId, newRoom);
         socket.join(roomId);
@@ -1053,35 +1058,44 @@ io.on('connection', (socket) => {
         socket.emit('voice_rooms_list', roomsList);
     });
 
-    socket.on('join_voice_room', async ({ roomId }) => {
+    socket.on('join_voice_room', async ({ roomId, profile }) => {
         const userId = userSocketMap.get(socket.id);
         const room = voiceRooms.get(roomId);
+
+        console.log(`[Voice] Join request for ${roomId} from socket ${socket.id} (User: ${userId})`);
 
         if (room && userId) {
             socket.join(roomId);
             room.participants.add(userId);
-            // By default, join as listener unless host? For now, everyone is speaker/listener mix
-            // room.speakers.add(userId); 
+
+            // Store profile
+            if (profile) {
+                room.profiles.set(userId, { id: userId, ...profile });
+            } else if (!room.profiles.has(userId)) {
+                // Fallback if no profile sent (shouldn't happen with updated frontend)
+                room.profiles.set(userId, { id: userId, name: `User ${userId}`, avatar: '' });
+            }
 
             console.log(`[VoiceRoom] User ${userId} joined ${roomId}`);
 
             // 1. Send room details to joiner
-            // We need profiles of existing participants to show avatars
-            // userIds in room:
-            const participantIds = Array.from(room.participants);
-
-            // Fetch profiles for all participants (this can be optimized)
-            // For now, sending IDs. Client can fetch profiles.
+            const participantsWithProfiles = Array.from(room.participants).map(uid =>
+                room.profiles.get(uid) || { id: uid, name: `User ${uid}`, avatar: '' }
+            );
 
             socket.emit('voice_room_joined', {
                 roomId: room.id,
                 topic: room.topic,
-                participants: participantIds,
+                participants: participantsWithProfiles, // Send full objects
                 isHost: room.hostId === userId
             });
 
             // 2. Notify others in room
-            socket.to(roomId).emit('voice_user_joined', { userId });
+            const userProfile = room.profiles.get(userId);
+            socket.to(roomId).emit('voice_user_joined', {
+                userId,
+                user: userProfile // Send full object
+            });
 
             // 3. Update Lobby
             io.emit('voice_rooms_update', Array.from(voiceRooms.values()).map(r => ({
@@ -1092,7 +1106,7 @@ io.on('connection', (socket) => {
                 speakersCount: r.speakers.size
             })));
         } else {
-            socket.emit('voice_error', { message: 'Room not found' });
+            socket.emit('voice_error', { message: 'Room not found or user not authenticated' });
         }
     });
 
@@ -1104,6 +1118,7 @@ io.on('connection', (socket) => {
             socket.leave(roomId);
             room.participants.delete(userId);
             room.speakers.delete(userId);
+            room.profiles.delete(userId); // Remove profile
 
             console.log(`[VoiceRoom] User ${userId} left ${roomId}`);
 
@@ -1223,6 +1238,7 @@ io.on('connection', (socket) => {
                 if (room.participants.has(userId)) {
                     room.participants.delete(userId);
                     room.speakers.delete(userId);
+                    room.profiles.delete(userId); // Remove profile
 
                     if (room.participants.size === 0) {
                         voiceRooms.delete(roomId);
