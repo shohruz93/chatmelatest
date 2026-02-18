@@ -96,6 +96,8 @@ const waitingUsers = new Map();
 const typingUsers = new Map();
 // Store active rooms: roomId -> { user1, user2 }
 const activeRooms = new Map();
+// Store active voice rooms: roomId -> { id, topic, hostId, participants: Set(userId), speakers: Set(userId) }
+const voiceRooms = new Map();
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
@@ -1000,7 +1002,6 @@ io.on('connection', (socket) => {
     });
 
     // Voice Room Management
-    const voiceRooms = new Map(); // roomId -> { id, topic, hostId, participants: Set(userId), speakers: Set(userId) }
 
     socket.on('create_voice_room', ({ topic }) => {
         const userId = userSocketMap.get(socket.id);
@@ -1086,7 +1087,9 @@ io.on('connection', (socket) => {
             io.emit('voice_rooms_update', Array.from(voiceRooms.values()).map(r => ({
                 id: r.id,
                 topic: r.topic,
-                participantsCount: r.participants.size
+                hostId: r.hostId,
+                participantsCount: r.participants.size,
+                speakersCount: r.speakers.size
             })));
         } else {
             socket.emit('voice_error', { message: 'Room not found' });
@@ -1124,7 +1127,9 @@ io.on('connection', (socket) => {
             io.emit('voice_rooms_update', Array.from(voiceRooms.values()).map(r => ({
                 id: r.id,
                 topic: r.topic,
-                participantsCount: r.participants.size
+                hostId: r.hostId,
+                participantsCount: r.participants.size,
+                speakersCount: r.speakers.size
             })));
         }
     });
@@ -1189,6 +1194,35 @@ io.on('connection', (socket) => {
 
         const userId = userSocketMap.get(socket.id);
         if (userId) {
+            // Cleanup voice rooms
+            for (const [roomId, room] of voiceRooms.entries()) {
+                if (room.participants.has(userId)) {
+                    room.participants.delete(userId);
+                    room.speakers.delete(userId);
+
+                    if (room.participants.size === 0) {
+                        voiceRooms.delete(roomId);
+                    } else {
+                        if (room.hostId === userId) {
+                            const newHost = room.participants.values().next().value;
+                            if (newHost) {
+                                room.hostId = newHost;
+                                io.to(roomId).emit('voice_room_host_changed', { newHostId: newHost });
+                            }
+                        }
+                        io.to(roomId).emit('voice_user_left', { userId });
+                    }
+
+                    io.emit('voice_rooms_update', Array.from(voiceRooms.values()).map(r => ({
+                        id: r.id,
+                        topic: r.topic,
+                        hostId: r.hostId,
+                        participantsCount: r.participants.size,
+                        speakersCount: r.speakers.size
+                    })));
+                }
+            }
+
             setTimeout(() => {
                 if (onlineUsers.get(userId) === socket.id) {
                     onlineUsers.delete(userId);
