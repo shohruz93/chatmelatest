@@ -82,6 +82,12 @@ export class AdminService {
     });
   }
 
+  getUserActivity(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/admin/users/activity`, {
+      params: { id: userId.toString() }
+    });
+  }
+
   getStats(): Observable<any> {
     return this.http.get(`${this.apiUrl}/admin/stats`);
   }

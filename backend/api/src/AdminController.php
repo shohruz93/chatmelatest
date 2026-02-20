@@ -452,5 +452,56 @@ class AdminController {
         $versions = $this->appVersion->getAllVersions();
         echo json_encode($versions);
     }
+
+    public function getUserActivity() {
+        if (!isset($_GET['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User ID required']);
+            return;
+        }
+
+        $userId = $_GET['id'];
+        
+        // Fetch activity from multiple tables using UNION ALL
+        // Ensure all created_at are treated as UNIX timestamps
+        $query = "
+            SELECT 'account_created' as type, '' as details, created_at as timestamp 
+            FROM users WHERE id = :uid1
+            UNION ALL
+            SELECT 'message_sent' as type, content as details, created_at as timestamp 
+            FROM messages WHERE sender_id = :uid2
+            UNION ALL
+            SELECT 'post_created' as type, text_content as details, created_at as timestamp 
+            FROM community_posts WHERE user_id = :uid3
+            UNION ALL
+            SELECT 'photo_uploaded' as type, caption as details, created_at as timestamp 
+            FROM gallery_images WHERE user_id = :uid4
+            UNION ALL
+            SELECT 'friend_request_sent' as type, '' as details, created_at as timestamp 
+            FROM friendships WHERE user_id = :uid5
+            ORDER BY timestamp DESC
+            LIMIT 50
+        ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':uid1', $userId);
+        $stmt->bindValue(':uid2', $userId);
+        $stmt->bindValue(':uid3', $userId);
+        $stmt->bindValue(':uid4', $userId);
+        $stmt->bindValue(':uid5', $userId);
+        $stmt->execute();
+        
+        $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Process activities if any special formatting is needed
+        // Truncate message contents to prevent huge payloads
+        foreach ($activities as &$activity) {
+             if (($activity['type'] === 'message_sent' || $activity['type'] === 'post_created' || $activity['type'] === 'photo_uploaded') && strlen($activity['details']) > 100) {
+                 $activity['details'] = substr($activity['details'], 0, 100) . '...';
+             }
+        }
+
+        echo json_encode($activities);
+    }
 }
 

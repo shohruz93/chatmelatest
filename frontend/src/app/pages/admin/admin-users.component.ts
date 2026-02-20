@@ -181,13 +181,13 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
                                 <!-- Tabs -->
                                 <div class="flex gap-8 border-b border-slate-200 dark:border-slate-800">
-                                    <button (click)="activeTab = 'overview'" 
+                                    <button (click)="setActiveTab('overview')" 
                                         [class]="activeTab === 'overview' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                                         class="pb-4 font-bold text-sm border-b-2 transition-colors">Overview</button>
-                                    <button (click)="activeTab = 'edit'" 
+                                    <button (click)="setActiveTab('edit')" 
                                         [class]="activeTab === 'edit' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                                         class="pb-4 font-bold text-sm border-b-2 transition-colors">Edit Profile</button>
-                                    <button (click)="activeTab = 'activity'" 
+                                    <button (click)="setActiveTab('activity')" 
                                         [class]="activeTab === 'activity' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                                         class="pb-4 font-bold text-sm border-b-2 transition-colors">Activity Logs</button>
                                 </div>
@@ -336,22 +336,62 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                                         <button (click)="saveUser()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20">
                                             Save Changes
                                         </button>
-                                        <button (click)="activeTab = 'overview'" class="flex-1 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold py-3 rounded-xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
+                                        <button (click)="setActiveTab('overview')" class="flex-1 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold py-3 rounded-xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors">
                                             Cancel
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- Activity Tab (Placeholder) -->
+                                <!-- Activity Tab -->
                                 <div *ngIf="activeTab === 'activity'" class="space-y-6 animate-fade-in-up">
-                                    <div class="text-center py-12">
+                                    <div *ngIf="isLoadingActivity" class="flex flex-col items-center justify-center py-12 gap-4">
+                                        <div class="animate-spin rounded-full h-10 w-10 border-b-4 border-blue-600"></div>
+                                        <span class="text-slate-500 font-medium animate-pulse">Loading activity history...</span>
+                                    </div>
+                                    
+                                    <div *ngIf="!isLoadingActivity && (!userActivity || userActivity.length === 0)" class="text-center py-12">
                                         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
-                                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Activity Log</h3>
-                                        <p class="text-slate-500 dark:text-slate-400">Detailed user activity history is coming soon.</p>
+                                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">No Activity Yet</h3>
+                                        <p class="text-slate-500 dark:text-slate-400">This user hasn't performed any logged actions.</p>
+                                    </div>
+
+                                    <div *ngIf="!isLoadingActivity && userActivity && userActivity.length > 0" class="relative">
+                                        <!-- Timeline line -->
+                                        <div class="absolute top-0 bottom-0 left-[23px] w-px bg-slate-200 dark:bg-slate-800"></div>
+                                        
+                                        <div class="space-y-8 relative z-10">
+                                            <div *ngFor="let activity of userActivity; let last = last" class="flex gap-4">
+                                                <!-- Icon col -->
+                                                <div class="flex-shrink-0 flex flex-col items-center">
+                                                    <div class="w-12 h-12 rounded-full border-4 border-white dark:border-[#151921] flex items-center justify-center"
+                                                         [ngClass]="getActivityIconBgClass(activity.type)">
+                                                        <!-- Uses dynamic icon based on type -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" [innerHTML]="getActivityIconPath(activity.type)"></svg>
+                                                    </div>
+                                                </div>
+                                                <!-- Content col -->
+                                                <div class="flex-1 pt-1 mb-2">
+                                                    <div class="bg-slate-50 dark:bg-slate-800/30 rounded-2xl p-5 border border-slate-100 dark:border-slate-800">
+                                                        <div class="flex justify-between items-start gap-4 mb-2">
+                                                            <h4 class="font-bold text-slate-800 dark:text-white flex-1">{{ getActivityTitle(activity.type) }}</h4>
+                                                            <div class="text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap bg-white dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-700">
+                                                                {{ formatActivityDate(activity.timestamp) }}
+                                                            </div>
+                                                        </div>
+                                                        <p *ngIf="activity.details" class="text-sm text-slate-600 dark:text-slate-400 break-words line-clamp-2">
+                                                            "{{ activity.details }}"
+                                                        </p>
+                                                        <p *ngIf="!activity.details && getActivityDescription(activity.type)" class="text-sm text-slate-500 dark:text-slate-500 italic">
+                                                            {{ getActivityDescription(activity.type) }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -385,6 +425,8 @@ export class AdminUsersComponent implements OnInit {
 
     selectedUser: any = null;
     userDetails: any = null;
+    userActivity: any[] | null = null;
+    isLoadingActivity: boolean = false;
     isEditing: boolean = false;
     editForm: any = {};
     activeTab: string = 'overview';
@@ -446,12 +488,30 @@ export class AdminUsersComponent implements OnInit {
     viewUser(user: any) {
         this.selectedUser = user;
         this.userDetails = null;
+        this.userActivity = null;
         this.isEditing = false;
         this.activeTab = 'overview';
         this.adminService.getUserDetails(user.id).subscribe(details => {
             this.userDetails = details;
             this.editForm = { ...details };
         });
+    }
+
+    setActiveTab(tab: string) {
+        this.activeTab = tab;
+        if (tab === 'activity' && !this.userActivity) {
+            this.isLoadingActivity = true;
+            this.adminService.getUserActivity(this.selectedUser.id).subscribe({
+                next: (log) => {
+                    this.userActivity = log;
+                    this.isLoadingActivity = false;
+                },
+                error: (err) => {
+                    console.error('Failed to load activity log', err);
+                    this.isLoadingActivity = false;
+                }
+            });
+        }
     }
 
     startEdit() {
@@ -488,6 +548,7 @@ export class AdminUsersComponent implements OnInit {
     closeUserDrawer() {
         this.selectedUser = null;
         this.userDetails = null;
+        this.userActivity = null;
         this.isEditing = false;
     }
 
@@ -527,5 +588,65 @@ export class AdminUsersComponent implements OnInit {
         }
     }
 
+    // Helper methods for the timeline UI
+    getActivityTitle(type: string): string {
+        switch (type) {
+            case 'account_created': return 'Account Created';
+            case 'message_sent': return 'Sent a Message';
+            case 'post_created': return 'Created a Post';
+            case 'photo_uploaded': return 'Uploaded a Photo';
+            case 'friend_request_sent': return 'Sent a Friend Request';
+            default: return 'Unknown Action';
+        }
+    }
+
+    getActivityDescription(type: string): string {
+        switch (type) {
+            case 'account_created': return 'User joined the platform.';
+            case 'friend_request_sent': return 'User sent a friend request.';
+            default: return '';
+        }
+    }
+
+    getActivityIconBgClass(type: string): string {
+        switch (type) {
+            case 'account_created': return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400';
+            case 'message_sent': return 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400';
+            case 'post_created': return 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400';
+            case 'photo_uploaded': return 'bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-500/20 dark:text-fuchsia-400';
+            case 'friend_request_sent': return 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400';
+            default: return 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+        }
+    }
+
+    getActivityIconPath(type: string): any {
+        let path = '';
+        switch (type) {
+            case 'account_created':
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />';
+                break;
+            case 'message_sent':
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />';
+                break;
+            case 'post_created':
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />';
+                break;
+            case 'photo_uploaded':
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />';
+                break;
+            case 'friend_request_sent':
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />';
+                break;
+            default:
+                path = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+        }
+        return path; // For Angular [innerHTML] binding
+    }
+
+    formatActivityDate(timestamp: number): string {
+        if (!timestamp) return '';
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
 
 }

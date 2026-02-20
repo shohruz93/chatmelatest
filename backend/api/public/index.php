@@ -417,6 +417,10 @@ $router->add('GET', '/admin/users/details', function() use ($adminController) {
     $adminController->getUserDetails();
 });
 
+$router->add('GET', '/admin/users/activity', function() use ($adminController) {
+    $adminController->getUserActivity();
+});
+
 $router->add('POST', '/admin/support/conversations', function() use ($adminController) {
     $adminController->getSupportConversations();
 });
