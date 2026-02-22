@@ -88,6 +88,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     // Rating & Comment Inputs
     newRating: number = 0;
     newComment: string = '';
+    isSubmitting: boolean = false;
     replyContent: { [key: number]: string } = {};
     showReplyInput: { [key: number]: boolean } = {};
     showReplies: { [key: number]: boolean } = {};
@@ -465,6 +466,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
             return;
         }
 
+        if (this.newComment.length > 250) {
+            alert('Comment cannot exceed 250 characters');
+            return;
+        }
+
+        this.isSubmitting = true;
+
         const data = {
             raterId: this.currentUser.id,
             ratedId: this.profileUser.id,
@@ -476,9 +484,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
             next: () => {
                 this.newRating = 0;
                 this.newComment = '';
+                this.isSubmitting = false;
                 this.loadProfile(this.profileUser.id); // Reload to get new stats and comments
             },
-            error: (err) => alert('Failed to submit rating')
+            error: (err) => {
+                this.isSubmitting = false;
+                alert('Failed to submit rating');
+            }
         });
     }
 
@@ -488,12 +500,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
             return;
         }
 
+        if (this.newComment.length > 250) {
+            alert('Comment cannot exceed 250 characters');
+            return;
+        }
+
+        this.isSubmitting = true;
+
         this.api.addComment(this.currentUser.id, this.profileUser.id, this.newComment).subscribe({
             next: () => {
                 this.newComment = '';
+                this.isSubmitting = false;
                 this.loadComments(this.profileUser.id);
             },
-            error: (err) => alert('Failed to submit comment')
+            error: (err) => {
+                this.isSubmitting = false;
+                alert('Failed to submit comment');
+            }
         });
     }
 
@@ -833,19 +856,3 @@ export class ProfileComponent implements OnInit, OnDestroy {
             error: (err) => {
                 console.error('Failed to delete image', err);
                 alert(this.languageService.translate('GALLERY.DELETE_ERROR'));
-            }
-        });
-    }
-
-    getGalleryImageUrl(path: string): string {
-        if (!path) return '';
-        if (path.startsWith('http')) return path;
-        return `${this.api.phpBaseUrl}${path}`;
-    }
-
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
-        this.stopTelegramPolling();
-    }
-}

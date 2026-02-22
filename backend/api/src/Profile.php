@@ -476,6 +476,12 @@ class Profile {
         $rating = $data['rating'];
         $comment = $data['comment'] ?? '';
         
+        if (mb_strlen($comment) > 250) {
+            http_response_code(400);
+            echo json_encode(["message" => "Comment cannot exceed 250 characters"]);
+            return;
+        }
+        
         // Always insert a new record (no update)
         $query = "INSERT INTO user_ratings (rater_id, rated_id, rating, comment) VALUES (:rater, :rated, :rating, :comment)";
         $stmt = $this->db->prepare($query);
@@ -499,6 +505,12 @@ class Profile {
         $userId = $data['userId'];
         $ratedId = $data['ratedId'];
         $comment = $data['comment'] ?? '';
+        
+        if (mb_strlen($comment) > 250) {
+            http_response_code(400);
+            echo json_encode(["message" => "Comment cannot exceed 250 characters"]);
+            return;
+        }
         
         if (empty($comment)) {
             http_response_code(400);
