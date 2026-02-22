@@ -84,10 +84,10 @@ export class SocketService implements OnDestroy {
     public roomUsers$ = this.roomUsersSubject.asObservable();
 
     // Voice Room Observables
-    public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable().pipe(shareReplay(1));
-    public voiceUserJoined$ = this.voiceUserJoinedSubject.asObservable().pipe(shareReplay(1));
-    public voiceUserLeft$ = this.voiceUserLeftSubject.asObservable().pipe(shareReplay(1));
-    public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable().pipe(shareReplay(1));
+    public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable();
+    public voiceUserJoined$ = this.voiceUserJoinedSubject.asObservable();
+    public voiceUserLeft$ = this.voiceUserLeftSubject.asObservable();
+    public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable();
     public voiceRoomsList$ = this.voiceRoomsListSubject.asObservable();
     public connectionState$ = this.connectionStateSubject.asObservable();
     private voiceErrorSubject = new Subject<any>();

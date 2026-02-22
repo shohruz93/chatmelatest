@@ -29,7 +29,22 @@ export class VoiceChatService {
     private config: RTCConfiguration = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
+            { urls: 'stun:stun1.l.google.com:19302' },
+            {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            }
         ]
     };
 
@@ -99,30 +114,42 @@ export class VoiceChatService {
      * Start a call to a specific participant (mesh initiation)
      */
     async startCall(targetUserId: number) {
-        console.log('[VoiceService] Starting call to', targetUserId);
+        const pc = this.getOrCreatePeerConnection(targetUserId);
+        if (pc.signalingState !== 'stable') {
+            console.log('[VoiceService] Skipping startCall - PC not stable:', pc.signalingState);
+            return;
+        }
 
+        console.log('[VoiceService] Starting call to', targetUserId);
         await this.initLocalStream();
 
-        const pc = this.getOrCreatePeerConnection(targetUserId);
-
         try {
-            const offer = await pc.createOffer();
+            const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: false });
             await pc.setLocalDescription(offer);
-            this.socket.emit('voice_offer', { targetId: targetUserId, offer });
+            this.socket.emit('voice_offer', { targetUserId: targetUserId, offer });
         } catch (e) {
             console.error('[VoiceService] Error creating offer for', targetUserId, e);
         }
     }
 
     private async handleOffer(offer: RTCSessionDescriptionInit, senderId: number) {
+        const pc = this.getOrCreatePeerConnection(senderId);
+        if (pc.signalingState !== 'stable') {
+            if (pc.signalingState === 'have-local-offer') {
+                console.log('[VoiceService] Glare detected, but ignoring for now (letting other side win if possible)');
+                // Basic glare: typically higher ID wins, but for simplicity we rely on the error to stop one side
+            }
+            console.log('[VoiceService] Ignoring offer - PC state:', pc.signalingState);
+            return;
+        }
+
         await this.initLocalStream();
 
-        const pc = this.getOrCreatePeerConnection(senderId);
         try {
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await pc.createAnswer();
+            const answer = await pc.createAnswer(); // answer options aren't typically needed in newer WebRTC APIs if transceivers/streams are handled
             await pc.setLocalDescription(answer);
-            this.socket.emit('voice_answer', { targetId: senderId, answer });
+            this.socket.emit('voice_answer', { targetUserId: senderId, answer });
         } catch (e) {
             console.error('[VoiceService] Error handling offer from', senderId, e);
         }
@@ -183,7 +210,7 @@ export class VoiceChatService {
         // Handle ICE candidates
         pc.onicecandidate = (event) => {
             if (event.candidate) {
-                this.socket.emit('voice_candidate', { targetId: userId, candidate: event.candidate });
+                this.socket.emit('voice_candidate', { targetUserId: userId, candidate: event.candidate });
             }
         };
 

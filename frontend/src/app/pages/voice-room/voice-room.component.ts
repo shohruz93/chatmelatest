@@ -110,22 +110,21 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
     }
 
     async attemptJoin() {
-        if (this.roomId && this.socketService.connectionState$ && !this.isJoined) {
-            console.log('[VoiceRoom] Joining room:', this.roomId);
+        if (!this.roomId || this.isJoined) return;
+        this.isJoined = true; // Prevent duplicate joins immediately
+        console.log('[VoiceRoom] Joining room:', this.roomId);
 
-            try {
-                await this.voiceService.initLocalStream();
-            } catch (e) {
-                console.warn('[VoiceRoom] Could not init stream, joining anyway as listener');
-            }
-
-            const profile = {
-                name: this.currentUser?.name || `User ${this.currentUser?.id}`,
-                avatar: this.currentUser?.avatar || ''
-            };
-            this.socketService.joinVoiceRoom(this.roomId, profile);
-            this.isJoined = true; // Prevent duplicate joins
+        try {
+            await this.voiceService.initLocalStream();
+        } catch (e) {
+            console.warn('[VoiceRoom] Could not init stream, joining anyway as listener');
         }
+
+        const profile = {
+            name: this.currentUser?.name || `User ${this.currentUser?.id}`,
+            avatar: this.currentUser?.avatar || ''
+        };
+        this.socketService.joinVoiceRoom(this.roomId, profile);
     }
 
     setupSocketEvents() {
@@ -245,13 +244,13 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
     leaveRoom() {
         if (this.roomId) {
             this.socketService.leaveVoiceRoom(this.roomId);
-            this.voiceService.cleanup();
             this.router.navigate(['/dashboard']);
         }
     }
 
     ngOnDestroy() {
         this.leaveRoom(); // Ensure we leave on navigation
+        this.voiceService.cleanup(); // Ensure cleanup is called directly
         this.subs.unsubscribe();
     }
 
