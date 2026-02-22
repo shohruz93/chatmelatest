@@ -1,26 +1,30 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { SocketService } from './socket.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VoiceChatService {
     private socket = inject(SocketService);
-    private peerConnection: RTCPeerConnection | null = null;
+
+    // Multi-participant mesh: userId -> RTCPeerConnection
+    private peerConnections = new Map<number, RTCPeerConnection>();
+    private remoteStreams = new Map<number, MediaStream>();
+    private audioElements = new Map<number, HTMLAudioElement>();
+    private analysers = new Map<number, AnalyserNode>(); // userId -> Analyser
+
+    private audioContext: AudioContext | null = null;
     private localStream: MediaStream | null = null;
-    private remoteStream: MediaStream | null = null;
-    private currentTargetUserId: number | null = null;
-    private connectionTimeout: any = null;
-    private iceGatheringTimeout: any = null;
-    private retryCount = 0;
-    private maxRetries = 3;
+    private localAnalyser: AnalyserNode | null = null;
 
     // Signals for UI state
     isActive = signal(false);
     isMuted = signal(false);
-    isRemoteAudioPlaying = signal(false);
     connectionError = signal<string | null>(null);
     isConnecting = signal(false);
+    // Map of active speakers: userId -> isSpeaking
+    public speakerActivity = signal<Map<number, boolean>>(new Map());
 
     private config: RTCConfiguration = {
         iceServers: [
@@ -34,185 +38,227 @@ export class VoiceChatService {
     }
 
     private setupSocketListeners() {
+        // Handle incoming offers from OTHER participants
         this.socket.on('voice_offer').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received offer', data);
+            console.log('[VoiceService] Received offer from', data.senderId);
             await this.handleOffer(data.offer, data.senderId);
         });
 
+        // Handle answers to OUR offers
         this.socket.on('voice_answer').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received answer', data);
-            await this.handleAnswer(data.answer);
+            console.log('[VoiceService] Received answer from', data.senderId);
+            await this.handleAnswer(data.answer, data.senderId);
         });
 
+        // Handle candidates from ANY participant
         this.socket.on('voice_candidate').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received candidate', data);
-            await this.handleCandidate(data.candidate);
+            console.log('[VoiceService] Received candidate from', data.senderId);
+            await this.handleCandidate(data.candidate, data.senderId);
         });
 
         this.socket.on('voice_error').subscribe((data: any) => {
             console.error('[VoiceService] Voice error:', data);
             this.connectionError.set(data.message || 'Voice connection failed');
-            this.isConnecting.set(false);
-            this.cleanup();
         });
     }
 
-    async startCall(targetUserId: number) {
-        console.log('[VoiceService] Starting call to', targetUserId);
-        this.currentTargetUserId = targetUserId;
-        this.isConnecting.set(true);
-        this.connectionError.set(null);
-
-        await this.initializePeerConnection(targetUserId);
-        if (!this.peerConnection) {
-            this.isConnecting.set(false);
-            return;
-        }
+    /**
+     * Initialize local media and prepare for connections
+     */
+    async initLocalStream() {
+        if (this.localStream) return;
 
         try {
-            const offer = await this.peerConnection.createOffer();
-            await this.peerConnection.setLocalDescription(offer);
-            this.socket.emit('voice_offer', { targetUserId, offer });
-            this.isActive.set(true);
-            this.isConnecting.set(false);
+            console.log('[VoiceService] Getting local user media...');
+            this.localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
-            // Set connection timeout (30 seconds)
-            this.connectionTimeout = setTimeout(() => {
-                if (this.peerConnection?.connectionState !== 'connected') {
-                    console.error('[VoiceService] Connection timeout');
-                    this.connectionError.set('Connection timeout - please try again');
-                    this.cleanup();
-                }
-            }, 30000);
+            if (!this.audioContext) {
+                this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            }
+
+            // Monitor local stream
+            const source = this.audioContext.createMediaStreamSource(this.localStream);
+            this.localAnalyser = this.audioContext.createAnalyser();
+            source.connect(this.localAnalyser);
+            this.monitorLevel(0, this.localAnalyser); // 0 for local
+
+            this.isActive.set(true);
+            this.isMuted.set(false);
+        } catch (e: any) {
+            console.error('[VoiceService] Error getting user media:', e);
+            if (e.name === 'NotAllowedError') {
+                this.connectionError.set('Microphone permission denied.');
+            } else {
+                this.connectionError.set('Could not access microphone.');
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Start a call to a specific participant (mesh initiation)
+     */
+    async startCall(targetUserId: number) {
+        console.log('[VoiceService] Starting call to', targetUserId);
+
+        await this.initLocalStream();
+
+        const pc = this.getOrCreatePeerConnection(targetUserId);
+
+        try {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            this.socket.emit('voice_offer', { targetId: targetUserId, offer });
         } catch (e) {
-            console.error('[VoiceService] Error creating offer:', e);
-            this.connectionError.set('Failed to create voice connection');
-            this.isConnecting.set(false);
-            this.cleanup();
+            console.error('[VoiceService] Error creating offer for', targetUserId, e);
         }
     }
 
     private async handleOffer(offer: RTCSessionDescriptionInit, senderId: number) {
-        if (this.isActive()) {
-            console.log('[VoiceService] Already in call, ignoring offer'); // Or handle collision
-            // return; 
-        }
+        await this.initLocalStream();
 
-        await this.initializePeerConnection(senderId);
+        const pc = this.getOrCreatePeerConnection(senderId);
         try {
-            await this.peerConnection!.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await this.peerConnection!.createAnswer();
-            await this.peerConnection!.setLocalDescription(answer);
-            this.socket.emit('voice_answer', { targetUserId: senderId, answer });
-            this.isActive.set(true);
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            this.socket.emit('voice_answer', { targetId: senderId, answer });
         } catch (e) {
-            console.error('[VoiceService] Error handling offer:', e);
+            console.error('[VoiceService] Error handling offer from', senderId, e);
         }
     }
 
-    private async handleAnswer(answer: RTCSessionDescriptionInit) {
-        if (!this.peerConnection) return;
+    private async handleAnswer(answer: RTCSessionDescriptionInit, senderId: number) {
+        const pc = this.peerConnections.get(senderId);
+        if (!pc) return;
         try {
-            await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+            await pc.setRemoteDescription(new RTCSessionDescription(answer));
         } catch (e) {
-            console.error('[VoiceService] Error handling answer:', e);
+            console.error('[VoiceService] Error handling answer from', senderId, e);
         }
     }
 
-    private async handleCandidate(candidate: RTCIceCandidateInit) {
-        if (!this.peerConnection) return;
+    private async handleCandidate(candidate: RTCIceCandidateInit, senderId: number) {
+        const pc = this.peerConnections.get(senderId);
+        if (!pc) return;
         try {
-            await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            await pc.addIceCandidate(new RTCIceCandidate(candidate));
         } catch (e) {
-            console.error('[VoiceService] Error adding candidate:', e);
+            console.error('[VoiceService] Error adding candidate from', senderId, e);
         }
     }
 
-    private async initializePeerConnection(targetUserId: number) {
-        this.cleanup(); // Close existing if any
-
-        try {
-            this.localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        } catch (e: any) {
-            console.error('[VoiceService] Error getting user media:', e);
-            if (e.name === 'NotAllowedError') {
-                this.connectionError.set('Microphone permission denied. Please allow microphone access.');
-            } else if (e.name === 'NotFoundError') {
-                this.connectionError.set('No microphone found. Please connect a microphone.');
-            } else {
-                this.connectionError.set('Could not access microphone. Please check permissions.');
-            }
-            this.isConnecting.set(false);
-            return;
+    private getOrCreatePeerConnection(userId: number): RTCPeerConnection {
+        if (this.peerConnections.has(userId)) {
+            return this.peerConnections.get(userId)!;
         }
 
-        this.peerConnection = new RTCPeerConnection(this.config);
+        console.log('[VoiceService] Creating PeerConnection for', userId);
+        const pc = new RTCPeerConnection(this.config);
 
         // Add local tracks
-        this.localStream.getTracks().forEach(track => {
-            this.peerConnection!.addTrack(track, this.localStream!);
-        });
+        if (this.localStream) {
+            this.localStream.getTracks().forEach(track => {
+                pc.addTrack(track, this.localStream!);
+            });
+        }
 
         // Handle remote tracks
-        this.peerConnection.ontrack = (event) => {
-            console.log('[VoiceService] Received remote track');
-            this.remoteStream = event.streams[0];
-            this.playRemoteAudio();
-            this.clearTimeouts();
+        pc.ontrack = (event) => {
+            console.log('[VoiceService] Received remote track from', userId);
+            const stream = event.streams[0];
+            this.remoteStreams.set(userId, stream);
+            this.playRemoteAudio(userId, stream);
+
+            // Monitor remote stream
+            if (this.audioContext) {
+                const source = this.audioContext.createMediaStreamSource(stream);
+                const analyser = this.audioContext.createAnalyser();
+                source.connect(analyser);
+                this.analysers.set(userId, analyser);
+                this.monitorLevel(userId, analyser);
+            }
         };
 
         // Handle ICE candidates
-        this.peerConnection.onicecandidate = (event) => {
+        pc.onicecandidate = (event) => {
             if (event.candidate) {
-                this.socket.emit('voice_candidate', { targetUserId, candidate: event.candidate });
+                this.socket.emit('voice_candidate', { targetId: userId, candidate: event.candidate });
             }
         };
 
-        // ICE gathering state monitoring
-        this.peerConnection.onicegatheringstatechange = () => {
-            console.log('[VoiceService] ICE gathering state:', this.peerConnection?.iceGatheringState);
-            if (this.peerConnection?.iceGatheringState === 'complete') {
-                if (this.iceGatheringTimeout) {
-                    clearTimeout(this.iceGatheringTimeout);
-                }
+        pc.onconnectionstatechange = () => {
+            console.log(`[VoiceService] Connection state for ${userId}:`, pc.connectionState);
+            if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+                this.removeParticipant(userId);
             }
         };
 
-        // Connection state monitoring
-        this.peerConnection.onconnectionstatechange = () => {
-            const state = this.peerConnection?.connectionState;
-            console.log('[VoiceService] Connection state:', state);
-
-            if (state === 'connected') {
-                this.clearTimeouts();
-                this.retryCount = 0;
-                this.connectionError.set(null);
-            } else if (state === 'disconnected') {
-                this.connectionError.set('Voice connection lost');
-                this.attemptReconnect();
-            } else if (state === 'failed') {
-                this.connectionError.set('Voice connection failed');
-                this.attemptReconnect();
-            } else if (state === 'closed') {
-                this.cleanup();
-            }
-        };
-
-        // Set ICE gathering timeout
-        this.iceGatheringTimeout = setTimeout(() => {
-            if (this.peerConnection?.iceGatheringState !== 'complete') {
-                console.warn('[VoiceService] ICE gathering timeout');
-            }
-        }, 10000);
+        this.peerConnections.set(userId, pc);
+        return pc;
     }
 
-    private playRemoteAudio() {
-        const audioElement = new Audio();
-        audioElement.srcObject = this.remoteStream;
-        audioElement.autoplay = true;
-        audioElement.play().then(() => {
-            this.isRemoteAudioPlaying.set(true);
-        }).catch(e => console.error('[VoiceService] Error playing active stream:', e));
+    private playRemoteAudio(userId: number, stream: MediaStream) {
+        // Remove existing if any
+        this.stopRemoteAudio(userId);
+
+        // ... handled via AudioContext logic for monitoring, but still need output
+        const audio = new Audio();
+        audio.srcObject = stream;
+        audio.autoplay = true;
+        audio.play().catch(e => console.warn('[VoiceService] Play error (expected if no user interaction yet):', e));
+        this.audioElements.set(userId, audio);
+    }
+
+    private monitorLevel(userId: number, analyser: AnalyserNode) {
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const checkValue = () => {
+            if (!this.isActive()) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / bufferLength;
+            const isSpeaking = average > 15; // Threshold
+
+            const current = this.speakerActivity();
+            if (current.get(userId) !== isSpeaking) {
+                const next = new Map(current);
+                next.set(userId, isSpeaking);
+                this.speakerActivity.set(next);
+            }
+
+            if (this.isActive()) {
+                requestAnimationFrame(checkValue);
+            }
+        };
+
+        requestAnimationFrame(checkValue);
+    }
+
+    private stopRemoteAudio(userId: number) {
+        const audio = this.audioElements.get(userId);
+        if (audio) {
+            audio.pause();
+            audio.srcObject = null;
+            this.audioElements.delete(userId);
+        }
+    }
+
+    removeParticipant(userId: number) {
+        console.log('[VoiceService] Removing participant', userId);
+        const pc = this.peerConnections.get(userId);
+        if (pc) {
+            pc.close();
+            this.peerConnections.delete(userId);
+        }
+        this.stopRemoteAudio(userId);
+        this.remoteStreams.delete(userId);
     }
 
     toggleMute() {
@@ -220,62 +266,36 @@ export class VoiceChatService {
             const audioTrack = this.localStream.getAudioTracks()[0];
             if (audioTrack) {
                 audioTrack.enabled = !audioTrack.enabled;
-                this.isMuted.set(!audioTrack.enabled); // enabled=true means NOT muted
+                this.isMuted.set(!audioTrack.enabled);
             }
         }
     }
 
-    private clearTimeouts() {
-        if (this.connectionTimeout) {
-            clearTimeout(this.connectionTimeout);
-            this.connectionTimeout = null;
-        }
-        if (this.iceGatheringTimeout) {
-            clearTimeout(this.iceGatheringTimeout);
-            this.iceGatheringTimeout = null;
-        }
-    }
-
-    private attemptReconnect() {
-        if (this.retryCount < this.maxRetries && this.currentTargetUserId) {
-            this.retryCount++;
-            console.log(`[VoiceService] Attempting reconnect ${this.retryCount}/${this.maxRetries}`);
-            setTimeout(() => {
-                if (this.currentTargetUserId) {
-                    this.startCall(this.currentTargetUserId);
-                }
-            }, 2000 * this.retryCount); // Exponential backoff
-        } else {
-            console.error('[VoiceService] Max retries reached');
-            this.cleanup();
-        }
+    // Public method to retry connection (for backward compatibility)
+    retryConnection() {
+        this.peerConnections.forEach((pc, userId) => {
+            if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+                this.startCall(userId);
+            }
+        });
     }
 
     cleanup() {
-        this.clearTimeouts();
+        console.log('[VoiceService] Cleaning up all connections');
+        this.peerConnections.forEach((pc, id) => {
+            pc.close();
+            this.stopRemoteAudio(id);
+        });
+        this.peerConnections.clear();
+        this.remoteStreams.clear();
+        this.audioElements.clear();
 
-        if (this.peerConnection) {
-            this.peerConnection.close();
-            this.peerConnection = null;
-        }
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => track.stop());
             this.localStream = null;
         }
-        this.remoteStream = null;
-        this.currentTargetUserId = null;
-        this.retryCount = 0;
         this.isActive.set(false);
         this.isMuted.set(false);
-        this.isRemoteAudioPlaying.set(false);
         this.isConnecting.set(false);
-    }
-
-    // Public method to retry connection
-    retryConnection() {
-        if (this.currentTargetUserId) {
-            this.retryCount = 0;
-            this.startCall(this.currentTargetUserId);
-        }
     }
 }

@@ -29,6 +29,11 @@
     font-weight: 600;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+}
+
 .btn-icon {
     background: none;
     border: none;
@@ -38,7 +43,8 @@
 }
 
 .btn-end-call {
-    background: #ef4444; /* Red */
+    background: #ef4444;
+    /* Red */
     color: white;
     border: none;
     border-radius: 50%;
@@ -56,9 +62,34 @@
     background: #dc2626;
 }
 
+.btn-control {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-control:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-control.muted {
+    background: #ef4444;
+}
+
 /* Participants Grid */
 .participants-grid {
-    flex: 1; /* Takes remaining space */
+    flex: 1;
+    /* Takes remaining space */
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 1rem;
@@ -108,13 +139,15 @@
 
 /* Chat Section */
 .chat-section {
-    flex: 1; /* Takes remaining space, creating 50/50 split roughly if grid content is small, but flex allows adjustment */
+    flex: 1;
+    /* Takes remaining space, creating 50/50 split roughly if grid content is small, but flex allows adjustment */
     display: flex;
     flex-direction: column;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     overflow: hidden;
-    margin-top: -10px; /* Overlap slightly */
+    margin-top: -10px;
+    /* Overlap slightly */
 }
 
 .messages-list {
@@ -212,15 +245,107 @@
 
 /* Material Icons fallback if font not loaded */
 .material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;  /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+}
+
+/* Avatar image */
+.avatar-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* Speaking border glow */
+.avatar-wrapper.speaking .avatar-img,
+.avatar-wrapper.speaking .avatar-placeholder {
+    border: 2.5px solid #6366f1;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+}
+
+/* Audio Wave Equalizer */
+.audio-waves {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+    margin-top: 6px;
+}
+
+.audio-waves span {
+    display: block;
+    width: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.25);
+    height: 4px;
+    transition: background 0.3s;
+}
+
+/* Animate bars when .speaking class is on participant card */
+.participant-card.speaking .audio-waves span {
+    background: #6366f1;
+}
+
+.participant-card.speaking .audio-waves span:nth-child(1) {
+    animation: wave 0.55s infinite ease-in-out alternate;
+}
+
+.participant-card.speaking .audio-waves span:nth-child(2) {
+    animation: wave 0.4s infinite ease-in-out alternate 0.1s;
+}
+
+.participant-card.speaking .audio-waves span:nth-child(3) {
+    animation: wave 0.7s infinite ease-in-out alternate 0.05s;
+}
+
+.participant-card.speaking .audio-waves span:nth-child(4) {
+    animation: wave 0.45s infinite ease-in-out alternate 0.15s;
+}
+
+@keyframes wave {
+    from {
+        height: 3px;
+    }
+
+    to {
+        height: 16px;
+    }
+}
+
+/* "You" badge */
+.self-badge {
+    font-size: 0.6rem;
+    background: #6366f1;
+    color: white;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 2px;
+}
+
+.message-content p {
+    margin: 0;
 }

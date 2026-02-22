@@ -6,6 +6,10 @@
         </button>
         <h2 class="room-title">{{ topic }}</h2>
         <div class="header-controls">
+            <button class="btn-control" [class.muted]="voiceService.isMuted()" (click)="voiceService.toggleMute()"
+                title="Toggle Mute">
+                <span class="material-icons">{{ voiceService.isMuted() ? 'mic_off' : 'mic' }}</span>
+            </button>
             <button class="btn-end-call" (click)="leaveRoom()" title="End Call">
                 <span class="material-icons">call_end</span>
             </button>
@@ -14,21 +18,23 @@
 
     <!-- Participants Area (Top Half) -->
     <div class="participants-grid">
-        <div class="participant-card glass-panel" *ngFor="let p of participants()">
-            <div class="avatar-wrapper">
+        <div class="participant-card glass-panel" *ngFor="let p of participants()" [class.speaking]="p.isSpeaking">
+            <div class="avatar-wrapper" [class.speaking]="p.isSpeaking">
                 <img *ngIf="p.avatar" [src]="p.avatar" class="avatar-img" [alt]="p.name">
-                <div *ngIf="!p.avatar" class="avatar-placeholder">{{ (p.name ? p.name.charAt(0) : '' + p.id).slice(0, 1)
-                    }}</div>
+                <div *ngIf="!p.avatar" class="avatar-placeholder">
+                    {{ (p.name || (''+p.id)).charAt(0).toUpperCase() }}
+                </div>
             </div>
             <span class="participant-name">{{ p.name || 'User ' + p.id }}</span>
-            <!-- Audio visualization placeholder -->
+            <span class="self-badge" *ngIf="p.isSelf">You</span>
+            <!-- Animated equalizer bars — 4 bars -->
             <div class="audio-waves">
-                <span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
             </div>
         </div>
 
         <div *ngIf="participants().length === 0" class="waiting-message">
-            <p>Waiting for others...</p>
+            <p>Waiting for participants…</p>
         </div>
     </div>
 
@@ -48,11 +54,12 @@
         </div>
 
         <div class="chat-input-bar">
-            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Type a message..."
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Type a message…"
                 class="chat-input">
             <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
                 <span class="material-icons">send</span>
             </button>
         </div>
     </div>
+
 </div>
