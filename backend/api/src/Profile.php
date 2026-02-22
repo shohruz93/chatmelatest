@@ -506,8 +506,8 @@ class Profile {
             return;
         }
         
-        // Insert comment without rating (rating = NULL or 0)
-        $query = "INSERT INTO user_ratings (rater_id, rated_id, rating, comment) VALUES (:rater, :rated, NULL, :comment)";
+        // Insert comment without rating (rating = 0)
+        $query = "INSERT INTO user_ratings (rater_id, rated_id, rating, comment) VALUES (:rater, :rated, 0, :comment)";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(":rater", $userId);
         $stmt->bindParam(":rated", $ratedId);
