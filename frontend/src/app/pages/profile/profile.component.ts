@@ -856,3 +856,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
             error: (err) => {
                 console.error('Failed to delete image', err);
                 alert(this.languageService.translate('GALLERY.DELETE_ERROR'));
+            }
+        });
+    }
+
+    getGalleryImageUrl(path: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${this.api.phpBaseUrl}${path}`;
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.stopTelegramPolling();
+    }
+}
