@@ -43,7 +43,7 @@ class Push {
         // Insert or update token (handles duplicate entries safely)
         $insertQuery = "INSERT INTO push_subscriptions (user_id, token, platform) 
                         VALUES (:user_id, :token, :platform)
-                        ON DUPLICATE KEY UPDATE platform = VALUES(platform), updated_at = CURRENT_TIMESTAMP";
+                        ON DUPLICATE KEY UPDATE platform = VALUES(platform)";
         $stmt = $this->db->prepare($insertQuery);
         $stmt->bindParam(":user_id", $userId);
         $stmt->bindParam(":token", $token);
