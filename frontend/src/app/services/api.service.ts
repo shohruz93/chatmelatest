@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 export class ApiService {
     private apiUrl = environment.phpBaseUrl;
     public phpBaseUrl = environment.phpBaseUrl;
-    
+
     private cache = new Map<string, Observable<any>>();
     private cacheTimers = new Map<string, any>();
     private readonly CACHE_DURATION = 5 * 60 * 1000;
@@ -26,15 +26,15 @@ export class ApiService {
         }
         return headers;
     }
-    
+
     private shouldCache(endpoint: string): boolean {
         return this.CACHEABLE_ENDPOINTS.some(cacheable => endpoint.includes(cacheable));
     }
-    
+
     private getCacheKey(endpoint: string, params: any): string {
         return `${endpoint}:${JSON.stringify(params)}`;
     }
-    
+
     private clearCache(key: string) {
         this.cache.delete(key);
         const timer = this.cacheTimers.get(key);
@@ -46,21 +46,21 @@ export class ApiService {
 
     get(endpoint: string, params: any = {}): Observable<any> {
         const cacheKey = this.getCacheKey(endpoint, params);
-        
+
         if (this.shouldCache(endpoint) && this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey)!;
         }
-        
+
         const request = this.http.get(`${this.apiUrl}${endpoint}`, { headers: this.getHeaders(), params }).pipe(
             shareReplay(1)
         );
-        
+
         if (this.shouldCache(endpoint)) {
             this.cache.set(cacheKey, request);
             const timer = setTimeout(() => this.clearCache(cacheKey), this.CACHE_DURATION);
             this.cacheTimers.set(cacheKey, timer);
         }
-        
+
         return request;
     }
 
@@ -110,5 +110,9 @@ export class ApiService {
 
     addComment(userId: number, ratedId: number, comment: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/profile/comment`, { userId, ratedId, comment });
+    }
+
+    searchByUniqueId(uniqueId: string): Observable<any> {
+        return this.http.get(`${this.apiUrl}/profile/search?uniqueId=${uniqueId}`);
     }
 }

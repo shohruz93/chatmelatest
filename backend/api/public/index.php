@@ -106,6 +106,15 @@ $router->add('POST', '/telegram/webhook', function() use ($telegramWebhook) {
 });
 
 // Profile Routes
+$router->add('GET', '/profile/search', function() use ($profile) {
+    if (isset($_GET['uniqueId'])) {
+        $profile->getByUniqueId($_GET['uniqueId']);
+    } else {
+        http_response_code(400);
+        echo json_encode(["message" => "uniqueId is required"]);
+    }
+});
+
 $router->add('GET', '/profile', function() use ($profile) {
     $userId = $_GET['userId'] ?? 1; 
     $profile->get($userId);
@@ -618,6 +627,14 @@ $router->add('DELETE', '/community/post', function() use ($communityController) 
 });
 
 
+
+// System Routes
+$router->add('GET', '/system/fix-unique-id', function() {
+    require_once __DIR__ . '/../fix_unique_id.php';
+});
+$router->add('POST', '/system/fix-unique-id', function() {
+    require_once __DIR__ . '/../fix_unique_id.php';
+});
 
 // Test Route
 $router->add('GET', '/', function() {

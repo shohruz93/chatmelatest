@@ -57,9 +57,10 @@ class User {
 
             $query = "INSERT INTO " . $this->table_name . " 
                     SET google_id=:google_id, email=:email, name=:name, 
-                        first_name=:first_name, family_name=:family_name, avatar=:avatar, created_at=UNIX_TIMESTAMP(), last_active=UNIX_TIMESTAMP()";
+                        first_name=:first_name, family_name=:family_name, avatar=:avatar, unique_id=:unique_id, created_at=UNIX_TIMESTAMP(), last_active=UNIX_TIMESTAMP()";
             
             $stmt = $this->conn->prepare($query);
+            $uniqueId = substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
 
             $stmt->bindParam(":google_id", $googleUser['sub']);
             $stmt->bindParam(":email", $googleUser['email']);
@@ -67,6 +68,7 @@ class User {
             $stmt->bindParam(":first_name", $googleUser['given_name']);
             $stmt->bindParam(":family_name", $googleUser['family_name']);
             $stmt->bindParam(":avatar", $googleUser['picture']);
+            $stmt->bindParam(":unique_id", $uniqueId);
             if ($stmt->execute()) {
                 $this->id = $this->conn->lastInsertId();
                 
@@ -98,11 +100,13 @@ class User {
             $this->id = $row['id'];
             return $this->id;
         } else {
-            $query = "INSERT INTO " . $this->table_name . " (email, name, google_id, created_at, last_active) VALUES (:email, :name, NULL, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())";
+            $query = "INSERT INTO " . $this->table_name . " (email, name, google_id, unique_id, created_at, last_active) VALUES (:email, :name, NULL, :unique_id, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())";
             $stmt = $this->conn->prepare($query);
             $defaultName = 'User';
+            $uniqueId = substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 10);
             $stmt->bindParam(":email", $email);
             $stmt->bindParam(":name", $defaultName);
+            $stmt->bindParam(":unique_id", $uniqueId);
             if ($stmt->execute()) {
                 $this->id = $this->conn->lastInsertId();
                 // Optionally set a default name
@@ -119,9 +123,17 @@ class User {
     }
 
     public function getProfile($id) {
-        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getByUniqueId($uniqueId) {
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin FROM " . $this->table_name . " WHERE unique_id = :unique_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":unique_id", $uniqueId);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

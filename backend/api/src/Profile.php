@@ -59,6 +59,44 @@ class Profile {
         }
     }
 
+    public function getByUniqueId($uniqueId) {
+        $profile = $this->user->getByUniqueId($uniqueId);
+        if ($profile) {
+            $userId = $profile['id'];
+            $profile['is_admin'] = (int)($profile['is_admin'] ?? 0);
+            
+            // Get interests
+            $query = "SELECT i.id, i.name FROM interests i 
+                      JOIN user_interests ui ON i.id = ui.interest_id 
+                      WHERE ui.user_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            $profile['interests'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get ratings
+            $query = "SELECT AVG(rating) as average_rating, COUNT(*) as rating_count FROM user_ratings WHERE rated_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            $ratingData = $stmt->fetch(PDO::FETCH_ASSOC);
+            $profile['rating'] = $ratingData['average_rating'] ? round($ratingData['average_rating'], 1) : 0;
+            $profile['rating_count'] = $ratingData['rating_count'];
+
+            // Get photos (Gallery)
+            $photoQuery = "SELECT image_path FROM gallery_images WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 6";
+            $photoStmt = $this->db->prepare($photoQuery);
+            $photoStmt->bindParam(":user_id", $userId);
+            $photoStmt->execute();
+            $profile['photos'] = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
+
+            echo json_encode($profile);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "User not found"]);
+        }
+    }
+
     public function update($userId) {
         // Check if it's FormData (multipart/form-data) first
         if (!empty($_POST)) {

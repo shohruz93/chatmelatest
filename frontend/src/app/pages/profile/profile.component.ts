@@ -108,6 +108,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     galleryLoading: boolean = false;
     uploadPercent: number = 0;
 
+    // Unique ID Search
+    searchUniqueId: string = '';
+    searchError: string = '';
+    searchLoading: boolean = false;
+
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
         { value: 'male', label: 'Male' },
@@ -609,6 +614,32 @@ export class ProfileComponent implements OnInit, OnDestroy {
             alert('Code copied to clipboard!');
         }).catch(err => {
             console.error('Failed to copy code', err);
+        });
+    }
+
+    copyUniqueId(code: string) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert('Unique ID copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy code', err);
+        });
+    }
+
+    searchUserByUniqueId() {
+        if (!this.searchUniqueId.trim()) return;
+        this.searchLoading = true;
+        this.searchError = '';
+        this.api.searchByUniqueId(this.searchUniqueId.trim()).subscribe({
+            next: (data) => {
+                this.searchLoading = false;
+                this.searchError = '';
+                this.searchUniqueId = '';
+                this.router.navigate(['/profile', data.id]);
+            },
+            error: (err) => {
+                this.searchLoading = false;
+                this.searchError = 'User not found';
+            }
         });
     }
 
