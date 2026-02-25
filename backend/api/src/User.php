@@ -622,6 +622,20 @@ class User {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":amount", $amount, PDO::PARAM_INT);
         $stmt->bindParam(":id", $userId);
+        $stmt->bindParam(":id", $userId);
         return $stmt->execute();
+    }
+
+    public function blockUser($blockerId, $blockedId) {
+        if ($blockerId == $blockedId) return false;
+        $query = "INSERT IGNORE INTO blocked_users (blocker_id, blocked_id) VALUES (:blocker, :blocked)";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([':blocker' => $blockerId, ':blocked' => $blockedId]);
+    }
+
+    public function unblockUser($blockerId, $blockedId) {
+        $query = "DELETE FROM blocked_users WHERE blocker_id = :blocker AND blocked_id = :blocked";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([':blocker' => $blockerId, ':blocked' => $blockedId]);
     }
 }

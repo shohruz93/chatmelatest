@@ -349,6 +349,39 @@ $router->add('POST', '/connect/random', function() use ($db) {
     }
 });
 
+// Block User Routes
+$router->add('POST', '/users/block', function() use ($db) {
+    require_once __DIR__ . '/../src/User.php';
+    $user = new User($db);
+    $data = json_decode(file_get_contents("php://input"), true);
+    $blockerId = $data['blockerId'] ?? 0;
+    $blockedId = $data['blockedId'] ?? 0;
+    
+    if ($blockerId && $blockedId) {
+        $success = $user->blockUser($blockerId, $blockedId);
+        echo json_encode(['success' => $success]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing IDs']);
+    }
+});
+
+$router->add('POST', '/users/unblock', function() use ($db) {
+    require_once __DIR__ . '/../src/User.php';
+    $user = new User($db);
+    $data = json_decode(file_get_contents("php://input"), true);
+    $blockerId = $data['blockerId'] ?? 0;
+    $blockedId = $data['blockedId'] ?? 0;
+    
+    if ($blockerId && $blockedId) {
+        $success = $user->unblockUser($blockerId, $blockedId);
+        echo json_encode(['success' => $success]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing IDs']);
+    }
+});
+
 // Advanced Matching Routes
 $router->add('GET', '/match/compatible', function() use ($advancedMatch) {
     $userId = $_GET['userId'] ?? 0;
