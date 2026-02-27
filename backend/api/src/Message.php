@@ -257,4 +257,66 @@ class Message {
             echo json_encode(["message" => "Failed to delete message"]);
         }
     }
+
+    public function uploadAttachment() {
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No file provided or upload error']);
+            return;
+        }
+
+        $file = $_FILES['file'];
+        $type = $_POST['type'] ?? 'image'; // 'image' or 'voice'
+
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (empty($extension)) {
+             // Fallback from mime type if extension is missing
+             $mime = $file['type'];
+             if ($mime == 'image/jpeg') $extension = 'jpg';
+             else if ($mime == 'image/png') $extension = 'png';
+             else if ($mime == 'image/webp') $extension = 'webp';
+             else if ($mime == 'audio/mp4') $extension = 'm4a';
+             else $extension = 'bin';
+        }
+
+        // Validate basic types
+        $allowedImageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowedVoiceTypes = ['m4a', 'mp4', 'aac', 'wav', 'mp3', 'webm', 'ogg', 'bin', '3gp'];
+
+        $allowedExts = $type === 'voice' ? $allowedVoiceTypes : $allowedImageTypes;
+
+        if (!in_array($extension, $allowedExts)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid file type: ' . $extension]);
+            return;
+        }
+
+        // Max 30MB
+        if ($file['size'] > 30 * 1024 * 1024) {
+            http_response_code(400);
+            echo json_encode(['error' => 'File too large. Maximum 30MB allowed.']);
+            return;
+        }
+
+        $uploadDir = __DIR__ . '/../../public_html/uploads/chat/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $filename = uniqid() . '_' . time() . '.' . $extension;
+        $filepath = $uploadDir . $filename;
+        $relativePath = '/uploads/chat/' . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to save file']);
+            return;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'url' => $relativePath,
+            'type' => $type
+        ]);
+    }
 }

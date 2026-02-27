@@ -256,6 +256,10 @@ $router->add('DELETE', '/messages', function() use ($message) {
     $message->delete();
 });
 
+$router->add('POST', '/messages/upload', function() use ($message) {
+    $message->uploadAttachment();
+});
+
 // Conversation Routes
 $router->add('GET', '/conversations', function() use ($conversation) {
     $userId = $_GET['userId'] ?? 1;
