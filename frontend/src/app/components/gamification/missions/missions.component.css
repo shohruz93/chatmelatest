@@ -147,54 +147,32 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
-.action-btn {
-    padding: 8px 16px;
-    border-radius: 12px;
-    border: none;
+.mission-status-badge {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.status-claimed {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
+}
+
+.status-active {
+    font-size: 0.72rem;
     font-weight: 600;
-    font-size: 0.8rem;
-    cursor: default;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.active-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.claim-btn {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    animation: claimPulse 2s infinite;
-}
-
-.claim-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
-}
-
-.claim-btn:active {
-    transform: translateY(0);
-}
-
-@keyframes claimPulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
-    }
-
-    70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
-    }
-
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    }
+    color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 4px 10px;
+    white-space: nowrap;
 }
 
 .no-missions {

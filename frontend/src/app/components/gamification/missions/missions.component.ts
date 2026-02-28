@@ -70,14 +70,4 @@ export class MissionsComponent implements OnInit {
         return this.iconMap[key] || this.iconMap['default'];
     }
 
-    onClaim(mission: Mission) {
-        if (mission.status === 'completed' && mission.user_mission_id) {
-            this.gameService.claimMission(mission.user_mission_id).subscribe(() => {
-                // Update local state
-                this.missions.update(current =>
-                    current.map(m => m.id === mission.id ? { ...m, status: 'claimed' as const } : m)
-                );
-            });
-        }
-    }
 }

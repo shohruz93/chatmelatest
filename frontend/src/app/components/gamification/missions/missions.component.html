@@ -1,8 +1,7 @@
 <div class="missions-container">
     <h3 class="missions-title">{{ 'MISSIONS.TITLE' | translate }}</h3>
     <div class="missions-list">
-        <div *ngFor="let mission of missions()" class="mission-card" [class.completed]="mission.status === 'completed'"
-            [class.claimed]="mission.status === 'claimed'">
+        <div *ngFor="let mission of missions()" class="mission-card" [class.claimed]="mission.status === 'claimed'">
 
             <div class="mission-icon emoji-icon">
                 {{ getMissionIcon(mission) }}
@@ -27,13 +26,12 @@
                 </div>
             </div>
 
-            <button class="action-btn" [class.claim-btn]="mission.status === 'completed'"
-                [class.active-btn]="mission.status === 'active'" [disabled]="mission.status !== 'completed'"
-                (click)="onClaim(mission)">
-                <span *ngIf="mission.status === 'active'">{{ 'MISSIONS.STATUS_ACTIVE' | translate }}</span>
-                <span *ngIf="mission.status === 'completed'">{{ 'MISSIONS.STATUS_CLAIM' | translate }}</span>
-                <span *ngIf="mission.status === 'claimed'">{{ 'MISSIONS.STATUS_DONE' | translate }}</span>
-            </button>
+            <div class="mission-status-badge">
+                <span *ngIf="mission.status === 'claimed'" class="status-claimed">✅ {{ 'MISSIONS.STATUS_DONE' |
+                    translate }}</span>
+                <span *ngIf="mission.status === 'active'" class="status-active">{{ 'MISSIONS.STATUS_ACTIVE' | translate
+                    }}</span>
+            </div>
         </div>
 
         <div *ngIf="missions().length === 0" class="no-missions">

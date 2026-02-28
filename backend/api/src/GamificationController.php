@@ -215,7 +215,7 @@ class GamificationController {
         // Find active missions matching this condition
         // For daily missions, ensure we only update today's instance
         $query = "
-            SELECT um.id, um.progress, m.condition_value 
+            SELECT um.id, um.progress, m.condition_value, m.reward_coins, m.xp_reward, m.title
             FROM user_missions um
             JOIN missions m ON um.mission_id = m.id
             WHERE um.user_id = :user_id 
@@ -229,15 +229,64 @@ class GamificationController {
         
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $newProgress = $row['progress'] + $amount;
-            $status = 'active';
+            
             if ($newProgress >= $row['condition_value']) {
-                $status = 'completed';
-                $newProgress = $row['condition_value']; // Cap it?
+                // Cap progress at condition_value
+                $newProgress = $row['condition_value'];
+                
+                // AUTO-CLAIM: set status directly to 'claimed'
+                $upd = "UPDATE user_missions SET progress = :prog, status = 'claimed', completed_at = NOW() WHERE id = :id";
+                $updStmt = $conn->prepare($upd);
+                $updStmt->execute([':prog' => $newProgress, ':id' => $row['id']]);
+                
+                // Award coins and XP to user
+                $userObj = new User($conn);
+                $rewardCoins = (int)$row['reward_coins'];
+                $rewardXp    = (int)$row['xp_reward'];
+                
+                if ($rewardCoins > 0) {
+                    $userObj->addCurrency($userId, $rewardCoins, 'coins');
+                    
+                    // Log coin transaction
+                    $logQuery = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note, created_at)
+                                 VALUES (0, :user_id, :amount, 'mission_reward', :note, NOW())";
+                    $logStmt = $conn->prepare($logQuery);
+                    $note = "Reward for mission: " . $row['title'];
+                    $logStmt->execute([
+                        ':user_id' => $userId,
+                        ':amount'  => $rewardCoins,
+                        ':note'    => $note
+                    ]);
+                }
+                
+                if ($rewardXp > 0) {
+                    $userObj->addCurrency($userId, $rewardXp, 'xp');
+                }
+                
+                // Send FCM push notification
+                try {
+                    require_once __DIR__ . '/Notification.php';
+                    $notification = new Notification($conn);
+                    $notifTitle = "🎉 Миссия пурра шуд!";
+                    $notifBody  = "«" . $row['title'] . "»";
+                    if ($rewardCoins > 0) $notifBody .= " +{$rewardCoins} 🪙";
+                    if ($rewardXp > 0)    $notifBody .= " +{$rewardXp} XP";
+                    $notification->send($userId, $notifTitle, $notifBody, [
+                        'type'    => 'mission_completed',
+                        'coins'   => (string)$rewardCoins,
+                        'xp'      => (string)$rewardXp,
+                        'mission' => $row['title']
+                    ]);
+                } catch (Exception $e) {
+                    error_log("GamificationController::updateProgress - Notification error: " . $e->getMessage());
+                }
+                
+            } else {
+                // Mission still in progress
+                $upd = "UPDATE user_missions SET progress = :prog WHERE id = :id";
+                $updStmt = $conn->prepare($upd);
+                $updStmt->execute([':prog' => $newProgress, ':id' => $row['id']]);
             }
-
-            $upd = "UPDATE user_missions SET progress = :prog, status = :status WHERE id = :id";
-            $updStmt = $conn->prepare($upd);
-            $updStmt->execute([':prog' => $newProgress, ':status' => $status, ':id' => $row['id']]);
         }
     }
 
