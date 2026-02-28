@@ -20,8 +20,9 @@ class Message {
 
     public function getHistory($userId, $otherUserId) {
         $query = "SELECT * FROM messages 
-                  WHERE (sender_id = :uid AND receiver_id = :oid) 
-                     OR (sender_id = :oid AND receiver_id = :uid)
+                  WHERE ((sender_id = :uid AND receiver_id = :oid) 
+                     OR (sender_id = :oid AND receiver_id = :uid))
+                     AND (is_deleted = 0 OR is_deleted IS NULL)
                   ORDER BY created_at ASC";
         
         $stmt = $this->db->prepare($query);
@@ -49,7 +50,7 @@ class Message {
                   JOIN users u ON u.id = m.sender_id
                   LEFT JOIN messages replied ON m.reply_to_message_id = replied.id
                   LEFT JOIN users reply_sender ON replied.sender_id = reply_sender.id
-                  WHERE m.room_id = :room $lastIdFilter
+                  WHERE m.room_id = :room AND (m.is_deleted = 0 OR m.is_deleted IS NULL) $lastIdFilter
                   ORDER BY m.created_at DESC 
                   LIMIT :limit OFFSET :offset";
         
