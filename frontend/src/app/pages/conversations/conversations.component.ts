@@ -195,20 +195,28 @@ export class ConversationsComponent implements OnInit, OnDestroy {
     getMessagePreview(message: string): string {
         if (!message) return '';
 
+        // Check for HTTP upload URLs
+        if (message.includes('/uploads/images/') || message.includes('.jpg') || message.includes('.png')) {
+            return '📷 Акс';
+        }
+        if (message.includes('/uploads/audio/') || message.includes('.m4a') || message.includes('.mp3')) {
+            return '🎤 Садо';
+        }
+
         // Check for base64 image
         if (message.startsWith('data:image')) {
-            return '📷 Image';
+            return '📷 Акс';
         }
 
         // Check for base64 audio
         if (message.startsWith('data:audio')) {
-            return '🎤 Voice Message';
+            return '🎤 Садо';
         }
 
         // Check if it's a very long string that looks like base64 but might not have the prefix
         // (Just in case, though usually they should have the prefix)
         if (message.length > 100 && !message.includes(' ') && (message.startsWith('/9j/') || message.startsWith('iVBOR'))) {
-            return '📷 Image';
+            return '📷 Акс';
         }
 
         return message;

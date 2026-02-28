@@ -133,8 +133,10 @@
                     @switch (msg.messageType) {
                     @case ('image') {
                     <div class="message-image-container">
-                        <img [attr.src]="msg.content" alt="Image" class="message-image"
-                            (click)="openImageModal(msg.content)">
+                        <img [attr.src]="msg.content" alt="Image" class="message-image" (click)="openImageModal(msg.content)">
+                        <button class="btn-download-media" (click)="downloadFile(msg.content, 'image')" title="Download Image">
+                            <span class="download-icon">↓</span>
+                        </button>
                     </div>
                     }
                     @case ('sticker') {
@@ -145,6 +147,9 @@
                     @case ('audio') {
                     <div class="message-voice">
                         <audio [attr.src]="msg.content" controls preload="metadata"></audio>
+                        <button class="btn-download-media audio-dl" (click)="downloadFile(msg.content, 'audio')" title="Download Audio">
+                            <span class="download-icon">↓</span>
+                        </button>
                     </div>
                     }
                     @default {

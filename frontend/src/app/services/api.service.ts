@@ -115,4 +115,12 @@ export class ApiService {
     searchByUniqueId(uniqueId: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/profile/search?uniqueId=${uniqueId}`);
     }
+
+    uploadFile(file: File, type: string): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+
+        return this.http.post(`${this.apiUrl}/messages/upload`, formData, { headers: this.getHeaders() });
+    }
 }

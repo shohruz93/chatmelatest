@@ -588,18 +588,53 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         input.onchange = (e: any) => {
             const file = e.target.files[0];
             if (file) {
-                // Convert to base64 and send
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const base64 = reader.result as string;
-                    this.chatService.sendMessage(base64, this.replyingToMessage, 'image');
-                    this.playSendSound();
-                    this.showMediaMenu = false;
-                };
-                reader.readAsDataURL(file);
+                // Upload file to server
+                this.api.uploadFile(file, 'image').subscribe({
+                    next: (res: any) => {
+                        if (res.success && res.url) {
+                            this.chatService.sendMessage(res.url, this.replyingToMessage, 'image');
+                            this.playSendSound();
+                            this.showMediaMenu = false;
+                        } else {
+                            alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload image');
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Image upload failed', err);
+                        alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload image');
+                    }
+                });
             }
         };
         input.click();
+    }
+
+    async downloadFile(url: string, type: 'image' | 'audio') {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+
+            const timestamp = new Date().getTime();
+            if (type === 'image') {
+                a.download = `chatme_img_${timestamp}.jpg`;
+            } else {
+                a.download = `chatme_audio_${timestamp}.${url.endsWith('.mp3') ? 'mp3' : 'm4a'}`;
+            }
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+
+            // Optional: Play a sound or show a toast on success
+        } catch (error) {
+            console.error('Error downloading file:', error);
+            alert(this.languageService.translate('CHAT.DOWNLOAD_FAILED') || 'Failed to download file');
+        }
     }
 
     async startRecording() {
@@ -635,10 +670,35 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.cdr.markForCheck();
 
             if (result.value && result.value.recordDataBase64) {
-                const base64Sound = 'data:audio/aac;base64,' + result.value.recordDataBase64;
-                this.chatService.sendMessage(base64Sound, this.replyingToMessage, 'audio');
-                this.playSendSound();
-                this.showMediaMenu = false;
+                const base64Sound = result.value.recordDataBase64;
+                try {
+                    const binaryString = window.atob(base64Sound);
+                    const len = binaryString.length;
+                    const bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    const blob = new Blob([bytes], { type: 'audio/m4a' });
+                    const file = new File([blob], `voice_${Date.now()}.m4a`, { type: 'audio/m4a' });
+
+                    this.api.uploadFile(file, 'voice').subscribe({
+                        next: (res: any) => {
+                            if (res.success && res.url) {
+                                this.chatService.sendMessage(res.url, this.replyingToMessage, 'audio');
+                                this.playSendSound();
+                                this.showMediaMenu = false;
+                            } else {
+                                alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
+                            }
+                        },
+                        error: (err) => {
+                            console.error('Audio upload failed', err);
+                            alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error converting base64 to file', e);
+                }
             }
         } catch (e) {
             console.error('Error stopping recording', e);

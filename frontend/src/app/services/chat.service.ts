@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, firstValueFrom } from 'rxjs';
 import { filter, take, timeout, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ChatMessage {
     id: string; // Real or temp ID
@@ -394,7 +395,9 @@ export class ChatService {
         // Prioritize explicit messageType, then fallback to type, then message_type
         let msgType = data.messageType || data.type || data.message_type || 'text';
 
-        if (msgType === 'image' && content && typeof content === 'string' && !content.startsWith('http') && !content.startsWith('data:image')) {
+        if (typeof content === 'string' && content.startsWith('/uploads/')) {
+            content = `${environment.phpBaseUrl}${content}`;
+        } else if (msgType === 'image' && content && typeof content === 'string' && !content.startsWith('http') && !content.startsWith('data:image')) {
             // Assume JPEG if unknown, but could be PNG. 
             content = `data:image/jpeg;base64,${content}`;
         } else if (msgType === 'audio' && content && typeof content === 'string' && !content.startsWith('http') && !content.startsWith('data:audio')) {
@@ -404,9 +407,9 @@ export class ChatService {
         // Auto-detect type if it's text but has media prefix (Fix for broken history/indexedDB data)
         if (typeof content === 'string') {
             const trimmed = content.trim();
-            if (trimmed.startsWith('data:image') || trimmed.includes(';base64,iVBOR')) {
+            if (trimmed.startsWith('data:image') || trimmed.includes(';base64,iVBOR') || trimmed.includes('/uploads/images/') || trimmed.endsWith('.jpg') || trimmed.endsWith('.png')) {
                 msgType = 'image';
-            } else if (trimmed.startsWith('data:audio') || trimmed.includes('data:audio/webm') || trimmed.includes(';base64,GkXfo')) {
+            } else if (trimmed.startsWith('data:audio') || trimmed.includes('data:audio/webm') || trimmed.includes(';base64,GkXfo') || trimmed.includes('/uploads/audio/') || trimmed.endsWith('.m4a') || trimmed.endsWith('.mp3')) {
                 // Common opus header start often starts with GkXfo...
                 msgType = 'audio';
             }
