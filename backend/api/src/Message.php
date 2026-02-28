@@ -246,10 +246,28 @@ class Message {
             echo json_encode(["message" => "Invalid data"]);
             return;
         }
+        $id = $data['id'];
+        
+        // Find if it's a media message and delete the physical file
+        $fileQuery = "SELECT content, type FROM messages WHERE id = :id AND type IN ('image', 'audio', 'voice')";
+        $fileStmt = $this->db->prepare($fileQuery);
+        $fileStmt->bindParam(":id", $id);
+        $fileStmt->execute();
+        
+        if ($row = $fileStmt->fetch(PDO::FETCH_ASSOC)) {
+            $content = $row['content']; // e.g. /uploads/chat/123.jpg
+            if (strpos($content, '/uploads/chat/') === 0) {
+                // Determine physical path
+                $physicalPath = __DIR__ . '/../public_html' . $content;
+                if (file_exists($physicalPath)) {
+                    unlink($physicalPath);
+                }
+            }
+        }
 
         $query = "UPDATE messages SET is_deleted = 1 WHERE id = :id";
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":id", $data['id']);
+        $stmt->bindParam(":id", $id);
 
         if ($stmt->execute()) {
             echo json_encode(["message" => "Message deleted"]);

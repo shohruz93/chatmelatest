@@ -66,6 +66,30 @@ class Conversation {
                   WHERE (sender_id = :u1 AND receiver_id = :p1) 
                      OR (sender_id = :p2 AND receiver_id = :u2)";
         try {
+            // First find all media files associated with this conversation
+            $fileQuery = "SELECT content FROM messages 
+                          WHERE ((sender_id = :u1 AND receiver_id = :p1) 
+                             OR (sender_id = :p2 AND receiver_id = :u2))
+                            AND type IN ('image', 'audio', 'voice')";
+                            
+            $fileStmt = $this->db->prepare($fileQuery);
+            $fileStmt->bindParam(":u1", $userId);
+            $fileStmt->bindParam(":p1", $partnerId);
+            $fileStmt->bindParam(":p2", $partnerId);
+            $fileStmt->bindParam(":u2", $userId);
+            $fileStmt->execute();
+            
+            while ($row = $fileStmt->fetch(PDO::FETCH_ASSOC)) {
+                $content = $row['content'];
+                if (strpos($content, '/uploads/chat/') === 0) {
+                    $physicalPath = __DIR__ . '/../public_html' . $content;
+                    if (file_exists($physicalPath)) {
+                        unlink($physicalPath);
+                    }
+                }
+            }
+
+            // Now delete the records
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(":u1", $userId);
             $stmt->bindParam(":p1", $partnerId);
