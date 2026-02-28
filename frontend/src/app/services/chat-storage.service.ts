@@ -464,4 +464,62 @@ export class ChatStorageService {
       request.onerror = (event) => reject((event.target as IDBRequest).error);
     });
   }
+
+  // Delete messages for any room NOT in validRoomIds, and clean up conversation records too
+  async clearOrphanRooms(validRoomIds: Set<string>): Promise<void> {
+    if (!this.db) {
+      return;
+    }
+
+    // 1. Clear orphan messages by looking up all unique room IDs in the messages store
+    await new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(MESSAGES_STORE, 'readwrite');
+      const store = transaction.objectStore(MESSAGES_STORE);
+      const index = store.index('roomId');
+      const seenRooms = new Set<string>();
+
+      const request = index.openCursor();
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          const roomId: string = cursor.value.roomId;
+          if (!seenRooms.has(roomId)) {
+            seenRooms.add(roomId);
+            if (!validRoomIds.has(roomId)) {
+              // Delete all messages in this orphan room
+              const rangeReq = index.openCursor(IDBKeyRange.only(roomId));
+              rangeReq.onsuccess = (ev2) => {
+                const c2 = (ev2.target as IDBRequest<IDBCursorWithValue>).result;
+                if (c2) {
+                  store.delete(c2.primaryKey);
+                  c2.continue();
+                }
+              };
+            }
+          }
+          cursor.continue();
+        }
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
+    });
+
+    // 2. Clear orphan conversation records
+    await new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(CONVERSATIONS_STORE, 'readwrite');
+      const store = transaction.objectStore(CONVERSATIONS_STORE);
+      const request = store.openCursor();
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+          if (!validRoomIds.has(cursor.value.roomId)) {
+            cursor.delete();
+          }
+          cursor.continue();
+        }
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
+    });
+  }
 }

@@ -19,38 +19,42 @@
         } @else {
         <div class="conversations-list">
             @for (conv of conversations; track conv.partner_id) {
-            <a (click)="openConversation($event, conv.partner_id)" class="conversation-item">
-                <div class="conversation-avatar">
-                    <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name">
-                    @if (socketService.isUserOnline(conv.partner_id)) {
-                    <span class="online-indicator"></span>
-                    }
-                </div>
-
-                <div class="conversation-info">
-                    <div class="conversation-header">
-                        <h3 class="partner-name">{{ conv.partner_name || 'Anonymous User' }}</h3>
-                        <span class="last-time">{{ conv.last_message_time | unixDate:'short' }}</span>
-                    </div>
-                    <div class="conversation-preview">
-                        <p class="last-message" [class.unread]="conv.unread_count > 0">
-                            @if (conv.last_message_sender_id == currentUser?.id) {
-                            <span class="status-ticks">
-                                @if (conv.last_message_is_read == 1) {
-                                <span class="tick double">✓✓</span>
-                                } @else {
-                                <span class="tick single">✓</span>
-                                }
-                            </span>
-                            }
-                            {{ getMessagePreview(conv.last_message) }}
-                        </p>
-                        @if (conv.unread_count > 0) {
-                        <span class="unread-badge">{{ conv.unread_count }}</span>
+            <div class="conversation-item-wrapper">
+                <a (click)="openConversation($event, conv.partner_id)" class="conversation-item">
+                    <div class="conversation-avatar">
+                        <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name">
+                        @if (socketService.isUserOnline(conv.partner_id)) {
+                        <span class="online-indicator"></span>
                         }
                     </div>
-                </div>
-            </a>
+
+                    <div class="conversation-info">
+                        <div class="conversation-header">
+                            <h3 class="partner-name">{{ conv.partner_name || 'Anonymous User' }}</h3>
+                            <span class="last-time">{{ conv.last_message_time | unixDate:'short' }}</span>
+                        </div>
+                        <div class="conversation-preview">
+                            <p class="last-message" [class.unread]="conv.unread_count > 0">
+                                @if (conv.last_message_sender_id == currentUser?.id) {
+                                <span class="status-ticks">
+                                    @if (conv.last_message_is_read == 1) {
+                                    <span class="tick double">✓✓</span>
+                                    } @else {
+                                    <span class="tick single">✓</span>
+                                    }
+                                </span>
+                                }
+                                {{ getMessagePreview(conv.last_message) }}
+                            </p>
+                            @if (conv.unread_count > 0) {
+                            <span class="unread-badge">{{ conv.unread_count }}</span>
+                            }
+                        </div>
+                    </div>
+                </a>
+                <button class="conv-delete-btn" (click)="deleteConversation($event, conv.partner_id)"
+                    title="Delete conversation">🗑️</button>
+            </div>
             }
 
             @if (conversations.length === 0) {

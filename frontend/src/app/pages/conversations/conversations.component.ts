@@ -131,11 +131,51 @@ export class ConversationsComponent implements OnInit, OnDestroy {
         return id1 === this.currentUser.id ? id2 : id1;
     }
 
+    async deleteConversation(event: Event, partnerId: number) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!confirm('Оё мехоҳед ин суҳбатро нест кунед?')) return;
+
+        try {
+            // 1. Call backend API to delete the conversation
+            await this.api.delete(`/conversations?userId=${this.currentUser.id}&partnerId=${partnerId}`).toPromise();
+
+            // 2. Determine roomId (room_{min}_{max})
+            const myId = this.currentUser.id;
+            const min = Math.min(myId, partnerId);
+            const max = Math.max(myId, partnerId);
+            const roomId = `room_${min}_${max}`;
+
+            // 3. Clear all messages for this room from IndexedDB
+            await this.storage.clearRoom(roomId);
+
+            // 4. Remove conversation record from IndexedDB
+            const validRoomIds = new Set<string>(
+                this.conversations
+                    .filter((c: any) => Number(c.partner_id) !== partnerId)
+                    .map((conv: any) => {
+                        const pId = Number(conv.partner_id);
+                        const mn = Math.min(myId, pId);
+                        const mx = Math.max(myId, pId);
+                        return `room_${mn}_${mx}`;
+                    })
+            );
+            await this.storage.clearOrphanRooms(validRoomIds);
+
+            // 5. Remove from local UI list
+            this.conversations = this.conversations.filter((c: any) => Number(c.partner_id) !== partnerId);
+        } catch (err) {
+            console.error('Failed to delete conversation:', err);
+            alert('Хатогӣ ҳангоми нест кардан. Лутфан дубора кӯшиш кунед.');
+        }
+    }
+
     loadConversations() {
         if (this.conversations.length === 0) this.loading = true; // Added conditional loading
         this.error = null;
         this.api.get(`/conversations?userId=${this.currentUser.id}`).subscribe({
-            next: (data: any) => {
+            next: async (data: any) => {
                 // Normalize avatar URLs
                 this.conversations = data.map((conv: any) => {
                     if (conv.partner_avatar && !conv.partner_avatar.startsWith('http')) {
@@ -144,8 +184,26 @@ export class ConversationsComponent implements OnInit, OnDestroy {
                     return conv;
                 });
 
+                // Compute valid room IDs (room_{min}_{max}) from all partner IDs in this list
+                const myId = this.currentUser.id;
+                const validRoomIds = new Set<string>(
+                    this.conversations.map((conv: any) => {
+                        const pId = Number(conv.partner_id);
+                        const min = Math.min(myId, pId);
+                        const max = Math.max(myId, pId);
+                        return `room_${min}_${max}`;
+                    })
+                );
+
+                // Remove orphaned messages and conversation records from IndexedDB
+                try {
+                    await this.storage.clearOrphanRooms(validRoomIds);
+                } catch (err) {
+                    console.warn('Failed to clear orphan rooms', err);
+                }
+
                 // Save to cache
-                this.storage.saveConversations(this.conversations); // Save all conversations to cache
+                this.storage.saveConversations(this.conversations);
 
                 this.loading = false;
             },

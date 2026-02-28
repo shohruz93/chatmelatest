@@ -74,6 +74,16 @@ export class ApiService {
         );
     }
 
+    delete(endpoint: string): Observable<any> {
+        return this.http.delete(`${this.apiUrl}${endpoint}`, { headers: this.getHeaders() }).pipe(
+            tap(() => {
+                this.cache.clear();
+                this.cacheTimers.forEach(timer => clearTimeout(timer));
+                this.cacheTimers.clear();
+            })
+        );
+    }
+
     // Guests
     recordView(viewerId: number, viewedId: number): Observable<any> {
         return this.http.post(`${this.apiUrl}/profile/view`, { viewerId, viewedId });

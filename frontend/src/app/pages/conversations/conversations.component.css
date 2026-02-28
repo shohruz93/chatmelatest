@@ -482,3 +482,39 @@
 .status-ticks .tick.single {
     color: var(--text-muted);
 }
+
+/* Conversation item with delete button */
+.conversation-item-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.conversation-item-wrapper .conversation-item {
+    flex: 1;
+    min-width: 0;
+}
+
+.conv-delete-btn {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 0.5rem 0.6rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.conversation-item-wrapper:hover .conv-delete-btn {
+    opacity: 1;
+}
+
+.conv-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
