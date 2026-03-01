@@ -1,4 +1,7 @@
-import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, ViewChild, effect } from '@angular/core';
+import {
+    Component, OnInit, OnDestroy, inject, signal, computed,
+    ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, ViewChild, effect
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -7,6 +10,8 @@ import { AuthService } from '../../services/auth.service';
 import { VoiceChatService } from '../../services/voice-chat.service';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
+
+const MAX_STAGE_SLOTS = 8;
 
 @Component({
     selector: 'app-voice-room',
@@ -28,97 +33,115 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
 
     roomId: string | null = null;
     topic: string = 'Voice Room';
+    language: string = 'EN';
+
+    /** All participants in the room */
     participants = signal<any[]>([]);
+    /** IDs of speakers on stage */
+    speakerIds = signal<Set<number>>(new Set());
+
     messages = signal<any[]>([]);
     currentUser: any;
     newMessage: string = '';
 
+    isHost: boolean = false;
+    isOnStage: boolean = false;
+    hasSentRequest: boolean = false;
+
+    /** Pending stage requests (admin sees these as a dialog queue) */
+    pendingRequests: Array<{ userId: number; userName: string; userAvatar: string }> = [];
+    /** set of userIds that have pending requests (for badge indicator) */
+    pendingRequestIds = new Set<number>();
+
     private subs: Subscription = new Subscription();
+    private isJoined = false;
 
     constructor() {
-        // Auto-scroll effect
+        // Auto-scroll on new messages
         effect(() => {
-            this.messages(); // Dependency
-            setTimeout(() => this.scrollToBottom(), 100);
+            this.messages();
+            setTimeout(() => this.scrollToBottom(), 80);
         });
 
-        // Sync speaking state from voiceService
+        // Sync speaking state from WebRTC service
         effect(() => {
             const activity = this.voiceService.speakerActivity();
             const current = this.participants();
-
-            if (current.length === 0) return;
+            if (!current.length) return;
 
             let changed = false;
             const updated = current.map(p => {
                 const isSpeaking = p.isSelf ? !!activity.get(0) : !!activity.get(p.id);
-                if (p.isSpeaking !== isSpeaking) {
-                    changed = true;
-                    return { ...p, isSpeaking };
-                }
+                if (p.isSpeaking !== isSpeaking) { changed = true; return { ...p, isSpeaking }; }
                 return p;
             });
-
-            if (changed) {
-                this.participants.set(updated);
-            }
+            if (changed) { this.participants.set(updated); }
         });
     }
 
-    connected = signal(false);
-    isJoined = false;
+    // ─── Computed: Stage 8 fixed slots (null = empty) ────────────────────────
+    stageSlots = computed<(any | null)[]>(() => {
+        const ids = this.speakerIds();
+        const all = this.participants();
+        const slots: (any | null)[] = new Array(MAX_STAGE_SLOTS).fill(null);
+        let i = 0;
+        for (const p of all) {
+            if (ids.has(Number(p.id)) && i < MAX_STAGE_SLOTS) {
+                slots[i++] = p;
+            }
+        }
+        return slots;
+    });
 
+    // ─── Computed: Audience (participants NOT on stage) ───────────────────────
+    audienceParticipants = computed<any[]>(() => {
+        const ids = this.speakerIds();
+        return this.participants().filter(p => !ids.has(Number(p.id)));
+    });
+
+    // ─── Lifecycle ───────────────────────────────────────────────────────────
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
-
-        // Setup socket event listeners FIRST so we don't miss events
         this.setupSocketEvents();
 
         this.subs.add(this.route.paramMap.subscribe(params => {
             this.roomId = params.get('roomId');
-            this.isJoined = false; // Reset joined state on room change
-            this.participants.set([]); // Clear participants
-            this.messages.set([]);    // Clear messages
+            this.isJoined = false;
+            this.participants.set([]);
+            this.messages.set([]);
+            this.speakerIds.set(new Set());
+            this.pendingRequests = [];
+            this.pendingRequestIds.clear();
+            this.hasSentRequest = false;
+            this.isHost = false;
+            this.isOnStage = false;
 
-            // Add myself immediately so the participant grid is not empty
-            // Add myself immediately so the participant grid is not empty
+            // Immediately add self so grid isn't blank
             if (this.currentUser) {
                 let avatar = this.currentUser.avatar || '';
-                if (avatar && !avatar.startsWith('http')) {
-                    avatar = environment.phpBaseUrl + avatar;
-                }
+                if (avatar && !avatar.startsWith('http')) avatar = environment.phpBaseUrl + avatar;
                 this.participants.set([{
                     id: this.currentUser.id,
                     name: this.currentUser.name || `User ${this.currentUser.id}`,
-                    avatar: avatar,
-                    isSelf: true
+                    avatar,
+                    isSelf: true,
+                    isSpeaking: false
                 }]);
             }
             this.attemptJoin();
         }));
 
         this.subs.add(this.socketService.connectionState$.subscribe(connected => {
-            this.connected.set(connected);
-            if (!connected) {
-                this.isJoined = false; // Reset on disconnect so we rejoin
-                this.voiceService.cleanup();
-            }
-            if (connected) {
-                this.attemptJoin();
-            }
+            if (!connected) { this.isJoined = false; this.voiceService.cleanup(); }
+            if (connected) this.attemptJoin();
         }));
     }
 
     async attemptJoin() {
         if (!this.roomId || this.isJoined) return;
-        this.isJoined = true; // Prevent duplicate joins immediately
-        console.log('[VoiceRoom] Joining room:', this.roomId);
-
-        try {
-            await this.voiceService.initLocalStream();
-        } catch (e) {
-            console.warn('[VoiceRoom] Could not init stream, joining anyway as listener');
-        }
+        this.isJoined = true;
+        try { await this.voiceService.initLocalStream(); }
+        catch { console.warn('[VoiceRoom] Could not init mic, joining as listener'); }
 
         const profile = {
             name: this.currentUser?.name || `User ${this.currentUser?.id}`,
@@ -127,120 +150,160 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         this.socketService.joinVoiceRoom(this.roomId, profile);
     }
 
+    // ─── Socket Events ───────────────────────────────────────────────────────
     setupSocketEvents() {
-        // Room Joined (Initial data from server) — includes ALL current participants
+        // Joined room – full snapshot
         this.subs.add(this.socketService.voiceRoomJoined$.subscribe((data: any) => {
-            console.log('[VoiceRoom] Room joined data:', data);
-            if (data && data.roomId === this.roomId) {
-                this.topic = data.topic || 'Voice Room';
+            if (!data || data.roomId !== this.roomId) return;
+            this.topic = data.topic || 'Voice Room';
+            this.language = data.language || 'EN';
+            this.isHost = !!data.isHost;
+            this.isOnStage = !!data.isOnStage;
 
-                // participants is array of {id, name, avatar} or just IDs
-                const serverParticipants = (data.participants || []).map((p: any) => {
-                    const id = (typeof p === 'object') ? (p.id ?? p.userId) : p;
-                    const name = (typeof p === 'object') ? p.name : `User ${id}`;
-                    let avatar = (typeof p === 'object') ? p.avatar : '';
+            const spk = new Set<number>((data.speakers || []).map((id: any) => Number(id)));
+            this.speakerIds.set(spk);
 
-                    // Prepend base URL if relative
-                    if (avatar && !avatar.startsWith('http')) {
-                        avatar = environment.phpBaseUrl + avatar;
-                    }
-
-                    return {
-                        id: id,
-                        name: name,
-                        avatar: avatar,
-                        isSpeaking: false,
-                        isSelf: String(id) === String(this.currentUser?.id)
-                    };
-                });
-
-                // Ensure self is in the list even if not returned by server yet (should be there)
-                if (this.currentUser && !serverParticipants.find((p: any) => String(p.id) === String(this.currentUser.id))) {
-                    serverParticipants.push({
-                        id: this.currentUser.id,
-                        name: this.currentUser.name || `User ${this.currentUser.id}`,
-                        avatar: this.currentUser.avatar || '',
-                        isSpeaking: false,
-                        isSelf: true
-                    });
-                }
-
-                this.participants.set(serverParticipants);
-                if (data.messages) {
-                    this.messages.set(data.messages);
-                }
-                this.cdr.markForCheck();
-            }
-        }));
-
-        // Another user joined the room
-        this.subs.add(this.socketService.voiceUserJoined$.subscribe((data: any) => {
-            console.log('[VoiceRoom] User joined event:', data);
-            const current = this.participants();
-            const user = data.user || { id: data.userId, name: `User ${data.userId}`, avatar: '' };
-
-            // Normalize user object
-            let avatar = user.avatar ?? '';
-            if (avatar && !avatar.startsWith('http')) {
-                avatar = environment.phpBaseUrl + avatar;
-            }
-
-            const newUser = {
-                id: user.id ?? user.userId ?? data.userId,
-                name: user.name ?? `User ${user.id ?? user.userId ?? data.userId}`,
-                avatar: avatar,
-                isSpeaking: false,
-                isSelf: String(user.id ?? data.userId) === String(this.currentUser?.id)
-            };
-
-            if (!current.find((p: any) => String(p.id) === String(newUser.id))) {
-                this.participants.set([...current, newUser]);
-                this.cdr.markForCheck();
-
-                // We are an existing participant, a new user joined.
-                // Initiate call to them.
-                if (newUser.id !== this.currentUser?.id) {
-                    this.voiceService.startCall(newUser.id);
-                }
-            }
-        }));
-
-        // User left
-        this.subs.add(this.socketService.voiceUserLeft$.subscribe((data: any) => {
-            const current = this.participants();
-            const userId = Number(data.userId);
-            this.participants.set(current.filter((p: any) => String(p.id) !== String(data.userId)));
-            this.voiceService.removeParticipant(userId);
+            const mapped = (data.participants || []).map((p: any) => this.normalizeParticipant(p));
+            this.participants.set(this.ensureSelf(mapped));
+            if (data.messages) this.messages.set(data.messages);
             this.cdr.markForCheck();
         }));
 
-        // Chat Message
+        // Someone joined
+        this.subs.add(this.socketService.voiceUserJoined$.subscribe((data: any) => {
+            const user = data.user || { id: data.userId, name: `User ${data.userId}`, avatar: '' };
+            const np = this.normalizeParticipant(user);
+            const current = this.participants();
+            if (!current.find((p: any) => String(p.id) === String(np.id))) {
+                this.participants.set([...current, np]);
+                if (np.id !== this.currentUser?.id) this.voiceService.startCall(np.id);
+            }
+            this.cdr.markForCheck();
+        }));
+
+        // Someone left
+        this.subs.add(this.socketService.voiceUserLeft$.subscribe((data: any) => {
+            const uid = Number(data.userId);
+            this.participants.update(list => list.filter(p => String(p.id) !== String(data.userId)));
+            const newSpk = new Set(this.speakerIds());
+            newSpk.delete(uid);
+            this.speakerIds.set(newSpk);
+            this.voiceService.removeParticipant(uid);
+            this.pendingRequestIds.delete(uid);
+            this.pendingRequests = this.pendingRequests.filter(r => r.userId !== uid);
+            this.cdr.markForCheck();
+        }));
+
+        // Chat message
         this.subs.add(this.socketService.voiceChatMessage$.subscribe((message: any) => {
-            console.log('[VoiceRoom] Message received:', message);
-            if (message.roomId === this.roomId) {
-                this.messages.update(msgs => {
-                    if (msgs.find(m => m.id === message.id)) return msgs;
-                    return [...msgs, message];
-                });
+            if (message.roomId !== this.roomId) return;
+            this.messages.update(msgs => msgs.find(m => m.id === message.id) ? msgs : [...msgs, message]);
+            this.cdr.markForCheck();
+        }));
+
+        // Speaker added (approved or host)
+        this.subs.add(this.socketService.on$('speaker_added').subscribe((data: any) => {
+            if (data.roomId !== this.roomId) return;
+            const newSpk = new Set(this.speakerIds());
+            newSpk.add(Number(data.userId));
+            this.speakerIds.set(newSpk);
+            // If this is me, update my stage status
+            if (String(data.userId) === String(this.currentUser?.id)) {
+                this.isOnStage = true;
+                this.hasSentRequest = false;
+            }
+            this.cdr.markForCheck();
+        }));
+
+        // Speaker removed
+        this.subs.add(this.socketService.on$('speaker_removed').subscribe((data: any) => {
+            if (data.roomId !== this.roomId) return;
+            const newSpk = new Set(this.speakerIds());
+            newSpk.delete(Number(data.userId));
+            this.speakerIds.set(newSpk);
+            if (String(data.userId) === String(this.currentUser?.id)) this.isOnStage = false;
+            this.cdr.markForCheck();
+        }));
+
+        // Stage request received (host only)
+        this.subs.add(this.socketService.on$('stage_request_received').subscribe((data: any) => {
+            if (data.roomId !== this.roomId) return;
+            this.pendingRequestIds.add(Number(data.userId));
+            // Avoid duplicates
+            if (!this.pendingRequests.find(r => r.userId === data.userId)) {
+                this.pendingRequests.push({ userId: data.userId, userName: data.userName, userAvatar: data.userAvatar || '' });
+            }
+            this.cdr.markForCheck();
+        }));
+
+        // My request was rejected
+        this.subs.add(this.socketService.on$('speaker_rejected').subscribe((data: any) => {
+            if (data.roomId !== this.roomId) return;
+            this.hasSentRequest = false;
+            this.cdr.markForCheck();
+        }));
+
+        // Host changed
+        this.subs.add(this.socketService.on$('voice_room_host_changed').subscribe((data: any) => {
+            if (String(data.newHostId) === String(this.currentUser?.id)) {
+                this.isHost = true;
                 this.cdr.markForCheck();
-            } else {
-                console.warn('[VoiceRoom] Message ignored - roomId mismatch:', message.roomId, this.roomId);
             }
         }));
     }
 
+    // ─── Admin Actions ───────────────────────────────────────────────────────
+    approveSpeaker(userId: number) {
+        if (!this.roomId) return;
+        this.socketService.emit('approve_speaker', { roomId: this.roomId, userId });
+        this.pendingRequests = this.pendingRequests.filter(r => r.userId !== userId);
+        this.pendingRequestIds.delete(userId);
+        this.cdr.markForCheck();
+    }
+
+    rejectSpeaker(userId: number) {
+        if (!this.roomId) return;
+        this.socketService.emit('reject_speaker', { roomId: this.roomId, userId });
+        this.pendingRequests = this.pendingRequests.filter(r => r.userId !== userId);
+        this.pendingRequestIds.delete(userId);
+        this.cdr.markForCheck();
+    }
+
+    removeSpeaker(userId: number) {
+        if (!this.roomId) return;
+        this.socketService.emit('remove_speaker', { roomId: this.roomId, userId });
+    }
+
+    requestSpeakerSlot() {
+        if (!this.roomId || this.hasSentRequest) return;
+        this.hasSentRequest = true;
+        this.socketService.emit('request_speaker_slot', { roomId: this.roomId });
+    }
+
+    onAudienceAvatarClick(p: any) {
+        if (!this.isHost) return;
+        // If they have a pending request, show approve/reject; otherwise invite manually
+        if (this.pendingRequestIds.has(Number(p.id))) return; // Handled by dialog
+        // Directly invite (approve without request) – admin privilege
+        this.approveSpeaker(Number(p.id));
+    }
+
+    // ─── Chat ─────────────────────────────────────────────────────────────────
     sendMessage() {
         if (!this.newMessage.trim() || !this.roomId) return;
-
         this.socketService.sendVoiceRoomMessage(
-            this.roomId,
-            this.newMessage,
+            this.roomId, this.newMessage,
             this.currentUser?.name,
             this.currentUser?.avatar
         );
         this.newMessage = '';
     }
 
+    isMyMessage(msg: any): boolean {
+        return String(msg.senderId) === String(this.currentUser?.id);
+    }
+
+    // ─── Room ─────────────────────────────────────────────────────────────────
     leaveRoom() {
         if (this.roomId) {
             this.socketService.leaveVoiceRoom(this.roomId);
@@ -248,21 +311,38 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         }
     }
 
-    ngOnDestroy() {
-        this.leaveRoom(); // Ensure we leave on navigation
-        this.voiceService.cleanup(); // Ensure cleanup is called directly
-        this.subs.unsubscribe();
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+    private normalizeParticipant(p: any): any {
+        const id = typeof p === 'object' ? (p.id ?? p.userId) : p;
+        const name = typeof p === 'object' ? p.name : `User ${id}`;
+        let avatar = typeof p === 'object' ? (p.avatar ?? '') : '';
+        if (avatar && !avatar.startsWith('http')) avatar = environment.phpBaseUrl + avatar;
+        return {
+            id: Number(id),
+            name,
+            avatar,
+            isSpeaking: false,
+            isSelf: String(id) === String(this.currentUser?.id),
+            isHost: String(id) === String(this.roomId?.split('_')[2]) // fallback
+        };
+    }
+
+    private ensureSelf(list: any[]): any[] {
+        if (!this.currentUser) return list;
+        if (list.find((p: any) => String(p.id) === String(this.currentUser.id))) return list;
+        let avatar = this.currentUser.avatar || '';
+        if (avatar && !avatar.startsWith('http')) avatar = environment.phpBaseUrl + avatar;
+        return [...list, { id: Number(this.currentUser.id), name: this.currentUser.name, avatar, isSelf: true, isSpeaking: false }];
     }
 
     scrollToBottom() {
-        if (this.scrollContainer) {
-            try {
-                this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
-            } catch (err) { }
-        }
+        try { this.scrollContainer?.nativeElement.scrollTo({ top: this.scrollContainer.nativeElement.scrollHeight, behavior: 'smooth' }); }
+        catch { }
     }
 
-    isMyMessage(msg: any): boolean {
-        return String(msg.senderId) === String(this.currentUser?.id);
+    ngOnDestroy() {
+        this.leaveRoom();
+        this.voiceService.cleanup();
+        this.subs.unsubscribe();
     }
 }

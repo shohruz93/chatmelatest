@@ -48,13 +48,15 @@ export class SocketService implements OnDestroy {
     private checkersRejectedSubject = new Subject<any>();
     private roomUsersSubject = new Subject<any>(); // New subject for room users
 
-    // Voice Room Subjects
     private voiceRoomJoinedSubject = new Subject<any>();
     private voiceUserJoinedSubject = new Subject<any>();
     private voiceUserLeftSubject = new Subject<any>();
     private voiceChatMessageSubject = new Subject<any>();
     private voiceRoomsListSubject = new Subject<any[]>();
-    private connectionStateSubject = new BehaviorSubject<boolean>(false); // New connection state
+    private voiceRoomsUpdateSubject = new Subject<any[]>();
+    private connectionStateSubject = new BehaviorSubject<boolean>(false);
+    // Generic pass-through subjects for new server events
+    private genericEventSubjects = new Map<string, Subject<any>>();
 
     public matchFound$ = this.matchFoundSubject.asObservable().pipe(shareReplay(1));
     public messageSent$ = this.messageSentSubject.asObservable().pipe(shareReplay(1));
@@ -89,6 +91,7 @@ export class SocketService implements OnDestroy {
     public voiceUserLeft$ = this.voiceUserLeftSubject.asObservable();
     public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable();
     public voiceRoomsList$ = this.voiceRoomsListSubject.asObservable();
+    public voiceRoomsUpdate$ = this.voiceRoomsUpdateSubject.asObservable();
     public connectionState$ = this.connectionStateSubject.asObservable();
     private voiceErrorSubject = new Subject<any>();
     public voiceError$ = this.voiceErrorSubject.asObservable();
@@ -162,19 +165,19 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_cancelled', (data) => this.checkersCancelledSubject.next(data));
         this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data));
 
-        // Voice Room Events
         this.socket.on('voice_room_created', (data) => console.log('Room created:', data));
         this.socket.on('voice_room_joined', (data) => this.voiceRoomJoinedSubject.next(data));
         this.socket.on('voice_user_joined', (data) => this.voiceUserJoinedSubject.next(data));
         this.socket.on('voice_user_left', (data) => this.voiceUserLeftSubject.next(data));
         this.socket.on('voice_chat_message', (data) => this.voiceChatMessageSubject.next(data));
-        this.socket.on('voice_rooms_list', (data) => this.voiceRoomsListSubject.next(data));
-        this.socket.on('voice_rooms_update', (data) => this.voiceRoomsListSubject.next(data));
-        this.socket.on('voice_error', (data) => {
-            console.error('Voice Error:', data);
-            this.voiceErrorSubject.next(data);
+        this.socket.on('voice_rooms_list', (data) => { this.voiceRoomsListSubject.next(data); this.voiceRoomsUpdateSubject.next(data); });
+        this.socket.on('voice_rooms_update', (data) => { this.voiceRoomsListSubject.next(data); this.voiceRoomsUpdateSubject.next(data); });
+        this.socket.on('voice_error', (data) => { console.error('Voice Error:', data); this.voiceErrorSubject.next(data); });
+        this.socket.on('voice_room_host_changed', (data) => this.forwardGenericEvent('voice_room_host_changed', data));
+        // Stage management events – forwarded generically
+        ['speaker_added', 'speaker_removed', 'speaker_rejected', 'stage_request_received'].forEach(ev => {
+            this.socket.on(ev, (data: any) => this.forwardGenericEvent(ev, data));
         });
-        this.socket.on('voice_room_host_changed', (data) => console.log('Host changed:', data));
 
         this.socket.on('connect', () => {
             const current = this.auth.currentUserValue;
@@ -419,8 +422,8 @@ export class SocketService implements OnDestroy {
         this.socket.emit('get_voice_rooms');
     }
 
-    createVoiceRoom(topic: string) {
-        this.socket.emit('create_voice_room', { topic });
+    createVoiceRoom(topic: string, language: string = 'EN') {
+        this.socket.emit('create_voice_room', { topic, language });
     }
 
     joinVoiceRoom(roomId: string, profile?: { name: string, avatar: string }) {
@@ -464,6 +467,22 @@ export class SocketService implements OnDestroy {
             this.socket.on(eventName, (data) => observer.next(data));
         });
     }
+
+    /** Alias for on() used in new VoiceRoom components */
+    on$(eventName: string): Observable<any> {
+        if (!this.genericEventSubjects.has(eventName)) {
+            this.genericEventSubjects.set(eventName, new Subject<any>());
+        }
+        return this.genericEventSubjects.get(eventName)!.asObservable();
+    }
+
+    private forwardGenericEvent(eventName: string, data: any) {
+        if (!this.genericEventSubjects.has(eventName)) {
+            this.genericEventSubjects.set(eventName, new Subject<any>());
+        }
+        this.genericEventSubjects.get(eventName)!.next(data);
+    }
+
     playNotificationSound() {
         const audio = new Audio('/mp3/notification.wav');
         audio.play().catch(err => console.error('Error playing notification sound:', err));

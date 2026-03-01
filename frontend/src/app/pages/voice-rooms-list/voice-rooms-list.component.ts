@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-voice-rooms-list',
@@ -17,8 +18,17 @@ export class VoiceRoomsListComponent implements OnInit, OnDestroy {
     private router = inject(Router);
 
     rooms = signal<any[]>([]);
+    filterLang: string = '';
     newRoomTopic: string = '';
+    newRoomLang: string = 'EN';
     showCreateModal: boolean = false;
+
+    languages = ['EN', 'RU', 'TJ', 'ES', 'CN', 'AR', 'FR', 'ID', 'JA'];
+
+    filteredRooms = computed(() => {
+        const lang = this.filterLang;
+        return lang ? this.rooms().filter(r => r.language === lang) : this.rooms();
+    });
 
     private subs: Subscription = new Subscription();
 
@@ -26,26 +36,37 @@ export class VoiceRoomsListComponent implements OnInit, OnDestroy {
         this.socketService.getVoiceRooms();
 
         this.subs.add(this.socketService.voiceRoomsList$.subscribe((data: any) => {
-            // data usually is List<VoiceRoom> or JSONArray
-            if (Array.isArray(data)) {
-                this.rooms.set(data);
+            if (Array.isArray(data)) this.rooms.set(data);
+        }));
+
+        // Also update list on live updates
+        this.subs.add(this.socketService.voiceRoomsUpdate$.subscribe((data: any) => {
+            if (Array.isArray(data)) this.rooms.set(data);
+        }));
+
+        // Auto-navigate admin into room right after creation
+        this.subs.add(this.socketService.voiceRoomJoined$.subscribe((data: any) => {
+            if (data?.roomId) {
+                this.router.navigate(['/dashboard/voice-room', data.roomId]);
             }
         }));
     }
 
+    setFilter(lang: string) {
+        this.filterLang = lang;
+    }
+
+    getAvatarUrl(avatar: string): string {
+        if (!avatar) return '';
+        if (avatar.startsWith('http')) return avatar;
+        return environment.phpBaseUrl + avatar;
+    }
+
     createRoom() {
         if (this.newRoomTopic.trim()) {
-            this.socketService.createVoiceRoom(this.newRoomTopic);
+            this.socketService.createVoiceRoom(this.newRoomTopic, this.newRoomLang);
             this.newRoomTopic = '';
             this.showCreateModal = false;
-            // Server usually auto-joins the creator or emits update. 
-            // If server auto-joins, we should listen to 'voice_room_joined' globally or just wait for list update?
-            // Let's rely on list update for now, or user can click join after it appears.
-            // Better yet, in Android `createVoiceRoom` just sends emit. `voice_room_joined` event handles the join.
-            // We probably need to handle `voice_room_joined` in app.component or similar if we want auto-navigation?
-            // Or we can just let `VoiceRoomComponent` handle join.
-            // But if I create a room, I expect to go there.
-            // I'll leave it manual for now (Wait for list update, then click join).
         }
     }
 

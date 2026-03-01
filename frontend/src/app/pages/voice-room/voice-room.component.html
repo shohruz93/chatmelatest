@@ -1,60 +1,109 @@
-<div class="voice-room-container">
-    <!-- Header -->
-    <header class="room-header glass-panel">
-        <button class="btn-icon" (click)="leaveRoom()" title="Leave Room">
+<div class="room-wrapper">
+    <!-- ── HEADER ──────────────────────────────── -->
+    <header class="room-header">
+        <button class="btn-icon" (click)="leaveRoom()">
             <span class="material-icons">arrow_back</span>
         </button>
-        <h2 class="room-title">{{ topic }}</h2>
+        <div class="header-center">
+            <div class="header-lang" *ngIf="language">
+                <span class="material-icons" style="font-size:14px">mic</span>
+                {{ language }}
+            </div>
+            <h2 class="room-title">{{ topic }}</h2>
+        </div>
         <div class="header-controls">
-            <button class="btn-control" [class.muted]="voiceService.isMuted()" (click)="voiceService.toggleMute()"
-                title="Toggle Mute">
+            <button class="btn-ctrl" [class.muted]="voiceService.isMuted()" (click)="voiceService.toggleMute()"
+                title="Mute">
                 <span class="material-icons">{{ voiceService.isMuted() ? 'mic_off' : 'mic' }}</span>
             </button>
-            <button class="btn-end-call" (click)="leaveRoom()" title="End Call">
+            <button class="btn-end" (click)="leaveRoom()" title="Leave">
                 <span class="material-icons">call_end</span>
             </button>
         </div>
     </header>
 
-    <!-- Participants Area (Top Half) -->
-    <div class="participants-grid">
-        <div class="participant-card glass-panel" *ngFor="let p of participants()" [class.speaking]="p.isSpeaking">
-            <div class="avatar-wrapper" [class.speaking]="p.isSpeaking">
-                <img *ngIf="p.avatar" [src]="p.avatar" class="avatar-img" [alt]="p.name">
-                <div *ngIf="!p.avatar" class="avatar-placeholder">
-                    {{ (p.name || (''+p.id)).charAt(0).toUpperCase() }}
+    <!-- ── STAGE (8 Slots Grid) ───────────────── -->
+    <div class="stage-section">
+        <div class="section-label">The Stage</div>
+        <div class="stage-grid">
+            <ng-container *ngFor="let slot of stageSlots(); let i = index">
+                <!-- Filled slot -->
+                <div class="stage-slot" *ngIf="slot; else emptySlot">
+                    <div class="avatar-ring" [class.speaking]="slot.isSpeaking">
+                        <img *ngIf="slot.avatar" [src]="slot.avatar" class="stage-avatar" [alt]="slot.name">
+                        <div *ngIf="!slot.avatar" class="stage-avatar-ph">
+                            {{ (slot.name||'U')[0].toUpperCase() }}
+                        </div>
+                        <!-- Crown for index 0 (host) -->
+                        <div class="host-crown" *ngIf="i === 0">
+                            <span class="material-icons" style="font-size:12px">star</span>
+                        </div>
+                    </div>
+                    <span class="slot-name">{{ slot.name || ('User '+slot.id) }}</span>
+                    <div class="audio-bars" [class.active]="slot.isSpeaking">
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <!-- Host: remove from stage button (admin only, not on host slot) -->
+                    <button class="btn-remove-speaker" *ngIf="isHost && i > 0" (click)="removeSpeaker(slot.id)"
+                        title="Remove from stage">
+                        <span class="material-icons" style="font-size:14px">close</span>
+                    </button>
                 </div>
-            </div>
-            <span class="participant-name">{{ p.name || 'User ' + p.id }}</span>
-            <span class="self-badge" *ngIf="p.isSelf">You</span>
-            <!-- Animated equalizer bars — 4 bars -->
-            <div class="audio-waves">
-                <span></span><span></span><span></span><span></span>
-            </div>
-        </div>
-
-        <div *ngIf="participants().length === 0" class="waiting-message">
-            <p>Waiting for participants…</p>
+                <!-- Empty slot -->
+                <ng-template #emptySlot>
+                    <div class="stage-slot empty">
+                        <div class="empty-slot-circle">{{ i + 1 }}</div>
+                    </div>
+                </ng-template>
+            </ng-container>
         </div>
     </div>
 
-    <!-- Chat Area (Bottom Half) -->
-    <div class="chat-section glass-panel">
-        <div class="messages-list" #messagesContainer>
-            <div *ngFor="let msg of messages()" class="message-bubble" [class.sent]="isMyMessage(msg)"
-                [class.received]="!isMyMessage(msg)">
-
-                <div class="message-content">
-                    <span *ngIf="!isMyMessage(msg)" class="sender-name">{{ msg.senderName || 'User ' + msg.senderId
-                        }}</span>
-                    <p>{{ msg.content }}</p>
-                    <span class="timestamp">{{ msg.timestamp * 1000 | date:'shortTime' }}</span>
+    <!-- ── AUDIENCE SECTION ────────────────────── -->
+    <div class="audience-section" *ngIf="audienceParticipants().length > 0">
+        <div class="section-label">Others in the room</div>
+        <div class="audience-row">
+            <div class="audience-member" *ngFor="let p of audienceParticipants()" (click)="onAudienceAvatarClick(p)"
+                [title]="p.name || 'User '+p.id">
+                <img *ngIf="p.avatar" [src]="p.avatar" class="audience-avatar" [alt]="p.name">
+                <div *ngIf="!p.avatar" class="audience-avatar audience-avatar-ph">
+                    {{ (p.name||'U')[0] }}
                 </div>
+                <span class="audience-name">{{ (p.name || ('User '+p.id)).split(' ')[0] }}</span>
+                <!-- Admin "invite to stage" badge -->
+                <div class="stage-request-badge" *ngIf="isHost && pendingRequestIds.has(p.id)">!</div>
             </div>
         </div>
+    </div>
 
+    <!-- ── NON-HOST: Request to speak button ──── -->
+    <div class="request-bar" *ngIf="!isHost && !isOnStage">
+        <button class="btn-request" (click)="requestSpeakerSlot()" [disabled]="hasSentRequest">
+            <span class="material-icons">pan_tool</span>
+            {{ hasSentRequest ? 'Request Sent…' : 'Request to Speak' }}
+        </button>
+    </div>
+
+    <!-- ── CHAT SECTION ───────────────────────── -->
+    <div class="chat-section">
+        <div class="messages-list" #messagesContainer>
+            <div *ngFor="let msg of messages()" class="msg-row" [class.mine]="isMyMessage(msg)">
+                <img *ngIf="!isMyMessage(msg) && msg.avatar" [src]="msg.avatar" class="msg-avatar">
+                <div *ngIf="!isMyMessage(msg) && !msg.avatar" class="msg-avatar msg-avatar-ph">
+                    {{ (msg.senderName||'U')[0] }}
+                </div>
+                <div class="msg-bubble-wrap">
+                    <span class="msg-sender" *ngIf="!isMyMessage(msg)">{{ msg.senderName || 'User '+msg.senderId
+                        }}</span>
+                    <div class="msg-bubble">{{ msg.content }}</div>
+                </div>
+                <button class="btn-wave" *ngIf="!isMyMessage(msg)" title="Wave">
+                    <span>👋</span>
+                </button>
+            </div>
+        </div>
         <div class="chat-input-bar">
-            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Type a message…"
+            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Comment…"
                 class="chat-input">
             <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
                 <span class="material-icons">send</span>
@@ -62,4 +111,20 @@
         </div>
     </div>
 
+    <!-- ── ADMIN: Stage Request Dialog ───────── -->
+    <div class="request-dialog-overlay" *ngIf="pendingRequests.length > 0 && isHost">
+        <div class="request-dialog">
+            <ng-container *ngIf="pendingRequests[0] as req">
+                <div class="req-avatar-wrap">
+                    <img *ngIf="req.userAvatar" [src]="req.userAvatar" class="req-avatar">
+                    <div *ngIf="!req.userAvatar" class="req-avatar req-avatar-ph">{{ (req.userName||'U')[0] }}</div>
+                </div>
+                <p><strong>{{ req.userName }}</strong> wants to speak on stage</p>
+                <div class="req-actions">
+                    <button class="btn-reject" (click)="rejectSpeaker(req.userId)">Reject</button>
+                    <button class="btn-approve" (click)="approveSpeaker(req.userId)">Allow</button>
+                </div>
+            </ng-container>
+        </div>
+    </div>
 </div>

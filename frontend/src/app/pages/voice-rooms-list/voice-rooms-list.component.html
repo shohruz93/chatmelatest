@@ -1,37 +1,85 @@
-<div class="rooms-container">
-    <div class="rooms-header">
-        <h2>Voice Rooms</h2>
-        <button class="btn-primary" (click)="showCreateModal = true">
-            <span class="material-icons">add</span> Create Room
-        </button>
+<div class="page-wrapper">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="tabs">
+      <button class="tab active">Voice</button>
+    </div>
+    <button class="btn-create" (click)="showCreateModal = true">
+      <span class="material-icons">mic</span>
+    </button>
+  </div>
+
+  <!-- Language Filters -->
+  <div class="lang-filters">
+    <button class="lang-chip" [class.active]="filterLang === ''" (click)="setFilter('')">All</button>
+    <button class="lang-chip" *ngFor="let l of languages" [class.active]="filterLang === l" (click)="setFilter(l)">{{ l }}</button>
+  </div>
+
+  <!-- Rooms List -->
+  <div class="rooms-list">
+    <div class="room-card" *ngFor="let room of filteredRooms()" (click)="joinRoom(room.id)">
+      <div class="room-meta">
+        <span class="lang-badge">
+          <span class="material-icons" style="font-size:13px; vertical-align:middle">mic</span>
+          {{ room.language || 'EN' }}
+        </span>
+        <span class="count-badge">
+          <span class="material-icons" style="font-size:13px; vertical-align:middle">people</span>
+          {{ room.participantsCount || 0 }}
+        </span>
+      </div>
+
+      <h3 class="room-topic">{{ room.topic }}</h3>
+
+      <div class="room-host-row">
+        <div class="host-avatar-wrap">
+          <img *ngIf="room.hostAvatar" [src]="getAvatarUrl(room.hostAvatar)" class="host-avatar" [alt]="room.hostName">
+          <div *ngIf="!room.hostAvatar" class="host-avatar host-avatar-placeholder">
+            {{ (room.hostName || 'H')[0].toUpperCase() }}
+          </div>
+        </div>
+        <span class="host-name">{{ room.hostName || ('User ' + room.hostId) }}</span>
+
+        <div class="avatar-strip" *ngIf="room.avatarPreview?.length">
+          <ng-container *ngFor="let p of room.avatarPreview">
+            <img *ngIf="p.avatar" [src]="getAvatarUrl(p.avatar)" class="strip-avatar" [title]="p.name">
+            <div *ngIf="!p.avatar" class="strip-avatar strip-avatar-ph">{{ (p.name||'U')[0] }}</div>
+          </ng-container>
+        </div>
+      </div>
     </div>
 
-    <div class="rooms-grid">
-        <div class="room-card glass-panel" *ngFor="let room of rooms()">
-            <div class="room-info">
-                <h3>{{ room.topic }}</h3>
-                <p class="participants-count">
-                    <span class="material-icons">group</span> {{ room.participantsCount || 0 }}
-                </p>
-                <div class="host-info" *ngIf="room.hostId">Host ID: {{ room.hostId }}</div>
-            </div>
-            <button class="btn-join" (click)="joinRoom(room.id)">Join</button>
-        </div>
-
-        <div *ngIf="rooms().length === 0" class="no-rooms">
-            <p>No active voice rooms. Create one to start chatting!</p>
-        </div>
+    <div *ngIf="filteredRooms().length === 0" class="empty-state">
+      <span class="material-icons empty-icon">mic_none</span>
+      <p>No active voice rooms.<br>Start one to talk with people!</p>
+      <button class="btn-create-big" (click)="showCreateModal = true">+ Create Room</button>
     </div>
+  </div>
 
-    <!-- Create Room Modal -->
-    <div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false">
-        <div class="modal-content glass-panel" (click)="$event.stopPropagation()">
-            <h3>Create Voice Room</h3>
-            <input type="text" [(ngModel)]="newRoomTopic" placeholder="Enter room topic" class="modal-input" autofocus>
-            <div class="modal-actions">
-                <button class="btn-secondary" (click)="showCreateModal = false">Cancel</button>
-                <button class="btn-primary" (click)="createRoom()" [disabled]="!newRoomTopic.trim()">Create</button>
-            </div>
-        </div>
+  <!-- Create Room Modal -->
+  <div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <h3>Create Voice Room</h3>
+      <input type="text" [(ngModel)]="newRoomTopic" placeholder="Room topic…" class="modal-input" autofocus>
+      <select [(ngModel)]="newRoomLang" class="modal-input">
+        <option value="EN">🇺🇸 English (EN)</option>
+        <option value="RU">🇷🇺 Russian (RU)</option>
+        <option value="TJ">🇹🇯 Tajik (TJ)</option>
+        <option value="ES">🇪🇸 Spanish (ES)</option>
+        <option value="CN">🇨🇳 Chinese (CN)</option>
+        <option value="AR">🇸🇦 Arabic (AR)</option>
+        <option value="FR">🇫🇷 French (FR)</option>
+        <option value="DE">🇩🇪 German (DE)</option>
+        <option value="ID">🇮🇩 Indonesian (ID)</option>
+        <option value="JA">🇯🇵 Japanese (JA)</option>
+        <option value="KO">🇰🇷 Korean (KO)</option>
+        <option value="PT">🇧🇷 Portuguese (PT)</option>
+        <option value="TR">🇹🇷 Turkish (TR)</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="showCreateModal = false">Cancel</button>
+        <button class="btn-confirm" (click)="createRoom()" [disabled]="!newRoomTopic.trim()">Create</button>
+      </div>
     </div>
+  </div>
 </div>
