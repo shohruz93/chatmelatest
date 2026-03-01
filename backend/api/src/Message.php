@@ -100,10 +100,6 @@ class Message {
             $content = $data['content'] ?? '';
             $isCorrection = isset($data['isCorrection']) && $data['isCorrection'] ? 1 : 0;
             
-            // 1. Sanitize content for security (only for text messages)
-            if ($type === 'text') {
-                $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
-            }
 
             // 2. Check for empty message
             if ($type === 'text' && trim($content) === '') {
