@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AuthWelcome.Text" xml:space="preserve">
+    <value>С возвращением</value>
+  </data>
+  <data name="AuthSubtitle.Text" xml:space="preserve">
+    <value>Общайтесь со всем миром</value>
+  </data>
+  <data name="AuthContinueGoogle.Text" xml:space="preserve">
+    <value>Войти через Google</value>
+  </data>
+  <data name="AuthContinueEmail.Text" xml:space="preserve">
+    <value>Войти через Email</value>
+  </data>
+  <data name="EmailLoginTitle.Text" xml:space="preserve">
+    <value>Вход по Email</value>
+  </data>
+  <data name="EmailLoginSubtitle.Text" xml:space="preserve">
+    <value>Войдите с помощью вашей почты</value>
+  </data>
+  <data name="EmailLabel.Header" xml:space="preserve">
+    <value>Электронная почта</value>
+  </data>
+  <data name="SendCodeBtn.Content" xml:space="preserve">
+    <value>Отправить код подтверждения</value>
+  </data>
+  <data name="VerifyTitle.Text" xml:space="preserve">
+    <value>Верификация</value>
+  </data>
+  <data name="VerifySubtitle.Text" xml:space="preserve">
+    <value>Введите 6-значный код</value>
+  </data>
+  <data name="VerifyBtn.Content" xml:space="preserve">
+    <value>Проверить и войти</value>
+  </data>
+</root>

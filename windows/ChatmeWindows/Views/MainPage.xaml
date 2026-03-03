@@ -1,0 +1,62 @@
+<Page
+    x:Class="ChatmeWindows.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar / Chat List -->
+        <Grid Grid.Column="0" BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}" BorderThickness="0,0,1,0">
+            <ListView x:Name="ChatListView" SelectionChanged="ChatListView_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Padding="10" Spacing="5">
+                            <TextBlock Text="{Binding PartnerName}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding LastMessage}" MaxLines="1" TextTrimming="CharacterEllipsis" Opacity="0.7"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+
+        <!-- Chat Area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <TextBlock x:Name="ChatHeader" Text="Select a chat" FontSize="18" Padding="20" FontWeight="SemiBold"/>
+
+            <!-- Messages -->
+            <ListView x:Name="MessageListView" Grid.Row="1" Padding="10">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border HorizontalAlignment="{Binding Alignment}" Background="{Binding Background}" CornerRadius="10" Padding="10" Margin="5">
+                            <TextBlock Text="{Binding Content}" TextWrapping="Wrap" MaxWidth="400"/>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <!-- Input -->
+            <Grid Grid.Row="2" Padding="10" Background="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="MessageInput" PlaceholderText="Type a message..." KeyDown="MessageInput_KeyDown"/>
+                <Button Grid.Column="1" Content="Send" Click="SendButton_Click" Margin="10,0,0,0"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

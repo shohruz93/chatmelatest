@@ -1,0 +1,6 @@
+<Solution>
+    <Project Path="ChatmeWindows.csproj">
+        <Platform Solution="Debug|*" Project="x64" />
+        <Deploy />
+    </Project>
+</Solution>

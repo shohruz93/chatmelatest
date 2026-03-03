@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Application
+    x:Class="ChatmeWindows.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Color x:Key="PrimaryColor">#4F46E5</Color>
+            <Color x:Key="SecondaryColor">#10B981</Color>
+            <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+            <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
+            
+            <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#4F46E5" Offset="0" />
+                <GradientStop Color="#10B981" Offset="1" />
+            </LinearGradientBrush>
+
+            <!-- Minimal Styles to keep code working -->
+            <Style x:Key="GlassCardStyle" TargetType="Border" />
+            <Style x:Key="PrimaryButtonStyle" TargetType="Button" />
+            <Style x:Key="SecondaryButtonStyle" TargetType="Button" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
