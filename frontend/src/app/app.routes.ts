@@ -3,6 +3,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { FeaturesComponent } from './pages/features/features.component';
 import { AboutComponent } from './pages/about/about.component';
 import { PrivacyPolicyComponent } from './components/privacy-policy/privacy-policy.component';
+import { TermsOfServiceComponent } from './components/terms-of-service/terms-of-service.component';
 import { LoginComponent } from './pages/login/login.component';
 import { OnboardingComponent } from './pages/onboarding/onboarding.component';
 import { ChatComponent } from './pages/chat/chat.component';
@@ -15,6 +16,7 @@ export const routes: Routes = [
     { path: 'features', component: FeaturesComponent },
     { path: 'about', component: AboutComponent },
     { path: 'privacy', component: PrivacyPolicyComponent },
+    { path: 'terms', component: TermsOfServiceComponent },
     { path: 'login', component: LoginComponent, canActivate: [loginGuard] },
     { path: 'onboarding', component: OnboardingComponent, canActivate: [authGuard] },
     {

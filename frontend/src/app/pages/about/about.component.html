@@ -77,6 +77,12 @@
     </main>
 
     <footer class="footer">
-        <p>{{ 'ABOUT_PAGE.FOOTER' | translate }}</p>
+        <div class="footer-content">
+            <p>{{ 'ABOUT_PAGE.FOOTER' | translate }}</p>
+            <div class="footer-links">
+                <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+                <a routerLink="/terms">{{ 'AUTH.TERMS' | translate }}</a>
+            </div>
+        </div>
     </footer>
 </div>

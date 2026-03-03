@@ -157,7 +157,13 @@
 
 
     <footer class="footer">
-        <p>{{ 'HOME.FOOTER_RIGHTS' | translate }}</p>
+        <div class="footer-content">
+            <p>{{ 'HOME.FOOTER_RIGHTS' | translate }}</p>
+            <div class="footer-links">
+                <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+                <a routerLink="/terms">{{ 'AUTH.TERMS' | translate }}</a>
+            </div>
+        </div>
     </footer>
 </div>
 

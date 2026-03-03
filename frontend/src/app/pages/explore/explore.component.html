@@ -211,19 +211,16 @@
     <div class="user-grid">
       @for (user of filteredUsers; track user.id) {
       <div class="user-card" (click)="openProfile(user)">
-        <!-- Online Status Badge -->
-        <div class="status-badge" [class.online]="user.isOnline" [class.offline]="!user.isOnline">
-          <span class="status-dot"></span>
-          @if (user.isOnline) {
-          {{ 'EXPLORE_PAGE.ONLINE' | translate }}
-          } @else {
-          {{ formatLastActive(user.last_active) || ('EXPLORE_PAGE.OFFLINE' | translate) }}
-          }
-        </div>
-
-        <!-- Avatar -->
-        <div class="user-avatar">
-          <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
+        <!-- Avatar Wrapper with Status -->
+        <div class="user-avatar-wrapper">
+          <div class="user-avatar">
+            <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
+          </div>
+          <div class="status-indicator" [class.online]="user.isOnline">
+            @if (!user.isOnline && user.last_active) {
+            <span class="last-active-mini">{{ formatLastActive(user.last_active) }}</span>
+            }
+          </div>
         </div>
 
         <!-- User Info -->
@@ -232,12 +229,8 @@
 
           <!-- User Rating -->
           @if (user.rating && user.rating > 0) {
-          <div class="user-rating">
-            <span class="rating-stars">
-              @for (star of [1, 2, 3, 4, 5]; track star) {
-              <span class="star" [class.filled]="star <= (user.rating || 0)">★</span>
-              }
-            </span>
+          <div class="user-rating-header">
+            <span class="star-icon">★</span>
             <span class="rating-value">{{ user.rating | number:'1.1-1' }}</span>
             <span class="rating-count">({{ user.rating_count }})</span>
           </div>
@@ -246,15 +239,12 @@
           <!-- Location & Gender (Inline) -->
           <div class="user-meta-row">
             @if (user.location) {
-            <div class="user-location">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="location-icon">
+            <div class="user-location-mini">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
-              <img [src]="getFlagIcon(user.location)" [alt]="user.location" class="flag-icon"
-                (error)="$event.target.style.display='none'" />
               <span>{{ getLocationLabel(user.location) }}</span>
             </div>
             }

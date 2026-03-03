@@ -1,0 +1,17 @@
+<div class="terms-container">
+    <div class="terms-header">
+        <h1>{{ 'terms.title' | translate }}</h1>
+        <p class="last-updated">{{ 'terms.last_updated' | translate }}: March 03, 2026</p>
+    </div>
+
+    <div class="terms-content">
+        <div *ngFor="let section of sections" class="terms-section">
+            <h2>{{ section.title | translate }}</h2>
+            <p>{{ section.content | translate }}</p>
+        </div>
+    </div>
+
+    <div class="terms-footer">
+        <p>{{ 'terms.footer_text' | translate }}</p>
+    </div>
+</div>

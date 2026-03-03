@@ -17,6 +17,7 @@ import { GamificationService } from '../../services/gamification.service';
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
+
 interface UserProfile {
     id: number;
     name: string;
@@ -453,13 +454,13 @@ export class ExploreComponent implements OnInit, OnDestroy {
 
             // Native language filter
             if (this.filterNativeLanguage !== 'any') {
-                const nativeLangs = Array.isArray(user.native_language) ? user.native_language : [user.native_language];
+                const nativeLangs = this.getLanguagesArray(user.native_language);
                 if (!nativeLangs.includes(this.filterNativeLanguage)) return false;
             }
 
             // Learning language filter
             if (this.filterLearningLanguage !== 'any') {
-                const learningLangs = Array.isArray(user.learning_language) ? user.learning_language : [user.learning_language];
+                const learningLangs = this.getLanguagesArray(user.learning_language);
                 if (!learningLangs.includes(this.filterLearningLanguage)) return false;
             }
 
@@ -470,38 +471,46 @@ export class ExploreComponent implements OnInit, OnDestroy {
     }
 
     sortUsers(users: UserProfile[]): UserProfile[] {
-        if (!this.currentUser) return this.shuffleArray(users);
+        if (!this.currentUser) return users;
 
-        const myLearning = this.getLanguagesArray(this.currentUser.learning_language);
-        if (myLearning.length === 0) return this.shuffleArray(users);
+        return [...users].sort((a, b) => {
+            // 1. Show online users first
+            if (a.isOnline && !b.isOnline) return -1;
+            if (!a.isOnline && b.isOnline) return 1;
 
-        const matchNative: UserProfile[] = [];
-        const matchLearning: UserProfile[] = [];
-        const others: UserProfile[] = [];
-
-        // Shuffle first to ensure randomness within groups
-        const shuffled = this.shuffleArray([...users]);
-
-        shuffled.forEach(user => {
-            // Skip self if present (though loadUsers should handle it, good safety)
-            if (user.id === this.currentUser.id) return;
-
-            const userNative = this.getLanguagesArray(user.native_language);
-            const userLearning = this.getLanguagesArray(user.learning_language);
-
-            const isNativeMatch = userNative.some(l => myLearning.includes(l));
-            const isLearningMatch = userLearning.some(l => myLearning.includes(l));
-
-            if (isNativeMatch) {
-                matchNative.push(user);
-            } else if (isLearningMatch) {
-                matchLearning.push(user);
-            } else {
-                others.push(user);
+            // 2. Then match by learning languages
+            const myLearning = this.getLanguagesArray(this.currentUser.learning_language);
+            if (myLearning.length > 0) {
+                const aNative = this.getLanguagesArray(a.native_language);
+                const bNative = this.getLanguagesArray(b.native_language);
+                const aMatch = aNative.some(l => myLearning.includes(l));
+                const bMatch = bNative.some(l => myLearning.includes(l));
+                if (aMatch && !bMatch) return -1;
+                if (!aMatch && bMatch) return 1;
             }
-        });
 
-        return [...matchNative, ...matchLearning, ...others];
+            // 3. Then by rating
+            const aRating = a.rating || 0;
+            const bRating = b.rating || 0;
+            if (aRating !== bRating) return bRating - aRating;
+
+            // 4. Then by last_active
+            const aTime = this.getTimestamp(a.last_active);
+            const bTime = this.getTimestamp(b.last_active);
+            return bTime - aTime;
+        });
+    }
+
+    private getTimestamp(lastActive: any): number {
+        if (!lastActive) return 0;
+        if (typeof lastActive === 'number') {
+            return lastActive < 10000000000 ? lastActive * 1000 : lastActive;
+        }
+        if (/^\d+$/.test(String(lastActive))) {
+            const num = parseInt(String(lastActive), 10);
+            return num < 10000000000 ? num * 1000 : num;
+        }
+        return new Date(String(lastActive)).getTime() || 0;
     }
 
     shuffleArray(array: any[]): any[] {
@@ -747,16 +756,16 @@ export class ExploreComponent implements OnInit, OnDestroy {
             if (diffMins < 1) {
                 return 'Just now';
             } else if (diffMins < 60) {
-                return `${diffMins}m ago`;
+                return `${diffMins}m`;
             } else if (diffHours < 24) {
-                return `${diffHours}h ago`;
+                return `${diffHours}h`;
             } else if (diffDays < 7) {
-                return `${diffDays}d ago`;
+                return `${diffDays}d`;
             } else {
                 return lastActiveDate.toLocaleDateString();
             }
         } catch (e) {
-            return 'Invalid Date';
+            return '';
         }
     }
 }

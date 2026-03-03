@@ -69,6 +69,12 @@
     </main>
 
     <footer class="footer">
-        <p>© 2025 Chatme. All rights reserved.</p>
+        <div class="footer-content">
+            <p>© 2025 Chatme. All rights reserved.</p>
+            <div class="footer-links">
+                <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+                <a routerLink="/terms">{{ 'AUTH.TERMS' | translate }}</a>
+            </div>
+        </div>
     </footer>
 </div>

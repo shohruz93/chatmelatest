@@ -1,0 +1,113 @@
+.terms-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: var(--text-color, #333);
+    background-color: var(--bg-color, #ffffff);
+    line-height: 1.6;
+}
+
+.terms-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border-color, #e0e0e0);
+}
+
+.terms-header h1 {
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+    color: var(--primary-color, #007bff);
+}
+
+.last-updated {
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+    margin: 0;
+}
+
+.terms-content {
+    margin-bottom: 40px;
+}
+
+.terms-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--section-bg, #f9f9f9);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color, #007bff);
+}
+
+.terms-section h2 {
+    font-size: 1.5rem;
+    margin: 0 0 15px 0;
+    color: var(--primary-color, #007bff);
+}
+
+.terms-section p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.terms-footer {
+    text-align: center;
+    padding: 20px;
+    border-top: 2px solid var(--border-color, #e0e0e0);
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .terms-container {
+        color: #e0e0e0;
+        background-color: #1e1e1e;
+    }
+
+    .terms-header {
+        border-bottom-color: #444;
+    }
+
+    .terms-header h1 {
+        color: #64b5f6;
+    }
+
+    .terms-section {
+        background-color: #2d2d2d;
+        border-left-color: #64b5f6;
+    }
+
+    .terms-section h2 {
+        color: #64b5f6;
+    }
+
+    .terms-footer {
+        border-top-color: #444;
+        color: #999;
+    }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .terms-container {
+        padding: 15px;
+    }
+
+    .terms-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .terms-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .terms-section h2 {
+        font-size: 1.2rem;
+    }
+
+    .terms-section p {
+        font-size: 0.95rem;
+    }
+}

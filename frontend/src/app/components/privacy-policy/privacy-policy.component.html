@@ -30,6 +30,12 @@
     </div>
 
     <div class="privacy-policy-footer">
-        <p>{{ 'privacy.footer_text' | translate }}</p>
+        <div class="footer-content">
+            <p>{{ 'privacy.footer_text' | translate }}</p>
+            <div class="footer-links">
+                <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+                <a routerLink="/terms">{{ 'AUTH.TERMS' | translate }}</a>
+            </div>
+        </div>
     </div>
 </div>

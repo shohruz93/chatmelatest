@@ -109,6 +109,28 @@
     border-top: 1px solid var(--border-color);
 }
 
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
 /* Features Section */
 .features-section {
     padding: 4rem 0;
@@ -180,7 +202,7 @@
 .download-section {
     padding: 3.5rem 0;
     margin-top: 2rem;
-    background: linear-gradient(180deg, rgba(99,102,241,0.06), transparent 60%);
+    background: linear-gradient(180deg, rgba(99, 102, 241, 0.06), transparent 60%);
 }
 
 .download-container {
@@ -225,23 +247,54 @@
     text-decoration: none;
     color: inherit;
     background: white;
-    box-shadow: 0 6px 20px rgba(16,24,40,0.06);
+    box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
     transition: transform 0.18s ease, box-shadow 0.18s ease;
     font-weight: 600;
 }
 
-.store-btn svg { display: block; }
+.store-btn svg {
+    display: block;
+}
 
-.store-btn.android { color: #0F9D58; }
-.store-btn.ios { color: #111827; }
+.store-btn.android {
+    color: #0F9D58;
+}
 
-.store-btn:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(16,24,40,0.12); }
+.store-btn.ios {
+    color: #111827;
+}
 
-.download-preview { width: 260px; display:flex; justify-content:center; }
-.phone-mock { width: 220px; border-radius: 28px; overflow: hidden; box-shadow: 0 30px 60px rgba(2,6,23,0.25); border: 8px solid rgba(255,255,255,0.6); }
-.phone-mock img { width: 100%; height: auto; display:block; }
+.store-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+}
 
-.download-note { text-align:center; color:var(--text-secondary); margin-top:0.75rem; font-size:0.95rem; }
+.download-preview {
+    width: 260px;
+    display: flex;
+    justify-content: center;
+}
+
+.phone-mock {
+    width: 220px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(2, 6, 23, 0.25);
+    border: 8px solid rgba(255, 255, 255, 0.6);
+}
+
+.phone-mock img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.download-note {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+}
 
 .about-content {
     max-width: 900px;
@@ -342,7 +395,17 @@
         font-size: 2rem;
     }
 
-    .download-container { flex-direction: column; gap: 1rem; }
-    .download-preview { width: 100%; order: -1; }
-    .phone-mock { width: 160px; }
+    .download-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .download-preview {
+        width: 100%;
+        order: -1;
+    }
+
+    .phone-mock {
+        width: 160px;
+    }
 }
