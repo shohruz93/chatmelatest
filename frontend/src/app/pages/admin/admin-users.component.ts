@@ -57,7 +57,7 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
        </div>
 
        <!-- Users Table -->
-       <div class="bg-white dark:bg-[#151921] rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800/50 overflow-hidden" *ngIf="usersResponse$ | async as response">
+       <div class="bg-white dark:bg-[#151921] rounded-[2rem] shadow-sm border border-slate-200 dark:border-slate-800/50 overflow-hidden" *ngIf="users && users.length > 0">
           <div class="overflow-x-auto">
              <table class="w-full text-left border-collapse">
                 <thead>
@@ -81,7 +81,7 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                    </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
-                   <tr *ngFor="let user of response.users" (click)="viewUser(user)" 
+                   <tr *ngFor="let user of users" (click)="viewUser(user)" 
                        class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group">
                       <td class="px-8 py-4">
                          <div class="flex items-center gap-4">
@@ -131,20 +131,19 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
              </table>
           </div>
 
-          <!-- Pagination -->
-          <div class="px-8 py-6 border-t border-slate-100 dark:border-slate-800/50 flex items-center justify-between bg-slate-50/30 dark:bg-slate-800/10">
-              <span class="text-sm font-medium text-slate-500 dark:text-slate-400">Page {{ response.page }} of {{ response.pages }} • {{ response.total }} total users</span>
-              <div class="flex gap-2">
-                 <button [disabled]="response.page <= 1" (click)="loadPage(response.page - 1)" 
-                    class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-all">
-                    Previous
-                 </button>
-                 <button [disabled]="response.page >= response.pages" (click)="loadPage(response.page + 1)" 
-                    class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 transition-all">
-                    Next
-                 </button>
-              </div>
-          </div>
+           <!-- Pagination Replacement: Infinite Scroll Sentinel -->
+           <div class="scroll-sentinel h-4 w-full"></div>
+           
+           <div *ngIf="isLoading" class="px-8 py-6 flex justify-center bg-slate-50/30 dark:bg-slate-800/10">
+               <div class="flex items-center gap-3 text-slate-500 font-medium">
+                   <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                   <span>Loading more users...</span>
+               </div>
+           </div>
+
+           <div *ngIf="!isLoading && currentPage >= totalPages && totalUsers > 0" class="px-8 py-6 text-center text-slate-400 text-sm italic bg-slate-50/30 dark:bg-slate-800/10">
+               Showing all {{ totalUsers }} users.
+           </div>
        </div>
 
        <!-- Modern User Details Slide-over -->
@@ -415,7 +414,11 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
   `
 })
 export class AdminUsersComponent implements OnInit {
-    usersResponse$!: Observable<GetUsersResponse>;
+    users: any[] = [];
+    totalUsers: number = 0;
+    totalPages: number = 0;
+    isLoading: boolean = false;
+
     searchTerm: string = '';
     currentStatus: string = 'all';
     currentPage: number = 1;
@@ -431,6 +434,8 @@ export class AdminUsersComponent implements OnInit {
     editForm: any = {};
     activeTab: string = 'overview';
 
+    private observer: IntersectionObserver | null = null;
+
     constructor(private adminService: AdminService) {
         this.searchSubject.pipe(
             debounceTime(300),
@@ -444,6 +449,26 @@ export class AdminUsersComponent implements OnInit {
 
     ngOnInit() {
         this.loadUsers();
+        this.setupInfiniteScroll();
+    }
+
+    ngOnDestroy() {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+    }
+
+    setupInfiniteScroll() {
+        this.observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !this.isLoading && this.currentPage < this.totalPages) {
+                this.loadNextPage();
+            }
+        }, { threshold: 0.1 });
+
+        // Wait for view to be ready
+        setTimeout(() => {
+            this.startObserving();
+        }, 1000);
     }
 
     onSearch(term: string) {
@@ -466,13 +491,44 @@ export class AdminUsersComponent implements OnInit {
         this.loadUsers();
     }
 
-    loadPage(page: number) {
-        this.currentPage = page;
-        this.loadUsers();
+    loadNextPage() {
+        this.currentPage++;
+        this.loadUsers(true);
     }
 
-    loadUsers() {
-        this.usersResponse$ = this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus, this.sortBy, this.sortDir);
+    loadUsers(append: boolean = false) {
+        if (this.isLoading) return;
+        this.isLoading = true;
+
+        this.adminService.getUsers(this.currentPage, this.searchTerm, this.currentStatus, this.sortBy, this.sortDir).subscribe({
+            next: (resp) => {
+                if (append) {
+                    this.users = [...this.users, ...resp.users];
+                } else {
+                    this.users = resp.users;
+                }
+                this.totalUsers = resp.total;
+                this.totalPages = resp.pages;
+                this.currentPage = resp.page;
+                this.isLoading = false;
+
+                // Re-observe if needed
+                if (this.currentPage < this.totalPages) {
+                    setTimeout(() => this.startObserving(), 100);
+                }
+            },
+            error: (err) => {
+                console.error('Failed to load users', err);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    private startObserving() {
+        const sentinel = document.querySelector('.scroll-sentinel');
+        if (sentinel && this.observer) {
+            this.observer.observe(sentinel);
+        }
     }
 
     isBanned(user: any): boolean {

@@ -463,7 +463,7 @@ class AdminController {
         $userId = $_GET['id'];
         
         // Fetch activity from multiple tables using UNION ALL
-        // Ensure all created_at are treated as UNIX timestamps
+        // Ensure all created_at are treated as UNIX timestamps consistently
         $query = "
             SELECT 'account_created' as type, '' as details, created_at as timestamp 
             FROM users WHERE id = :uid1
@@ -478,6 +478,40 @@ class AdminController {
             FROM gallery_images WHERE user_id = :uid4
             UNION ALL
             SELECT 'friend_request_sent' as type, '' as details, created_at as timestamp 
+            FROM friendships WHERE user_id = :uid5
+            ORDER BY timestamp DESC
+            LIMIT 50
+        ";
+
+        // IMPORTANT: If any table uses TIMESTAMP instead of INT, 
+        // we should wrap it in UNIX_TIMESTAMP() to be safe.
+        // Based on schema research, most are INT now but some migrations might be partial.
+        // Let's use a more defensive query.
+
+        $query = "
+            SELECT CAST('account_created' AS CHAR) COLLATE utf8mb4_unicode_ci as type, 
+                   CAST('' AS CHAR) COLLATE utf8mb4_unicode_ci as details, 
+                   (CASE WHEN created_at REGEXP '^[0-9]+$' THEN created_at ELSE UNIX_TIMESTAMP(created_at) END) as timestamp 
+            FROM users WHERE id = :uid1
+            UNION ALL
+            SELECT CAST('message_sent' AS CHAR) COLLATE utf8mb4_unicode_ci as type, 
+                   CAST(COALESCE(content, '') AS CHAR) COLLATE utf8mb4_unicode_ci as details, 
+                   (CASE WHEN created_at REGEXP '^[0-9]+$' THEN created_at ELSE UNIX_TIMESTAMP(created_at) END) as timestamp 
+            FROM messages WHERE sender_id = :uid2
+            UNION ALL
+            SELECT CAST('post_created' AS CHAR) COLLATE utf8mb4_unicode_ci as type, 
+                   CAST(COALESCE(text_content, '') AS CHAR) COLLATE utf8mb4_unicode_ci as details, 
+                   (CASE WHEN created_at REGEXP '^[0-9]+$' THEN created_at ELSE UNIX_TIMESTAMP(created_at) END) as timestamp 
+            FROM community_posts WHERE user_id = :uid3
+            UNION ALL
+            SELECT CAST('photo_uploaded' AS CHAR) COLLATE utf8mb4_unicode_ci as type, 
+                   CAST(COALESCE(caption, '') AS CHAR) COLLATE utf8mb4_unicode_ci as details, 
+                   (CASE WHEN created_at REGEXP '^[0-9]+$' THEN created_at ELSE UNIX_TIMESTAMP(created_at) END) as timestamp 
+            FROM gallery_images WHERE user_id = :uid4
+            UNION ALL
+            SELECT CAST('friend_request_sent' AS CHAR) COLLATE utf8mb4_unicode_ci as type, 
+                   CAST('' AS CHAR) COLLATE utf8mb4_unicode_ci as details, 
+                   (CASE WHEN created_at REGEXP '^[0-9]+$' THEN created_at ELSE UNIX_TIMESTAMP(created_at) END) as timestamp 
             FROM friendships WHERE user_id = :uid5
             ORDER BY timestamp DESC
             LIMIT 50
