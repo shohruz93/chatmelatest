@@ -140,6 +140,12 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
     async attemptJoin() {
         if (!this.roomId || this.isJoined) return;
         this.isJoined = true;
+
+        // Set local userId for WebRTC glare resolution
+        if (this.currentUser?.id) {
+            this.voiceService.setMyUserId(Number(this.currentUser.id));
+        }
+
         try { await this.voiceService.initLocalStream(); }
         catch { console.warn('[VoiceRoom] Could not init mic, joining as listener'); }
 
@@ -165,7 +171,22 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
 
             const mapped = (data.participants || []).map((p: any) => this.normalizeParticipant(p));
             this.participants.set(this.ensureSelf(mapped));
-            if (data.messages) this.messages.set(data.messages);
+            if (data.messages) {
+                const normalizedMsgs = (data.messages as any[]).map((msg: any) => {
+                    if (msg.avatar && !msg.avatar.startsWith('http')) {
+                        return { ...msg, avatar: environment.phpBaseUrl + msg.avatar };
+                    }
+                    return msg;
+                });
+                this.messages.set(normalizedMsgs);
+            }
+
+            // Initiate WebRTC calls to all existing participants in the room
+            for (const p of mapped) {
+                if (!p.isSelf && Number(p.id) !== Number(this.currentUser?.id)) {
+                    this.voiceService.startCall(Number(p.id));
+                }
+            }
             this.cdr.markForCheck();
         }));
 
@@ -197,6 +218,10 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
         // Chat message
         this.subs.add(this.socketService.voiceChatMessage$.subscribe((message: any) => {
             if (message.roomId !== this.roomId) return;
+            // Normalize avatar URL
+            if (message.avatar && !message.avatar.startsWith('http')) {
+                message = { ...message, avatar: environment.phpBaseUrl + message.avatar };
+            }
             this.messages.update(msgs => msgs.find(m => m.id === message.id) ? msgs : [...msgs, message]);
             this.cdr.markForCheck();
         }));
@@ -231,7 +256,11 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
             this.pendingRequestIds.add(Number(data.userId));
             // Avoid duplicates
             if (!this.pendingRequests.find(r => r.userId === data.userId)) {
-                this.pendingRequests.push({ userId: data.userId, userName: data.userName, userAvatar: data.userAvatar || '' });
+                let userAvatar = data.userAvatar || '';
+                if (userAvatar && !userAvatar.startsWith('http')) {
+                    userAvatar = environment.phpBaseUrl + userAvatar;
+                }
+                this.pendingRequests.push({ userId: data.userId, userName: data.userName, userAvatar });
             }
             this.cdr.markForCheck();
         }));
@@ -291,10 +320,14 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
     // ─── Chat ─────────────────────────────────────────────────────────────────
     sendMessage() {
         if (!this.newMessage.trim() || !this.roomId) return;
+        let avatar = this.currentUser?.avatar || '';
+        if (avatar && !avatar.startsWith('http')) {
+            avatar = environment.phpBaseUrl + avatar;
+        }
         this.socketService.sendVoiceRoomMessage(
             this.roomId, this.newMessage,
             this.currentUser?.name,
-            this.currentUser?.avatar
+            avatar
         );
         this.newMessage = '';
     }

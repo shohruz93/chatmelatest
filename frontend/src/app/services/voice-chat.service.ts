@@ -13,6 +13,8 @@ export class VoiceChatService {
     private remoteStreams = new Map<number, MediaStream>();
     private audioElements = new Map<number, HTMLAudioElement>();
     private analysers = new Map<number, AnalyserNode>(); // userId -> Analyser
+    private queuedCandidates = new Map<number, RTCIceCandidateInit[]>(); // userId -> queued ICE candidates
+    private myUserId: number = 0; // Set from outside to resolve glare
 
     private audioContext: AudioContext | null = null;
     private localStream: MediaStream | null = null;
@@ -52,23 +54,31 @@ export class VoiceChatService {
         this.setupSocketListeners();
     }
 
+    /** Must be called before joining a room to enable glare resolution */
+    setMyUserId(id: number) {
+        this.myUserId = id;
+    }
+
     private setupSocketListeners() {
         // Handle incoming offers from OTHER participants
         this.socket.on('voice_offer').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received offer from', data.senderId);
-            await this.handleOffer(data.offer, data.senderId);
+            const senderId = Number(data.senderId);
+            console.log('[VoiceService] Received offer from', senderId);
+            await this.handleOffer(data.offer, senderId);
         });
 
         // Handle answers to OUR offers
         this.socket.on('voice_answer').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received answer from', data.senderId);
-            await this.handleAnswer(data.answer, data.senderId);
+            const senderId = Number(data.senderId);
+            console.log('[VoiceService] Received answer from', senderId);
+            await this.handleAnswer(data.answer, senderId);
         });
 
         // Handle candidates from ANY participant
         this.socket.on('voice_candidate').subscribe(async (data: any) => {
-            console.log('[VoiceService] Received candidate from', data.senderId);
-            await this.handleCandidate(data.candidate, data.senderId);
+            const senderId = Number(data.senderId);
+            console.log('[VoiceService] Received candidate from', senderId);
+            await this.handleCandidate(data.candidate, senderId);
         });
 
         this.socket.on('voice_error').subscribe((data: any) => {
@@ -134,20 +144,42 @@ export class VoiceChatService {
 
     private async handleOffer(offer: RTCSessionDescriptionInit, senderId: number) {
         const pc = this.getOrCreatePeerConnection(senderId);
-        if (pc.signalingState !== 'stable') {
-            if (pc.signalingState === 'have-local-offer') {
-                console.log('[VoiceService] Glare detected, but ignoring for now (letting other side win if possible)');
-                // Basic glare: typically higher ID wins, but for simplicity we rely on the error to stop one side
+
+        // Glare resolution: both sides sent offers simultaneously
+        if (pc.signalingState === 'have-local-offer') {
+            // "Polite peer" pattern: the side with the HIGHER userId yields (rollback)
+            const isPolite = this.myUserId > senderId;
+            if (isPolite) {
+                console.log(`[VoiceService] Glare with ${senderId}: I am polite (my ID ${this.myUserId} > ${senderId}), rolling back`);
+                try {
+                    await pc.setLocalDescription({ type: 'rollback' } as any);
+                } catch (e) {
+                    console.warn('[VoiceService] Rollback failed, recreating PC for', senderId);
+                    // If rollback not supported, recreate the peer connection
+                    pc.close();
+                    this.peerConnections.delete(senderId);
+                    const newPc = this.getOrCreatePeerConnection(senderId);
+                    return this.acceptOffer(newPc, offer, senderId);
+                }
+            } else {
+                console.log(`[VoiceService] Glare with ${senderId}: I am impolite (my ID ${this.myUserId} <= ${senderId}), ignoring remote offer`);
+                return;
             }
+        } else if (pc.signalingState !== 'stable') {
             console.log('[VoiceService] Ignoring offer - PC state:', pc.signalingState);
             return;
         }
 
+        await this.acceptOffer(pc, offer, senderId);
+    }
+
+    private async acceptOffer(pc: RTCPeerConnection, offer: RTCSessionDescriptionInit, senderId: number) {
         await this.initLocalStream();
 
         try {
             await pc.setRemoteDescription(new RTCSessionDescription(offer));
-            const answer = await pc.createAnswer(); // answer options aren't typically needed in newer WebRTC APIs if transceivers/streams are handled
+            this.flushQueuedCandidates(senderId, pc);
+            const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
             this.socket.emit('voice_answer', { targetUserId: senderId, answer });
         } catch (e) {
@@ -160,6 +192,7 @@ export class VoiceChatService {
         if (!pc) return;
         try {
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            this.flushQueuedCandidates(senderId, pc);
         } catch (e) {
             console.error('[VoiceService] Error handling answer from', senderId, e);
         }
@@ -168,10 +201,36 @@ export class VoiceChatService {
     private async handleCandidate(candidate: RTCIceCandidateInit, senderId: number) {
         const pc = this.peerConnections.get(senderId);
         if (!pc) return;
+
+        // Queue candidates until remoteDescription is set
+        if (!pc.remoteDescription) {
+            console.log(`[VoiceService] Queuing candidate for ${senderId} (no remoteDescription yet)`);
+            if (!this.queuedCandidates.has(senderId)) {
+                this.queuedCandidates.set(senderId, []);
+            }
+            this.queuedCandidates.get(senderId)!.push(candidate);
+            return;
+        }
+
         try {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
         } catch (e) {
             console.error('[VoiceService] Error adding candidate from', senderId, e);
+        }
+    }
+
+    private async flushQueuedCandidates(userId: number, pc: RTCPeerConnection) {
+        const queued = this.queuedCandidates.get(userId);
+        if (queued && queued.length > 0) {
+            console.log(`[VoiceService] Flushing ${queued.length} queued candidates for ${userId}`);
+            for (const c of queued) {
+                try {
+                    await pc.addIceCandidate(new RTCIceCandidate(c));
+                } catch (e) {
+                    console.warn('[VoiceService] Error adding queued candidate:', e);
+                }
+            }
+            this.queuedCandidates.delete(userId);
         }
     }
 
@@ -286,6 +345,7 @@ export class VoiceChatService {
         }
         this.stopRemoteAudio(userId);
         this.remoteStreams.delete(userId);
+        this.queuedCandidates.delete(userId);
     }
 
     toggleMute() {
