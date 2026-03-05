@@ -32,20 +32,28 @@ export class VoiceChatService {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' },
             {
-                urls: 'turn:openrelay.metered.ca:80',
-                username: 'openrelayproject',
-                credential: 'openrelayproject'
+                urls: 'turn:standard.relay.metered.ca:80',
+                username: '85ec47e112fd21e9041e528f',
+                credential: 'VgzcBiwBqMPCgbJr'
             },
             {
-                urls: 'turn:openrelay.metered.ca:443',
-                username: 'openrelayproject',
-                credential: 'openrelayproject'
+                urls: 'turn:standard.relay.metered.ca:80?transport=tcp',
+                username: '85ec47e112fd21e9041e528f',
+                credential: 'VgzcBiwBqMPCgbJr'
             },
             {
-                urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-                username: 'openrelayproject',
-                credential: 'openrelayproject'
+                urls: 'turn:standard.relay.metered.ca:443',
+                username: '85ec47e112fd21e9041e528f',
+                credential: 'VgzcBiwBqMPCgbJr'
+            },
+            {
+                urls: 'turns:standard.relay.metered.ca:443?transport=tcp',
+                username: '85ec47e112fd21e9041e528f',
+                credential: 'VgzcBiwBqMPCgbJr'
             }
         ]
     };
