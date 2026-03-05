@@ -279,6 +279,16 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
                 this.cdr.markForCheck();
             }
         }));
+
+        // Room closed by host
+        this.subs.add(this.socketService.on$('voice_room_closed').subscribe((data: any) => {
+            if (data.roomId !== this.roomId) return;
+            console.log('[VoiceRoom] Room closed:', data.reason);
+            alert(data.reason || 'The host has closed the room');
+            this.voiceService.cleanup();
+            this.roomId = null;
+            this.router.navigate(['/dashboard']);
+        }));
     }
 
     // ─── Admin Actions ───────────────────────────────────────────────────────
@@ -340,6 +350,8 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
     leaveRoom() {
         if (this.roomId) {
             this.socketService.leaveVoiceRoom(this.roomId);
+            this.voiceService.cleanup();
+            this.roomId = null;
             this.router.navigate(['/dashboard']);
         }
     }

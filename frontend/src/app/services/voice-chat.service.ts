@@ -376,13 +376,23 @@ export class VoiceChatService {
         this.peerConnections.clear();
         this.remoteStreams.clear();
         this.audioElements.clear();
+        this.queuedCandidates.clear();
+        this.analysers.clear();
 
         if (this.localStream) {
             this.localStream.getTracks().forEach(track => track.stop());
             this.localStream = null;
         }
+
+        if (this.audioContext) {
+            this.audioContext.close().catch(() => { });
+            this.audioContext = null;
+            this.localAnalyser = null;
+        }
+
         this.isActive.set(false);
         this.isMuted.set(false);
         this.isConnecting.set(false);
+        this.speakerActivity.set(new Map());
     }
 }
