@@ -26,12 +26,20 @@
                 <TextBlock x:Name="CodeEmailText" Text="Code sent to ..."/>
                 <PasswordBox x:Name="CodeBox" Header="Verification Code"/>
                 <Button Content="Login" HorizontalAlignment="Stretch" Click="VerifyCode_Click"/>
-                <Button Content="Resend" HorizontalAlignment="Center" Click="ResendCode_Click"/>
+                <Button Content="Back" HorizontalAlignment="Center" Click="ShowEmailInput_Click"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                <DropDownButton x:Name="LangButton" Content="EN" />
-                <Button x:Name="ThemeToggleButton" Content="Theme" Click="ThemeToggle_Click" />
+                <DropDownButton x:Name="LangButton" Content="EN">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="English" Tag="en-US" Click="Lang_Click"/>
+                            <MenuFlyoutItem Text="Русский" Tag="ru-RU" Click="Lang_Click"/>
+                            <MenuFlyoutItem Text="Тоҷикӣ" Tag="tg-TJ" Click="Lang_Click"/>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <Button x:Name="ThemeToggleButton" Content="🌙" Click="ThemeToggle_Click" />
             </StackPanel>
 
             <TextBlock x:Name="ErrorDisplay" Foreground="Red" Visibility="Collapsed" HorizontalAlignment="Center" TextWrapping="Wrap"/>

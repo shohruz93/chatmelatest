@@ -19,12 +19,13 @@
             <h2>{{ 'privacy.contact_us' | translate }}</h2>
             <p>{{ 'privacy.contact_us_desc' | translate }}</p>
             <p>
-                <strong>{{ 'privacy.email' | translate }}:</strong>
-                <a href="mailto:privacy@chatme.com">privacy@chatme.com</a>
+                <strong>{{ 'privacy.contact' | translate }}:</strong>
+                <a [href]="'mailto:' + languageService.get('privacy.email')">{{ languageService.get('privacy.email')
+                    }}</a>
             </p>
             <p>
                 <strong>{{ 'privacy.phone' | translate }}:</strong>
-                <a href="tel:+1234567890">+1 (234) 567-890</a>
+                <a [href]="'tel:' + languageService.get('privacy.phone')">{{ languageService.get('privacy.phone') }}</a>
             </p>
         </div>
     </div>

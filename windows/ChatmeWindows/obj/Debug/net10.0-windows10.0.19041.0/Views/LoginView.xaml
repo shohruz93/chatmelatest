@@ -12,26 +12,34 @@
             <TextBlock x:ConnectionId='5' x:Name="SubtitleText" Text="Welcome" HorizontalAlignment="Center" />
             
             <StackPanel x:ConnectionId='6' x:Name="ChoosePanel" Spacing="10">
-                <Button x:ConnectionId='19' Content="Google" HorizontalAlignment="Stretch"                          />
-                <Button x:ConnectionId='20' Content="Email" HorizontalAlignment="Stretch"                             />
+                <Button x:ConnectionId='22' Content="Google" HorizontalAlignment="Stretch"                          />
+                <Button x:ConnectionId='23' Content="Email" HorizontalAlignment="Stretch"                             />
             </StackPanel>
 
             <StackPanel x:ConnectionId='7' x:Name="EmailInputPanel" Spacing="10" Visibility="Collapsed">
-                <TextBox x:ConnectionId='16' x:Name="EmailBox" Header="Email" PlaceholderText="email@example.com"/>
-                <Button x:ConnectionId='17' Content="Send Code" HorizontalAlignment="Stretch"                       />
-                <Button x:ConnectionId='18' Content="Back" HorizontalAlignment="Center"                           />
+                <TextBox x:ConnectionId='19' x:Name="EmailBox" Header="Email" PlaceholderText="email@example.com"/>
+                <Button x:ConnectionId='20' Content="Send Code" HorizontalAlignment="Stretch"                       />
+                <Button x:ConnectionId='21' Content="Back" HorizontalAlignment="Center"                           />
             </StackPanel>
 
             <StackPanel x:ConnectionId='8' x:Name="CodeVerifyPanel" Spacing="10" Visibility="Collapsed">
-                <TextBlock x:ConnectionId='12' x:Name="CodeEmailText" Text="Code sent to ..."/>
-                <PasswordBox x:ConnectionId='13' x:Name="CodeBox" Header="Verification Code"/>
-                <Button x:ConnectionId='14' Content="Login" HorizontalAlignment="Stretch"                         />
-                <Button x:ConnectionId='15' Content="Resend" HorizontalAlignment="Center"                         />
+                <TextBlock x:ConnectionId='15' x:Name="CodeEmailText" Text="Code sent to ..."/>
+                <PasswordBox x:ConnectionId='16' x:Name="CodeBox" Header="Verification Code"/>
+                <Button x:ConnectionId='17' Content="Login" HorizontalAlignment="Stretch"                         />
+                <Button x:ConnectionId='18' Content="Back" HorizontalAlignment="Center"                             />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                <DropDownButton x:ConnectionId='10' x:Name="LangButton" Content="EN" />
-                <Button x:ConnectionId='11' x:Name="ThemeToggleButton" Content="Theme"                           />
+                <DropDownButton x:ConnectionId='10' x:Name="LangButton" Content="EN">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem x:ConnectionId='12' Text="English" Tag="en-US"                   />
+                            <MenuFlyoutItem x:ConnectionId='13' Text="Русский" Tag="ru-RU"                   />
+                            <MenuFlyoutItem x:ConnectionId='14' Text="Тоҷикӣ" Tag="tg-TJ"                   />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+                <Button x:ConnectionId='11' x:Name="ThemeToggleButton" Content="🌙"                           />
             </StackPanel>
 
             <TextBlock x:ConnectionId='9' x:Name="ErrorDisplay" Foreground="Red" Visibility="Collapsed" HorizontalAlignment="Center" TextWrapping="Wrap"/>

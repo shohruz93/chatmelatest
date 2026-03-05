@@ -28,6 +28,17 @@ namespace ChatmeWindows.Services
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<AuthResponse?> LoginWithGoogleAsync(string idToken)
+        {
+            var response = await _httpClient.PostAsJsonAsync("/auth/google", new { token = idToken });
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<AuthResponse>(content);
+            }
+            return null;
+        }
+
         public async Task<AuthResponse?> LoginAsync(string email, string code)
         {
             var response = await _httpClient.PostAsJsonAsync("/auth/verify-code", new { email, code });

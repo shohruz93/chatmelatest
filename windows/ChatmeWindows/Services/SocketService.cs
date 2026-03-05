@@ -37,7 +37,10 @@ namespace ChatmeWindows.Services
                 try
                 {
                     var data = response.GetValue<JObject>(0);
-                    OnMessageReceived?.Invoke(data);
+                    if (data != null)
+                    {
+                        OnMessageReceived?.Invoke(data);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +54,10 @@ namespace ChatmeWindows.Services
                 try
                 {
                     var data = response.GetValue<JObject>(0);
-                    OnTyping?.Invoke(data["userId"]?.ToString() ?? "", data["isTyping"]?.Value<bool>() ?? false);
+                    if (data != null)
+                    {
+                        OnTyping?.Invoke(data["userId"]?.ToString() ?? "", data["isTyping"]?.Value<bool>() ?? false);
+                    }
                 }
                 catch (Exception ex)
                 {

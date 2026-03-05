@@ -18,15 +18,16 @@ namespace ChatmeWindows
             this.InitializeComponent();
         }
 
-        /// <summary>
-        /// Invoked when the application is launched normally by the end user.  Other entry points
-        /// will be used such as when the application is launched to open a specific file.
-        /// </summary>
-        /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             window ??= new Window();
             window.Title = "Chatme";
+
+            // Resize window to be more mobile-like/narrow
+            IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            Microsoft.UI.WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            Microsoft.UI.Windowing.AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+            appWindow.Resize(new Windows.Graphics.SizeInt32 { Width = 450, Height = 750 });
 
             if (window.Content is not Frame rootFrame)
             {
