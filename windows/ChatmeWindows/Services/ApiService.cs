@@ -76,32 +76,69 @@ namespace ChatmeWindows.Services
     public class AuthResponse
     {
         public string Token { get; set; } = string.Empty;
-        public UserDto User { get; set; } = new();
+        public AppUser User { get; set; } = new();
     }
 
-    public class UserDto
+    public class AppUser
     {
+        [JsonProperty("id")]
         public int Id { get; set; }
+        
+        [JsonProperty("name")]
         public string Name { get; set; } = string.Empty;
+        
+        [JsonProperty("email")]
         public string Email { get; set; } = string.Empty;
+        
+        [JsonProperty("photoURL")]
         public string? PhotoUrl { get; set; }
+        
+        [JsonProperty("coins")]
+        public int Coins { get; set; }
+        
+        [JsonProperty("xp")]
+        public int Xp { get; set; }
+        
+        [JsonProperty("is_admin")]
+        public bool IsAdmin { get; set; }
     }
 
     public class ConversationDto
     {
+        [JsonProperty("partner_id")]
         public int PartnerId { get; set; }
+        
+        [JsonProperty("partner_name")]
         public string PartnerName { get; set; } = string.Empty;
+        
+        [JsonProperty("partner_avatar")]
+        public string? PartnerAvatar { get; set; }
+        
+        [JsonProperty("last_message")]
         public string? LastMessage { get; set; }
+        
+        [JsonProperty("last_message_time")]
         public long? LastMessageTime { get; set; }
+        
+        [JsonProperty("unread_count")]
         public int UnreadCount { get; set; }
     }
 
     public class MessageDto
     {
+        [JsonProperty("id")]
         public string Id { get; set; } = string.Empty;
+        
+        [JsonProperty("sender_id")]
         public int SenderId { get; set; }
+        
+        [JsonProperty("content")]
         public string Content { get; set; } = string.Empty;
+        
+        [JsonProperty("type")]
         public string Type { get; set; } = "text";
+        
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
     }
 }

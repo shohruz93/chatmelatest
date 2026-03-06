@@ -219,6 +219,16 @@ namespace ChatmeWindows.Views
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(settingsPath)!);
                 string json = System.Text.Json.JsonSerializer.Serialize(response);
                 System.IO.File.WriteAllText(settingsPath, json);
+
+                // Save critical UI fields directly to LocalSettings for fast retrieval
+                try 
+                {
+                    ApplicationData.Current.LocalSettings.Values["UserName"] = response.User.Name;
+                    ApplicationData.Current.LocalSettings.Values["UserPhoto"] = response.User.PhotoUrl;
+                    ApplicationData.Current.LocalSettings.Values["UserCoins"] = response.User.Coins.ToString();
+                    ApplicationData.Current.LocalSettings.Values["UserXp"] = response.User.Xp.ToString();
+                }
+                catch { }
             }
             catch (Exception ex)
             {

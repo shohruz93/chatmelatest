@@ -9,20 +9,63 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <Color x:Key="SystemAccentColor">#4F46E5</Color>
+                    <Color x:Key="SystemAccentColorDark1">#4338CA</Color>
+                    <Color x:Key="SystemAccentColorDark2">#3730A3</Color>
+                    <Color x:Key="SystemAccentColorDark3">#312E81</Color>
+                    <Color x:Key="SystemAccentColorLight1">#6366F1</Color>
+                    <Color x:Key="SystemAccentColorLight2">#818CF8</Color>
+                    <Color x:Key="SystemAccentColorLight3">#A5B4FC</Color>
+                    <SolidColorBrush x:Key="SystemAccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Color x:Key="SystemAccentColor">#4F46E5</Color>
+                    <Color x:Key="SystemAccentColorDark1">#4338CA</Color>
+                    <Color x:Key="SystemAccentColorDark2">#3730A3</Color>
+                    <Color x:Key="SystemAccentColorDark3">#312E81</Color>
+                    <Color x:Key="SystemAccentColorLight1">#6366F1</Color>
+                    <Color x:Key="SystemAccentColorLight2">#818CF8</Color>
+                    <Color x:Key="SystemAccentColorLight3">#A5B4FC</Color>
+                    <SolidColorBrush x:Key="SystemAccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- Fonts -->
+            <FontFamily x:Key="AppFontFamily">Inter, Segoe UI, sans-serif</FontFamily>
+
+            <!-- Base Colors -->
             <Color x:Key="PrimaryColor">#4F46E5</Color>
             <Color x:Key="SecondaryColor">#10B981</Color>
             <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
             <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}" />
-            
-            <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#4F46E5" Offset="0" />
-                <GradientStop Color="#10B981" Offset="1" />
+
+            <!-- Primary gradient used by controls (added to fix missing resource lookup) -->
+            <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="{StaticResource PrimaryColor}" Offset="0" />
+                <GradientStop Color="{StaticResource SystemAccentColorLight1}" Offset="1" />
             </LinearGradientBrush>
 
-            <!-- Minimal Styles to keep code working -->
-            <Style x:Key="GlassCardStyle" TargetType="Border" />
-            <Style x:Key="PrimaryButtonStyle" TargetType="Button" />
-            <Style x:Key="SecondaryButtonStyle" TargetType="Button" />
+            <!-- Global Styles -->
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            </Style>
+            
+            <Style TargetType="TextBox">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            </Style>
+            
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            </Style>
+
+            <Style x:Key="GlassCardStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

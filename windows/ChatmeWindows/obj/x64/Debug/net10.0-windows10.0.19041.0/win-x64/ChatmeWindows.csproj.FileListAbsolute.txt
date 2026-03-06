@@ -1,3 +1,6 @@
+D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\App.xbf
+D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Views\LoginView.xbf
+D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Views\MainPage.xbf
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Assets\LockScreenLogo.scale-200.png
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Assets\SplashScreen.scale-200.png
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Assets\Square150x150Logo.scale-200.png
@@ -6,9 +9,6 @@ D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\wi
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Assets\StoreLogo.png
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Assets\Wide310x150Logo.scale-200.png
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ChatmeWindows.exe
-D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\App.xbf
-D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Views\LoginView.xbf
-D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\Views\MainPage.xbf
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ChatmeWindows.deps.json
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ChatmeWindows.runtimeconfig.json
 D:\ChatmeLast\windows\ChatmeWindows\bin\x64\Debug\net10.0-windows10.0.19041.0\win-x64\ChatmeWindows.dll
