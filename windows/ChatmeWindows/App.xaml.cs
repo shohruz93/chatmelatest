@@ -36,7 +36,36 @@ namespace ChatmeWindows
                 window.Content = rootFrame;
             }
 
-            _ = rootFrame.Navigate(typeof(Views.LoginView), e.Arguments);
+            // Check if user is already logged in
+            bool isLoggedIn = false;
+            ChatmeWindows.Services.AuthResponse? savedUser = null;
+            try
+            {
+                string settingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChatmeWindows", "session.json");
+                if (System.IO.File.Exists(settingsPath))
+                {
+                    string json = System.IO.File.ReadAllText(settingsPath);
+                    savedUser = System.Text.Json.JsonSerializer.Deserialize<ChatmeWindows.Services.AuthResponse>(json);
+                    
+                    if (savedUser != null && !string.IsNullOrEmpty(savedUser.Token))
+                    {
+                        isLoggedIn = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            { 
+               System.Diagnostics.Debug.WriteLine($"Error reading session: {ex.Message}");
+            }
+
+            if (isLoggedIn && savedUser != null)
+            {
+                _ = rootFrame.Navigate(typeof(Views.MainPage), savedUser);
+            }
+            else
+            {
+                _ = rootFrame.Navigate(typeof(Views.LoginView), e.Arguments);
+            }
             window.Activate();
         }
 

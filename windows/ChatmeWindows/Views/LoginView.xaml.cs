@@ -215,14 +215,15 @@ namespace ChatmeWindows.Views
         {
             try
             {
-                var settings = ApplicationData.Current.LocalSettings;
-                settings.Values["Token"] = response.Token;
-                settings.Values["UserId"] = response.User.Id;
-                settings.Values["UserName"] = response.User.Name;
-                settings.Values["UserEmail"] = response.User.Email;
-                settings.Values["UserPhoto"] = response.User.PhotoUrl;
+                string settingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChatmeWindows", "session.json");
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(settingsPath)!);
+                string json = System.Text.Json.JsonSerializer.Serialize(response);
+                System.IO.File.WriteAllText(settingsPath, json);
             }
-            catch { /* Ignore for unpackaged */ }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving session: {ex.Message}");
+            }
         }
 
         // --- THEME & LANG ---

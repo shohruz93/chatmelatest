@@ -1,0 +1,117 @@
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ChatmeWindows.Services
+{
+    public class GoogleAuthService
+    {
+        private const string ClientId = "1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com"; 
+
+        public async Task<string?> AuthenticateAsync()
+        {
+            string[] hosts = { "127.0.0.1", "localhost" };
+            int[] ports = { 7777, 50002, 50003, 50004, 50005, 50006 };
+            HttpListener? listener = null;
+            string? redirectUri = null;
+
+            foreach (string host in hosts)
+            {
+                foreach (int port in ports)
+                {
+                    try
+                    {
+                        redirectUri = $"http://{host}:{port}/";
+                        listener = new HttpListener();
+                        listener.Prefixes.Add(redirectUri);
+                        listener.Start();
+                        goto ServerStarted;
+                    }
+                    catch (HttpListenerException ex)
+                    {
+                        listener?.Close();
+                        listener = null;
+                        System.Diagnostics.Debug.WriteLine($"Host {host}, Port {port} failed: {ex.ErrorCode} - {ex.Message}");
+                        continue;
+                    }
+                }
+            }
+
+        ServerStarted:
+            if (listener == null || redirectUri == null)
+            {
+                throw new Exception("Local server failed to start on all attempts (127.0.0.1 and localhost, ports 7777, 50002-50006). This usually means Windows is blocking the port range or requires Administrator privileges to register the URL.");
+            }
+
+            string authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
+                             $"client_id={ClientId}&" +
+                             $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
+                             $"response_type=id_token&" +
+                             $"scope=openid%20email%20profile&" +
+                             $"nonce={Guid.NewGuid()}";
+
+            OpenBrowser(authUrl);
+
+            var context = await listener.GetContextAsync();
+            var response = context.Response;
+
+            string html = @"<html>
+                <body style='font-family: sans-serif; text-align: center; margin-top: 100px;'>
+                <script>
+                    if (window.location.hash) {
+                        var params = new URLSearchParams(window.location.hash.substring(1));
+                        var idToken = params.get('id_token');
+                        if (idToken) {
+                            fetch('/', { method: 'POST', body: idToken })
+                                .then(() => {
+                                    document.body.innerHTML = '<h2>Login successful!</h2><p>You can safely close this window and return to the Chatme app.</p>';
+                                    window.close();
+                                })
+                                .catch(e => {
+                                    document.body.innerHTML = '<h2>Error completing login.</h2><p>' + e + '</p>';
+                                });
+                        }
+                    }
+                </script>
+                <h2>Completing authentication...</h2>
+                </body></html>";
+
+            byte[] buffer = Encoding.UTF8.GetBytes(html);
+            response.ContentLength64 = buffer.Length;
+            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
+            response.OutputStream.Close();
+
+            var postContext = await listener.GetContextAsync();
+            string? idToken = null;
+            if (postContext.Request.HttpMethod == "POST")
+            {
+                using var reader = new StreamReader(postContext.Request.InputStream, postContext.Request.ContentEncoding);
+                idToken = await reader.ReadToEndAsync();
+            }
+
+            postContext.Response.StatusCode = 200;
+            postContext.Response.Close();
+            listener.Stop();
+            listener.Close();
+
+            return idToken;
+        }
+
+        private static void OpenBrowser(string url)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+            }
+            catch
+            {
+                url = url.Replace("&", "^&");
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+            }
+        }
+    }
+}
