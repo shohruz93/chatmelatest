@@ -66,6 +66,17 @@ export class LanguageService {
 
     private translations: any = {
         'en': {
+            'CONTACT_PAGE': {
+                'TITLE': 'Contact Us',
+                'SUBTITLE': 'Get in touch with the Chatme team',
+                'EMAIL_SUPPORT': 'General Support',
+                'EMAIL_SUPPORT_DESC': 'For general questions, technical issues, or feedback.',
+                'EMAIL_PRIVACY': 'Privacy & Legal',
+                'EMAIL_PRIVACY_DESC': 'For privacy concerns, data requests, or legal inquiries.',
+                'RESPONSE_TIME_TITLE': 'Response Time',
+                'RESPONSE_TIME_DESC': 'We aim to respond to all inquiries within 24-48 hours during regular business days.',
+                'MAILING_ADDRESS_TITLE': 'Mailing Address'
+            },
             'HOME': {
                 'TITLE': 'Chatme - Connect with the World',
                 'SUBTITLE': 'Find new friends, practice languages, and chat with people across the globe.',
@@ -600,6 +611,17 @@ export class LanguageService {
             }
         },
         'ru': {
+            'CONTACT_PAGE': {
+                'TITLE': 'Свяжитесь с нами',
+                'SUBTITLE': 'Свяжитесь с командой Chatme',
+                'EMAIL_SUPPORT': 'Общая поддержка',
+                'EMAIL_SUPPORT_DESC': 'По общим вопросам, техническим проблемам или отзывам.',
+                'EMAIL_PRIVACY': 'Конфиденциальность и юридические вопросы',
+                'EMAIL_PRIVACY_DESC': 'По вопросам конфиденциальности, запросам данных или юридическим вопросам.',
+                'RESPONSE_TIME_TITLE': 'Время ответа',
+                'RESPONSE_TIME_DESC': 'Мы стараемся отвечать на все запросы в течение 24-48 часов в рабочие дни.',
+                'MAILING_ADDRESS_TITLE': 'Почтовый адрес'
+            },
             'HOME': {
                 'TITLE': 'Chatme - Соединяйтесь с миром',
                 'HERO_TITLE_PREFIX': 'Общайтесь с людьми, которые разделяют вашу',

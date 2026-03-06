@@ -1,0 +1,64 @@
+<div class="page-container">
+    <div class="header-wrapper">
+        <app-header></app-header>
+    </div>
+
+    <main class="content">
+        <section class="hero-section">
+            <h1 class="page-title">{{ 'CONTACT_PAGE.TITLE' | translate }}</h1>
+            <p class="page-subtitle">{{ 'CONTACT_PAGE.SUBTITLE' | translate }}</p>
+        </section>
+
+        <section class="contact-content">
+            <div class="contact-card">
+                <div class="contact-method">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="method-details">
+                        <h3>{{ 'CONTACT_PAGE.EMAIL_SUPPORT' | translate }}</h3>
+                        <p>{{ 'CONTACT_PAGE.EMAIL_SUPPORT_DESC' | translate }}</p>
+                        <a href="mailto:support@chatme.tj" class="contact-link">support@chatme.tj</a>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="icon-wrapper">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="method-details">
+                        <h3>{{ 'CONTACT_PAGE.EMAIL_PRIVACY' | translate }}</h3>
+                        <p>{{ 'CONTACT_PAGE.EMAIL_PRIVACY_DESC' | translate }}</p>
+                        <a href="mailto:privacy@chatme.tj" class="contact-link">privacy@chatme.tj</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>{{ 'CONTACT_PAGE.RESPONSE_TIME_TITLE' | translate }}</h2>
+                <p>{{ 'CONTACT_PAGE.RESPONSE_TIME_DESC' | translate }}</p>
+            </div>
+
+            <div class="info-section">
+                <h2>{{ 'CONTACT_PAGE.MAILING_ADDRESS_TITLE' | translate }}</h2>
+                <p>Chatme Inc.</p>
+                <!-- Add physical address if you have one, or remove this part
+                <p>123 Startup Ave, Suite 100</p>
+                <p>City, State, ZIP</p>
+                <p>Country</p>
+                -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>{{ 'ABOUT_PAGE.FOOTER' | translate }}</p>
+            <div class="footer-links">
+                <a routerLink="/about">{{ 'HOME.ABOUT' | translate }}</a>
+                <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+                <a routerLink="/terms">{{ 'AUTH.TERMS' | translate }}</a>
+            </div>
+        </div>
+    </footer>
+</div>
