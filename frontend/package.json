@@ -46,6 +46,7 @@
     "@independo/capacitor-voice-recorder": "^7.1.10",
     "country-list": "^2.4.1",
     "firebase": "^12.6.0",
+    "livekit-client": "^2.17.2",
     "phaser": "^3.90.0",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.8.1",

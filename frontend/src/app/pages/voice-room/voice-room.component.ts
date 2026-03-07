@@ -154,6 +154,9 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
             avatar: this.currentUser?.avatar || ''
         };
         this.socketService.joinVoiceRoom(this.roomId, profile);
+
+        // Connect to LiveKit room for audio (SFU handles all participants)
+        await this.voiceService.joinRoom(this.roomId);
     }
 
     // ─── Socket Events ───────────────────────────────────────────────────────
@@ -181,12 +184,7 @@ export class VoiceRoomComponent implements OnInit, OnDestroy {
                 this.messages.set(normalizedMsgs);
             }
 
-            // Initiate WebRTC calls to all existing participants in the room
-            for (const p of mapped) {
-                if (!p.isSelf && Number(p.id) !== Number(this.currentUser?.id)) {
-                    this.voiceService.startCall(Number(p.id));
-                }
-            }
+            // LiveKit SFU auto-connects to all room participants — no manual startCall needed
             this.cdr.markForCheck();
         }));
 
