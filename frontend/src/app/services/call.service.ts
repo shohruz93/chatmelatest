@@ -46,6 +46,13 @@ export class CallService implements OnDestroy {
         // Someone is calling us
         this.socket.on('incoming_call').pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
             console.log('[CallService] Incoming call from', data.callerName);
+
+            // If we are already in a call or have an incoming call, ignore (or handle as busy)
+            if (this.incomingCall() || this.activeCall()) {
+                console.log('[CallService] Busy, ignoring incoming call');
+                return;
+            }
+
             this.incomingCall.set({
                 callerId: data.callerId,
                 callerName: data.callerName,
@@ -216,8 +223,9 @@ export class CallService implements OnDestroy {
     private ringtoneInterval: any = null;
 
     private playRingtone() {
+        if (this.ringtoneInterval) return; // Already playing
         try {
-            this.audioCtx = new AudioContext();
+            this.audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
             let tick = 0;
             this.ringtoneInterval = setInterval(() => {
                 if (!this.audioCtx) return;

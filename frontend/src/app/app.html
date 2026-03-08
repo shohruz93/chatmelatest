@@ -15,11 +15,15 @@
         <h3 class="call-caller-name">{{ callService.incomingCall()!.callerName }}</h3>
         <div class="call-action-btns">
             <button class="btn-reject-call" (click)="callService.rejectCall()">
-                <span class="call-btn-icon">📵</span>
+                <div class="call-btn-icon">
+                    <span class="material-icons" style="font-size: 32px;">call_end</span>
+                </div>
                 <span>{{ 'CALL.DECLINE' | translate }}</span>
             </button>
             <button class="btn-accept-call" (click)="callService.acceptCall()">
-                <span class="call-btn-icon">📞</span>
+                <div class="call-btn-icon">
+                    <span class="material-icons" style="font-size: 32px;">call</span>
+                </div>
                 <span>{{ 'CALL.ACCEPT' | translate }}</span>
             </button>
         </div>

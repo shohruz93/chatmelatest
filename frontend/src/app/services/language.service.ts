@@ -608,6 +608,15 @@ export class LanguageService {
                 'MEDITATION': 'Meditation',
                 'PETS': 'Pets',
                 'FOOD': 'Food'
+            },
+            'CALL': {
+                'INCOMING': 'Incoming Voice Call...',
+                'DECLINE': 'Decline',
+                'ACCEPT': 'Accept',
+                'ON_CALL_WITH': 'On call with',
+                'USER_BUSY': 'User is busy',
+                'USER_OFFLINE': 'User is offline',
+                'DECLINED': 'Call declined'
             }
         },
         'ru': {
@@ -1004,6 +1013,15 @@ export class LanguageService {
                 'MEDITATION': 'Медитация',
                 'PETS': 'Домашние животные',
                 'FOOD': 'Еда'
+            },
+            'CALL': {
+                'INCOMING': 'Входящий голосовой вызов...',
+                'DECLINE': 'Отклонить',
+                'ACCEPT': 'Принять',
+                'ON_CALL_WITH': 'В разговоре с',
+                'USER_BUSY': 'Пользователь занят',
+                'USER_OFFLINE': 'Пользователь не в сети',
+                'DECLINED': 'Вызов отклонен'
             }
         },
         'tj': {
@@ -1373,6 +1391,15 @@ export class LanguageService {
                 'MEDITATION': 'Медитатсия',
                 'PETS': 'Ҳайвонҳои хонагӣ',
                 'FOOD': 'Хӯрок'
+            },
+            'CALL': {
+                'INCOMING': 'Занги овозии воридотӣ...',
+                'DECLINE': 'Рад кардан',
+                'ACCEPT': 'Қабул кардан',
+                'ON_CALL_WITH': 'Дар тамос бо',
+                'USER_BUSY': 'Корбар банд аст',
+                'USER_OFFLINE': 'Корбар ғайрифаъол аст',
+                'DECLINED': 'Занг рад карда шуд'
             }
         },
         'es': {
@@ -1691,6 +1718,15 @@ export class LanguageService {
                 'MEDITATION': 'Meditación',
                 'PETS': 'Mascotas',
                 'FOOD': 'Comida'
+            },
+            'CALL': {
+                'INCOMING': 'Llamada de voz entrante...',
+                'DECLINE': 'Rechazar',
+                'ACCEPT': 'Aceptar',
+                'ON_CALL_WITH': 'En llamada con',
+                'USER_BUSY': 'Usuario ocupado',
+                'USER_OFFLINE': 'Usuario fuera de línea',
+                'DECLINED': 'Llamada rechazada'
             }
         },
         'ar': {
@@ -1935,6 +1971,15 @@ export class LanguageService {
                 'MEDITATION': 'التأمل',
                 'PETS': 'الحيوانات الأليفة',
                 'FOOD': 'الطعام'
+            },
+            'CALL': {
+                'INCOMING': 'مكالمة صوتية واردة...',
+                'DECLINE': 'رفض',
+                'ACCEPT': 'قبول',
+                'ON_CALL_WITH': 'في مكالمة مع',
+                'USER_BUSY': 'المستخدم مشغول',
+                'USER_OFFLINE': 'المستخدم غير متصل',
+                'DECLINED': 'تم رفض المكالمة'
             }
         },
         'fr': {
