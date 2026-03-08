@@ -6,6 +6,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
+import { CallService } from '../../services/call.service';
 
 @Component({
     selector: 'app-tab-nav',
@@ -19,6 +20,7 @@ export class TabNavComponent {
     private api = inject(ApiService);
     private auth = inject(AuthService);
     private socketService = inject(SocketService);
+    public callService = inject(CallService);
     protected unreadCount = signal(0);
     currentRoute = '';
 

@@ -10,6 +10,8 @@ import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { ChatService, ChatMessage } from '../../services/chat.service';
 import { GamificationService } from '../../services/gamification.service';
+import { CallService } from '../../services/call.service';
+import { VoiceChatService } from '../../services/voice-chat.service';
 import { Subscription } from 'rxjs';
 import { VoiceRecorder } from '@independo/capacitor-voice-recorder';
 
@@ -18,7 +20,6 @@ import { CountrySelectComponent } from '../../components/country-select/country-
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ImageModalComponent } from '../../components/image-modal/image-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { SafeUrlPipe } from '../../pipes/safe-url.pipe';
 
 @Component({
     selector: 'app-chat',
@@ -55,6 +56,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private router = inject(Router);
     public languageService = inject(LanguageService);
     public gamificationService = inject(GamificationService);
+    public callService = inject(CallService);
+    public voiceService = inject(VoiceChatService);
 
     // Signals from Service
     messages = this.chatService.orderedMessages;
@@ -545,6 +548,20 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             };
             setTimeout(() => document.addEventListener('click', closeHandler), 0);
         }
+    }
+
+    // Voice Calling 
+    startVoiceCall() {
+        if (!this.partner || !this.roomId) return;
+        this.callService.startCall(this.partner.id, this.partnerName, this.partnerAvatar, this.roomId);
+    }
+
+    isSelfSpeaking(): boolean {
+        return !!this.voiceService.speakerActivity().get(0);
+    }
+
+    isPartnerSpeaking(): boolean {
+        return !!this.voiceService.speakerActivity().get(this.partner?.id);
     }
 
     openSendCoinsModal() {

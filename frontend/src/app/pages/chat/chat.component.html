@@ -27,7 +27,14 @@
         }
 
         <div class="header-actions">
-            <div class="actions-dropdown">
+            <!-- Add Call Button -->
+            <button class="btn-action-header call-btn" (click)="startVoiceCall()"
+                [title]="'CHAT.VOICE_CALL' | translate"
+                [disabled]="!isPartnerOnline || callService.activeCall() != null">
+                <span class="material-icons">call</span>
+            </button>
+
+            <div class="actions-dropdown" style="position: relative;">
                 <button class="btn-action-header" (click)="toggleActionsMenu($event)"
                     [title]="'CHAT.ACTIONS' | translate">
                     <span class="icon">⚡</span>
@@ -67,6 +74,40 @@
         }
         }
     </header>
+
+    <!-- ── Active Call Bar (shows when a call is accepted and active) ── -->
+    @if (callService.activeCall()?.roomId === 'call_' + roomId) {
+    <div class="active-call-bar glass-panel">
+        <div class="call-bar-info">
+            <span class="material-icons incoming-call-icon call-bar-icon"
+                [class.speaking]="isPartnerSpeaking()">call</span>
+            <div class="call-bar-details">
+                <span class="call-bar-name">{{ 'CALL.ON_CALL_WITH' | translate }} {{ partnerName }}</span>
+                <span class="call-bar-timer">{{ callService.formatDuration(callService.callDurationSeconds()) }}</span>
+            </div>
+        </div>
+
+        <!-- Animated Voice Waveform -->
+        <div class="call-waveform">
+            <div class="wave" [class.active]="isPartnerSpeaking() || isSelfSpeaking()" style="--d: 0s"></div>
+            <div class="wave" [class.active]="isPartnerSpeaking() || isSelfSpeaking()" style="--d: 0.1s"></div>
+            <div class="wave" [class.active]="isPartnerSpeaking() || isSelfSpeaking()" style="--d: 0.2s"></div>
+            <div class="wave" [class.active]="isPartnerSpeaking() || isSelfSpeaking()" style="--d: 0.3s"></div>
+            <div class="wave" [class.active]="isPartnerSpeaking() || isSelfSpeaking()" style="--d: 0.4s"></div>
+        </div>
+
+        <div class="call-bar-actions">
+            <!-- Mute Toggle -->
+            <button class="btn-call-mute" (click)="voiceService.toggleMute()" [class.muted]="voiceService.isMuted()">
+                <span class="material-icons">{{ voiceService.isMuted() ? 'mic_off' : 'mic' }}</span>
+            </button>
+            <!-- Hang Up -->
+            <button class="btn-call-end" (click)="callService.endCall()">
+                <span class="material-icons" style="color: white; font-size: 20px;">call_end</span>
+            </button>
+        </div>
+    </div>
+    }
 
     <!-- Messages Area -->
     <main class="messages-container" #messagesContainer>
@@ -133,8 +174,10 @@
                     @switch (msg.messageType) {
                     @case ('image') {
                     <div class="message-image-container">
-                        <img [attr.src]="msg.content" alt="Image" class="message-image" (click)="openImageModal(msg.content)">
-                        <button class="btn-download-media" (click)="downloadFile(msg.content, 'image')" title="Download Image">
+                        <img [attr.src]="msg.content" alt="Image" class="message-image"
+                            (click)="openImageModal(msg.content)">
+                        <button class="btn-download-media" (click)="downloadFile(msg.content, 'image')"
+                            title="Download Image">
                             <span class="download-icon">↓</span>
                         </button>
                     </div>
@@ -147,7 +190,8 @@
                     @case ('audio') {
                     <div class="message-voice">
                         <audio [attr.src]="msg.content" controls preload="metadata"></audio>
-                        <button class="btn-download-media audio-dl" (click)="downloadFile(msg.content, 'audio')" title="Download Audio">
+                        <button class="btn-download-media audio-dl" (click)="downloadFile(msg.content, 'audio')"
+                            title="Download Audio">
                             <span class="download-icon">↓</span>
                         </button>
                     </div>

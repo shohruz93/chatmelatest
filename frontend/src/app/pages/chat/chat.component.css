@@ -200,6 +200,154 @@
     flex-direction: column;
 }
 
+/* ── Call Button in Header ── */
+.call-btn {
+    animation: pulse 2s infinite;
+}
+
+.call-btn:disabled {
+    opacity: 0.5;
+    animation: none;
+    cursor: not-allowed;
+}
+
+/* ── Active Call Bar (Below Header) ── */
+.active-call-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    margin: 0.5rem 1rem 0;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 12px;
+    animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.call-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.call-bar-icon {
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+
+.call-bar-icon.speaking {
+    animation: pulseGreen 1.5s infinite;
+}
+
+.call-bar-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.call-bar-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.call-bar-timer {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+}
+
+/* Animated Waveform */
+.call-waveform {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 24px;
+}
+
+.wave {
+    width: 4px;
+    height: 4px;
+    background: var(--text-secondary);
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.wave.active {
+    background: #22c55e;
+    animation: bounce 1s infinite ease-in-out;
+    animation-delay: var(--d);
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        height: 4px;
+    }
+
+    50% {
+        height: 20px;
+    }
+}
+
+.call-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.btn-call-mute,
+.btn-call-end {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-call-mute:active,
+.btn-call-end:active {
+    transform: scale(0.9);
+}
+
+.btn-call-mute {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-call-mute.muted {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.btn-call-end {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+.btn-call-end:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+}
+.btn-call-end .material-icons {
+    font-size: 20px;
+}
+
 .message-sent {
     align-items: flex-end;
     justify-content: flex-end !important;

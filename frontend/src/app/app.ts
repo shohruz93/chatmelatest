@@ -4,6 +4,7 @@ import { CommonModule, Location } from '@angular/common';
 import { SocketService } from './services/socket.service';
 import { PushService } from './services/push.service';
 import { HeartbeatService } from './services/heartbeat.service';
+import { CallService } from './services/call.service';
 import { Subscription } from 'rxjs';
 import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
@@ -24,6 +25,7 @@ export class App implements OnInit, OnDestroy {
   private location = inject(Location);
   private pushService = inject(PushService);
   private heartbeatService = inject(HeartbeatService);
+  public callService = inject(CallService);
 
   showIncomingRequestModal = false;
   showExitModal = false;

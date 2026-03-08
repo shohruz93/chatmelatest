@@ -75,3 +75,183 @@
         font-size: 0.75rem;
     }
 }
+
+/* ── Global Incoming Call Overlay ── */
+.incoming-call-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeInCall 0.3s ease-out;
+}
+
+@keyframes fadeInCall {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.call-modal-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    width: 90%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: slideUpCall 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpCall {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Avatar & Rings */
+.call-avatar-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+}
+
+.call-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    position: relative;
+    z-index: 10;
+    background: #2a2a35;
+}
+
+.call-ring-1, .call-ring-2, .call-ring-3 {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.2);
+    z-index: 1;
+}
+
+.call-ring-1 { animation: ripple 2s infinite ease-out; }
+.call-ring-2 { animation: ripple 2s infinite ease-out 0.6s; }
+.call-ring-3 { animation: ripple 2s infinite ease-out 1.2s; }
+
+@keyframes ripple {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+/* Text */
+.call-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.call-caller-name {
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+}
+
+/* Action Buttons */
+.call-action-btns {
+    display: flex;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.call-action-btns button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.call-action-btns button:active {
+    transform: scale(0.95);
+}
+
+.call-btn-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-reject-call .call-btn-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    animation: pulseRed 2s infinite;
+}
+
+.btn-accept-call .call-btn-icon {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes pulseGreen {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* ── Toast Notification ── */
+.call-toast {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    z-index: 10000;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+    backdrop-filter: blur(8px);
+    animation: dropDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.call-toast.busy {
+    background: rgba(245, 158, 11, 0.9);
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4);
+}
+
+@keyframes dropDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}

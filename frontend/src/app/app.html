@@ -1,5 +1,45 @@
 <router-outlet />
 
+<!-- ── Global Incoming Call Overlay (shown on any page) ── -->
+@if (callService.incomingCall()) {
+<div class="incoming-call-overlay">
+    <div class="call-modal-card">
+        <div class="call-avatar-ring">
+            <img [src]="callService.incomingCall()!.callerAvatar || 'assets/default-avatar.png'" class="call-avatar"
+                alt="caller">
+            <div class="call-ring-1"></div>
+            <div class="call-ring-2"></div>
+            <div class="call-ring-3"></div>
+        </div>
+        <p class="call-label">{{ 'CALL.INCOMING' | translate }}</p>
+        <h3 class="call-caller-name">{{ callService.incomingCall()!.callerName }}</h3>
+        <div class="call-action-btns">
+            <button class="btn-reject-call" (click)="callService.rejectCall()">
+                <span class="call-btn-icon">📵</span>
+                <span>{{ 'CALL.DECLINE' | translate }}</span>
+            </button>
+            <button class="btn-accept-call" (click)="callService.acceptCall()">
+                <span class="call-btn-icon">📞</span>
+                <span>{{ 'CALL.ACCEPT' | translate }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+<!-- ── Rejected / Busy Notification ── -->
+@if (callService.callRejectedReason()) {
+<div class="call-toast" [class.busy]="callService.callRejectedReason() === 'busy'">
+    @if (callService.callRejectedReason() === 'busy') {
+    📵 {{ 'CALL.USER_BUSY' | translate }}
+    } @else if (callService.callRejectedReason() === 'offline') {
+    📴 {{ 'CALL.USER_OFFLINE' | translate }}
+    } @else {
+    ❌ {{ 'CALL.DECLINED' | translate }}
+    }
+</div>
+}
+
 <!-- Exit Confirmation Modal -->
 @if (showExitModal) {
 <div class="modal-overlay" (click)="closeExitModal()">
