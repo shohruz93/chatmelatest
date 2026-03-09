@@ -71,6 +71,64 @@ namespace ChatmeWindows.Services
             }
             return new List<MessageDto>();
         }
+
+        // --- Explore Endpoints ---
+
+        public async Task<ExploreResponse?> GetExploreUsersAsync(int userId, string gender = "any", string location = "any")
+        {
+            var url = $"/users/random?userId={userId}&limit=40&offset=0";
+            if (gender != "any") url += $"&gender={gender}";
+            if (location != "any") url += $"&location={location}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<ExploreResponse>(content);
+            }
+            return null;
+        }
+
+        public async Task<SmartMatchResponse?> GetSmartMatchAsync(int userId, string gender = "any", string location = "any")
+        {
+            var url = $"/users/smart-match?userId={userId}&gender={gender}&location={location}";
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<SmartMatchResponse>(content);
+            }
+            return null;
+        }
+
+        // --- Community Endpoints ---
+
+        public async Task<List<CommunityPostDto>> GetCommunityFeedAsync(int? viewerId = null, int page = 1)
+        {
+            var url = $"/community/feed?page={page}&limit=20&sort=newest&time_range=all";
+            if (viewerId.HasValue) url += $"&viewerId={viewerId.Value}";
+
+            var response = await _httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<CommunityPostDto>>(content) ?? new List<CommunityPostDto>();
+            }
+            return new List<CommunityPostDto>();
+        }
+
+        // --- Guests Endpoints ---
+
+        public async Task<List<GuestDto>> GetGuestsAsync(int userId)
+        {
+            var response = await _httpClient.GetAsync($"/profile/guests?userId={userId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<GuestDto>>(content) ?? new List<GuestDto>();
+            }
+            return new List<GuestDto>();
+        }
     }
 
     public class AuthResponse
@@ -101,6 +159,12 @@ namespace ChatmeWindows.Services
         
         [JsonProperty("is_admin")]
         public bool IsAdmin { get; set; }
+
+        [JsonProperty("gender")]
+        public string? Gender { get; set; }
+
+        [JsonProperty("location")]
+        public string? Location { get; set; }
     }
 
     public class ConversationDto
@@ -140,5 +204,71 @@ namespace ChatmeWindows.Services
         
         [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class ExploreResponse
+    {
+        [JsonProperty("users")]
+        public List<ExploreUserDto> Users { get; set; } = new();
+        [JsonProperty("total_count")]
+        public int TotalCount { get; set; }
+    }
+
+    public class ExploreUserDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? Avatar { get; set; }
+        public string? Gender { get; set; }
+        public string? Location { get; set; }
+        public string? Bio { get; set; }
+        [JsonProperty("native_language")]
+        public string? NativeLanguage { get; set; }
+        [JsonProperty("learning_language")]
+        public string? LearningLanguage { get; set; }
+        public bool IsOnline { get; set; }
+    }
+
+    public class SmartMatchResponse
+    {
+        public int? Id { get; set; }
+        public string? Name { get; set; }
+    }
+
+    public class CommunityPostDto
+    {
+        public int Id { get; set; }
+        [JsonProperty("user_id")]
+        public int UserId { get; set; }
+        [JsonProperty("user_name")]
+        public string UserName { get; set; } = string.Empty;
+        [JsonProperty("user_avatar")]
+        public string? UserAvatar { get; set; }
+        [JsonProperty("content_type")]
+        public string ContentType { get; set; } = "text";
+        [JsonProperty("text_content")]
+        public string? TextContent { get; set; }
+        [JsonProperty("media_path")]
+        public string? MediaPath { get; set; }
+        [JsonProperty("likes_count")]
+        public int LikesCount { get; set; }
+        [JsonProperty("comments_count")]
+        public int CommentsCount { get; set; }
+        [JsonProperty("created_at")]
+        public long CreatedAt { get; set; }
+    }
+
+    public class GuestDto
+    {
+        [JsonProperty("viewer_id")]
+        public int ViewerId { get; set; }
+        [JsonProperty("viewer_name")]
+        public string ViewerName { get; set; } = string.Empty;
+        [JsonProperty("viewer_avatar")]
+        public string? ViewerAvatar { get; set; }
+        [JsonProperty("view_count")]
+        public int ViewCount { get; set; }
+        [JsonProperty("last_viewed")]
+        public long LastViewed { get; set; }
     }
 }

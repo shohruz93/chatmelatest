@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,6 +9,7 @@ using Microsoft.UI.Xaml.Navigation;
 using ChatmeWindows.Services;
 using Newtonsoft.Json.Linq;
 using Windows.Storage;
+using System;
 
 namespace ChatmeWindows.Views
 {
@@ -18,13 +21,24 @@ namespace ChatmeWindows.Views
         
         public ObservableCollection<ConversationViewModel> Conversations { get; } = new();
         public ObservableCollection<MessageViewModel> Messages { get; } = new();
+        public ObservableCollection<ExploreUserViewModel> ExploreUsers { get; } = new();
+        public ObservableCollection<GuestViewModel> Guests { get; } = new();
 
         private static Microsoft.UI.Xaml.Media.ImageSource? GetSafeImageSource(string? url)
         {
             if (string.IsNullOrEmpty(url)) return null;
+            
+            string finalUrl = url;
+            if (finalUrl.StartsWith("/") || finalUrl.StartsWith("uploads/"))
+            {
+                finalUrl = finalUrl.StartsWith("/") 
+                    ? $"https://shphbjeio23.chatme.tj{finalUrl}"
+                    : $"https://shphbjeio23.chatme.tj/{finalUrl}";
+            }
+
             try
             {
-                if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+                if (Uri.TryCreate(finalUrl, UriKind.Absolute, out Uri? uri))
                 {
                     return new BitmapImage(uri);
                 }
@@ -57,6 +71,8 @@ namespace ChatmeWindows.Views
 
             ChatListView.ItemsSource = Conversations;
             MessageListView.ItemsSource = Messages;
+            UsersGrid.ItemsSource = ExploreUsers;
+            GuestsGrid.ItemsSource = Guests;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -72,6 +88,8 @@ namespace ChatmeWindows.Views
                 MyXpText.Text = response.User.Xp.ToString();
 
                 await LoadConversations();
+                await LoadExploreUsers(); 
+                await LoadGuests();
                 await _socketService.ConnectAsync(response.User.Id.ToString());
                 
                 _socketService.OnMessageReceived += socketData =>
@@ -79,7 +97,7 @@ namespace ChatmeWindows.Views
                     this.DispatcherQueue.TryEnqueue(() =>
                     {
                         var msg = socketData.ToObject<MessageDto>();
-                        if (msg != null && ActiveChatPanel.Visibility == Visibility.Visible && ChatListView.SelectedItem is ConversationViewModel selected && selected.PartnerId == msg.SenderId)
+                        if (msg != null && MessagesView.IsLoaded && MessagesView.Visibility == Visibility.Visible && ActiveChatContent.Visibility == Visibility.Visible && ChatListView.SelectedItem is ConversationViewModel selected && selected.PartnerId == msg.SenderId)
                         {
                             Messages.Add(new MessageViewModel(msg.Content, msg.SenderId == _currentUser.User.Id, msg.CreatedAt));
                         }
@@ -102,12 +120,147 @@ namespace ChatmeWindows.Views
             foreach (var item in list) Conversations.Add(new ConversationViewModel(item));
         }
 
+        private async Task LoadExploreUsers()
+        {
+            if (_currentUser == null) return;
+            var response = await _apiService.GetExploreUsersAsync(_currentUser.User.Id);
+            if (response != null)
+            {
+                UserCountText.Text = $"{response.TotalCount} корбар ёфт шуд";
+                ExploreUsers.Clear();
+                foreach (var user in response.Users)
+                {
+                    ExploreUsers.Add(new ExploreUserViewModel(user));
+                }
+            }
+        }
+
+        private async Task LoadGuests()
+        {
+            if (_currentUser == null) return;
+            var list = await _apiService.GetGuestsAsync(_currentUser.User.Id);
+            Guests.Clear();
+            foreach (var g in list) Guests.Add(new GuestViewModel(g));
+        }
+
+        private void MainNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        {
+            var tag = args.SelectedItemContainer?.Tag?.ToString();
+            if (tag == null) return;
+
+            // Reset visibilities
+            ExploreView.Visibility = Visibility.Collapsed;
+            MessagesView.Visibility = Visibility.Collapsed;
+            CommunityView.Visibility = Visibility.Collapsed;
+            GuestsView.Visibility = Visibility.Collapsed;
+            VoiceRoomsView.Visibility = Visibility.Collapsed;
+            TabSelectorGrid.Visibility = Visibility.Collapsed;
+
+            switch (tag)
+            {
+                case "Messages":
+                    MessagesView.Visibility = Visibility.Visible;
+                    break;
+                case "Explore":
+                    ExploreView.Visibility = Visibility.Visible;
+                    TabSelectorGrid.Visibility = Visibility.Visible;
+                    break;
+                case "Community":
+                    CommunityView.Visibility = Visibility.Visible;
+                    TabSelectorGrid.Visibility = Visibility.Visible;
+                    break;
+                case "Guests":
+                    GuestsView.Visibility = Visibility.Visible;
+                    _ = LoadGuests();
+                    break;
+                case "VoiceRooms":
+                    VoiceRoomsView.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        private void TabButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button b && b == UsersTabButton)
+            {
+                ExploreView.Visibility = Visibility.Visible;
+                CommunityView.Visibility = Visibility.Collapsed;
+                UsersTabButton.Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemAccentColorBrush"];
+                UsersTabButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
+                CommunityTabButton.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                CommunityTabButton.Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
+            }
+            else
+            {
+                ExploreView.Visibility = Visibility.Collapsed;
+                CommunityView.Visibility = Visibility.Visible;
+                CommunityTabButton.Background = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemAccentColorBrush"];
+                CommunityTabButton.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
+                UsersTabButton.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                UsersTabButton.Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
+            }
+        }
+
+        private async void RandomConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser == null) return;
+            var match = await _apiService.GetSmartMatchAsync(_currentUser.User.Id);
+            if (match != null && match.Id.HasValue)
+            {
+                OpenChatWithUser(match.Id.Value, match.Name ?? "User");
+            }
+        }
+
+        private void ExploreSendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is ExploreUserViewModel user)
+            {
+                OpenChatWithUser(user.Id, user.Name);
+            }
+        }
+
+        private async void OpenChatWithUser(int userId, string name)
+        {
+            // Switch to Messages view
+            MessagesView.Visibility = Visibility.Visible;
+            ExploreView.Visibility = Visibility.Collapsed;
+            TabSelectorGrid.Visibility = Visibility.Collapsed;
+            
+            // Set as active chat
+            EmptyChatState.Visibility = Visibility.Collapsed;
+            ActiveChatContent.Visibility = Visibility.Visible;
+            ChatHeaderName.Text = name;
+            ChatHeaderStatus.Text = "Connecting...";
+
+            // Find or add to conversations
+            var existing = Conversations.FirstOrDefault(c => c.PartnerId == userId);
+            if (existing == null)
+            {
+                var newConv = new ConversationViewModel(new ConversationDto { PartnerId = userId, PartnerName = name });
+                Conversations.Insert(0, newConv);
+                ChatListView.SelectedItem = newConv;
+            }
+            else
+            {
+                ChatListView.SelectedItem = existing;
+            }
+
+            // Load history
+            var history = await _apiService.GetMessagesAsync(userId);
+            Messages.Clear();
+            foreach (var m in history)
+            {
+                Messages.Add(new MessageViewModel(m.Content, m.SenderId == _currentUser?.User.Id, m.CreatedAt));
+            }
+            ChatHeaderStatus.Text = "Online";
+        }
+
         private async void ChatListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ChatListView.SelectedItem is ConversationViewModel selected)
             {
-                EmptyStatePanel.Visibility = Visibility.Collapsed;
-                ActiveChatPanel.Visibility = Visibility.Visible;
+                EmptyChatState.Visibility = Visibility.Collapsed;
+                ActiveChatContent.Visibility = Visibility.Visible;
                 ChatHeaderName.Text = selected.PartnerName;
                 ActiveChatAvatar.ProfilePicture = selected.AvatarUrl;
                 
@@ -127,7 +280,7 @@ namespace ChatmeWindows.Views
 
         private async void MessageInput_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter && Windows.UI.Core.CoreWindow.GetForCurrentThread().GetKeyState(Windows.System.VirtualKey.Shift) == Windows.UI.Core.CoreVirtualKeyStates.None) 
+            if (e.Key == Windows.System.VirtualKey.Enter && !Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(Windows.System.VirtualKey.Shift).HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down)) 
             {
                 e.Handled = true;
                 await SendMessage();
@@ -178,30 +331,6 @@ namespace ChatmeWindows.Views
             this.Frame.Navigate(typeof(LoginView));
         }
 
-        private void MainNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
-        {
-            if (args.IsSettingsSelected)
-            {
-                // Navigate to standard settings page if needed
-            }
-            else if (args.SelectedItemContainer != null)
-            {
-                var tag = args.SelectedItemContainer.Tag?.ToString();
-                switch (tag)
-                {
-                    case "Home":
-                    case "Wallet":
-                    case "Games":
-                        // For demonstration, navigate or change content
-                        System.Diagnostics.Debug.WriteLine($"Navigated to: {tag}");
-                        break;
-                    case "Messages":
-                        // Current page
-                        break;
-                }
-            }
-        }
-
         private static bool TryGetLocalSetting(string key, out string? value)
         {
             value = null;
@@ -237,6 +366,92 @@ namespace ChatmeWindows.Views
                 catch { /* swallow fallback errors */ }
                 return false;
             }
+        }
+    }
+
+    public class ExploreUserViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string? AvatarUrlString { get; set; }
+        public string? Gender { get; set; }
+        public string? LocationName { get; set; }
+        public string? Bio { get; set; }
+        public string? NativeLanguage { get; set; }
+        public bool IsOnline { get; set; }
+
+        public Microsoft.UI.Xaml.Media.ImageSource? Avatar => GetSafeImage(AvatarUrlString);
+        public Visibility IsOnlineVisibility => IsOnline ? Visibility.Visible : Visibility.Collapsed;
+
+        public ExploreUserViewModel(ExploreUserDto dto)
+        {
+            Id = dto.Id;
+            Name = dto.Name;
+            AvatarUrlString = dto.Avatar;
+            Gender = dto.Gender ?? "N/A";
+            LocationName = dto.Location ?? "N/A";
+            Bio = dto.Bio ?? "No bio yet.";
+            NativeLanguage = dto.NativeLanguage ?? "N/A";
+            IsOnline = dto.IsOnline;
+        }
+
+        private static Microsoft.UI.Xaml.Media.ImageSource? GetSafeImage(string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return null;
+            string finalUrl = url;
+            if (finalUrl.StartsWith("/") || finalUrl.StartsWith("uploads/"))
+            {
+                finalUrl = finalUrl.StartsWith("/") 
+                    ? $"https://shphbjeio23.chatme.tj{finalUrl}"
+                    : $"https://shphbjeio23.chatme.tj/{finalUrl}";
+            }
+            try
+            {
+                if (Uri.TryCreate(finalUrl, UriKind.Absolute, out Uri? uri))
+                    return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(uri);
+            }
+            catch { }
+            return null;
+        }
+    }
+
+    public class GuestViewModel
+    {
+        public string ViewerName { get; set; }
+        public string? AvatarUrlString { get; set; }
+        public int ViewCount { get; set; }
+        public string LastViewedTime { get; set; }
+
+        public string ViewCountText => $"{ViewCount} тамошо";
+
+        public Microsoft.UI.Xaml.Media.ImageSource? AvatarUrl 
+        {
+            get 
+            {
+                if (string.IsNullOrEmpty(AvatarUrlString)) return null;
+                string finalUrl = AvatarUrlString;
+                if (finalUrl.StartsWith("/") || finalUrl.StartsWith("uploads/"))
+                {
+                    finalUrl = finalUrl.StartsWith("/") 
+                        ? $"https://shphbjeio23.chatme.tj{finalUrl}"
+                        : $"https://shphbjeio23.chatme.tj/{finalUrl}";
+                }
+                try
+                {
+                    if (Uri.TryCreate(finalUrl, UriKind.Absolute, out Uri? uri))
+                        return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(uri);
+                }
+                catch { }
+                return null;
+            }
+        }
+
+        public GuestViewModel(GuestDto dto)
+        {
+            ViewerName = dto.ViewerName;
+            AvatarUrlString = dto.ViewerAvatar;
+            ViewCount = dto.ViewCount;
+            LastViewedTime = DateTimeOffset.FromUnixTimeSeconds(dto.LastViewed).LocalDateTime.ToString("g");
         }
     }
 
