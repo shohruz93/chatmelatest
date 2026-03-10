@@ -23,6 +23,7 @@ namespace ChatmeWindows.Views
         public ObservableCollection<MessageViewModel> Messages { get; } = new();
         public ObservableCollection<ExploreUserViewModel> ExploreUsers { get; } = new();
         public ObservableCollection<GuestViewModel> Guests { get; } = new();
+        public ObservableCollection<CommunityPostViewModel> CommunityPosts { get; } = new();
 
         private static Microsoft.UI.Xaml.Media.ImageSource? GetSafeImageSource(string? url)
         {
@@ -73,6 +74,7 @@ namespace ChatmeWindows.Views
             MessageListView.ItemsSource = Messages;
             UsersGrid.ItemsSource = ExploreUsers;
             GuestsGrid.ItemsSource = Guests;
+            CommunityFeedListView.ItemsSource = CommunityPosts;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -90,6 +92,7 @@ namespace ChatmeWindows.Views
                 await LoadConversations();
                 await LoadExploreUsers(); 
                 await LoadGuests();
+                await LoadCommunityFeed();
                 await _socketService.ConnectAsync(response.User.Id.ToString());
                 
                 _socketService.OnMessageReceived += socketData =>
@@ -143,6 +146,14 @@ namespace ChatmeWindows.Views
             foreach (var g in list) Guests.Add(new GuestViewModel(g));
         }
 
+        private async Task LoadCommunityFeed()
+        {
+            if (_currentUser == null) return;
+            var list = await _apiService.GetCommunityFeedAsync(_currentUser.User.Id);
+            CommunityPosts.Clear();
+            foreach (var post in list) CommunityPosts.Add(new CommunityPostViewModel(post));
+        }
+
         private void MainNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             var tag = args.SelectedItemContainer?.Tag?.ToString();
@@ -168,6 +179,7 @@ namespace ChatmeWindows.Views
                 case "Community":
                     CommunityView.Visibility = Visibility.Visible;
                     TabSelectorGrid.Visibility = Visibility.Visible;
+                    _ = LoadCommunityFeed();
                     break;
                 case "Guests":
                     GuestsView.Visibility = Visibility.Visible;
@@ -452,6 +464,57 @@ namespace ChatmeWindows.Views
             AvatarUrlString = dto.ViewerAvatar;
             ViewCount = dto.ViewCount;
             LastViewedTime = DateTimeOffset.FromUnixTimeSeconds(dto.LastViewed).LocalDateTime.ToString("g");
+        }
+    }
+
+    public class CommunityPostViewModel
+    {
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string? UserAvatarString { get; set; }
+        public string? ContentType { get; set; }
+        public string? TextContent { get; set; }
+        public string? MediaUrlString { get; set; }
+        public int LikesCount { get; set; }
+        public int CommentsCount { get; set; }
+        public string CreatedAtString { get; set; }
+
+        public Microsoft.UI.Xaml.Media.ImageSource? UserAvatar => GetSafeImage(UserAvatarString);
+        public Microsoft.UI.Xaml.Media.ImageSource? MediaContent => GetSafeImage(MediaUrlString);
+        
+        public Visibility TextVisibility => !string.IsNullOrEmpty(TextContent) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility MediaVisibility => !string.IsNullOrEmpty(MediaUrlString) ? Visibility.Visible : Visibility.Collapsed;
+
+        public CommunityPostViewModel(CommunityPostDto dto)
+        {
+            Id = dto.Id;
+            UserName = dto.UserName;
+            UserAvatarString = dto.UserAvatar;
+            ContentType = dto.ContentType;
+            TextContent = dto.TextContent;
+            MediaUrlString = dto.MediaPath;
+            LikesCount = dto.LikesCount;
+            CommentsCount = dto.CommentsCount;
+            CreatedAtString = DateTimeOffset.FromUnixTimeSeconds(dto.CreatedAt).LocalDateTime.ToString("g");
+        }
+
+        private static Microsoft.UI.Xaml.Media.ImageSource? GetSafeImage(string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return null;
+            string finalUrl = url;
+            if (finalUrl.StartsWith("/") || finalUrl.StartsWith("uploads/"))
+            {
+                finalUrl = finalUrl.StartsWith("/") 
+                    ? $"https://shphbjeio23.chatme.tj{finalUrl}"
+                    : $"https://shphbjeio23.chatme.tj/{finalUrl}";
+            }
+            try
+            {
+                if (Uri.TryCreate(finalUrl, UriKind.Absolute, out Uri? uri))
+                    return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(uri);
+            }
+            catch { }
+            return null;
         }
     }
 
