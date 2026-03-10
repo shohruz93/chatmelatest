@@ -182,19 +182,19 @@
     padding: 1rem 1.5rem;
     background: #1877F2;
     color: #fff;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 12px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(24,119,242,0.12);
+    box-shadow: 0 4px 12px rgba(24, 119, 242, 0.12);
     margin: 0.5rem 0 2rem 0;
 }
 
 .btn-facebook:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(24,119,242,0.18);
+    box-shadow: 0 8px 20px rgba(24, 119, 242, 0.18);
     filter: brightness(1.03);
 }
 
@@ -506,10 +506,13 @@
 
     .login-container {
         padding: 1rem;
+        flex-direction: column;
+        justify-content: flex-start;
     }
 
     .login-card {
         padding: 2rem 1.5rem;
+        margin-top: 1rem;
     }
 
     .title {
@@ -519,10 +522,45 @@
     .icon-wrapper {
         width: 60px;
         height: 60px;
+        margin-bottom: 1rem;
     }
 
     .chat-icon {
         font-size: 2rem;
+    }
+
+    .btn-google,
+    .btn-facebook {
+        padding: 0.875rem 1.25rem;
+    }
+
+    .login-info-section {
+        margin: 2rem 1rem;
+        padding: 2rem 1.5rem;
+        border-radius: 24px;
+    }
+
+    .info-title {
+        font-size: 1.75rem;
+    }
+
+    .info-text {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        padding: 1.5rem;
+    }
+
+    .info-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
     }
 
     .circle-1,
