@@ -610,4 +610,151 @@ class Profile {
             echo json_encode(["message" => "Guests marked as seen"]);
         }
     }
+
+    public function follow() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $followerId = $data['followerId'] ?? 0;
+        $followedId = $data['followedId'] ?? 0;
+
+        if (!$followerId || !$followedId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Both followerId and followedId are required"]);
+            return;
+        }
+
+        if ($followerId == $followedId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Cannot follow yourself"]);
+            return;
+        }
+
+        try {
+            $query = "INSERT IGNORE INTO follows (follower_id, followed_id) VALUES (:follower_id, :followed_id)";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":follower_id", $followerId);
+            $stmt->bindParam(":followed_id", $followedId);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() > 0) {
+                // Send notification
+                try {
+                    $followerName = $this->user->getNameById($followerId);
+                    $title = 'New follower';
+                    $body = ($followerName ?: 'Someone') . ' started following you.';
+                    $payload = [
+                        'type' => 'follow',
+                        'followerId' => $followerId
+                    ];
+                    $this->notification->send($followedId, $title, $body, $payload);
+                    $this->telegram->notifyNewFollower($followedId, $followerName ?: 'Someone'); // Not strictly required, but nice
+                } catch (Exception $e) {
+                    error_log("Error sending follow notification: " . $e->getMessage());
+                }
+            }
+
+            echo json_encode(["success" => true, "message" => "Followed successfully"]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
+
+    public function unfollow() {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $followerId = $data['followerId'] ?? 0;
+        $followedId = $data['followedId'] ?? 0;
+
+        if (!$followerId || !$followedId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Both followerId and followedId are required"]);
+            return;
+        }
+
+        try {
+            $query = "DELETE FROM follows WHERE follower_id = :follower_id AND followed_id = :followed_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":follower_id", $followerId);
+            $stmt->bindParam(":followed_id", $followedId);
+            $stmt->execute();
+
+            echo json_encode(["success" => true, "message" => "Unfollowed successfully"]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
+
+    public function getFollowStatus($followerId, $followedId) {
+        try {
+            $query = "SELECT 1 FROM follows WHERE follower_id = :follower_id AND followed_id = :followed_id LIMIT 1";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":follower_id", $followerId);
+            $stmt->bindParam(":followed_id", $followedId);
+            $stmt->execute();
+
+            $isFollowing = $stmt->fetchColumn() ? true : false;
+            echo json_encode(["isFollowing" => $isFollowing]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
+
+    public function getFollowers($userId) {
+        try {
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, f.created_at as followed_at
+                      FROM follows f
+                      JOIN users u ON f.follower_id = u.id
+                      WHERE f.followed_id = :user_id
+                      ORDER BY f.created_at DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            
+            $followers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($followers);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
+
+    public function getFollowing($userId) {
+        try {
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, f.created_at as followed_at
+                      FROM follows f
+                      JOIN users u ON f.followed_id = u.id
+                      WHERE f.follower_id = :user_id
+                      ORDER BY f.created_at DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            
+            $following = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode($following);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
+
+    public function getFollowCounts($userId) {
+        try {
+            $query = "SELECT 
+                        (SELECT COUNT(*) FROM follows WHERE followed_id = :user_id) as followers_count,
+                        (SELECT COUNT(*) FROM follows WHERE follower_id = :user_id) as following_count";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            
+            $counts = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode([
+                "followers" => (int)$counts['followers_count'],
+                "following" => (int)$counts['following_count']
+            ]);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["error" => "Database error"]);
+        }
+    }
 }

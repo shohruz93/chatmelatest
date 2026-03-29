@@ -169,6 +169,36 @@ $router->add('POST', '/profile/comment/like', function() use ($profile) {
     $profile->likeComment();
 });
 
+// Follow Routes
+$router->add('POST', '/follow', function() use ($profile) {
+    $profile->follow();
+});
+
+$router->add('POST', '/unfollow', function() use ($profile) {
+    $profile->unfollow();
+});
+
+$router->add('GET', '/follow/status', function() use ($profile) {
+    $followerId = $_GET['followerId'] ?? 0;
+    $followedId = $_GET['followedId'] ?? 0;
+    $profile->getFollowStatus($followerId, $followedId);
+});
+
+$router->add('GET', '/follow/followers', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getFollowers($userId);
+});
+
+$router->add('GET', '/follow/following', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getFollowing($userId);
+});
+
+$router->add('GET', '/follow/counts', function() use ($profile) {
+    $userId = $_GET['userId'] ?? 0;
+    $profile->getFollowCounts($userId);
+});
+
 // Gamification Routes
 $router->add('GET', '/gamification/missions', function() use ($gamificationController) {
     $gamificationController->getMissions();
