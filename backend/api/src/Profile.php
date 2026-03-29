@@ -741,10 +741,11 @@ class Profile {
     public function getFollowCounts($userId) {
         try {
             $query = "SELECT 
-                        (SELECT COUNT(*) FROM follows WHERE followed_id = :user_id) as followers_count,
-                        (SELECT COUNT(*) FROM follows WHERE follower_id = :user_id) as following_count";
+                        (SELECT COUNT(*) FROM follows WHERE followed_id = :id1) as followers_count,
+                        (SELECT COUNT(*) FROM follows WHERE follower_id = :id2) as following_count";
             $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":user_id", $userId);
+            $stmt->bindParam(":id1", $userId);
+            $stmt->bindParam(":id2", $userId);
             $stmt->execute();
             
             $counts = $stmt->fetch(PDO::FETCH_ASSOC);
