@@ -132,16 +132,16 @@ class CommunityController {
         $sort = $_GET['sort'] ?? 'newest';
         $timeRange = $_GET['time_range'] ?? 'all';
 
-        $orderBy = "ORDER BY cp.created_at DESC";
+        $orderBy = "ORDER BY RAND()";
         if ($sort === 'likes') {
-            $orderBy = "ORDER BY cp.likes_count DESC, cp.created_at DESC";
+            $orderBy = "ORDER BY cp.likes_count DESC, RAND()";
         } elseif ($sort === 'comments') {
-            $orderBy = "ORDER BY cp.comments_count DESC, cp.created_at DESC";
+            $orderBy = "ORDER BY cp.comments_count DESC, RAND()";
         } elseif ($sort === 'views') {
-            $orderBy = "ORDER BY cp.views_count DESC, cp.created_at DESC";
+            $orderBy = "ORDER BY cp.views_count DESC, RAND()";
         }
 
-        $whereClause = "";
+        $whereClause = "WHERE cp.user_id != ?";
         if ($timeRange !== 'all') {
             $now = TimestampHelper::now();
             $startTime = 0;
@@ -152,7 +152,7 @@ class CommunityController {
             } elseif ($timeRange === 'month') {
                 $startTime = $now - (30 * 24 * 60 * 60);
             }
-            $whereClause = "WHERE cp.created_at >= " . $startTime;
+            $whereClause = "WHERE cp.created_at >= " . $startTime . " AND cp.user_id != ?";
         }
         
         $stmt = $this->db->prepare("
@@ -173,8 +173,9 @@ class CommunityController {
         ");
         $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(2, $viewerId ?? 0, PDO::PARAM_INT);
-        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(4, (int)$offset, PDO::PARAM_INT);
+        $stmt->bindValue(3, $viewerId ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(4, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(5, (int)$offset, PDO::PARAM_INT);
         $stmt->execute();
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
