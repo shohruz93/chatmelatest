@@ -159,17 +159,22 @@ class CommunityController {
             SELECT cp.*, 
                    u.name as user_name, 
                    u.avatar as user_avatar,
-                   CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked
+                   u.native_language,
+                   u.learning_language,
+                   CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
+                   CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_following
             FROM community_posts cp
             JOIN users u ON cp.user_id = u.id
             LEFT JOIN community_reactions cr ON cp.id = cr.post_id AND cr.user_id = ?
+            LEFT JOIN follows f ON f.followed_id = cp.user_id AND f.follower_id = ?
             $whereClause
             $orderBy
             LIMIT ? OFFSET ?
         ");
         $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
-        $stmt->bindValue(2, (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(3, (int)$offset, PDO::PARAM_INT);
+        $stmt->bindValue(2, $viewerId ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(4, (int)$offset, PDO::PARAM_INT);
         $stmt->execute();
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -201,18 +206,23 @@ class CommunityController {
             SELECT cp.*, 
                    u.name as user_name, 
                    u.avatar as user_avatar,
-                   CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked
+                   u.native_language,
+                   u.learning_language,
+                   CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
+                   CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_following
             FROM community_posts cp
             JOIN users u ON cp.user_id = u.id
             LEFT JOIN community_reactions cr ON cp.id = cr.post_id AND cr.user_id = ?
+            LEFT JOIN follows f ON f.followed_id = cp.user_id AND f.follower_id = ?
             WHERE cp.user_id = ?
             ORDER BY cp.created_at DESC
             LIMIT ? OFFSET ?
         ");
         $stmt->bindValue(1, $viewerId ?? 0, PDO::PARAM_INT);
-        $stmt->bindValue(2, $userId, PDO::PARAM_INT);
-        $stmt->bindValue(3, (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(4, (int)$offset, PDO::PARAM_INT);
+        $stmt->bindValue(2, $viewerId ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(3, $userId, PDO::PARAM_INT);
+        $stmt->bindValue(4, (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(5, (int)$offset, PDO::PARAM_INT);
         $stmt->execute();
         $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
