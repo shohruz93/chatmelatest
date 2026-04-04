@@ -299,6 +299,29 @@ class Telegram {
         }
     }
 
+    public function notifyNewFollower($userId, $followerName) {
+        try {
+            $query = "SELECT telegram_chat_id, notifications_enabled FROM telegram_connections 
+                      WHERE user_id = :user_id AND notifications_enabled = 1";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) {
+                $connection = $stmt->fetch(PDO::FETCH_ASSOC);
+                $chatId = $connection['telegram_chat_id'];
+
+                $safeFollowerName = $this->escapeHtml($followerName);
+
+                $message = "<b>New follower!</b>\n\n$safeFollowerName started following you.";
+                $this->sendMessage($chatId, $message);
+            }
+        } catch (Exception $e) {
+            error_log("Error notifying new follower: " . $e->getMessage());
+        }
+    }
+
     public function notifyNewGuest($userId, $guestName) {
         try {
             $query = "SELECT telegram_chat_id, notifications_enabled FROM telegram_connections 

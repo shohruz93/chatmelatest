@@ -24,8 +24,6 @@ require_once __DIR__ . '/../src/Conversation.php';
 require_once __DIR__ . '/../src/AdminController.php';
 require_once __DIR__ . '/../src/Push.php';
 require_once __DIR__ . '/../src/AppVersion.php';
-require_once __DIR__ . '/../src/Telegram.php';
-require_once __DIR__ . '/../src/TelegramWebhook.php';
 require_once __DIR__ . '/../src/GamificationController.php';
 require_once __DIR__ . '/../src/GameController.php';
 require_once __DIR__ . '/../src/GalleryController.php';
@@ -51,8 +49,6 @@ $conversation = new Conversation($db);
 $adminController = new AdminController($db);
 $push = new Push($db);
 $appVersion = new AppVersion($db);
-$telegram = new Telegram($db);
-$telegramWebhook = new TelegramWebhook($db);
 $gamificationController = new GamificationController();
 $gameController = new GameController();
 $galleryController = new GalleryController();
@@ -78,31 +74,6 @@ $router->add('POST', '/push/subscribe', function() use ($push) {
 
 $router->add('POST', '/push/unsubscribe', function() use ($push) {
     $push->unsubscribe();
-});
-
-// Telegram Routes
-$router->add('POST', '/telegram/generate-code', function() use ($telegram) {
-    $telegram->generateConnectionCode();
-});
-
-$router->add('POST', '/telegram/verify-connect', function() use ($telegram) {
-    $telegram->verifyAndConnect();
-});
-
-$router->add('GET', '/telegram/status', function() use ($telegram) {
-    $telegram->getStatus();
-});
-
-$router->add('POST', '/telegram/disconnect', function() use ($telegram) {
-    $telegram->disconnect();
-});
-
-$router->add('POST', '/telegram/toggle-notifications', function() use ($telegram) {
-    $telegram->toggleNotifications();
-});
-
-$router->add('POST', '/telegram/webhook', function() use ($telegramWebhook) {
-    $telegramWebhook->handleUpdate();
 });
 
 // Profile Routes

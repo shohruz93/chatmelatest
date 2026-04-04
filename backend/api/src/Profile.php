@@ -11,13 +11,13 @@ class Profile {
     private $db;
     private $user;
     private $notification;
-    private $telegram;
+
 
     public function __construct($db) {
         $this->db = $db;
         $this->user = new User($db);
         $this->notification = new Notification($db);
-        $this->telegram = new Telegram($db);
+
     }
 
     public function get($userId) {
@@ -337,7 +337,7 @@ class Profile {
                 'viewerId' => $viewerId
             ];
             $this->notification->send($viewedId, $title, $body, $payload);
-            $this->telegram->notifyNewGuest($viewedId, $viewerName ?: 'Someone');
+
             
             // Track gamification progress for the viewer
             GamificationController::updateProgress($viewerId, 'view_profile');
@@ -567,7 +567,7 @@ class Profile {
             try {
                 $commenterName = $this->user->getNameById($userId);
                 $commentPreview = substr($comment, 0, 100);
-                $this->telegram->notifyNewComment($ratedId, $commenterName ?: 'Someone', $commentPreview);
+
                 
                 // Track gamification progress
                 GamificationController::updateProgress($userId, 'add_comment');
@@ -646,7 +646,7 @@ class Profile {
                         'followerId' => $followerId
                     ];
                     $this->notification->send($followedId, $title, $body, $payload);
-                    $this->telegram->notifyNewFollower($followedId, $followerName ?: 'Someone'); // Not strictly required, but nice
+
                 } catch (Exception $e) {
                     error_log("Error sending follow notification: " . $e->getMessage());
                 }
