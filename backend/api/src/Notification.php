@@ -77,6 +77,62 @@ class Notification {
         }
     }
 
+    public function sendToMultiple($userIds, $title, $body, $data = []) {
+        if (empty($userIds)) return;
+
+        // Get all tokens for all users in one query
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        $query = "SELECT user_id, token FROM push_subscriptions WHERE user_id IN ($placeholders)";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($userIds);
+        $allTokens = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($allTokens)) return;
+
+        $accessToken = $this->getAccessToken();
+        if (!$accessToken) return;
+
+        $serviceAccount = json_decode(file_get_contents($this->serviceAccountPath), true);
+        $projectId = $serviceAccount['project_id'];
+        $url = "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send";
+
+        $headers = [
+            'Authorization: Bearer ' . $accessToken,
+            'Content-Type: application/json'
+        ];
+
+        foreach ($allTokens as $tokenData) {
+            $token = $tokenData['token'];
+            $payload = [
+                'message' => [
+                    'token' => $token,
+                    'notification' => [
+                        'title' => $title,
+                        'body' => $body
+                    ],
+                    'data' => array_map('strval', $data)
+                ]
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+            $result = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 404 || $httpCode === 410) {
+                $this->deleteToken($token);
+            }
+        }
+    }
+
     private function getAccessToken() {
         if (!file_exists($this->serviceAccountPath)) {
             $this->logFcm("FCM: Service account file not found at " . $this->serviceAccountPath);

@@ -719,6 +719,18 @@ class Profile {
         }
     }
 
+    public function getFollowerIds($userId) {
+        try {
+            $query = "SELECT follower_id FROM follows WHERE followed_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":user_id", $userId);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     public function getFollowing($userId) {
         try {
             $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, f.created_at as followed_at

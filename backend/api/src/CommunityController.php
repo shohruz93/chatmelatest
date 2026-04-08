@@ -330,18 +330,34 @@ class CommunityController {
         $stmt = $this->db->prepare("UPDATE community_posts SET comments_count = comments_count + 1 WHERE id = ?");
         $stmt->execute([$postId]);
 
-        // Get user info
-        $stmt = $this->db->prepare("SELECT name, avatar FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Get user info and post author info
+        $stmt = $this->db->prepare("SELECT u.name, u.avatar, cp.user_id as author_id 
+                                    FROM users u, community_posts cp 
+                                    WHERE u.id = ? AND cp.id = ?");
+        $stmt->execute([$userId, $postId]);
+        $info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Send notification to post author if commenter is not the author
+        if ($info && $info['author_id'] != $userId) {
+            require_once __DIR__ . '/Notification.php';
+            $notif = new Notification($this->db);
+            $title = "New Comment";
+            $body = $info['name'] . " commented on your post: " . substr($content, 0, 50) . "...";
+            $payload = [
+                'type' => 'comment',
+                'postId' => $postId,
+                'commentId' => $commentId
+            ];
+            $notif->send($info['author_id'], $title, $body, $payload);
+        }
 
         echo json_encode([
             'success' => true,
             'comment' => [
                 'id' => $commentId,
                 'user_id' => $userId,
-                'user_name' => $user['name'],
-                'user_avatar' => $user['avatar'],
+                'user_name' => $info['name'],
+                'user_avatar' => $info['avatar'],
                 'content' => $content,
                 'created_at' => $now
             ]

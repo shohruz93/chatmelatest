@@ -28,6 +28,7 @@ require_once __DIR__ . '/../src/GamificationController.php';
 require_once __DIR__ . '/../src/GameController.php';
 require_once __DIR__ . '/../src/GalleryController.php';
 require_once __DIR__ . '/../src/CommunityController.php';
+require_once __DIR__ . '/../src/VoiceController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -53,6 +54,7 @@ $gamificationController = new GamificationController();
 $gameController = new GameController();
 $galleryController = new GalleryController();
 $communityController = new CommunityController();
+$voiceController = new VoiceController($db);
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -662,6 +664,11 @@ $router->add('DELETE', '/community/post', function() use ($communityController) 
         return;
     }
     $communityController->deletePost($postId, $userId);
+});
+
+// Voice Room Routes
+$router->add('POST', '/voice/notify-followers', function() use ($voiceController) {
+    $voiceController->notifyFollowers();
 });
 
 
