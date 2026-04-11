@@ -194,17 +194,11 @@ class CoinsController {
 
     /**
      * Log a coin transaction
+     * History logging is disabled - no longer needed
      */
     private function logTransaction($senderId, $receiverId, $amount, $type = 'transfer', $note = null) {
-        $query = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note) 
-                  VALUES (:sender_id, :receiver_id, :amount, :type, :note)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':sender_id', $senderId);
-        $stmt->bindParam(':receiver_id', $receiverId);
-        $stmt->bindParam(':amount', $amount);
-        $stmt->bindParam(':type', $type);
-        $stmt->bindParam(':note', $note);
-        return $stmt->execute();
+        // Transaction history recording is disabled
+        return true;
     }
 
     /**

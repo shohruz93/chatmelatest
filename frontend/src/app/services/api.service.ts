@@ -133,4 +133,16 @@ export class ApiService {
 
         return this.http.post(`${this.apiUrl}/messages/upload`, formData, { headers: this.getHeaders() });
     }
+
+    getFollowers(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/follow/followers?userId=${userId}`, { headers: this.getHeaders() });
+    }
+
+    getFollowing(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/follow/following?userId=${userId}`, { headers: this.getHeaders() });
+    }
+
+    getFollowCounts(userId: number): Observable<any> {
+        return this.http.get(`${this.apiUrl}/follow/counts?userId=${userId}`, { headers: this.getHeaders() });
+    }
 }

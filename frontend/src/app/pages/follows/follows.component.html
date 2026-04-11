@@ -1,0 +1,54 @@
+<div class="follows-page">
+    <header class="page-header">
+        <button class="btn-back" [routerLink]="['/dashboard/profile', userId]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </button>
+        <h2>{{ (type === 'followers' ? 'PROFILE.FOLLOWERS' : 'PROFILE.FOLLOWING') | translate }}</h2>
+    </header>
+
+    <div class="follows-content">
+        @if (loading) {
+        <div class="loading-state">
+            <div class="loader-large"></div>
+            <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
+        </div>
+        } @else {
+            @if (users.length === 0) {
+            <div class="empty-state">
+                <div class="empty-icon">{{ type === 'followers' ? '👥' : '➕' }}</div>
+                <p>{{ (type === 'followers' ? 'COMMUNITY.NO_FOLLOWERS' : 'COMMUNITY.NO_FOLLOWING') | translate }}</p>
+            </div>
+            } @else {
+            <div class="user-list">
+                @for (user of users; track user.id) {
+                <div class="user-item" [routerLink]="['/dashboard/profile', user.id]">
+                    <div class="avatar-wrapper">
+                        <img [src]="user.avatar || getPlaceholder(user.gender)" [alt]="user.name">
+                    </div>
+                    <div class="user-info">
+                        <div class="name-row">
+                            <span class="user-name">{{ user.name }}</span>
+                        </div>
+                        <p class="user-bio" *ngIf="user.bio">{{ user.bio }}</p>
+                        <div class="location-info" *ngIf="user.location">
+                            <span class="location-icon">📍</span>
+                            {{ user.location }}
+                        </div>
+                    </div>
+                    <div class="item-action">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        }
+    </div>
+</div>

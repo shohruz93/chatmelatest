@@ -1,18 +1,23 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { GamificationService } from '../../../services/gamification.service';
 import { TranslatePipe } from '../../../pipes/translate.pipe';
 
 @Component({
     selector: 'app-wallet',
     standalone: true,
-    imports: [CommonModule, RouterLink, TranslatePipe],
+    imports: [CommonModule, TranslatePipe],
     templateUrl: './wallet.component.html',
     styleUrls: ['./wallet.component.css']
 })
 export class WalletComponent {
     gameService = inject(GamificationService);
+
+    @Output() coinsClicked = new EventEmitter<void>();
+
+    onCoinsClick() {
+        this.coinsClicked.emit();
+    }
 
     get level() {
         // Basic leveling: Level = sqrt(XP / 100) + 1

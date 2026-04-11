@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -24,6 +24,9 @@ export class CommunityFeedComponent implements OnInit {
     private translationService = inject(TranslationService);
     public languageService = inject(LanguageService);
     private communityStorage = inject(CommunityStorageService);
+
+    @Input() filterUserId?: number;  // If set, shows only this user's posts
+    @Input() showCreateForm: boolean = true;  // Show/hide post creation form
 
     currentUser = this.auth.currentUserValue;
     posts = signal<CommunityPost[]>([]);
@@ -120,13 +123,17 @@ export class CommunityFeedComponent implements OnInit {
             this.isLoadingMore.set(true);
         }
 
-        this.communityService.getFeed(
-            this.currentUser?.id,
-            this.page(),
-            10,
-            this.sortBy(),
-            this.timeRange()
-        ).subscribe({
+        const request$ = this.filterUserId
+            ? this.communityService.getUserPosts(this.filterUserId, this.currentUser?.id, this.page(), 10)
+            : this.communityService.getFeed(
+                this.currentUser?.id,
+                this.page(),
+                10,
+                this.sortBy(),
+                this.timeRange()
+            );
+
+        request$.subscribe({
             next: (newPosts) => {
                 if (newPosts.length < 10) {
                     this.hasMore.set(false);

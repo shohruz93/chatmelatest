@@ -1,4 +1,5 @@
 <!-- Create Post Button -->
+@if (showCreateForm) {
 <div class="create-post-card" (click)="openCreateModal()">
     <img [src]="getAvatarUrl(currentUser?.avatar)" class="user-avatar" alt="You">
     <div class="create-placeholder">{{ 'COMMUNITY.CREATE_POST_PLACEHOLDER' | translate }}</div>
@@ -6,30 +7,9 @@
         <button class="add-btn">+</button>
     </div>
 </div>
+}
 
-<!-- Filter Bar -->
-<div class="filter-bar-container">
-    <div class="filter-bar">
-        <div class="filter-group">
-            <button class="filter-chip" [class.active]="sortBy() === 'newest'" (click)="onSortChange('newest')">{{
-                'COMMUNITY.NEWEST' | translate }}</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'likes'" (click)="onSortChange('likes')">{{
-                'COMMUNITY.POPULAR' | translate }}</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'comments'" (click)="onSortChange('comments')">{{
-                'COMMUNITY.DISCUSSED' | translate }}</button>
-            <button class="filter-chip" [class.active]="sortBy() === 'views'" (click)="onSortChange('views')">{{
-                'COMMUNITY.SEEN' | translate }}</button>
-        </div>
-        <div class="filter-group time-group">
-            <select [ngModel]="timeRange()" (ngModelChange)="onTimeRangeChange($event)" class="time-select">
-                <option value="all">{{ 'COMMUNITY.TIME_ALL' | translate }}</option>
-                <option value="month">{{ 'COMMUNITY.TIME_MONTH' | translate }}</option>
-                <option value="week">{{ 'COMMUNITY.TIME_WEEK' | translate }}</option>
-                <option value="day">{{ 'COMMUNITY.TIME_DAY' | translate }}</option>
-            </select>
-        </div>
-    </div>
-</div>
+
 
 <div class="community-feed no-scrollbar" (scroll)="onScroll($event)">
 

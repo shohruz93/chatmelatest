@@ -145,18 +145,7 @@ class GamificationController {
         $this->user->addCurrency($userId, $mission['reward_coins'], 'coins');
         $this->user->addCurrency($userId, $mission['xp_reward'], 'xp');
 
-        // Log transaction for coins
-        if ($mission['reward_coins'] > 0) {
-            $logQuery = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note, created_at) 
-                         VALUES (0, :user_id, :amount, 'mission_reward', :note, NOW())";
-            $logStmt = $this->conn->prepare($logQuery);
-            $note = "Reward for mission: " . $mission['title'];
-            $logStmt->execute([
-                ':user_id' => $userId, 
-                ':amount' => $mission['reward_coins'],
-                ':note' => $note
-            ]);
-        }
+        // Transaction history recording is disabled
 
         // Update status to claimed
         $updateQuery = "UPDATE user_missions SET status = 'claimed', completed_at = NOW() WHERE id = :id";
@@ -246,17 +235,7 @@ class GamificationController {
                 
                 if ($rewardCoins > 0) {
                     $userObj->addCurrency($userId, $rewardCoins, 'coins');
-                    
-                    // Log coin transaction
-                    $logQuery = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note, created_at)
-                                 VALUES (0, :user_id, :amount, 'mission_reward', :note, NOW())";
-                    $logStmt = $conn->prepare($logQuery);
-                    $note = "Reward for mission: " . $row['title'];
-                    $logStmt->execute([
-                        ':user_id' => $userId,
-                        ':amount'  => $rewardCoins,
-                        ':note'    => $note
-                    ]);
+                    // Transaction history recording is disabled
                 }
                 
                 if ($rewardXp > 0) {

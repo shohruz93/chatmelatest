@@ -91,4 +91,17 @@ export class AdminService {
   getStats(): Observable<any> {
     return this.http.get(`${this.apiUrl}/admin/stats`);
   }
+
+  getCommunityPosts(page: number = 1, limit: number = 20): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admin/community/posts`, {
+      params: {
+        page: page.toString(),
+        limit: limit.toString()
+      }
+    });
+  }
+
+  deleteCommunityPost(postId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/community/posts/delete`, { post_id: postId });
+  }
 }

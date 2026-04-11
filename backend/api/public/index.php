@@ -470,6 +470,10 @@ $router->add('GET', '/admin/users/details', function() use ($adminController) {
     $adminController->getUserDetails();
 });
 
+$router->add('POST', '/admin/users/update', function() use ($adminController) {
+    $adminController->updateUser();
+});
+
 $router->add('GET', '/admin/users/activity', function() use ($adminController) {
     $adminController->getUserActivity();
 });
@@ -485,6 +489,14 @@ $router->add('POST', '/admin/apps/upload', function() use ($adminController) {
 
 $router->add('GET', '/admin/apps', function() use ($adminController) {
     $adminController->getAppVersions();
+});
+
+$router->add('GET', '/admin/community/posts', function() use ($adminController) {
+    $adminController->getCommunityPosts();
+});
+
+$router->add('POST', '/admin/community/posts/delete', function() use ($adminController) {
+    $adminController->deleteCommunityPost();
 });
 
 // App Version Check (Public)

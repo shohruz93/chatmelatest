@@ -1,5 +1,5 @@
 <div class="wallet-container">
-    <div class="currency-card coins" routerLink="/dashboard/coins">
+    <div class="currency-card coins" (click)="onCoinsClick()">
         <div class="icon-wrapper spin-animation">🪙</div>
         <div class="amount">
             <span class="value">{{ gameService.userCoins() }}</span>

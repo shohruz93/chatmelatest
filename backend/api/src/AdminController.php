@@ -537,5 +537,69 @@ class AdminController {
 
         echo json_encode($activities);
     }
+
+    public function getCommunityPosts() {
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $offset = ($page - 1) * $limit;
+
+        $query = "SELECT cp.*, u.name as user_name, u.avatar as user_avatar 
+                  FROM community_posts cp
+                  JOIN users u ON cp.user_id = u.id
+                  ORDER BY cp.created_at DESC
+                  LIMIT :limit OFFSET :offset";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Count total
+        $totalStmt = $this->db->query("SELECT COUNT(*) as count FROM community_posts");
+        $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+        echo json_encode([
+            'posts' => $posts,
+            'total' => $total,
+            'page' => $page,
+            'pages' => ceil($total / $limit)
+        ]);
+    }
+
+    public function deleteCommunityPost() {
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->post_id)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Post ID required']);
+            return;
+        }
+
+        // Get post to delete media if exists
+        $stmt = $this->db->prepare("SELECT media_path FROM community_posts WHERE id = :id");
+        $stmt->bindParam(":id", $data->post_id);
+        $stmt->execute();
+        $post = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($post && $post['media_path']) {
+            $filepath = __DIR__ . '/../public_html' . $post['media_path'];
+            if (file_exists($filepath)) {
+                @unlink($filepath);
+            }
+        }
+
+        $query = "DELETE FROM community_posts WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":id", $data->post_id);
+        
+        if($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Post deleted successfully']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to delete post']);
+        }
+    }
 }
+
 

@@ -42,6 +42,14 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/all-comments/all-comments.component').then(m => m.AllCommentsComponent)
             },
             {
+                path: 'profile/:id/followers',
+                loadComponent: () => import('./pages/follows/follows.component').then(m => m.FollowsComponent)
+            },
+            {
+                path: 'profile/:id/following',
+                loadComponent: () => import('./pages/follows/follows.component').then(m => m.FollowsComponent)
+            },
+            {
                 path: 'guests',
                 loadComponent: () => import('./pages/guests/guests.component').then(m => m.GuestsComponent)
             },

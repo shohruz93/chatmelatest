@@ -22,11 +22,12 @@ import { WalletComponent } from '../../components/gamification/wallet/wallet.com
 import { MissionsComponent } from '../../components/gamification/missions/missions.component';
 import { GalleryService, GalleryImage } from '../../services/gallery.service';
 import { LanguageService } from '../../services/language.service';
+import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
 
 @Component({
     selector: 'app-profile',
     standalone: true,
-    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe, UnixDatePipe, WalletComponent, MissionsComponent],
+    imports: [CommonModule, FormsModule, ConfirmDialogComponent, RouterLink, CountrySelectComponent, TranslatePipe, WalletComponent, MissionsComponent, CommunityFeedComponent],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.css'
 })
@@ -112,6 +113,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
     searchUniqueId: string = '';
     searchError: string = '';
     searchLoading: boolean = false;
+
+    // Missions Modal
+    showMissionsModal: boolean = false;
+
+    // Follow & Guest counts
+    followersCount: number = 0;
+    followingCount: number = 0;
+    guestsCount: number = 0;
 
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
@@ -286,12 +295,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
                 if (this.isOwnProfile) {
                     this.gameService.setWalletState(data.coins, data.xp);
+                    this.api.getNewGuestsCount(userId).subscribe({
+                        next: (res) => this.guestsCount = res.count || 0,
+                        error: () => {}
+                    });
                 }
+
+                // Load follow counts
+                this.loadFollowCounts(userId);
             },
             error: (err) => {
                 console.error('Error loading profile', err);
                 this.loading = false;
             }
+        });
+    }
+
+    loadFollowCounts(userId: number) {
+        this.api.get(`/profile/follow-counts?userId=${userId}`).subscribe({
+            next: (data) => {
+                this.followersCount = data.followers || 0;
+                this.followingCount = data.following || 0;
+            },
+            error: () => {}
         });
     }
 
@@ -634,7 +660,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 this.searchLoading = false;
                 this.searchError = '';
                 this.searchUniqueId = '';
-                this.router.navigate(['/profile', data.id]);
+                this.router.navigate(['/dashboard/profile', data.id]);
             },
             error: (err) => {
                 this.searchLoading = false;

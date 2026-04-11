@@ -18,6 +18,10 @@ export const ADMIN_ROUTES: Routes = [
             {
                 path: 'apps',
                 loadComponent: () => import('./app-versions/app-versions.component').then(m => m.AppVersionsComponent)
+            },
+            {
+                path: 'community',
+                loadComponent: () => import('./admin-community/admin-community.component').then(m => m.AdminCommunityComponent)
             }
         ]
     }
