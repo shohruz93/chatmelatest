@@ -1,19 +1,4 @@
 <div class="explore-container">
-  <!-- Tab Navigation -->
-  <div class="explore-tabhost">
-    <div class="tab-navigation">
-      <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
-        <span class="tab-icon">👥</span>
-        <span>{{ 'EXPLORE_PAGE.USERS' | translate }}</span>
-      </button>
-      <button class="tab-btn" [class.active]="activeTab === 'community'" (click)="activeTab = 'community'">
-        <span class="tab-icon">📱</span>
-        <span>{{ 'EXPLORE_PAGE.COMMUNITY' | translate }}</span>
-      </button>
-    </div>
-  </div>
-
-  @if (activeTab === 'users') {
   <!-- Filter Sidebar (hidden by default) -->
   @if (showFilters()) {
   <aside class="filter-sidebar">
@@ -135,8 +120,6 @@
     <div class="explore-header">
       <div class="header-content">
         <h1>{{ 'EXPLORE_PAGE.TITLE' | translate }}</h1>
-        <p class="user-count">{{ totalUsers() === 1 ? ('EXPLORE_PAGE.USER_FOUND' | translate: {count: totalUsers()}) :
-          ('EXPLORE_PAGE.USERS_FOUND' | translate: {count: totalUsers()}) }}</p>
       </div>
       <button class="connect-random-btn" (click)="connectRandomly()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -366,14 +349,6 @@
     }
     }
   </main>
-  }
-
-  @if (activeTab === 'community') {
-  <!-- Community Feed -->
-  <div class="community-tab-content">
-    <app-community-feed></app-community-feed>
-  </div>
-  }
 
   <!-- Profile Modal -->
   @if (selectedUser) {

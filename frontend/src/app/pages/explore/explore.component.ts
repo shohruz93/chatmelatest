@@ -11,7 +11,6 @@ import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ProfileCompletionModalComponent } from '../../components/profile-completion-modal/profile-completion-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
 import { AppVersionService } from '../../services/app-version.service';
 import { GamificationService } from '../../services/gamification.service';
 import { Capacitor } from '@capacitor/core';
@@ -38,7 +37,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, CommunityFeedComponent, UserProfileModalComponent, ProfileCompletionModalComponent],
+    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, UserProfileModalComponent, ProfileCompletionModalComponent],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -64,9 +63,6 @@ export class ExploreComponent implements OnInit, OnDestroy {
     // Pagination state
     currentOffset: number = 0;
     hasMoreUsers: boolean = true;
-
-    // Tab Navigation
-    activeTab: 'users' | 'community' = 'users';
 
     // Filters
     filterStatus: string = 'any';
