@@ -77,7 +77,14 @@ class Message {
                     'isCorrection' => (bool)$msg['is_correction']
                 ];
             }
-            unset($msg['reply_content'], $msg['reply_sender_name']);
+            
+            if (isset($msg['reactions_json']) && !empty($msg['reactions_json'])) {
+                $msg['reactions'] = json_decode($msg['reactions_json'], true);
+            } else {
+                $msg['reactions'] = new stdClass();
+            }
+            
+            unset($msg['reply_content'], $msg['reply_sender_name'], $msg['reactions_json']);
             $result[] = $msg;
         }
 
@@ -333,5 +340,71 @@ class Message {
             'url' => $relativePath,
             'type' => $type
         ]);
+    }
+
+    public function react() {
+        $json = file_get_contents("php://input");
+        $data = json_decode($json, true);
+
+        if (!isset($data['messageId']) || !isset($data['emoji']) || !isset($data['userId'])) {
+            http_response_code(400);
+            echo json_encode(["message" => "Invalid data"]);
+            return;
+        }
+
+        $messageId = $data['messageId'];
+        $emoji = $data['emoji'];
+        $userId = strval($data['userId']);
+
+        try {
+            $query = "SELECT reactions_json FROM messages WHERE id = :id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(":id", $messageId);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                http_response_code(404);
+                echo json_encode(["message" => "Message not found"]);
+                return;
+            }
+
+            $reactions = [];
+            if (!empty($row['reactions_json'])) {
+                $reactions = json_decode($row['reactions_json'], true);
+                if (!is_array($reactions)) $reactions = [];
+            }
+
+            if (!isset($reactions[$emoji])) {
+                $reactions[$emoji] = [];
+            }
+
+            $index = array_search($userId, $reactions[$emoji]);
+            if ($index !== false) {
+                array_splice($reactions[$emoji], $index, 1);
+                if (empty($reactions[$emoji])) {
+                    unset($reactions[$emoji]);
+                }
+            } else {
+                $reactions[$emoji][] = $userId;
+            }
+
+            $newReactionsJson = empty($reactions) ? null : json_encode($reactions);
+
+            $updateQuery = "UPDATE messages SET reactions_json = :reactions WHERE id = :id";
+            $updateStmt = $this->db->prepare($updateQuery);
+            $updateStmt->bindParam(":reactions", $newReactionsJson);
+            $updateStmt->bindParam(":id", $messageId);
+            
+            if ($updateStmt->execute()) {
+                echo json_encode(["message" => "Reaction updated", "reactions" => $reactions]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["message" => "Failed to update reaction"]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(["message" => "Database error. Make sure reactions_json column exists.", "error" => $e->getMessage()]);
+        }
     }
 }

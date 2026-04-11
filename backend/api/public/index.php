@@ -263,6 +263,10 @@ $router->add('POST', '/messages/upload', function() use ($message) {
     $message->uploadAttachment();
 });
 
+$router->add('POST', '/messages/react', function() use ($message) {
+    $message->react();
+});
+
 // Conversation Routes
 $router->add('GET', '/conversations', function() use ($conversation) {
     $userId = $_GET['userId'] ?? 1;
