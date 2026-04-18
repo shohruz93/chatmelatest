@@ -13,6 +13,9 @@
                 <div class="profile-avatar">
                     <img [src]="userAvatar || 'default-avatar.png'" [alt]="userDisplayName">
                     <span class="online-status-dot"></span>
+                    @if (newGuestsCount > 0) {
+                    <span class="badge guest-badge-sidebar">{{ newGuestsCount }}</span>
+                    }
                 </div>
                 <div class="profile-info">
                     <div class="profile-name">{{ userDisplayName }}</div>

@@ -56,5 +56,8 @@
     <a routerLink="/dashboard/profile" class="tab-link" [class.active]="isActive('/dashboard/profile')">
         <span class="tab-icon">👤</span>
         <span class="tab-label">{{ 'NAV.PROFILE' | translate }}</span>
+        @if (newGuestsCount() > 0) {
+        <span class="badge">{{ newGuestsCount() }}</span>
+        }
     </a>
 </nav>

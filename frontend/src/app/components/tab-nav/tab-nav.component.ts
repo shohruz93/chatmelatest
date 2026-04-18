@@ -22,6 +22,7 @@ export class TabNavComponent {
     private socketService = inject(SocketService);
     public callService = inject(CallService);
     protected unreadCount = signal(0);
+    protected newGuestsCount = signal(0);
     currentRoute = '';
 
     constructor() {
@@ -30,6 +31,7 @@ export class TabNavComponent {
         ).subscribe((event: any) => {
             this.currentRoute = event.urlAfterRedirects;
             this.checkUnread();
+            this.checkNewGuests();
         });
 
         // Real-time unread updates
@@ -38,6 +40,19 @@ export class TabNavComponent {
         });
 
         this.checkUnread();
+        this.checkNewGuests();
+    }
+
+    checkNewGuests() {
+        const user = this.auth.currentUserValue;
+        if (user) {
+            this.api.getNewGuestsCount(user.id).subscribe({
+                next: (data: any) => {
+                    this.newGuestsCount.set(data.count || 0);
+                },
+                error: () => this.newGuestsCount.set(0)
+            });
+        }
     }
 
     checkUnread() {
