@@ -1,0 +1,182 @@
+<div class="fixed inset-0 z-[100] flex flex-col bg-slate-900 text-white overflow-hidden font-sans">
+  <!-- Top Bar -->
+  <div class="flex items-center justify-between p-4 border-b border-white/10 bg-slate-800/80 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <button (click)="closeGame()" class="p-2 hover:bg-white/10 rounded-full transition-colors" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <h2 class="text-xl font-bold tracking-tight">Language Game</h2>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="flex-1 relative overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center p-4">
+    
+    <!-- Config State -->
+    <ng-container *ngIf="state === 'config'">
+      <div class="w-full max-w-md animate-fade-in flex flex-col items-center">
+        <!-- Icon Banner -->
+        <div class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-cyan-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-extrabold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Test Your Vocabulary</h1>
+        <p class="text-slate-400 text-center mb-10 text-lg">Translate words to master your skills.</p>
+        
+        <!-- Language Selectors -->
+        <div class="flex items-center justify-between w-full mb-8 bg-slate-800/60 p-4 rounded-2xl border border-white/5">
+          <div class="flex flex-col items-center flex-1">
+            <p class="text-xs text-slate-400 mb-2 uppercase tracking-wider font-semibold">Native</p>
+            <div class="relative group">
+              <select [(ngModel)]="nativeLanguage" class="appearance-none bg-slate-700 hover:bg-slate-600 text-white pl-10 pr-8 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-colors shadow-lg">
+                <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
+              </select>
+              <img [src]="getFlag(nativeLanguage)" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-sm object-cover" alt="flag">
+            </div>
+          </div>
+          
+          <button (click)="swapDirection()" class="px-3 hover:scale-110 active:scale-95 transition-transform">
+            <div class="p-3 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 3h5v5"></path><path d="M4 20h5v-5"></path>
+                <path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path>
+              </svg>
+            </div>
+          </button>
+          
+          <div class="flex flex-col items-center flex-1">
+            <p class="text-xs text-slate-400 mb-2 uppercase tracking-wider font-semibold">Learning</p>
+            <div class="relative group">
+              <select [(ngModel)]="learningLanguage" class="appearance-none bg-slate-700 hover:bg-slate-600 text-white pl-10 pr-8 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-colors shadow-lg">
+                <option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</option>
+              </select>
+              <img [src]="getFlag(learningLanguage)" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-sm object-cover" alt="flag">
+            </div>
+          </div>
+        </div>
+
+        <!-- Questions Count Slider -->
+        <div class="w-full bg-slate-800/60 p-5 rounded-2xl border border-white/5 mb-10">
+          <div class="flex justify-between mb-2">
+            <label class="text-slate-300 font-medium">Questions</label>
+            <span class="text-blue-400 font-bold bg-blue-500/10 px-3 py-0.5 rounded-full">{{ questionsCount }}</span>
+          </div>
+          <input type="range" min="5" max="20" step="1" [(ngModel)]="questionsCount" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+        </div>
+
+        <button (click)="startGame()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 active:from-blue-700 active:to-cyan-600 rounded-2xl font-bold text-lg shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:shadow-[0_10px_40px_rgba(59,130,246,0.4)] transition-all transform hover:-translate-y-1 text-white">
+          Start Game
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Loading State -->
+    <ng-container *ngIf="state === 'loading'">
+      <div class="flex flex-col items-center animate-pulse">
+        <svg class="animate-spin -ml-1 mr-3 h-12 w-12 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-xl text-slate-300">Preparing vocabulary...</p>
+      </div>
+    </ng-container>
+
+    <!-- Playing State -->
+    <ng-container *ngIf="state === 'playing'">
+      <div class="w-full max-w-lg animate-fade-in-up flex flex-col h-full">
+        <!-- Progress and Score -->
+        <div class="flex justify-between items-end mb-2 px-2">
+          <span class="text-slate-400 font-medium">Question <span class="text-white">{{ currentIndex + 1 }}</span>/{{ questions.length }}</span>
+          <span class="text-blue-400 font-bold bg-blue-500/10 px-3 py-1 rounded-lg">Score: {{ score }}</span>
+        </div>
+        <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-8">
+          <div class="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 ease-out" [style.width.%]="progressPercentage"></div>
+        </div>
+
+        <!-- Target Word Card -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 shadow-2xl rounded-3xl p-8 flex items-center justify-center min-h-[160px] mb-8 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <h2 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-300 text-center drop-shadow-lg tracking-wide">
+            {{ currentQuestion.word }}
+          </h2>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="grid grid-cols-2 gap-4 flex-1">
+          <button *ngFor="let option of currentQuestion.options; let i = index"
+            (click)="onAnswer(i)"
+            [disabled]="hasAnswered"
+            [class.shake]="shakeIncorrect && selectedIndex === i"
+            [class.border-transparent]="!hasAnswered"
+            [class.border-white]="hasAnswered && currentQuestion.correctIndex === i"
+            [ngClass]="{
+              'bg-slate-800 hover:bg-slate-700 active:bg-slate-600': !hasAnswered,
+              'bg-green-500 hover:bg-green-500 scale-[1.02] shadow-[0_0_20px_rgba(34,197,94,0.4)] z-10': hasAnswered && currentQuestion.correctIndex === i,
+              'bg-red-500/80 hover:bg-red-500/80 opacity-60': hasAnswered && selectedIndex === i && currentQuestion.correctIndex !== i,
+              'bg-slate-800/40 opacity-40': hasAnswered && selectedIndex !== i && currentQuestion.correctIndex !== i
+            }"
+            class="relative overflow-hidden rounded-2xl p-4 sm:p-6 min-h-[100px] flex items-center justify-center transition-all duration-300 border-2 shadow-lg">
+            
+            <span class="text-xl sm:text-2xl font-bold text-center {{ hasAnswered && (currentQuestion.correctIndex === i || selectedIndex === i) ? 'text-white' : 'text-slate-200' }}">
+              {{ option }}
+            </span>
+          </button>
+        </div>
+
+        <!-- Next Button -->
+        <div class="mt-8 h-16">
+          <button *ngIf="hasAnswered" (click)="nextQuestion()" class="w-full h-full bg-slate-100 hover:bg-white text-slate-900 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all animate-bounce-in flex items-center justify-center gap-2">
+            {{ currentIndex + 1 < questions.length ? 'Next Question' : 'View Results' }}
+            <svg *ngIf="currentIndex + 1 < questions.length" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Finished State -->
+    <ng-container *ngIf="state === 'finished'">
+      <div class="w-full max-w-md animate-zoom-in flex flex-col items-center bg-slate-800/40 p-8 rounded-3xl border border-slate-700 backdrop-blur-sm">
+        <svg class="w-24 h-24 mb-6 {{ (score / questions.length) >= 0.5 ? 'text-yellow-400 drop-shadow-[0_0_20px_rgba(250,204,21,0.6)]' : 'text-slate-500' }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        
+        <h2 class="text-3xl font-extrabold mb-2 text-center text-white">
+          {{ (score / questions.length) === 1 ? 'Perfect!' : (score / questions.length) >= 0.5 ? 'Good Job!' : 'Keep Practicing' }}
+        </h2>
+        <p class="text-slate-400 mb-6">You scored</p>
+        
+        <div class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-10 drop-shadow-md">
+          {{ score }} <span class="text-3xl text-slate-500">/ {{ questions.length }}</span>
+        </div>
+
+        <button (click)="resetGame()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-2xl font-bold shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-1 mb-4">
+          Play Again
+        </button>
+        <button (click)="closeGame()" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-2xl font-bold transition-all">
+          Exit Game
+        </button>
+      </div>
+    </ng-container>
+
+    <!-- Error State -->
+    <ng-container *ngIf="state === 'error'">
+      <div class="text-center">
+        <svg class="w-20 h-20 text-red-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h2 class="text-2xl font-bold mb-4">Oops!</h2>
+        <p class="text-slate-400 mb-8">Not enough words in the dictionary to start.</p>
+        <button (click)="resetGame()" class="px-8 py-3 bg-slate-700 rounded-xl hover:bg-slate-600 font-semibold transition-colors">Go Back</button>
+      </div>
+    </ng-container>
+    
+  </div>
+</div>
