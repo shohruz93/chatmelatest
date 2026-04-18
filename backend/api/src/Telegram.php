@@ -7,11 +7,17 @@ class Telegram {
     private $botToken;
     private $botUsername;
     private $apiBaseUrl = 'https://api.telegram.org/bot';
+    
+    // Admin's personal Telegram chat_id — replace this with your actual Telegram chat ID
+    // To get your chat ID: message @userinfobot on Telegram
+    private $adminTelegramChatId;
 
     public function __construct($db) {
         $this->db = $db;
         $this->botToken = getenv('TELEGRAM_BOT_TOKEN') ?: '8538925698:AAGxnUX0jqbA7-E6H6lZwUoSR8ez7rEYhN0';
         $this->botUsername = getenv('TELEGRAM_BOT_USERNAME');
+        // Admin Telegram Chat ID — set via env or hardcode your personal Telegram chat ID here
+        $this->adminTelegramChatId = getenv('ADMIN_TELEGRAM_CHAT_ID') ?: ''; 
     }
 
     private function getBotUsername() {
@@ -366,6 +372,41 @@ class Telegram {
             }
         } catch (Exception $e) {
             error_log("Error notifying new comment: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Sends a direct Telegram notification to the admin's personal Telegram
+     * when someone messages the admin (user #1) while offline.
+     * This bypasses the telegram_connections table — always reaches the admin.
+     *
+     * @param string $senderName   Name of the person who sent the message
+     * @param string $messageText  Preview of the message content
+     * @param int    $senderId     ID of the sender (for the app link)
+     */
+    public function notifyAdminOfflineMessage($senderName, $messageText, $senderId) {
+        try {
+            if (empty($this->adminTelegramChatId)) {
+                error_log("Admin Telegram Chat ID not configured. Set ADMIN_TELEGRAM_CHAT_ID env variable.");
+                return;
+            }
+
+            $safeSenderName  = $this->escapeHtml($senderName);
+            $safeMessageText = $this->escapeHtml($messageText);
+            $appLink = 'https://chatme.tj';
+
+            $now = date('H:i', time() + 18000); // UTC+5 (Tajikistan time)
+
+            $message =
+                "\u{1F514} <b>Паёми нав!</b>\n" .
+                "\u{1F464} Фиристанда: <b>$safeSenderName</b>\n" .
+                "\u{1F4AC} Паём: $safeMessageText\n" .
+                "\u{1F552} Вақт: $now\n\n" .
+                "\u{1F517} <a href=\"$appLink\">Дохил шавед ба ChatMe</a>";
+
+            $this->sendMessage($this->adminTelegramChatId, $message);
+        } catch (Exception $e) {
+            error_log("Error notifying admin via Telegram: " . $e->getMessage());
         }
     }
 }

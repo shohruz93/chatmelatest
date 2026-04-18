@@ -187,6 +187,20 @@ class Message {
 
                             $messagePreview = ($type === 'text') ? substr($content, 0, 100) : '[' . ucfirst($type) . ']';
 
+                            // If admin (user #1) is offline, send a direct Telegram notification
+                            if ((int)$data['receiverId'] === 1) {
+                                try {
+                                    $telegram = new Telegram($this->db);
+                                    $telegram->notifyAdminOfflineMessage(
+                                        $senderName ?: 'Номаълум',
+                                        $messagePreview,
+                                        $data['senderId']
+                                    );
+                                } catch (Exception $tgEx) {
+                                    error_log("Admin Telegram notify error: " . $tgEx->getMessage());
+                                }
+                            }
+
                         } catch (Exception $e) {
                             // Ignore notification errors to not break message saving
                         }
