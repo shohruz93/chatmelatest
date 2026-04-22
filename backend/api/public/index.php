@@ -194,6 +194,14 @@ $router->add('POST', '/games/win', function() use ($gameController) {
     $gameController->win();
 });
 
+$router->add('POST', '/games/reward-completion', function() use ($gameController) {
+    $gameController->rewardCompletion();
+});
+
+$router->add('POST', '/games/hint', function() use ($gameController) {
+    $gameController->useHint();
+});
+
 // Coins Routes
 require_once __DIR__ . '/../src/CoinsController.php';
 $coinsController = new CoinsController();
@@ -208,6 +216,18 @@ $router->add('GET', '/coins/transactions', function() use ($coinsController) {
 
 $router->add('POST', '/coins/send', function() use ($coinsController) {
     $coinsController->sendCoins();
+});
+
+$router->add('POST', '/coins/reward-ad', function() use ($coinsController) {
+    $coinsController->rewardAd();
+});
+
+$router->add('POST', '/coins/buy-vip', function() use ($coinsController) {
+    $coinsController->buyVip();
+});
+
+$router->add('POST', '/coins/vip-settings', function() use ($coinsController) {
+    $coinsController->updateVipSettings();
 });
 
 // Match Routes

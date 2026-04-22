@@ -123,15 +123,24 @@ class User {
     }
 
     public function getProfile($id) {
-        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin, is_vip, vip_until, hide_from_connect FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && $user['is_vip'] && $user['vip_until'] < time()) {
+            // VIP expired
+            $this->conn->query("UPDATE users SET is_vip = 0, hide_from_connect = 0 WHERE id = " . (int)$user['id']);
+            $user['is_vip'] = 0;
+            $user['hide_from_connect'] = 0;
+        }
+
+        return $user;
     }
 
     public function getByUniqueId($uniqueId) {
-        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin FROM " . $this->table_name . " WHERE unique_id = :unique_id";
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin, is_vip, vip_until, hide_from_connect FROM " . $this->table_name . " WHERE unique_id = :unique_id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":unique_id", $uniqueId);
         $stmt->execute();
@@ -207,11 +216,11 @@ class User {
              $onlineScore = "CASE WHEN last_active > (UNIX_TIMESTAMP() - 300) THEN 1 ELSE 0 END";
         }
 
-        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active, 
+        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active, is_vip,
                   ($genderScore) as gender_priority,
                   ($languageScore) as lang_score,
                   ($onlineScore) as online_priority
-                  FROM " . $this->table_name . " WHERE id != :current_user_id";
+                  FROM " . $this->table_name . " WHERE id != :current_user_id AND (hide_from_connect = 0 OR is_vip = 0)";
         
         // Appply Filters
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -287,7 +296,7 @@ class User {
         }
 
         // Calculate Total Count
-        $countQuery = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE id != :current_user_id";
+        $countQuery = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE id != :current_user_id AND (hide_from_connect = 0 OR is_vip = 0)";
         $countParams = [':current_user_id' => $currentUserId];
         
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -523,7 +532,7 @@ class User {
         // User wants "Online status priority".
         // We will build a dynamic score or WHERE clause.
         
-        $whereClauses = "u.id != :current_user_id " . $excludeSql;
+        $whereClauses = "u.id != :current_user_id AND (u.hide_from_connect = 0 OR u.is_vip = 0) " . $excludeSql;
         
         if (!empty($genderFilter) && $genderFilter !== 'any') {
             $whereClauses .= " AND u.gender = :gender";
@@ -557,7 +566,7 @@ class User {
             // $onlineScore = ...
         }
 
-        $query = "SELECT u.id, u.name, u.avatar, u.gender, u.last_active, u.email, u.bio, u.location, u.native_language, u.learning_language,
+        $query = "SELECT u.id, u.name, u.avatar, u.gender, u.last_active, u.email, u.bio, u.location, u.native_language, u.learning_language, u.is_vip,
                   ($onlineScore) as is_online
                   FROM " . $this->table_name . " u
                   WHERE $whereClauses

@@ -142,7 +142,7 @@ class GamificationController {
         }
 
         // Award rewards
-        $this->user->addCurrency($userId, $mission['reward_coins'], 'coins');
+        // $this->user->addCurrency($userId, $mission['reward_coins'], 'coins'); // Removed free coins
         $this->user->addCurrency($userId, $mission['xp_reward'], 'xp');
 
         // Transaction history recording is disabled
@@ -155,7 +155,7 @@ class GamificationController {
 
         echo json_encode([
             "message" => "Reward claimed",
-            "coins_added" => $mission['reward_coins'],
+            "coins_added" => 0, // No coins for missions
             "xp_added" => $mission['xp_reward']
         ]);
     }
@@ -233,10 +233,12 @@ class GamificationController {
                 $rewardCoins = (int)$row['reward_coins'];
                 $rewardXp    = (int)$row['xp_reward'];
                 
+                /* 
                 if ($rewardCoins > 0) {
                     $userObj->addCurrency($userId, $rewardCoins, 'coins');
                     // Transaction history recording is disabled
                 }
+                */
                 
                 if ($rewardXp > 0) {
                     $userObj->addCurrency($userId, $rewardXp, 'xp');
@@ -248,11 +250,11 @@ class GamificationController {
                     $notification = new Notification($conn);
                     $notifTitle = "🎉 Миссия пурра шуд!";
                     $notifBody  = "«" . $row['title'] . "»";
-                    if ($rewardCoins > 0) $notifBody .= " +{$rewardCoins} 🪙";
+                    // if ($rewardCoins > 0) $notifBody .= " +{$rewardCoins} 🪙"; // Removed coin info from notif
                     if ($rewardXp > 0)    $notifBody .= " +{$rewardXp} XP";
                     $notification->send($userId, $notifTitle, $notifBody, [
                         'type'    => 'mission_completed',
-                        'coins'   => (string)$rewardCoins,
+                        'coins'   => "0",
                         'xp'      => (string)$rewardXp,
                         'mission' => $row['title']
                     ]);

@@ -202,6 +202,126 @@ class CoinsController {
     }
 
     /**
+     * POST /coins/reward-ad
+     * Award coins for watching an ad
+     */
+    public function rewardAd() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        // Amount of coins to award for one ad
+        $rewardAmount = 3; 
+
+        if ($this->user->addCurrency($userId, $rewardAmount, 'coins')) {
+            $updatedProfile = $this->user->getProfile($userId);
+            echo json_encode([
+                "success" => true,
+                "message" => "Rewarded $rewardAmount coins",
+                "coins_added" => $rewardAmount,
+                "current_coins" => (int)$updatedProfile['coins']
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to award coins"]);
+        }
+    }
+
+    /**
+     * POST /coins/buy-vip
+     * Upgrade user to VIP (costs coins)
+     */
+    public function buyVip() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $months = (int)($data['months'] ?? 1);
+        $cost = $months * 30; // 30 coins per month
+
+        $profile = $this->user->getProfile($userId);
+        if (!$profile || $profile['coins'] < $cost) {
+            http_response_code(400);
+            echo json_encode(["error" => "Insufficient coins"]);
+            return;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            // Deduct coins
+            $this->user->addCurrency($userId, -$cost, 'coins');
+
+            // Set VIP status
+            $duration = $months * 30 * 24 * 60 * 60; // seconds
+            $newVipUntil = max(time(), (int)($profile['vip_until'] ?? 0)) + $duration;
+
+            $query = "UPDATE users SET is_vip = 1, vip_until = :until WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([':until' => $newVipUntil, ':id' => $userId]);
+
+            $this->conn->commit();
+
+            echo json_encode([
+                "success" => true,
+                "message" => "VIP activated until " . date('Y-m-d H:i:s', $newVipUntil),
+                "vip_until" => $newVipUntil,
+                "current_coins" => (int)($profile['coins'] - $cost)
+            ]);
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to purchase VIP"]);
+        }
+    }
+
+    /**
+     * POST /coins/vip-settings
+     * Toggle hide_from_connect
+     */
+    public function updateVipSettings() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $hide = (int)($data['hide_from_connect'] ?? 0);
+
+        $profile = $this->user->getProfile($userId);
+        if (!$profile || !$profile['is_vip']) {
+            http_response_code(403);
+            echo json_encode(["error" => "Only VIP users can change this setting"]);
+            return;
+        }
+
+        $query = "UPDATE users SET hide_from_connect = :hide WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        if ($stmt->execute([':hide' => $hide, ':id' => $userId])) {
+            echo json_encode(["success" => true, "hide_from_connect" => $hide]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to update settings"]);
+        }
+    }
+
+    /**
      * Extract User ID from Bearer Token
      */
     private function getUserIdFromToken($headers) {

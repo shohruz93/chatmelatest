@@ -97,6 +97,74 @@ class GameController {
         ]);
     }
 
+    // POST /games/reward-completion
+    public function rewardCompletion() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["message" => "Unauthorized"]);
+            return;
+        }
+
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->score)) {
+            http_response_code(400);
+            echo json_encode(["message" => "Missing score"]);
+            return;
+        }
+
+        $score = intval($data->score);
+        $coins = 0;
+        if ($score >= 90) {
+            $coins = 1;
+            $this->user->addCurrency($userId, $coins, 'coins');
+            $this->logTransaction(0, $userId, $coins, 'game_reward', "Reward for high score: " . $score . "%");
+        }
+        
+        $xp = 5;
+        $this->user->addCurrency($userId, $xp, 'xp');
+
+        $profile = $this->user->getProfile($userId);
+
+        echo json_encode([
+            "message" => "Reward processed",
+            "coins_added" => $coins,
+            "xp_added" => $xp,
+            "current_coins" => $profile['coins']
+        ]);
+    }
+
+    // POST /games/hint
+    public function useHint() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["message" => "Unauthorized"]);
+            return;
+        }
+
+        $cost = 1;
+        $profile = $this->user->getProfile($userId);
+        if (!$profile || $profile['coins'] < $cost) {
+            http_response_code(400);
+            echo json_encode(["message" => "Insufficient coins"]);
+            return;
+        }
+
+        $this->user->addCurrency($userId, -$cost, 'coins');
+        $this->logTransaction($userId, 0, $cost, 'game_hint', "Used hint in game");
+
+        $profile = $this->user->getProfile($userId);
+        echo json_encode([
+            "message" => "Hint purchased",
+            "current_coins" => $profile['coins']
+        ]);
+    }
+
     /**
      * Log a coin transaction
      */
