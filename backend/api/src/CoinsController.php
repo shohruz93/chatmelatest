@@ -248,7 +248,7 @@ class CoinsController {
 
         $data = json_decode(file_get_contents("php://input"), true);
         $months = (int)($data['months'] ?? 1);
-        $cost = $months * 30; // 30 coins per month
+        $cost = ($months >= 6) ? 150 : ($months * 30); // Discount for 6 months
 
         $profile = $this->user->getProfile($userId);
         if (!$profile || $profile['coins'] < $cost) {

@@ -160,6 +160,7 @@ class GameController {
 
         $profile = $this->user->getProfile($userId);
         echo json_encode([
+            "success" => true,
             "message" => "Hint purchased",
             "current_coins" => $profile['coins']
         ]);
