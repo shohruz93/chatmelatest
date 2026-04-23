@@ -19,6 +19,7 @@ class Conversation {
                 u.name as partner_name, 
                 u.avatar as partner_avatar, 
                 u.last_active as partner_last_active,
+                u.is_vip as partner_is_vip,
                 m.content as last_message, 
                 m.created_at as last_message_time,
                 m.sender_id as last_message_sender_id,

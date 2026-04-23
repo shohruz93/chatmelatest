@@ -161,6 +161,7 @@ class CommunityController {
                    u.avatar as user_avatar,
                    u.native_language,
                    u.learning_language,
+                   u.is_vip,
                    CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
                    CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_following
             FROM community_posts cp
@@ -209,6 +210,7 @@ class CommunityController {
                    u.avatar as user_avatar,
                    u.native_language,
                    u.learning_language,
+                   u.is_vip,
                    CASE WHEN cr.id IS NOT NULL THEN 1 ELSE 0 END as user_liked,
                    CASE WHEN f.id IS NOT NULL THEN 1 ELSE 0 END as is_following
             FROM community_posts cp
@@ -331,7 +333,7 @@ class CommunityController {
         $stmt->execute([$postId]);
 
         // Get user info and post author info
-        $stmt = $this->db->prepare("SELECT u.name, u.avatar, cp.user_id as author_id 
+        $stmt = $this->db->prepare("SELECT u.name, u.avatar, u.is_vip, cp.user_id as author_id 
                                     FROM users u, community_posts cp 
                                     WHERE u.id = ? AND cp.id = ?");
         $stmt->execute([$userId, $postId]);
@@ -358,6 +360,7 @@ class CommunityController {
                 'user_id' => $userId,
                 'user_name' => $info['name'],
                 'user_avatar' => $info['avatar'],
+                'is_vip' => $info['is_vip'],
                 'content' => $content,
                 'created_at' => $now
             ]
@@ -371,7 +374,7 @@ class CommunityController {
         $offset = ($page - 1) * $limit;
         
         $stmt = $this->db->prepare("
-            SELECT cc.*, u.name as user_name, u.avatar as user_avatar
+            SELECT cc.*, u.name as user_name, u.avatar as user_avatar, u.is_vip
             FROM community_comments cc
             JOIN users u ON cc.user_id = u.id
             WHERE cc.post_id = ?
