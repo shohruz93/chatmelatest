@@ -220,7 +220,7 @@ class User {
                   ($genderScore) as gender_priority,
                   ($languageScore) as lang_score,
                   ($onlineScore) as online_priority
-                  FROM " . $this->table_name . " WHERE id != :current_user_id AND (hide_from_connect = 0 OR is_vip = 0)";
+                  FROM " . $this->table_name . " WHERE id != :current_user_id AND hide_from_connect = 0";
         
         // Appply Filters
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -296,7 +296,7 @@ class User {
         }
 
         // Calculate Total Count
-        $countQuery = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE id != :current_user_id AND (hide_from_connect = 0 OR is_vip = 0)";
+        $countQuery = "SELECT COUNT(*) as total FROM " . $this->table_name . " WHERE id != :current_user_id AND hide_from_connect = 0";
         $countParams = [':current_user_id' => $currentUserId];
         
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -532,7 +532,7 @@ class User {
         // User wants "Online status priority".
         // We will build a dynamic score or WHERE clause.
         
-        $whereClauses = "u.id != :current_user_id AND (u.hide_from_connect = 0 OR u.is_vip = 0) " . $excludeSql;
+        $whereClauses = "u.id != :current_user_id AND u.hide_from_connect = 0 " . $excludeSql;
         
         if (!empty($genderFilter) && $genderFilter !== 'any') {
             $whereClauses .= " AND u.gender = :gender";

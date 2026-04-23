@@ -375,7 +375,7 @@ class Profile {
         }
 
         try {
-            $query = "SELECT u.id, u.name, u.avatar, u.bio, pv.viewed_at 
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.is_vip, pv.viewed_at 
                       FROM profile_views pv 
                       JOIN users u ON pv.viewer_id = u.id 
                       WHERE pv.viewed_id = ? 
@@ -702,7 +702,7 @@ class Profile {
 
     public function getFollowers($userId) {
         try {
-            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, f.created_at as followed_at
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, u.is_vip, f.created_at as followed_at
                       FROM follows f
                       JOIN users u ON f.follower_id = u.id
                       WHERE f.followed_id = :user_id
@@ -733,7 +733,7 @@ class Profile {
 
     public function getFollowing($userId) {
         try {
-            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, f.created_at as followed_at
+            $query = "SELECT u.id, u.name, u.avatar, u.bio, u.gender, u.location, u.unique_id, u.last_active, u.is_vip, f.created_at as followed_at
                       FROM follows f
                       JOIN users u ON f.followed_id = u.id
                       WHERE f.follower_id = :user_id

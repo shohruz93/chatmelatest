@@ -183,7 +183,7 @@ class CommunityController {
         // Get recent comments for each post (max 2)
         foreach ($posts as &$post) {
             $stmt = $this->db->prepare("
-                SELECT cc.*, u.name as user_name, u.avatar as user_avatar
+                SELECT cc.*, u.name as user_name, u.avatar as user_avatar, u.is_vip
                 FROM community_comments cc
                 JOIN users u ON cc.user_id = u.id
                 WHERE cc.post_id = ?
