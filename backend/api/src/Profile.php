@@ -403,7 +403,7 @@ class Profile {
 
     public function getComments($userId) {
         // Get ratings/comments
-        $query = "SELECT ur.*, u.name as rater_name, u.avatar as rater_avatar 
+        $query = "SELECT ur.*, u.name as rater_name, u.avatar as rater_avatar, u.is_vip as rater_is_vip 
                   FROM user_ratings ur 
                   JOIN users u ON ur.rater_id = u.id 
                   WHERE ur.rated_id = :user_id 
@@ -423,7 +423,7 @@ class Profile {
             }
 
             // Get replies
-            $query = "SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar 
+            $query = "SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar, u.is_vip as replier_is_vip 
                       FROM comment_replies cr 
                       JOIN users u ON cr.user_id = u.id 
                       WHERE cr.rating_id = :rating_id 

@@ -339,7 +339,7 @@ class User {
         $myInterests = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         // Prepare optional WHERE clauses for filters
-        $extraWhere = '';
+        $extraWhere = ' AND u.hide_from_connect = 0';
         $params = [];
         if (!empty($genderFilter) && $genderFilter !== 'any') {
             $extraWhere .= " AND u.gender = :gender";
@@ -368,7 +368,7 @@ class User {
             $inQuery = implode(',', array_fill(0, count($myInterests), '?'));
 
             $sql = "
-                SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language,
+                SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language, u.is_vip,
                        COUNT(ui.interest_id) as shared_count
                 FROM users u
                 JOIN user_interests ui ON u.id = ui.user_id
@@ -421,7 +421,7 @@ class User {
             $langWhere = ' AND (' . implode(' OR ', $langConditions) . ')';
         }
 
-        $finalSql = "SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language
+        $finalSql = "SELECT u.id, u.name, u.avatar, u.gender, u.location, u.bio, u.native_language, u.learning_language, u.is_vip
                      FROM users u
                      WHERE $whereClauses $langWhere
                      ORDER BY RAND()
