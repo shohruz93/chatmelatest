@@ -11,6 +11,10 @@ export interface User {
   is_admin: number; // 0 or 1
   avatar?: string;
   gender?: string;
+  coins?: number;
+  xp?: number;
+  is_vip?: number;
+  vip_until?: number;
   status?: string;
   created_at: string;
   last_active: number | string | null;
@@ -103,5 +107,13 @@ export class AdminService {
 
   deleteCommunityPost(postId: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/community/posts/delete`, { post_id: postId });
+  }
+
+  addCoins(userId: number, amount: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/coins`, { user_id: userId, amount });
+  }
+
+  toggleVip(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/users/toggle-vip`, { user_id: userId });
   }
 }

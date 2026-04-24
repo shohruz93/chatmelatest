@@ -68,7 +68,7 @@ class AdminController {
             $sortBy = 'created_at';
         }
 
-        $query = "SELECT id, name, first_name, family_name, email, is_admin, status, gender, avatar, created_at, last_active FROM users";
+        $query = "SELECT id, name, first_name, family_name, email, is_admin, is_vip, vip_until, coins, xp, status, gender, avatar, created_at, last_active FROM users";
         $countQuery = "SELECT COUNT(*) as count FROM users";
         
         $conditions = [];
@@ -194,6 +194,65 @@ class AdminController {
         } else {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to update admin status']);
+        }
+    }
+
+    public function addCoins() {
+        $data = json_decode(file_get_contents("php://input"));
+        
+        if (!isset($data->user_id) || !isset($data->amount)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User ID and amount required']);
+            return;
+        }
+
+        if ($this->user->addCurrency($data->user_id, $data->amount, 'coins')) {
+            echo json_encode(['message' => 'Coins updated successfully']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update coins']);
+        }
+    }
+
+    public function toggleVip() {
+        $data = json_decode(file_get_contents("php://input"));
+        
+        if (!isset($data->user_id)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User ID required']);
+            return;
+        }
+
+        // Get current VIP status
+        $stmt = $this->db->prepare("SELECT is_vip FROM users WHERE id = :id");
+        $stmt->bindParam(":id", $data->user_id);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            http_response_code(404);
+            echo json_encode(['error' => 'User not found']);
+            return;
+        }
+
+        $isVip = $user['is_vip'] ? 0 : 1;
+        $vipUntil = $isVip ? (time() + (30 * 24 * 60 * 60)) : 0; // Default 30 days if enabling
+
+        $query = "UPDATE users SET is_vip = :is_vip, vip_until = :vip_until WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":is_vip", $isVip);
+        $stmt->bindParam(":vip_until", $vipUntil);
+        $stmt->bindParam(":id", $data->user_id);
+
+        if ($stmt->execute()) {
+            echo json_encode([
+                'message' => $isVip ? 'VIP activated' : 'VIP deactivated',
+                'is_vip' => $isVip,
+                'vip_until' => $vipUntil
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update VIP status']);
         }
     }
 

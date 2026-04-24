@@ -93,6 +93,7 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                                     </div>
                                 </div>
                                 <span *ngIf="user.is_admin" class="absolute -bottom-1 -right-1 w-5 h-5 bg-indigo-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-[#151921]" title="Admin">★</span>
+                                <span *ngIf="user.is_vip" class="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-[#151921]" title="VIP">💎</span>
                             </div>
                             <div>
                                <div class="font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ user.name }}</div>
@@ -189,6 +190,9 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                                     <button (click)="setActiveTab('activity')" 
                                         [class]="activeTab === 'activity' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
                                         class="pb-4 font-bold text-sm border-b-2 transition-colors">Activity Logs</button>
+                                    <button (click)="setActiveTab('coins')" 
+                                        [class]="activeTab === 'coins' ? 'border-blue-600 text-blue-600 dark:text-blue-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'"
+                                        class="pb-4 font-bold text-sm border-b-2 transition-colors">Coins & VIP</button>
                                 </div>
                             </div>
                             
@@ -394,6 +398,69 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                                     </div>
                                 </div>
 
+                                <!-- Coins & VIP Tab -->
+                                <div *ngIf="activeTab === 'coins'" class="space-y-8 animate-fade-in-up">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="p-6 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                                            <div class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-2">Current Coins</div>
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white text-xl">🪙</div>
+                                                <div class="text-3xl font-black text-slate-800 dark:text-white">{{ userDetails.coins || 0 }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="p-6 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20">
+                                            <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-2">User Level</div>
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xl">⭐</div>
+                                                <div class="text-3xl font-black text-slate-800 dark:text-white">{{ calculateLevel(userDetails.xp) }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add/Remove Coins -->
+                                    <div class="bg-slate-50 dark:bg-slate-800/30 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800">
+                                        <h4 class="text-lg font-black text-slate-800 dark:text-white mb-4">Manage Coins</h4>
+                                        <div class="flex gap-4">
+                                            <div class="relative flex-1">
+                                                <input type="number" [(ngModel)]="coinAmount" placeholder="Amount (e.g. 100 or -50)" 
+                                                    class="w-full pl-4 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#151921] text-slate-800 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                                            </div>
+                                            <button (click)="adjustCoins()" [disabled]="!coinAmount"
+                                                class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/20">
+                                                Update
+                                            </button>
+                                        </div>
+                                        <p class="text-xs text-slate-500 mt-3">Enter a positive number to add coins, or negative to subtract.</p>
+                                    </div>
+
+                                    <!-- VIP Status -->
+                                    <div class="bg-white dark:bg-[#151921] p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <div>
+                                                <h4 class="text-lg font-black text-slate-800 dark:text-white">VIP Membership</h4>
+                                                <p class="text-sm text-slate-500">Enable premium features for this user.</p>
+                                            </div>
+                                            <div [class]="userDetails.is_vip ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'" 
+                                                 class="px-4 py-1.5 rounded-full text-white text-xs font-black uppercase tracking-widest">
+                                                {{ userDetails.is_vip ? 'Active' : 'Inactive' }}
+                                            </div>
+                                        </div>
+
+                                        <div *ngIf="userDetails.is_vip" class="mb-6 p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
+                                            <div class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">Expires On</div>
+                                            <div class="text-lg font-bold text-slate-800 dark:text-white">
+                                                {{ userDetails.vip_until | unixDate:'full' }}
+                                            </div>
+                                        </div>
+
+                                        <button (click)="toggleVip()" 
+                                            [class]="userDetails.is_vip ? 'bg-rose-50 text-rose-600 hover:bg-rose-100 border-rose-200' : 'bg-amber-50 text-amber-600 hover:bg-amber-100 border-amber-200'"
+                                            class="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest border transition-all">
+                                            {{ userDetails.is_vip ? 'Deactivate VIP' : 'Activate VIP (30 Days)' }}
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                             
                             <ng-template #loadingDetails>
@@ -433,6 +500,7 @@ export class AdminUsersComponent implements OnInit {
     isEditing: boolean = false;
     editForm: any = {};
     activeTab: string = 'overview';
+    coinAmount: number | null = null;
 
     private observer: IntersectionObserver | null = null;
 
@@ -640,6 +708,48 @@ export class AdminUsersComponent implements OnInit {
                     this.selectedUser.is_admin = !this.selectedUser.is_admin;
                     if (this.userDetails) this.userDetails.is_admin = !this.userDetails.is_admin;
                 }
+            });
+        }
+    }
+
+    calculateLevel(xp: number): number {
+        if (!xp) return 1;
+        return Math.floor(Math.sqrt(xp / 100)) + 1;
+    }
+
+    adjustCoins() {
+        if (!this.coinAmount || !this.selectedUser) return;
+        
+        this.adminService.addCoins(this.selectedUser.id, this.coinAmount).subscribe({
+            next: () => {
+                if (this.userDetails) {
+                    this.userDetails.coins = (this.userDetails.coins || 0) + this.coinAmount!;
+                }
+                this.coinAmount = null;
+                this.loadUsers();
+            },
+            error: (err) => alert('Failed to update coins')
+        });
+    }
+
+    toggleVip() {
+        if (!this.selectedUser) return;
+        
+        const action = this.userDetails.is_vip ? 'deactivate' : 'activate';
+        if (confirm(`Are you sure you want to ${action} VIP for this user?`)) {
+            this.adminService.toggleVip(this.selectedUser.id).subscribe({
+                next: (res: any) => {
+                    if (this.userDetails) {
+                        this.userDetails.is_vip = res.is_vip;
+                        this.userDetails.vip_until = res.vip_until;
+                    }
+                    if (this.selectedUser) {
+                        this.selectedUser.is_vip = res.is_vip;
+                        this.selectedUser.vip_until = res.vip_until;
+                    }
+                    this.loadUsers();
+                },
+                error: (err) => alert('Failed to update VIP status')
             });
         }
     }
