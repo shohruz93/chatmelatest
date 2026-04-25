@@ -215,14 +215,14 @@ class CoinsController {
             return;
         }
 
-        // Check cooldown: 30 minutes (1800 seconds)
-        $query = "SELECT created_at FROM coin_transactions WHERE receiver_id = :user_id AND type = 'ad_reward' ORDER BY created_at DESC LIMIT 1";
+        // Check cooldown from users table (using last_ad_reward column)
+        $query = "SELECT last_ad_reward FROM users WHERE id = :user_id";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([':user_id' => $userId]);
-        $lastAd = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($lastAd) {
-            $lastTime = strtotime($lastAd['created_at']);
+        if ($user && $user['last_ad_reward']) {
+            $lastTime = strtotime($user['last_ad_reward']);
             $now = time();
             if (($now - $lastTime) < 1800) {
                 // Cooldown active
@@ -234,12 +234,11 @@ class CoinsController {
 
         $rewardAmount = 3; 
 
-        if ($this->user->addCurrency($userId, $rewardAmount, 'coins')) {
-            // Log transaction to enforce cooldown
-            $logQuery = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note) VALUES (0, :user_id, :amount, 'ad_reward', 'Watched Monetag Ad')";
-            $logStmt = $this->conn->prepare($logQuery);
-            $logStmt->execute([':user_id' => $userId, ':amount' => $rewardAmount]);
-
+        // Update coins and last_ad_reward timestamp
+        $updateQuery = "UPDATE users SET coins = coins + :amount, last_ad_reward = NOW() WHERE id = :user_id";
+        $updateStmt = $this->conn->prepare($updateQuery);
+        
+        if ($updateStmt->execute([':amount' => $rewardAmount, ':user_id' => $userId])) {
             echo "OK";
         } else {
             http_response_code(500);
@@ -248,9 +247,56 @@ class CoinsController {
     }
 
     /**
-     * POST /coins/buy-vip
-     * Upgrade user to VIP (costs coins)
+     * POST /coins/claim-reward
+     * Manually claim 3 coins (30 min cooldown)
      */
+    public function claimReward() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        // Check cooldown from users table (using last_ad_reward column)
+        $query = "SELECT last_ad_reward FROM users WHERE id = :user_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':user_id' => $userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && $user['last_ad_reward']) {
+            $lastTime = strtotime($user['last_ad_reward']);
+            $now = time();
+            $diff = $now - $lastTime;
+            if ($diff < 1800) {
+                http_response_code(429);
+                echo json_encode([
+                    "error" => "Cooldown active",
+                    "remaining" => 1800 - $diff
+                ]);
+                return;
+            }
+        }
+
+        $rewardAmount = 3; 
+
+        // Update coins and last_ad_reward timestamp
+        $updateQuery = "UPDATE users SET coins = coins + :amount, last_ad_reward = NOW() WHERE id = :user_id";
+        $updateStmt = $this->conn->prepare($updateQuery);
+        
+        if ($updateStmt->execute([':amount' => $rewardAmount, ':user_id' => $userId])) {
+            echo json_encode([
+                "success" => true,
+                "message" => "Reward claimed!",
+                "amount" => $rewardAmount
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to claim reward"]);
+        }
+    }
     public function buyVip() {
         $headers = getallheaders();
         $userId = $this->getUserIdFromToken($headers);

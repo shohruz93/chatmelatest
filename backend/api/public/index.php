@@ -230,6 +230,10 @@ $router->add('POST', '/coins/vip-settings', function() use ($coinsController) {
     $coinsController->updateVipSettings();
 });
 
+$router->add('POST', '/coins/claim-reward', function() use ($coinsController) {
+    $coinsController->claimReward();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

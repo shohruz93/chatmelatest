@@ -16,7 +16,6 @@ import { interval, Subscription, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OnDestroy } from '@angular/core';
 
-import { TelegramService } from '../../services/telegram.service';
 import { GamificationService } from '../../services/gamification.service';
 import { WalletComponent } from '../../components/gamification/wallet/wallet.component';
 import { MissionsComponent } from '../../components/gamification/missions/missions.component';
@@ -37,7 +36,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     private countryService = inject(CountryService);
-    private telegramService = inject(TelegramService);
     private gameService = inject(GamificationService);
     private galleryService = inject(GalleryService);
     private languageService = inject(LanguageService);
@@ -45,7 +43,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private appVersionService = inject(AppVersionService);
 
     private destroy$ = new Subject<void>();
-    private telegramPollSubscription: Subscription | null = null;
 
     isWeb = false;
     downloadUrls: { android: string | null; ios: string | null } = { android: null, ios: null };
@@ -74,17 +71,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     // Bio character limit
     bioMaxLength: number = 500;
-
-    // Telegram Integration
-    telegramConnected: boolean = false;
-    telegramUsername: string = '';
-    telegramNotificationsEnabled: boolean = true;
-    telegramLoading: boolean = false;
-    telegramConnectionCode: string = '';
-    telegramDeepLink: string = '';
-    showTelegramConnect: boolean = false;
-    telegramBotName: string = '';
-    telegramPollingActive: boolean = false;
 
     // Rating & Comment Inputs
     newRating: number = 0;
@@ -240,8 +226,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 if (!this.isOwnProfile && this.currentUser) {
                     this.api.recordView(this.currentUser.id, userId).subscribe();
                 } else if (this.isOwnProfile) {
-                    this.checkTelegramStatus();
-
                     // Check for edit query parameter
                     this.route.queryParams.subscribe(queryParams => {
                         if (queryParams['edit'] === 'true') {
@@ -710,135 +694,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
         });
     }
 
-    // Telegram Methods
-    checkTelegramStatus() {
-        if (!this.currentUser?.id) return;
-
-        this.telegramLoading = true;
-        this.telegramService.getStatus(this.currentUser.id).subscribe({
-            next: (status) => {
-                this.telegramConnected = status.connected;
-                this.telegramUsername = status.telegramUsername || '';
-                this.telegramNotificationsEnabled = status.notificationsEnabled || false;
-                this.telegramLoading = false;
-            },
-            error: (err) => {
-                console.error('Failed to check Telegram status', err);
-                this.telegramLoading = false;
-            }
-        });
-    }
-
-    generateTelegramCode() {
-        this.telegramLoading = true;
-
-        this.telegramService.generateCode(this.currentUser.id).subscribe({
-            next: (res) => {
-                if (res.success) {
-                    this.telegramConnectionCode = res.code;
-                    this.telegramDeepLink = res.deepLink;
-                    this.telegramBotName = res.botUsername;
-                    this.showTelegramConnect = true;
-
-                    this.startTelegramPolling();
-                }
-                this.telegramLoading = false;
-            },
-            error: (err) => {
-                console.error('Failed to generate code', err);
-                alert('Failed to generate connection code. Please try again.');
-                this.telegramLoading = false;
-            }
-        });
-    }
-
-    private startTelegramPolling() {
-        if (this.telegramPollingActive) return;
-
-        this.telegramPollingActive = true;
-        let pollCount = 0;
-        const maxPolls = 60;
-
-        this.telegramPollSubscription = interval(2000)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(() => {
-                pollCount++;
-
-                if (pollCount > maxPolls) {
-                    this.stopTelegramPolling();
-                    return;
-                }
-
-                this.telegramService.getStatus(this.currentUser.id).subscribe({
-                    next: (status) => {
-                        if (status.connected) {
-                            this.telegramConnected = status.connected;
-                            this.telegramUsername = status.telegramUsername || '';
-                            this.telegramNotificationsEnabled = status.notificationsEnabled || false;
-                            this.showTelegramConnect = false;
-                            this.stopTelegramPolling();
-                        }
-                    },
-                    error: (err) => {
-                        console.error('Error polling Telegram status', err);
-                    }
-                });
-            });
-    }
-
-    private stopTelegramPolling() {
-        if (this.telegramPollSubscription) {
-            this.telegramPollSubscription.unsubscribe();
-            this.telegramPollSubscription = null;
-        }
-        this.telegramPollingActive = false;
-    }
-
-    toggleTelegramConnectModal() {
-        if (this.showTelegramConnect) {
-            this.showTelegramConnect = false;
-            this.stopTelegramPolling();
-            this.checkTelegramStatus();
-        } else {
-            this.generateTelegramCode();
-        }
-    }
-
-    disconnectTelegram() {
-        if (!confirm('Are you sure you want to disconnect Telegram notifications?')) return;
-
-        this.telegramLoading = true;
-        this.telegramService.disconnect(this.currentUser.id).subscribe({
-            next: (res) => {
-                this.telegramConnected = false;
-                this.telegramUsername = '';
-                this.telegramNotificationsEnabled = false;
-                this.telegramLoading = false;
-                alert('Telegram disconnected successfully.');
-            },
-            error: (err) => {
-                console.error('Failed to disconnect Telegram', err);
-                alert('Failed to disconnect Telegram.');
-                this.telegramLoading = false;
-            }
-        });
-    }
-
-    toggleTelegramNotifications() {
-        // Optimistic update
-        const newState = !this.telegramNotificationsEnabled;
-        this.telegramNotificationsEnabled = newState;
-
-        this.telegramService.toggleNotifications(this.currentUser.id, newState).subscribe({
-            error: (err) => {
-                // Revert on error
-                this.telegramNotificationsEnabled = !newState;
-                console.error('Failed to toggle notifications', err);
-                alert('Failed to update notification settings.');
-            }
-        });
-    }
-
     // Tab Navigation
     setActiveTab(tab: 'missions' | 'rates' | 'gallery') {
         this.activeTab = tab;
@@ -967,6 +822,5 @@ export class ProfileComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
-        this.stopTelegramPolling();
     }
 }

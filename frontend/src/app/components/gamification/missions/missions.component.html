@@ -6,12 +6,11 @@
         style="margin: 0 0 1.5rem 0; padding: 1rem; text-align: center; border-radius: 12px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05)); border: 1px solid rgba(255, 215, 0, 0.3);">
         <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: #d4af37; font-size: 1.1rem;">{{ 'COINS.EARN_FREE_COINS'
             | translate }}</h4>
-        <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 0.8rem;">Watch a short video ad to earn free coins
-            instantly!</p>
+        <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 0.8rem;">Claim your free coins every 30 minutes!</p>
         <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading"
             style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 250px; margin: 0 auto; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; font-weight: bold; border-radius: 8px; padding: 0.6rem;">
-            <span class="material-icons" style="font-size: 1.2rem;">{{ adLoading ? 'timer' : 'play_circle' }}</span>
-            {{ adLoading ? 'Next ad in ' + cooldownRemaining() : 'Watch Ad (+3 🪙)' }}
+            <span class="material-icons" style="font-size: 1.2rem;">{{ adLoading ? 'timer' : 'card_giftcard' }}</span>
+            {{ adLoading ? 'Next reward in ' + cooldownRemaining() : 'Claim Coins (+3 🪙)' }}
         </button>
     </div>
 </div>

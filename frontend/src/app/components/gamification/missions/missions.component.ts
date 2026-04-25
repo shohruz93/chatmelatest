@@ -114,28 +114,29 @@ export class MissionsComponent implements OnInit {
     watchAd() {
         if (this.adLoading) return;
         
-        // Save time for UI cooldown
-        localStorage.setItem('last_ad_watch_time', Date.now().toString());
-        this.checkAdCooldown();
-
-        // Get Current User ID
-        const userStr = localStorage.getItem('user');
-        let userId = '';
-        if (userStr) {
-            try {
-                const user = JSON.parse(userStr);
-                userId = user.id;
-            } catch(e) {}
-        }
-        
-        // Open the Direct Link in a new tab with User ID for S2S Postback
-        window.open(`https://omg10.com/4/10923391?var=${userId}`, '_blank');
-
-        alert('Watch the ad in the new tab. The system will process it and add your coins shortly!');
-        
-        // Check balance after 15 seconds to see if S2S arrived
-        setTimeout(() => {
-            this.gameService.getBalance().subscribe();
-        }, 15000);
+        this.adLoading = true;
+        this.gameService.claimReward().subscribe({
+            next: (res) => {
+                alert('Success! You claimed 3 coins.');
+                // Save time for UI cooldown
+                localStorage.setItem('last_ad_watch_time', Date.now().toString());
+                this.checkAdCooldown();
+            },
+            error: (err) => {
+                this.adLoading = false;
+                if (err.status === 429) {
+                    alert('Please wait for the cooldown to finish.');
+                    // Sync cooldown if possible
+                    if (err.error?.remaining) {
+                        const lastTime = Date.now() - (1800 - err.error.remaining) * 1000;
+                        localStorage.setItem('last_ad_watch_time', lastTime.toString());
+                        this.checkAdCooldown();
+                    }
+                } else {
+                    console.error('Failed to claim reward', err);
+                    alert('Failed to claim reward. Please try again later.');
+                }
+            }
+        });
     }
 }
