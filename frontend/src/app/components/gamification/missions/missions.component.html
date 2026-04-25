@@ -1,41 +1,17 @@
 <div class="missions-container">
     <h3 class="missions-title">{{ 'MISSIONS.TITLE' | translate }}</h3>
-    <div class="missions-list">
-        <div *ngFor="let mission of missions()" class="mission-card" [class.claimed]="mission.status === 'claimed'">
 
-            <div class="mission-icon emoji-icon">
-                {{ getMissionIcon(mission) }}
-            </div>
-
-            <div class="mission-content">
-                <div class="mission-header">
-                    <span class="mission-title">{{mission.title}}</span>
-                    <span class="mission-rewards">
-                        <span class="reward-pill coin">+{{mission.reward_coins}} <span
-                                class="coin-icon">🪙</span></span>
-                        <span class="reward-pill xp">+{{mission.xp_reward}} XP</span>
-                    </span>
-                </div>
-                <p class="mission-desc">{{mission.description}}</p>
-
-                <div class="mission-progress" *ngIf="mission.status !== 'claimed'">
-                    <div class="progress-track">
-                        <div class="progress-bar" [style.width.%]="getProgressPercent(mission)"></div>
-                    </div>
-                    <span class="progress-text">{{mission.progress || 0}}/{{mission.condition_value}}</span>
-                </div>
-            </div>
-
-            <div class="mission-status-badge">
-                <span *ngIf="mission.status === 'claimed'" class="status-claimed">✅ {{ 'MISSIONS.STATUS_DONE' |
-                    translate }}</span>
-                <span *ngIf="mission.status === 'active'" class="status-active">{{ 'MISSIONS.STATUS_ACTIVE' | translate
-                    }}</span>
-            </div>
-        </div>
-
-        <div *ngIf="missions().length === 0" class="no-missions">
-            <p>{{ 'MISSIONS.NO_MISSIONS' | translate }}</p>
-        </div>
+    <!-- Earn Coins (Rewarded Ad Section) -->
+    <div class="earn-coins-section glass-panel"
+        style="margin: 0 0 1.5rem 0; padding: 1rem; text-align: center; border-radius: 12px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05)); border: 1px solid rgba(255, 215, 0, 0.3);">
+        <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: #d4af37; font-size: 1.1rem;">{{ 'COINS.EARN_FREE_COINS'
+            | translate }}</h4>
+        <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 0.8rem;">Watch a short video ad to earn free coins
+            instantly!</p>
+        <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading"
+            style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 250px; margin: 0 auto; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; font-weight: bold; border-radius: 8px; padding: 0.6rem;">
+            <span class="material-icons" style="font-size: 1.2rem;">{{ adLoading ? 'timer' : 'play_circle' }}</span>
+            {{ adLoading ? 'Next ad in ' + cooldownRemaining() : 'Watch Ad (+3 🪙)' }}
+        </button>
     </div>
 </div>

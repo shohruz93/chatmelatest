@@ -218,8 +218,8 @@ $router->add('POST', '/coins/send', function() use ($coinsController) {
     $coinsController->sendCoins();
 });
 
-$router->add('POST', '/coins/reward-ad', function() use ($coinsController) {
-    $coinsController->rewardAd();
+$router->add('GET', '/webhook/monetag', function() use ($coinsController) {
+    $coinsController->monetagWebhook();
 });
 
 $router->add('POST', '/coins/buy-vip', function() use ($coinsController) {

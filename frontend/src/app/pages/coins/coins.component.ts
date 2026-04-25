@@ -35,6 +35,7 @@ export class CoinsComponent implements OnInit {
     transactions = signal<Transaction[]>([]);
     loading = signal(true);
     activeTab: 'all' | 'incoming' | 'outgoing' = 'all';
+    adLoading = false;
 
     ngOnInit() {
         this.loadTransactions();
@@ -68,6 +69,7 @@ export class CoinsComponent implements OnInit {
     }
 
     getName(tx: Transaction): string {
+        if (tx.type === 'win' && tx.note === 'Won in ad_reward') return 'Ad Reward';
         if (this.isGameTx(tx)) return 'Game Reward';
         if (this.isMissionTx(tx)) return 'Daily Mission';
         const name = tx.direction === 'incoming' ? tx.sender_name : tx.receiver_name;
@@ -90,5 +92,30 @@ export class CoinsComponent implements OnInit {
 
     isMissionTx(tx: Transaction): boolean {
         return tx.note === 'Reward for mission: ';
+    }
+
+    watchAd() {
+        this.adLoading = true;
+        
+        // Open the Direct Link in a new tab
+        window.open('https://omg10.com/4/10923391', '_blank');
+
+        // Simulate a delay for the user to watch the ad (e.g., 5 seconds)
+        // In a real S2S integration, the backend would notify the frontend via socket
+        setTimeout(() => {
+            // Give 5 coins using the existing win endpoint
+            this.gamificationService.win(5, 'ad_reward').subscribe({
+                next: (res) => {
+                    this.adLoading = false;
+                    alert('Thanks for watching! You earned 5 coins! 🪙');
+                    this.loadTransactions(); // Refresh the list to show the new transaction
+                },
+                error: (err) => {
+                    console.error('Failed to claim ad reward', err);
+                    this.adLoading = false;
+                    alert('Something went wrong while claiming your reward.');
+                }
+            });
+        }, 5000); // 5 seconds wait
     }
 }

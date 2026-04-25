@@ -13,6 +13,9 @@ import { GamificationService, Mission } from '../../../services/gamification.ser
 export class MissionsComponent implements OnInit {
     gameService = inject(GamificationService);
     missions = signal<Mission[]>([]);
+    adLoading = false;
+    cooldownRemaining = signal<string>('');
+    private cooldownTimer: any;
 
     // Icon mapping for different mission types
     private iconMap: { [key: string]: string } = {
@@ -41,6 +44,44 @@ export class MissionsComponent implements OnInit {
 
     ngOnInit() {
         this.loadMissions();
+        this.checkAdCooldown();
+    }
+
+    ngOnDestroy() {
+        if (this.cooldownTimer) clearInterval(this.cooldownTimer);
+    }
+
+    checkAdCooldown() {
+        const lastWatch = localStorage.getItem('last_ad_watch_time');
+        if (lastWatch) {
+            const lastTime = parseInt(lastWatch, 10);
+            const now = Date.now();
+            const elapsed = now - lastTime;
+            const cooldownMs = 30 * 60 * 1000; // 30 minutes
+
+            if (elapsed < cooldownMs) {
+                this.adLoading = true;
+                this.updateCooldownText(cooldownMs - elapsed);
+                this.cooldownTimer = setInterval(() => {
+                    const newElapsed = Date.now() - lastTime;
+                    if (newElapsed >= cooldownMs) {
+                        clearInterval(this.cooldownTimer);
+                        this.adLoading = false;
+                        this.cooldownRemaining.set('');
+                        localStorage.removeItem('last_ad_watch_time');
+                    } else {
+                        this.updateCooldownText(cooldownMs - newElapsed);
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    updateCooldownText(ms: number) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        this.cooldownRemaining.set(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
     }
 
     loadMissions() {
@@ -70,4 +111,31 @@ export class MissionsComponent implements OnInit {
         return this.iconMap[key] || this.iconMap['default'];
     }
 
+    watchAd() {
+        if (this.adLoading) return;
+        
+        // Save time for UI cooldown
+        localStorage.setItem('last_ad_watch_time', Date.now().toString());
+        this.checkAdCooldown();
+
+        // Get Current User ID
+        const userStr = localStorage.getItem('user');
+        let userId = '';
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                userId = user.id;
+            } catch(e) {}
+        }
+        
+        // Open the Direct Link in a new tab with User ID for S2S Postback
+        window.open(`https://omg10.com/4/10923391?var=${userId}`, '_blank');
+
+        alert('Watch the ad in the new tab. The system will process it and add your coins shortly!');
+        
+        // Check balance after 15 seconds to see if S2S arrived
+        setTimeout(() => {
+            this.gameService.getBalance().subscribe();
+        }, 15000);
+    }
 }

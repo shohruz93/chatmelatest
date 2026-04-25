@@ -202,33 +202,48 @@ class CoinsController {
     }
 
     /**
-     * POST /coins/reward-ad
-     * Award coins for watching an ad
+     * GET /webhook/monetag
+     * Monetag S2S Postback Webhook
+     * URL format: /webhook/monetag?user_id={var}
      */
-    public function rewardAd() {
-        $headers = getallheaders();
-        $userId = $this->getUserIdFromToken($headers);
+    public function monetagWebhook() {
+        $userId = $_GET['user_id'] ?? null;
         
         if (!$userId) {
-            http_response_code(401);
-            echo json_encode(["error" => "Unauthorized"]);
+            http_response_code(400);
+            echo "Missing user_id";
             return;
         }
 
-        // Amount of coins to award for one ad
+        // Check cooldown: 30 minutes (1800 seconds)
+        $query = "SELECT created_at FROM coin_transactions WHERE receiver_id = :user_id AND type = 'ad_reward' ORDER BY created_at DESC LIMIT 1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':user_id' => $userId]);
+        $lastAd = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($lastAd) {
+            $lastTime = strtotime($lastAd['created_at']);
+            $now = time();
+            if (($now - $lastTime) < 1800) {
+                // Cooldown active
+                http_response_code(429);
+                echo "Cooldown active";
+                return;
+            }
+        }
+
         $rewardAmount = 3; 
 
         if ($this->user->addCurrency($userId, $rewardAmount, 'coins')) {
-            $updatedProfile = $this->user->getProfile($userId);
-            echo json_encode([
-                "success" => true,
-                "message" => "Rewarded $rewardAmount coins",
-                "coins_added" => $rewardAmount,
-                "current_coins" => (int)$updatedProfile['coins']
-            ]);
+            // Log transaction to enforce cooldown
+            $logQuery = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note) VALUES (0, :user_id, :amount, 'ad_reward', 'Watched Monetag Ad')";
+            $logStmt = $this->conn->prepare($logQuery);
+            $logStmt->execute([':user_id' => $userId, ':amount' => $rewardAmount]);
+
+            echo "OK";
         } else {
             http_response_code(500);
-            echo json_encode(["error" => "Failed to award coins"]);
+            echo "Failed";
         }
     }
 

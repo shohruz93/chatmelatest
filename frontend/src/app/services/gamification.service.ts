@@ -123,5 +123,15 @@ export class GamificationService {
     getBalance(): Observable<{ coins: number; xp: number }> {
         return this.http.get<{ coins: number; xp: number }>(`${this.apiUrl}/coins/balance`, { headers: this.getHeaders() });
     }
+
+    rewardAd(): Observable<any> {
+        return this.http.post(`${this.apiUrl}/coins/reward-ad`, {}, { headers: this.getHeaders() }).pipe(
+            tap((res: any) => {
+                if (res.current_coins !== undefined) {
+                    this.userCoins.set(res.current_coins);
+                }
+            })
+        );
+    }
 }
 
