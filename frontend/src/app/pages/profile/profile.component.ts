@@ -117,6 +117,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     // Missions Modal
     showMissionsModal: boolean = false;
 
+    // VIP Modal
+    showVipModal: boolean = false;
+    vipLoading: boolean = false;
+
     // Follow & Guest counts
     followersCount: number = 0;
     followingCount: number = 0;
@@ -482,6 +486,43 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 console.error('Error updating profile', err);
                 this.loading = false;
                 alert('Failed to save profile. Please try again.');
+            }
+        });
+    }
+    
+    formatVipDate(timestamp: any): string {
+        if (!timestamp) return 'N/A';
+        const date = new Date(timestamp * 1000);
+        return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    buyVip(months: number) {
+        if (this.vipLoading) return;
+
+        const cost = months >= 6 ? 250 : 50;
+        if (this.profileUser.coins < cost) {
+            alert(this.languageService.translate('COINS.INSUFFICIENT_BALANCE') || 'Insufficient coins');
+            return;
+        }
+
+        const confirmMsg = months === 1 
+            ? `Buy 1 Month VIP for 50 coins?`
+            : `Buy 6 Months VIP for 250 coins? (Save 50 coins!)`;
+
+        if (!confirm(confirmMsg)) return;
+
+        this.vipLoading = true;
+        this.api.post('/coins/buy-vip', { months }).subscribe({
+            next: (res: any) => {
+                this.vipLoading = false;
+                this.showVipModal = false;
+                // Refresh profile data
+                this.loadProfile(this.profileUser.id);
+                alert('VIP activated successfully! Enjoy your premium features.');
+            },
+            error: (err) => {
+                this.vipLoading = false;
+                alert(err.error?.error || 'Failed to purchase VIP');
             }
         });
     }

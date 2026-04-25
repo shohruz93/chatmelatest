@@ -210,6 +210,34 @@
                         </a>
                     </div>
 
+                    <!-- VIP Section (own profile only) -->
+                    @if (isOwnProfile) {
+                    <div class="vip-promo-section" style="margin-top: 1.5rem;">
+                        <!-- Active VIP -->
+                        @if (profileUser?.is_vip) {
+                        <div class="vip-active-card">
+                            <div class="vip-active-icon">⭐</div>
+                            <div class="vip-active-info">
+                                <h3 class="vip-active-title">VIP Active</h3>
+                                <p class="vip-active-until">Expires: {{ formatVipDate(profileUser?.vip_until) }}</p>
+                            </div>
+                        </div>
+                        } @else {
+                        <!-- VIP promo -->
+                        <div class="vip-promo-card">
+                            <div class="vip-promo-left">
+                                <span class="vip-crown">👑</span>
+                                <div>
+                                    <h3 class="vip-promo-title">Upgrade to VIP</h3>
+                                    <p class="vip-promo-sub">⭐ Gold badge · 🔒 Profile privacy · 🚫 Ad-free</p>
+                                </div>
+                            </div>
+                            <button class="btn-get-vip" (click)="showVipModal = true">Get VIP</button>
+                        </div>
+                        }
+                    </div>
+                    }
+
                     @if (bio) {
                     <div class="bio-section">
                         <h3>
@@ -334,6 +362,8 @@
             </div>
         </div>
 
+
+
         <!-- Community Feed (Posts) -->
         @if (profileUser?.id) {
         <div class="profile-community-section">
@@ -350,6 +380,59 @@
                     <button class="btn-close-missions" (click)="showMissionsModal = false">×</button>
                 </div>
                 <app-missions></app-missions>
+            </div>
+        </div>
+        }
+
+        <!-- VIP Purchase Modal -->
+        @if (showVipModal) {
+        <div class="vip-modal-overlay" (click)="showVipModal = false">
+            <div class="vip-modal" (click)="$event.stopPropagation()">
+                <div class="vip-modal-header">
+                    <h3>💎 VIP Membership</h3>
+                    <button class="btn-close-vip" (click)="showVipModal = false">×</button>
+                </div>
+                
+                <div class="vip-modal-body">
+                    <p class="vip-intro">Choose a plan to activate premium features!</p>
+                    
+                    <div class="vip-plans">
+                        <div class="vip-plan-card" (click)="buyVip(1)">
+                            <div class="plan-header">
+                                <span class="plan-duration">1 Month</span>
+                                <span class="plan-badge">Standard</span>
+                            </div>
+                            <div class="plan-price">
+                                <span class="price-amount">50</span>
+                                <span class="price-currency">🪙</span>
+                            </div>
+                            <button class="btn-buy-plan" [disabled]="vipLoading">Buy Now</button>
+                        </div>
+                        
+                        <div class="vip-plan-card featured" (click)="buyVip(6)">
+                            <div class="plan-header">
+                                <span class="plan-duration">6 Months</span>
+                                <span class="plan-badge hot">Most Popular</span>
+                            </div>
+                            <div class="plan-price">
+                                <span class="price-amount">250</span>
+                                <span class="price-currency">🪙</span>
+                            </div>
+                            <div class="plan-savings">Save 50 coins!</div>
+                            <button class="btn-buy-plan primary" [disabled]="vipLoading">Buy Now</button>
+                        </div>
+                    </div>
+                    
+                    <div class="vip-benefits">
+                        <h4>Benefits of VIP:</h4>
+                        <ul>
+                            <li>🌟 <strong>Gold Star Badge:</strong> Stand out in chats and comments</li>
+                            <li>🖼️ <strong>Animated Border:</strong> Dynamic frame for your avatar</li>
+                            <li>🕵️ <strong>Incognito Mode:</strong> Hide yourself from "Connect" discovery</li>
+                            <li>🚫 <strong>Ad-Free:</strong> No more interruptions while chatting</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
         }

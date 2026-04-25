@@ -6,7 +6,6 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { CountryService } from '../../services/country.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 
 import { LanguageService } from '../../services/language.service';
 import { GalleryService, GalleryImage } from '../../services/gallery.service';
@@ -14,7 +13,7 @@ import { GalleryService, GalleryImage } from '../../services/gallery.service';
 @Component({
     selector: 'app-user-profile-modal',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslatePipe, UnixDatePipe],
+    imports: [CommonModule, FormsModule, TranslatePipe],
     templateUrl: './user-profile-modal.component.html',
     styleUrls: ['./user-profile-modal.component.css']
 })
@@ -66,26 +65,32 @@ export class UserProfileModalComponent implements OnInit {
     ];
 
     // Tab Navigation
-    activeTab: 'rates' | 'gallery' = 'rates';
+    activeTab: 'posts' | 'rates' = 'posts';
 
-    // Gallery
-    galleryImages: GalleryImage[] = [];
+    // Gallery (kept for legacy)
+    galleryImages: any[] = [];
     showViewModal: boolean = false;
-    viewingImage: GalleryImage | null = null;
+    viewingImage: any | null = null;
     galleryLoading: boolean = false;
+
+    // Posts
+    userPosts: any[] = [];
+    postsLoading: boolean = false;
+
+    // Avatar zoom
+    showAvatarZoom: boolean = false;
 
     ngOnInit() {
         this.currentUser = this.auth.currentUserValue;
         if (this.user && this.user.id) {
-            // Record profile view if viewing another user's profile
             if (this.currentUser && this.currentUser.id !== this.user.id) {
                 this.api.recordView(this.currentUser.id, this.user.id).subscribe({
                     next: () => { },
                     error: () => { }
                 });
             }
-
             this.loadRatingsAndComments();
+            this.loadUserPosts();
         }
     }
 
@@ -170,6 +175,16 @@ export class UserProfileModalComponent implements OnInit {
 
     close() {
         this.closeEvent.emit();
+    }
+
+    openAvatarZoom() {
+        if (this.user?.avatar) {
+            this.showAvatarZoom = true;
+        }
+    }
+
+    closeAvatarZoom() {
+        this.showAvatarZoom = false;
     }
 
     sendMessage() {
@@ -315,30 +330,36 @@ export class UserProfileModalComponent implements OnInit {
     }
 
     // Tab Navigation
-    setActiveTab(tab: 'rates' | 'gallery') {
+    setActiveTab(tab: 'posts' | 'rates') {
         this.activeTab = tab;
-        if (tab === 'gallery' && this.galleryImages.length === 0) {
-            this.loadGallery();
-        }
     }
 
-    // Gallery Methods
-    loadGallery() {
+    // Load User Posts
+    loadUserPosts() {
         if (!this.user?.id) return;
-        this.galleryLoading = true;
-        this.galleryService.getGallery(this.user.id, this.currentUser?.id).subscribe({
-            next: (images) => {
-                this.galleryImages = images;
-                this.galleryLoading = false;
-                // Manually trigger change detection to ensure view updates
+        this.postsLoading = true;
+        this.api.get(`/community/user?userId=${this.user.id}&limit=18`).subscribe({
+            next: (data: any) => {
+                this.userPosts = Array.isArray(data) ? data : (data.posts || []);
+                this.postsLoading = false;
                 this.cdr.detectChanges();
             },
-            error: (err) => {
-                console.error('Failed to load gallery', err);
-                this.galleryLoading = false;
+            error: () => {
+                this.postsLoading = false;
                 this.cdr.detectChanges();
             }
         });
+    }
+
+    getPostMediaUrl(path: string): string {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        return `${this.api.phpBaseUrl}${path}`;
+    }
+
+    openFullProfile() {
+        this.router.navigate(['/dashboard/profile', this.user.id]);
+        this.close();
     }
 
     viewImage(image: GalleryImage) {

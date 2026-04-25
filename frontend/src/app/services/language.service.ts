@@ -473,7 +473,9 @@ export class LanguageService {
                 'AMOUNT': 'Amount',
                 'NOTE': 'Note',
                 'NOTE_PLACEHOLDER': 'Add a message...',
-                'SEND': 'Send'
+                'SEND': 'Send',
+                'EARN_FREE_COINS': 'Earn Free Coins',
+                'INSUFFICIENT_BALANCE': 'Insufficient coin balance'
             },
 
             'CHECKERS': {
@@ -966,6 +968,11 @@ export class LanguageService {
                 'TIME_H_AGO': '{{count}}ч назад',
                 'TIME_D_AGO': '{{count}}д назад'
             },
+            'COINS': {
+                'TITLE': 'Монеты',
+                'EARN_FREE_COINS': 'Заработать монеты',
+                'INSUFFICIENT_BALANCE': 'Недостаточно монет'
+            },
             'MISSIONS': {
                 'TITLE': 'Ежедневные миссии',
                 'STATUS_ACTIVE': 'Активно',
@@ -1346,6 +1353,11 @@ export class LanguageService {
                 'TIME_M_AGO': '{{count}} дақ пеш',
                 'TIME_H_AGO': '{{count}} соат пеш',
                 'TIME_D_AGO': '{{count}} рӯз пеш'
+            },
+            'COINS': {
+                'TITLE': 'Тангаҳо',
+                'EARN_FREE_COINS': 'Танга гирифтан',
+                'INSUFFICIENT_BALANCE': 'Тангаи нокифоя'
             },
             'MISSIONS': {
                 'TITLE': 'Миссияҳои ҳаррӯза',
