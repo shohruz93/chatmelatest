@@ -10,7 +10,7 @@
             <!-- Profile Link -->
             <div class="user-profile" routerLink="profile" routerLinkActive="active"
                 [title]="'NAV.GO_TO_PROFILE' | translate">
-                <div class="profile-avatar">
+                <div class="profile-avatar" [class.vip-avatar]="currentUser?.is_vip">
                     <img [src]="userAvatar || 'default-avatar.png'" [alt]="userDisplayName">
                     <span class="online-status-dot"></span>
                     @if (newGuestsCount > 0) {
@@ -18,7 +18,12 @@
                     }
                 </div>
                 <div class="profile-info">
-                    <div class="profile-name">{{ userDisplayName }}</div>
+                    <div class="profile-name" [class.vip-text]="currentUser?.is_vip">
+                        {{ userDisplayName }}
+                        @if (currentUser?.is_vip) {
+                        <span class="vip-star">⭐</span>
+                        }
+                    </div>
                     <div class="profile-stats">
                         <span class="stat-item coins" [title]="'COMMON.COINS' | translate">
                             <span class="stat-icon">🪙</span>

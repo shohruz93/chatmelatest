@@ -43,7 +43,7 @@
             </button>
             }
             <div class="avatar-section">
-                <div class="avatar-wrapper">
+                <div class="avatar-wrapper" [class.vip-avatar]="profileUser?.is_vip">
                     <img [src]="previewUrl || profileUser?.avatar || 'default-avatar.png'"
                         alt="{{ 'NAV.PROFILE' | translate }}">
 
@@ -169,7 +169,12 @@
                 </div>
                 } @else {
                 <div class="view-mode">
-                    <h1 class="user-name">{{ profileUser?.name }}</h1>
+                    <h1 class="user-name" [class.vip-text]="profileUser?.is_vip">
+                        {{ profileUser?.name }}
+                        @if (profileUser?.is_vip) {
+                        <span class="vip-star">⭐</span>
+                        }
+                    </h1>
                     <div class="user-email">{{ profileUser?.email }}</div>
                     @if (profileUser?.unique_id) {
                     <div class="user-unique-id"

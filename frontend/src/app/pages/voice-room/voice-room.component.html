@@ -29,7 +29,7 @@
             <ng-container *ngFor="let slot of stageSlots(); let i = index">
                 <!-- Filled slot -->
                 <div class="stage-slot" *ngIf="slot; else emptySlot">
-                    <div class="avatar-ring" [class.speaking]="slot.isSpeaking">
+                    <div class="avatar-ring" [class.speaking]="slot.isSpeaking" [class.vip-avatar]="slot.is_vip">
                         <img *ngIf="slot.avatar" [src]="slot.avatar" class="stage-avatar" [alt]="slot.name">
                         <div *ngIf="!slot.avatar" class="stage-avatar-ph">
                             {{ (slot.name||'U')[0].toUpperCase() }}
@@ -39,7 +39,10 @@
                             <span class="material-icons" style="font-size:12px">star</span>
                         </div>
                     </div>
-                    <span class="slot-name">{{ slot.name || ('User '+slot.id) }}</span>
+                    <span class="slot-name" [class.vip-text]="slot.is_vip" style="display: flex; align-items: center; justify-content: center;">
+                        {{ slot.name || ('User '+slot.id) }}
+                        @if (slot.is_vip) { <span class="vip-star" style="font-size: 0.9rem; margin-left: 2px;">⭐</span> }
+                    </span>
                     <div class="audio-bars" [class.active]="slot.isSpeaking">
                         <span></span><span></span><span></span><span></span>
                     </div>
@@ -65,11 +68,16 @@
         <div class="audience-row">
             <div class="audience-member" *ngFor="let p of audienceParticipants()" (click)="onAudienceAvatarClick(p)"
                 [title]="p.name || 'User '+p.id">
-                <img *ngIf="p.avatar" [src]="p.avatar" class="audience-avatar" [alt]="p.name">
-                <div *ngIf="!p.avatar" class="audience-avatar audience-avatar-ph">
-                    {{ (p.name||'U')[0] }}
+                <div [class.vip-avatar]="p.is_vip" style="border-radius: 50%; height: max-content;">
+                    <img *ngIf="p.avatar" [src]="p.avatar" class="audience-avatar" [alt]="p.name">
+                    <div *ngIf="!p.avatar" class="audience-avatar audience-avatar-ph">
+                        {{ (p.name||'U')[0] }}
+                    </div>
                 </div>
-                <span class="audience-name">{{ (p.name || ('User '+p.id)).split(' ')[0] }}</span>
+                <span class="audience-name" [class.vip-text]="p.is_vip" style="display: flex; align-items: center; justify-content: center;">
+                    {{ (p.name || ('User '+p.id)).split(' ')[0] }}
+                    @if (p.is_vip) { <span class="vip-star" style="font-size: 0.8rem; margin-left: 1px;">⭐</span> }
+                </span>
                 <!-- Admin "invite to stage" badge -->
                 <div class="stage-request-badge" *ngIf="isHost && pendingRequestIds.has(p.id)">!</div>
             </div>

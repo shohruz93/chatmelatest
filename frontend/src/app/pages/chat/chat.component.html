@@ -3,12 +3,15 @@
     <header class="chat-header glass-panel">
         @if (roomId) {
         <div class="header-user-info" (click)="openPartnerProfile()" style="cursor: pointer;">
-            <div class="avatar-container">
+            <div class="avatar-container" [class.vip-avatar]="partner?.is_vip" style="border-radius: 50%;">
                 <img [src]="partnerAvatar || 'default-avatar.png'" alt="Partner Avatar" class="header-avatar">
                 <span class="status-indicator" [class.online]="isPartnerOnline"></span>
             </div>
             <div class="user-details">
-                <h2 class="user-name">{{ partnerName }}</h2>
+                <h2 class="user-name" [class.vip-text]="partner?.is_vip" style="display: flex; align-items: center;">
+                    {{ partnerName }}
+                    @if (partner?.is_vip) { <span class="vip-star" style="font-size: 1.2rem; margin-left: 4px;">⭐</span> }
+                </h2>
                 <span class="user-status">
                     @if (isSyncing()) {
                     <span class="syncing-indicator">{{ 'CHAT.SYNCING' | translate }}...</span>
@@ -392,10 +395,13 @@
                 <h3>{{ 'CHAT.REQUEST_TITLE' | translate }}</h3>
             </div>
             <div class="modal-body center-content">
-                <div class="avatar-large">
+                <div class="avatar-large" [class.vip-avatar]="incomingRequest.is_vip" style="border-radius: 50%; height: max-content; margin: 0 auto;">
                     <img [src]="incomingRequest.avatar || 'default-avatar.png'" alt="User">
                 </div>
-                <h3>{{ incomingRequest.name || ('COMMON.ANONYMOUS' | translate) }}</h3>
+                <h3 [class.vip-text]="incomingRequest.is_vip" style="display: flex; align-items: center; justify-content: center;">
+                    {{ incomingRequest.name || ('COMMON.ANONYMOUS' | translate) }}
+                    @if (incomingRequest.is_vip) { <span class="vip-star" style="font-size: 1.2rem; margin-left: 4px;">⭐</span> }
+                </h3>
                 <p>{{ 'CHAT.REQUEST_DESC' | translate }}</p>
             </div>
             <div class="modal-footer">

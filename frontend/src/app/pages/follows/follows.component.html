@@ -26,12 +26,15 @@
             <div class="user-list">
                 @for (user of users; track user.id) {
                 <div class="user-item" [routerLink]="['/dashboard/profile', user.id]">
-                    <div class="avatar-wrapper">
+                    <div class="avatar-wrapper" [class.vip-avatar]="user.is_vip" style="border-radius: 50%; height: max-content;">
                         <img [src]="user.avatar || getPlaceholder(user.gender)" [alt]="user.name">
                     </div>
                     <div class="user-info">
                         <div class="name-row">
-                            <span class="user-name">{{ user.name }}</span>
+                            <span class="user-name" [class.vip-text]="user.is_vip" style="display: flex; align-items: center;">
+                                {{ user.name }}
+                                @if (user.is_vip) { <span class="vip-star" style="font-size: 1.1rem; margin-left: 2px;">⭐</span> }
+                            </span>
                         </div>
                         <p class="user-bio" *ngIf="user.bio">{{ user.bio }}</p>
                         <div class="location-info" *ngIf="user.location">

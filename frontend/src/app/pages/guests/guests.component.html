@@ -15,11 +15,14 @@
         <div class="guests-grid">
             @for (guest of guests; track guest.id) {
             <div class="guest-card" [routerLink]="['/dashboard/profile', guest.id]">
-                <div class="guest-avatar">
+                <div class="guest-avatar" [class.vip-avatar]="guest.is_vip" style="border-radius: 50%; height: max-content;">
                     <img [src]="guest.avatar || 'default-avatar.png'" [alt]="guest.name">
                 </div>
                 <div class="guest-info">
-                    <h3>{{ guest.name }}</h3>
+                    <h3 [class.vip-text]="guest.is_vip" style="display: flex; align-items: center; justify-content: center;">
+                        {{ guest.name }}
+                        @if (guest.is_vip) { <span class="vip-star" style="font-size: 1rem; margin-left: 2px;">⭐</span> }
+                    </h3>
                     <p class="visit-time">Visited {{ guest.viewed_at | unixDate:'relative' }}</p>
                 </div>
             </div>

@@ -21,7 +21,7 @@
             @for (conv of conversations; track conv.partner_id) {
             <div class="conversation-item-wrapper">
                 <a (click)="openConversation($event, conv.partner_id)" class="conversation-item">
-                    <div class="conversation-avatar">
+                    <div class="conversation-avatar" [class.vip-avatar]="conv.partner_is_vip" style="border-radius: 50%;">
                         <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name">
                         @if (socketService.isUserOnline(conv.partner_id)) {
                         <span class="online-indicator"></span>
@@ -30,7 +30,10 @@
 
                     <div class="conversation-info">
                         <div class="conversation-header">
-                            <h3 class="partner-name">{{ conv.partner_name || 'Anonymous User' }}</h3>
+                            <h3 class="partner-name" [class.vip-text]="conv.partner_is_vip" style="display: flex; align-items: center;">
+                                {{ conv.partner_name || 'Anonymous User' }}
+                                @if (conv.partner_is_vip) { <span class="vip-star" style="font-size: 1.1rem; margin-left: 2px;">⭐</span> }
+                            </h3>
                             <span class="last-time">{{ conv.last_message_time | unixDate:'short' }}</span>
                         </div>
                         <div class="conversation-preview">

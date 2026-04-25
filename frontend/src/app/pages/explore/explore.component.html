@@ -196,7 +196,7 @@
       <div class="user-card" (click)="openProfile(user)">
         <!-- Avatar Wrapper with Status -->
         <div class="user-avatar-wrapper">
-          <div class="user-avatar">
+          <div class="user-avatar" [class.vip-avatar]="user.is_vip">
             <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name" class="avatar-img" />
           </div>
           <div class="status-indicator" [class.online]="user.isOnline">
@@ -208,7 +208,10 @@
 
         <!-- User Info -->
         <div class="user-info">
-          <h3 class="user-name">{{ user.name }}</h3>
+          <h3 class="user-name" [class.vip-text]="user.is_vip" style="display: flex; align-items: center;">
+            {{ user.name }}
+            @if (user.is_vip) { <span class="vip-star" style="font-size: 1.2rem; margin-left: 4px;">⭐</span> }
+          </h3>
 
           <!-- User Rating -->
           @if (user.rating && user.rating > 0) {

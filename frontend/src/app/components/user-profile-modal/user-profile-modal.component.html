@@ -10,7 +10,7 @@
 
         <div class="profile-card">
             <div class="avatar-section">
-                <div class="avatar-wrapper">
+                <div class="avatar-wrapper" [class.vip-avatar]="user.is_vip">
                     <img [src]="user.avatar || 'default-avatar.png'" [alt]="user.name">
                     <div class="status-indicator" [class.online]="user.isOnline" [class.offline]="!user.isOnline"></div>
                 </div>
@@ -18,7 +18,10 @@
 
             <div class="info-section">
                 <div class="view-mode">
-                    <h1 class="user-name">{{ user.name }}</h1>
+                    <h1 class="user-name" [class.vip-text]="user.is_vip" style="display: flex; align-items: center;">
+                        {{ user.name }}
+                        @if (user.is_vip) { <span class="vip-star" style="font-size: 1.5rem; margin-left: 4px;">⭐</span> }
+                    </h1>
                     <div class="user-status-info">
                         @if (user.isOnline) {
                         <span class="online-status">{{ 'CHAT.ONLINE' | translate }}</span>
@@ -162,9 +165,14 @@
                     @for (comment of comments; track comment.id) {
                     <div class="comment-card">
                         <div class="comment-header">
-                            <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
+                            <div [class.vip-avatar]="comment.rater_is_vip" style="border-radius: 50%; height: max-content;">
+                                <img [src]="comment.rater_avatar || 'default-avatar.png'" class="comment-avatar">
+                            </div>
                             <div class="comment-meta">
-                                <span class="comment-author">{{ comment.rater_name }}</span>
+                                <span class="comment-author" [class.vip-text]="comment.rater_is_vip">
+                                    {{ comment.rater_name }}
+                                    @if (comment.rater_is_vip) { <span class="vip-star" style="font-size: 1rem; margin-left: 2px;">⭐</span> }
+                                </span>
                                 <span class="comment-rating">
                                     @for (star of [1,2,3,4,5]; track star) {
                                     <span class="star-display" [class.filled]="star <= comment.rating">★</span>
@@ -205,9 +213,14 @@
                         <div class="replies-list">
                             @for (reply of comment.replies; track reply.id) {
                             <div class="reply-item">
-                                <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
+                                <div [class.vip-avatar]="reply.replier_is_vip" style="border-radius: 50%; height: max-content;">
+                                    <img [src]="reply.replier_avatar || 'default-avatar.png'" class="reply-avatar">
+                                </div>
                                 <div class="reply-content">
-                                    <span class="reply-author">{{ reply.replier_name }}</span>
+                                    <span class="reply-author" [class.vip-text]="reply.replier_is_vip">
+                                        {{ reply.replier_name }}
+                                        @if (reply.replier_is_vip) { <span class="vip-star" style="font-size: 0.9rem; margin-left: 2px;">⭐</span> }
+                                    </span>
                                     <span class="reply-text">{{ reply.content }}</span>
                                 </div>
                             </div>

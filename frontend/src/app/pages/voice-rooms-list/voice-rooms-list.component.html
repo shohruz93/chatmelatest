@@ -32,13 +32,16 @@
       <h3 class="room-topic">{{ room.topic }}</h3>
 
       <div class="room-host-row">
-        <div class="host-avatar-wrap">
+        <div class="host-avatar-wrap" [class.vip-avatar]="room.host_is_vip" style="border-radius: 50%;">
           <img *ngIf="room.hostAvatar" [src]="getAvatarUrl(room.hostAvatar)" class="host-avatar" [alt]="room.hostName">
           <div *ngIf="!room.hostAvatar" class="host-avatar host-avatar-placeholder">
             {{ (room.hostName || 'H')[0].toUpperCase() }}
           </div>
         </div>
-        <span class="host-name">{{ room.hostName || ('User ' + room.hostId) }}</span>
+        <span class="host-name" [class.vip-text]="room.host_is_vip" style="display: flex; align-items: center;">
+          {{ room.hostName || ('User ' + room.hostId) }}
+          @if (room.host_is_vip) { <span class="vip-star" style="font-size: 0.9rem; margin-left: 2px;">⭐</span> }
+        </span>
 
         <div class="avatar-strip" *ngIf="room.avatarPreview?.length">
           <ng-container *ngFor="let p of room.avatarPreview">

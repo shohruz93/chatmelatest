@@ -312,7 +312,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     loadFollowCounts(userId: number) {
-        this.api.get(`/profile/follow-counts?userId=${userId}`).subscribe({
+        this.api.get(`/follow/counts?userId=${userId}`).subscribe({
             next: (data) => {
                 this.followersCount = data.followers || 0;
                 this.followingCount = data.following || 0;

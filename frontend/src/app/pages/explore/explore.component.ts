@@ -32,6 +32,7 @@ interface UserProfile {
     interests?: { id: number; name: string }[];
     rating?: number;
     rating_count?: number;
+    is_vip?: boolean | number;
 }
 
 @Component({

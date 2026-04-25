@@ -23,6 +23,7 @@ export interface CommunityPost {
     translated_text?: string;
     show_translation?: boolean;
     translating?: boolean;
+    is_vip?: boolean | number;
 }
 
 export interface CommunityComment {
@@ -32,6 +33,7 @@ export interface CommunityComment {
     user_avatar: string;
     content: string;
     created_at: number;
+    is_vip?: boolean | number;
 }
 
 @Injectable({
