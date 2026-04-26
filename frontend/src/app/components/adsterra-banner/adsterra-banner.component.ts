@@ -1,12 +1,16 @@
-import { Component, Input, OnInit, ElementRef, Renderer2, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, Renderer2, ViewChild, AfterViewInit, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-adsterra-banner',
   standalone: true,
   imports: [CommonModule],
-  template: `<div #adContainer class="ad-container" [style.min-height.px]="height"></div>`,
+  template: `<div *ngIf="!isVip" #adContainer class="ad-container" [style.min-height.px]="height"></div>`,
   styles: [`
+    :host.hidden-ad {
+      display: none !important;
+    }
     .ad-container { 
       display: flex; 
       justify-content: center; 
@@ -18,15 +22,28 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class AdsterraBannerComponent implements AfterViewInit {
+export class AdsterraBannerComponent implements AfterViewInit, OnInit {
   @Input() key!: string;
   @Input() width!: number;
   @Input() height!: number;
-  @ViewChild('adContainer', { static: false }) adContainer!: ElementRef;
+  @ViewChild('adContainer', { static: false }) adContainer?: ElementRef;
 
-  constructor(private renderer: Renderer2) {}
+  isVip = false;
+
+  @HostBinding('class.hidden-ad') get hidden() {
+    return this.isVip;
+  }
+
+  constructor(private renderer: Renderer2, private authService: AuthService) {}
+
+  ngOnInit() {
+    const user = this.authService.currentUserValue;
+    this.isVip = user && (user.is_vip === 1 || user.is_vip === true || user.is_vip === '1');
+  }
 
   ngAfterViewInit() {
+    if (this.isVip) return;
+    if (!this.adContainer) return;
     if (!this.key || !this.width || !this.height) return;
 
     // Create an iframe to safely isolate the document.write call from invoke.js

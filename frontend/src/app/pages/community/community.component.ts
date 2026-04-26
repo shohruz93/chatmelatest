@@ -25,10 +25,10 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         </button>
       </header>
 
-      <div class="hidden md:flex justify-center my-4 w-full">
+      <div class="hidden md:flex justify-center my-4 w-full ad-wrapper">
         <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
       </div>
-      <div class="flex md:hidden justify-center my-4 w-full">
+      <div class="flex md:hidden justify-center my-4 w-full ad-wrapper">
         <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
       </div>
 
@@ -40,7 +40,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         </div>
         
         <!-- Right column: Vertical Ad (Independent) -->
-        <div class="hidden xl:block absolute right-4 top-0 w-[160px] h-full pointer-events-none">
+        <div class="hidden xl:block absolute right-4 top-0 w-[160px] h-full pointer-events-none ad-wrapper">
           <div class="sticky top-4 pointer-events-auto">
             <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
           </div>

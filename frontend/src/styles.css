@@ -104,3 +104,8 @@
   50% { transform: rotateY(180deg) scale(1.2); }
   100% { transform: rotateY(360deg) scale(1); }
 }
+
+/* Hide ad wrapper containers entirely for VIP users */
+.ad-wrapper:has(app-adsterra-banner.hidden-ad):not(:has(app-adsterra-banner:not(.hidden-ad))) {
+  display: none !important;
+}
