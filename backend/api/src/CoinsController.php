@@ -224,15 +224,15 @@ class CoinsController {
         if ($user && $user['last_ad_reward']) {
             $lastTime = strtotime($user['last_ad_reward']);
             $now = time();
-            if (($now - $lastTime) < 1800) {
-                // Cooldown active
+            if (($now - $lastTime) < 300) {
+                // Cooldown active (5 mins)
                 http_response_code(429);
                 echo "Cooldown active";
                 return;
             }
         }
 
-        $rewardAmount = 3; 
+        $rewardAmount = 1; 
 
         // Update coins and last_ad_reward timestamp
         $updateQuery = "UPDATE users SET coins = coins + :amount, last_ad_reward = NOW() WHERE id = :user_id";
@@ -243,6 +243,60 @@ class CoinsController {
         } else {
             http_response_code(500);
             echo "Failed";
+        }
+    }
+
+    /**
+     * POST /coins/reward-ad
+     * Simple reward endpoint for Android (checks 5 min cooldown)
+     */
+    public function rewardAd() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        // Check cooldown from users table
+        $query = "SELECT last_ad_reward FROM users WHERE id = :user_id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':user_id' => $userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && $user['last_ad_reward']) {
+            $lastTime = strtotime($user['last_ad_reward']);
+            $now = time();
+            $diff = $now - $lastTime;
+            if ($diff < 300) {
+                http_response_code(429);
+                echo json_encode([
+                    "error" => "Cooldown active",
+                    "remaining" => 300 - $diff
+                ]);
+                return;
+            }
+        }
+
+        $rewardAmount = 1; 
+
+        // Update coins and last_ad_reward timestamp
+        $updateQuery = "UPDATE users SET coins = coins + :amount, last_ad_reward = NOW() WHERE id = :user_id";
+        $updateStmt = $this->conn->prepare($updateQuery);
+        
+        if ($updateStmt->execute([':amount' => $rewardAmount, ':user_id' => $userId])) {
+            $profile = $this->user->getProfile($userId);
+            echo json_encode([
+                "success" => true,
+                "message" => "Reward claimed!",
+                "amount" => $rewardAmount,
+                "current_coins" => (int)$profile['coins']
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to claim reward"]);
         }
     }
 
@@ -329,17 +383,17 @@ class CoinsController {
             $lastTime = strtotime($user['last_ad_reward']);
             $now = time();
             $diff = $now - $lastTime;
-            if ($diff < 1800) {
+            if ($diff < 300) {
                 http_response_code(429);
                 echo json_encode([
                     "error" => "Cooldown active",
-                    "remaining" => 1800 - $diff
+                    "remaining" => 300 - $diff
                 ]);
                 return;
             }
         }
 
-        $rewardAmount = 3; 
+        $rewardAmount = 1; 
 
         // Update coins and last_ad_reward timestamp
         $updateQuery = "UPDATE users SET coins = coins + :amount, last_ad_reward = NOW() WHERE id = :user_id";

@@ -132,7 +132,7 @@ export class GamificationService {
         return this.http.post(`${this.apiUrl}/coins/claim-reward`, { adToken }, { headers: this.getHeaders() }).pipe(
             tap((res: any) => {
                 if (res.success) {
-                    this.userCoins.update(c => c + (res.amount || 3));
+                    this.userCoins.update(c => c + (res.amount || 1));
                 }
             })
         );

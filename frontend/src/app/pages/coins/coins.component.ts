@@ -36,9 +36,17 @@ export class CoinsComponent implements OnInit {
     loading = signal(true);
     activeTab: 'all' | 'incoming' | 'outgoing' = 'all';
     adLoading = false;
+    showAdBanner = signal(false);
+    adCountdown = signal(30);
+    private adToken: string | null = null;
+    private adInterval: any;
 
     ngOnInit() {
         this.loadTransactions();
+    }
+
+    ngOnDestroy() {
+        if (this.adInterval) clearInterval(this.adInterval);
     }
 
     loadTransactions() {
@@ -95,27 +103,56 @@ export class CoinsComponent implements OnInit {
     }
 
     watchAd() {
-        this.adLoading = true;
-        
-        // Open the Direct Link in a new tab
-        window.open('https://omg10.com/4/10923391', '_blank');
+        if (this.adLoading || this.showAdBanner()) return;
 
-        // Simulate a delay for the user to watch the ad (e.g., 5 seconds)
-        // In a real S2S integration, the backend would notify the frontend via socket
-        setTimeout(() => {
-            // Give 5 coins using the existing win endpoint
-            this.gamificationService.win(5, 'ad_reward').subscribe({
-                next: (res) => {
+        this.adLoading = true;
+        this.gamificationService.startAd().subscribe({
+            next: (res) => {
+                if (res.adToken) {
+                    this.adToken = res.adToken;
+                    this.showAdBanner.set(true);
+                    this.adCountdown.set(30);
+
+                    this.adInterval = setInterval(() => {
+                        const current = this.adCountdown();
+                        if (current > 0) {
+                            this.adCountdown.set(current - 1);
+                        } else {
+                            clearInterval(this.adInterval);
+                            this.submitAdClaim();
+                        }
+                    }, 1000);
+                } else {
                     this.adLoading = false;
-                    alert('Thanks for watching! You earned 5 coins! 🪙');
-                    this.loadTransactions(); // Refresh the list to show the new transaction
-                },
-                error: (err) => {
-                    console.error('Failed to claim ad reward', err);
-                    this.adLoading = false;
-                    alert('Something went wrong while claiming your reward.');
+                    alert('Failed to start ad. Please try again.');
                 }
-            });
-        }, 5000); // 5 seconds wait
+            },
+            error: (err) => {
+                this.adLoading = false;
+                console.error('Failed to start ad', err);
+                alert('Failed to start ad. Please try again later.');
+            }
+        });
+    }
+
+    submitAdClaim() {
+        if (!this.adToken) return;
+
+        this.gamificationService.claimReward(this.adToken).subscribe({
+            next: (res) => {
+                this.showAdBanner.set(false);
+                this.adLoading = false;
+                this.adToken = null;
+                alert('Success! You earned 1 coin! 🪙');
+                this.loadTransactions();
+            },
+            error: (err) => {
+                this.showAdBanner.set(false);
+                this.adLoading = false;
+                this.adToken = null;
+                console.error('Failed to claim reward', err);
+                alert(err.error?.error || 'Failed to claim reward. Please try again later.');
+            }
+        });
     }
 }

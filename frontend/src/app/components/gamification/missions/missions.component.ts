@@ -63,7 +63,7 @@ export class MissionsComponent implements OnInit {
             const lastTime = parseInt(lastWatch, 10);
             const now = Date.now();
             const elapsed = now - lastTime;
-            const cooldownMs = 30 * 60 * 1000; // 30 minutes
+            const cooldownMs = 5 * 60 * 1000; // 5 minutes
 
             if (elapsed < cooldownMs) {
                 this.adLoading = true;
@@ -138,17 +138,7 @@ export class MissionsComponent implements OnInit {
                         }
                     }, 1000);
 
-                    // Inject the ad script
-                    setTimeout(() => {
-                        const container = document.getElementById('container-09cc432a48f328b7d41a9b783422085d');
-                        if (container) {
-                            const script = document.createElement('script');
-                            script.async = true;
-                            script.dataset['cfasync'] = 'false';
-                            script.src = 'https://turbulentrefreshments.com/09cc432a48f328b7d41a9b783422085d/invoke.js';
-                            container.appendChild(script);
-                        }
-                    }, 100);
+                    // The iframe or redirect logic will be handled in the template based on showAdBanner
                 } else {
                     this.adLoading = false;
                     alert('Failed to start ad. Please try again.');
@@ -170,7 +160,7 @@ export class MissionsComponent implements OnInit {
                 this.showAdBanner.set(false);
                 this.adLoading = false;
                 this.adToken = null;
-                alert('Success! You claimed 3 coins.');
+                alert('Success! You claimed 1 coin.');
                 localStorage.setItem('last_ad_watch_time', Date.now().toString());
                 this.checkAdCooldown();
             },
@@ -181,7 +171,7 @@ export class MissionsComponent implements OnInit {
                 if (err.status === 429) {
                     alert('Please wait for the cooldown to finish.');
                     if (err.error?.remaining) {
-                        const lastTime = Date.now() - (1800 - err.error.remaining) * 1000;
+                        const lastTime = Date.now() - (300 - err.error.remaining) * 1000;
                         localStorage.setItem('last_ad_watch_time', lastTime.toString());
                         this.checkAdCooldown();
                     }

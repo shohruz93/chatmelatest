@@ -12,11 +12,22 @@
         <h3 style="margin-top: 0; color: #d4af37; font-size: 1.2rem;">{{ 'COINS.EARN_FREE_COINS' | translate }}</h3>
         <p style="font-size: 0.9rem; color: #a0aec0; margin-bottom: 1rem;">Watch a short video ad to earn free coins
             instantly!</p>
-        <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading"
+        <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading || showAdBanner()"
             style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 300px; margin: 0 auto; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; font-weight: bold;">
             <span class="material-icons">play_circle</span>
-            {{ adLoading ? 'Loading Ad...' : 'Watch Ad (+5 🪙)' }}
+            @if (showAdBanner()) {
+                {{ adCountdown() }}s remaining...
+            } @else {
+                {{ adLoading ? 'Loading Ad...' : 'Watch Ad (+1 🪙)' }}
+            }
         </button>
+
+        @if (showAdBanner()) {
+        <div class="ad-banner-container mt-4 flex justify-center items-center w-full min-h-[400px]" style="margin-top: 1.5rem;">
+            <iframe src="https://turbulentrefreshments.com/xvsg557b7p?key=928dbe8b524af5ce05cf5c9ecd083c13" 
+                    width="100%" height="400" frameborder="0" style="border-radius: 12px; background: #000;"></iframe>
+        </div>
+        }
     </div>
 
     <!-- Transaction Tabs -->
