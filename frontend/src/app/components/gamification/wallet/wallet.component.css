@@ -33,6 +33,79 @@
     cursor: pointer;
 }
 
+/* ─── Animated Add-Coins Button ─── */
+.add-coins-btn {
+    margin-left: auto;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.plus-ring {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 215, 0, 0.6);
+    animation: pulseRing 1.8s ease-out infinite;
+}
+
+.plus-ring.ring-2 {
+    animation-delay: 0.9s;
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: scale(0.7);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.plus-icon {
+    position: relative;
+    z-index: 2;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700, #FF8C00);
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 900;
+    line-height: 30px;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6), 0 0 24px rgba(255, 140, 0, 0.3);
+    animation: plusBounce 2s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+@keyframes plusBounce {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
+    50% { transform: scale(1.15); box-shadow: 0 0 22px rgba(255, 215, 0, 0.9), 0 0 40px rgba(255, 140, 0, 0.5); }
+}
+
+.currency-card.coins:hover .plus-icon {
+    transform: scale(1.25) rotate(90deg);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+}
+
+.currency-card.coins:hover .plus-ring {
+    border-color: rgba(255, 215, 0, 0.9);
+    animation-duration: 1s;
+}
+
+
 .currency-card::after {
     content: '';
     position: absolute;

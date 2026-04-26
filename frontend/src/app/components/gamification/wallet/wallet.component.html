@@ -5,6 +5,11 @@
             <span class="value">{{ gameService.userCoins() }}</span>
             <span class="label">{{ 'COINS.TITLE' | translate }}</span>
         </div>
+        <div class="add-coins-btn" title="Earn more coins">
+            <div class="plus-ring"></div>
+            <div class="plus-ring ring-2"></div>
+            <span class="plus-icon">+</span>
+        </div>
     </div>
 
     <div class="currency-card xp">
@@ -16,4 +21,5 @@
             <div class="progress-fill" [style.width.%]="progressPercent"></div>
         </div>
     </div>
+
 </div>
