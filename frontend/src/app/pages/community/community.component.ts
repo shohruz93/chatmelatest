@@ -32,7 +32,20 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
       </div>
 
-      <app-community-feed></app-community-feed>
+      <div class="relative flex justify-center w-full max-w-[1400px] mx-auto px-4 pb-8 h-full min-h-[600px]">
+        
+        <!-- Center column: Feed (Strictly Centered) -->
+        <div class="w-full max-w-[800px]">
+          <app-community-feed></app-community-feed>
+        </div>
+        
+        <!-- Right column: Vertical Ad (Independent) -->
+        <div class="hidden xl:block absolute right-4 top-0 w-[160px] h-full pointer-events-none">
+          <div class="sticky top-4 pointer-events-auto">
+            <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
+          </div>
+        </div>
+      </div>
       
       <app-language-game *ngIf="showLanguageGame" (close)="showLanguageGame = false"></app-language-game>
     </div>

@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, Output, EventEmitter, OnInit, injec
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CountryService, Language } from '../../services/country.service';
+import { AdsterraBannerComponent } from '../adsterra-banner/adsterra-banner.component';
 
 export enum QuestionDirection {
   NATIVE_TO_LEARNING,
@@ -70,7 +71,7 @@ const LOCAL_DICTIONARY: { [lang: string]: string }[] = [
 @Component({
   selector: 'app-language-game',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdsterraBannerComponent],
   templateUrl: './language-game.component.html',
   styleUrls: ['./language-game.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
