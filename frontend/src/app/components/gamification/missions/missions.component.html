@@ -7,10 +7,20 @@
         <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: #d4af37; font-size: 1.1rem;">{{ 'COINS.EARN_FREE_COINS'
             | translate }}</h4>
         <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 0.8rem;">Claim your free coins every 30 minutes!</p>
-        <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading"
+        <button class="btn-primary" (click)="watchAd()" [disabled]="adLoading || showAdBanner()"
             style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; max-width: 250px; margin: 0 auto; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000; font-weight: bold; border-radius: 8px; padding: 0.6rem;">
             <span class="material-icons" style="font-size: 1.2rem;">{{ adLoading ? 'timer' : 'card_giftcard' }}</span>
-            {{ adLoading ? 'Next reward in ' + cooldownRemaining() : 'Claim Coins (+3 🪙)' }}
+            @if (showAdBanner()) {
+                {{ adCountdown() }}s remaining...
+            } @else {
+                {{ adLoading ? 'Next reward in ' + cooldownRemaining() : 'Claim Coins (+3 🪙)' }}
+            }
         </button>
+
+        @if (showAdBanner()) {
+        <div class="ad-banner-container mt-4 flex justify-center items-center w-full min-h-[50px]">
+            <div id="container-09cc432a48f328b7d41a9b783422085d"></div>
+        </div>
+        }
     </div>
 </div>

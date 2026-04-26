@@ -2,12 +2,13 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
 import { LanguageGameComponent } from '../../components/language-game/language-game.component';
+import { AdsterraBannerComponent } from '../../components/adsterra-banner/adsterra-banner.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CommonModule, CommunityFeedComponent, LanguageGameComponent, TranslatePipe],
+  imports: [CommonModule, CommunityFeedComponent, LanguageGameComponent, TranslatePipe, AdsterraBannerComponent],
   template: `
     <div class="community-page-container relative">
       <header class="page-header flex justify-between items-center">
@@ -23,6 +24,14 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
           </svg>
         </button>
       </header>
+
+      <div class="hidden md:flex justify-center my-4 w-full">
+        <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
+      </div>
+      <div class="flex md:hidden justify-center my-4 w-full">
+        <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
+      </div>
+
       <app-community-feed></app-community-feed>
       
       <app-language-game *ngIf="showLanguageGame" (close)="showLanguageGame = false"></app-language-game>

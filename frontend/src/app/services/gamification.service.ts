@@ -124,8 +124,12 @@ export class GamificationService {
         return this.http.get<{ coins: number; xp: number }>(`${this.apiUrl}/coins/balance`, { headers: this.getHeaders() });
     }
 
-    claimReward(): Observable<any> {
-        return this.http.post(`${this.apiUrl}/coins/claim-reward`, {}, { headers: this.getHeaders() }).pipe(
+    startAd(): Observable<any> {
+        return this.http.post(`${this.apiUrl}/coins/start-ad`, {}, { headers: this.getHeaders() });
+    }
+
+    claimReward(adToken: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/coins/claim-reward`, { adToken }, { headers: this.getHeaders() }).pipe(
             tap((res: any) => {
                 if (res.success) {
                     this.userCoins.update(c => c + (res.amount || 3));

@@ -247,8 +247,28 @@ class CoinsController {
     }
 
     /**
+     * POST /coins/start-ad
+     * Generate an ad token to securely verify 30-second view time
+     */
+    public function startAd() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+        
+        $payload = json_encode(['id' => $userId, 'start' => time()]);
+        $signature = hash_hmac('sha256', $payload, 'ChatMeSecureAdSecret123!');
+        $adToken = base64_encode($payload . '::' . $signature);
+        
+        echo json_encode(["adToken" => $adToken]);
+    }
+
+    /**
      * POST /coins/claim-reward
-     * Manually claim 3 coins (30 min cooldown)
+     * Manually claim 3 coins after viewing ad for 30s (30 min cooldown)
      */
     public function claimReward() {
         $headers = getallheaders();
@@ -257,6 +277,45 @@ class CoinsController {
         if (!$userId) {
             http_response_code(401);
             echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $adToken = $data['adToken'] ?? null;
+        if (!$adToken) {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing ad token"]);
+            return;
+        }
+        
+        $decoded = base64_decode($adToken);
+        $parts = explode('::', $decoded);
+        if (count($parts) !== 2) {
+            http_response_code(400); echo json_encode(["error" => "Invalid ad token format"]); return;
+        }
+        
+        $payload = $parts[0];
+        $signature = $parts[1];
+        $expectedSignature = hash_hmac('sha256', $payload, 'ChatMeSecureAdSecret123!');
+        
+        if (!hash_equals($expectedSignature, $signature)) {
+            http_response_code(400); echo json_encode(["error" => "Token signature mismatch"]); return;
+        }
+        
+        $tokenData = json_decode($payload, true);
+        if ($tokenData['id'] != $userId) {
+            http_response_code(400); echo json_encode(["error" => "Token user mismatch"]); return;
+        }
+        
+        $elapsed = time() - $tokenData['start'];
+        if ($elapsed < 28) { // give 2 seconds buffer for network latency
+            http_response_code(400); 
+            echo json_encode(["error" => "Ad watched for too little time. Needs 30 seconds."]); 
+            return;
+        }
+        if ($elapsed > 300) { // 5 mins expiry
+            http_response_code(400); 
+            echo json_encode(["error" => "Ad token expired"]); 
             return;
         }
 

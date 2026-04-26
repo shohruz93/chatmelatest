@@ -8,11 +8,12 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
 import { Subscription } from 'rxjs';
 import { ChatStorageService } from '../../services/chat-storage.service';
+import { AdsterraBannerComponent } from '../../components/adsterra-banner/adsterra-banner.component';
 
 @Component({
     selector: 'app-conversations',
     standalone: true,
-    imports: [CommonModule, RouterModule, TranslatePipe, UnixDatePipe],
+    imports: [CommonModule, RouterModule, TranslatePipe, UnixDatePipe, AdsterraBannerComponent],
     templateUrl: './conversations.component.html',
     styleUrl: './conversations.component.css'
 })

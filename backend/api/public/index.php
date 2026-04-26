@@ -234,6 +234,10 @@ $router->add('POST', '/coins/claim-reward', function() use ($coinsController) {
     $coinsController->claimReward();
 });
 
+$router->add('POST', '/coins/start-ad', function() use ($coinsController) {
+    $coinsController->startAd();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

@@ -10,6 +10,7 @@ import { ApiService } from '../../services/api.service';
 import { CountryService } from '../../services/country.service';
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ProfileCompletionModalComponent } from '../../components/profile-completion-modal/profile-completion-modal.component';
+import { AdsterraBannerComponent } from '../../components/adsterra-banner/adsterra-banner.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AppVersionService } from '../../services/app-version.service';
 import { GamificationService } from '../../services/gamification.service';
@@ -38,7 +39,7 @@ interface UserProfile {
 @Component({
     selector: 'app-explore',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, UserProfileModalComponent, ProfileCompletionModalComponent],
+    imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, UserProfileModalComponent, ProfileCompletionModalComponent, AdsterraBannerComponent],
     templateUrl: './explore.component.html',
     styleUrls: ['./explore.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush

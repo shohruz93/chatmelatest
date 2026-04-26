@@ -17,6 +17,11 @@ export class MissionsComponent implements OnInit {
     cooldownRemaining = signal<string>('');
     private cooldownTimer: any;
 
+    showAdBanner = signal<boolean>(false);
+    private adToken: string | null = null;
+    adCountdown = signal<number>(30);
+    private adInterval: any;
+
     // Icon mapping for different mission types
     private iconMap: { [key: string]: string } = {
         'translate_message': '🌐',
@@ -49,6 +54,7 @@ export class MissionsComponent implements OnInit {
 
     ngOnDestroy() {
         if (this.cooldownTimer) clearInterval(this.cooldownTimer);
+        if (this.adInterval) clearInterval(this.adInterval);
     }
 
     checkAdCooldown() {
@@ -112,21 +118,68 @@ export class MissionsComponent implements OnInit {
     }
 
     watchAd() {
-        if (this.adLoading) return;
+        if (this.adLoading || this.showAdBanner()) return;
         
         this.adLoading = true;
-        this.gameService.claimReward().subscribe({
+        this.gameService.startAd().subscribe({
             next: (res) => {
+                if (res.adToken) {
+                    this.adToken = res.adToken;
+                    this.showAdBanner.set(true);
+                    this.adCountdown.set(30);
+                    
+                    this.adInterval = setInterval(() => {
+                        const current = this.adCountdown();
+                        if (current > 0) {
+                            this.adCountdown.set(current - 1);
+                        } else {
+                            clearInterval(this.adInterval);
+                            this.submitAdClaim();
+                        }
+                    }, 1000);
+
+                    // Inject the ad script
+                    setTimeout(() => {
+                        const container = document.getElementById('container-09cc432a48f328b7d41a9b783422085d');
+                        if (container) {
+                            const script = document.createElement('script');
+                            script.async = true;
+                            script.dataset['cfasync'] = 'false';
+                            script.src = 'https://turbulentrefreshments.com/09cc432a48f328b7d41a9b783422085d/invoke.js';
+                            container.appendChild(script);
+                        }
+                    }, 100);
+                } else {
+                    this.adLoading = false;
+                    alert('Failed to start ad. Please try again.');
+                }
+            },
+            error: (err) => {
+                this.adLoading = false;
+                console.error('Failed to start ad', err);
+                alert('Failed to start ad. Please try again later.');
+            }
+        });
+    }
+
+    submitAdClaim() {
+        if (!this.adToken) return;
+
+        this.gameService.claimReward(this.adToken).subscribe({
+            next: (res) => {
+                this.showAdBanner.set(false);
+                this.adLoading = false;
+                this.adToken = null;
                 alert('Success! You claimed 3 coins.');
-                // Save time for UI cooldown
                 localStorage.setItem('last_ad_watch_time', Date.now().toString());
                 this.checkAdCooldown();
             },
             error: (err) => {
+                this.showAdBanner.set(false);
                 this.adLoading = false;
+                this.adToken = null;
                 if (err.status === 429) {
                     alert('Please wait for the cooldown to finish.');
-                    // Sync cooldown if possible
                     if (err.error?.remaining) {
                         const lastTime = Date.now() - (1800 - err.error.remaining) * 1000;
                         localStorage.setItem('last_ad_watch_time', lastTime.toString());
@@ -134,7 +187,7 @@ export class MissionsComponent implements OnInit {
                     }
                 } else {
                     console.error('Failed to claim reward', err);
-                    alert('Failed to claim reward. Please try again later.');
+                    alert(err.error?.error || 'Failed to claim reward. Please try again later.');
                 }
             }
         });

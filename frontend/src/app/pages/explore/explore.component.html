@@ -1,122 +1,6 @@
-<div class="explore-container">
-  <!-- Filter Sidebar (hidden by default) -->
-  @if (showFilters()) {
-  <aside class="filter-sidebar">
-    <div class="filter-header">
-      <h2>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-        </svg>
-        {{ 'EXPLORE_PAGE.FILTERS' | translate }}
-      </h2>
-      <button class="reset-btn" (click)="toggleFilterPanel()">{{ 'EXPLORE_PAGE.CLOSE_FILTERS' | translate }}</button>
-    </div>
-
-    <div class="filter-section">
-      <label>{{ 'EXPLORE_PAGE.STATUS' | translate }}</label>
-      <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
-        @for (option of statusOptions; track option.value) {
-        <option [value]="option.value">
-          {{ option.label | translate }}
-        </option>
-        }
-      </select>
-    </div>
-
-    <div class="filter-section">
-      <label>{{ 'EXPLORE_PAGE.GENDER' | translate }}</label>
-      <select [(ngModel)]="filterGender" (change)="onFilterChange()" class="filter-select">
-        @for (option of genderOptions; track option.value) {
-        <option [value]="option.value">
-          {{ option.label | translate }}
-        </option>
-        }
-      </select>
-    </div>
-
-    <div class="filter-section">
-      <label>{{ 'EXPLORE_PAGE.LOCATION' | translate }}</label>
-      <div class="custom-select-container">
-        <div class="custom-select" (click)="toggleLocationDropdown()">
-          @if (filterLocation !== 'any') {
-          <img class="select-flag" [src]="getSelectedLocationFlag()" alt="" />
-          }
-          <span>{{ getSelectedLocationLabel() }}</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        @if (showLocationDropdown) {
-        <div class="custom-dropdown">
-          @for (option of locationOptions; track option.value) {
-          <div class="dropdown-option" [class.selected]="filterLocation === option.value"
-            (click)="selectLocation(option.value)">
-            @if (option.flagUrl) {
-            <img class="option-flag" [src]="option.flagUrl" alt="" />
-            }
-            <span>{{ option.label }}</span>
-          </div>
-          }
-        </div>
-        }
-      </div>
-    </div>
-
-    <div class="filter-section">
-      <label>{{ 'EXPLORE_PAGE.NATIVE_LANGUAGE' | translate }}</label>
-      <div class="custom-select-container">
-        <div class="custom-select" (click)="toggleNativeLanguageDropdown()">
-          @if (filterNativeLanguage !== 'any') {
-          <img class="select-flag" [src]="getSelectedNativeLanguageFlag()" alt="" />
-          }
-          <span>{{ getSelectedNativeLanguageLabel() }}</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        @if (showNativeLanguageDropdown) {
-        <div class="custom-dropdown">
-          @for (option of languageOptions; track option.value) {
-          <div class="dropdown-option" [class.selected]="filterNativeLanguage === option.value"
-            (click)="selectNativeLanguage(option.value)">
-            @if (option.flagUrl) {
-            <img class="option-flag" [src]="option.flagUrl" alt="" />
-            }
-            <span>{{ option.label }}</span>
-          </div>
-          }
-        </div>
-        }
-      </div>
-    </div>
-
-    <div class="filter-section">
-      <label>{{ 'EXPLORE_PAGE.LEARNING_LANGUAGE' | translate }}</label>
-      <div class="custom-select-container">
-        <div class="custom-select" (click)="toggleLearningLanguageDropdown()">
-          @if (filterLearningLanguage !== 'any') {
-          <img class="select-flag" [src]="getSelectedLearningLanguageFlag()" alt="" />
-          }
-          <span>{{ getSelectedLearningLanguageLabel() }}</span>
-          <i class="fas fa-chevron-down"></i>
-        </div>
-        @if (showLearningLanguageDropdown) {
-        <div class="custom-dropdown">
-          @for (option of languageOptions; track option.value) {
-          <div class="dropdown-option" [class.selected]="filterLearningLanguage === option.value"
-            (click)="selectLearningLanguage(option.value)">
-            @if (option.flagUrl) {
-            <img class="option-flag" [src]="option.flagUrl" alt="" />
-            }
-            <span>{{ option.label }}</span>
-          </div>
-          }
-        </div>
-        }
-      </div>
-    </div>
-  </aside>
-  }
-
-  <!-- Main Content -->
-  <main class="explore-content">
+<div class="explore-container flex flex-col xl:flex-row gap-6 justify-center w-full max-w-[1400px] mx-auto">
+  <div class="flex-1 w-full max-w-[1100px] flex flex-col">
+    <!-- Header -->
     <div class="explore-header">
       <div class="header-content">
         <h1>{{ 'EXPLORE_PAGE.TITLE' | translate }}</h1>
@@ -128,12 +12,126 @@
         </svg>
         <span>{{ 'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate }}</span>
       </button>
-      <!-- Toggle Filters Button -->
-      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' |
-        translate }}</button>
+      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' | translate }}</button>
     </div>
 
-    @if (updateAvailable()) {
+    <!-- Filter Bar (horizontal) -->
+    @if (showFilters()) {
+    <div class="filter-horizontal-bar bg-[var(--bg-secondary)] rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.1)] mb-6 border border-[var(--border-color)]">
+      <div class="filter-header flex justify-between items-center mb-4">
+        <h2 class="flex items-center gap-2 text-lg font-semibold text-[var(--text-primary)]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--accent-primary)]">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          {{ 'EXPLORE_PAGE.FILTERS' | translate }}
+        </h2>
+        <button class="reset-btn" (click)="toggleFilterPanel()">{{ 'EXPLORE_PAGE.CLOSE_FILTERS' | translate }}</button>
+      </div>
+
+      <div class="flex flex-wrap gap-4">
+        <div class="filter-section flex-1 min-w-[150px] !mb-0">
+          <label>{{ 'EXPLORE_PAGE.STATUS' | translate }}</label>
+          <select [(ngModel)]="filterStatus" (change)="onFilterChange()" class="filter-select">
+            @for (option of statusOptions; track option.value) {
+            <option [value]="option.value">{{ option.label | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-section flex-1 min-w-[150px] !mb-0">
+          <label>{{ 'EXPLORE_PAGE.GENDER' | translate }}</label>
+          <select [(ngModel)]="filterGender" (change)="onFilterChange()" class="filter-select">
+            @for (option of genderOptions; track option.value) {
+            <option [value]="option.value">{{ option.label | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-section flex-1 min-w-[150px] !mb-0">
+          <label>{{ 'EXPLORE_PAGE.LOCATION' | translate }}</label>
+          <div class="custom-select-container">
+            <div class="custom-select" (click)="toggleLocationDropdown()">
+              @if (filterLocation !== 'any') {
+              <img class="select-flag" [src]="getSelectedLocationFlag()" alt="" />
+              }
+              <span>{{ getSelectedLocationLabel() }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            @if (showLocationDropdown) {
+            <div class="custom-dropdown">
+              @for (option of locationOptions; track option.value) {
+              <div class="dropdown-option" [class.selected]="filterLocation === option.value"
+                (click)="selectLocation(option.value)">
+                @if (option.flagUrl) {
+                <img class="option-flag" [src]="option.flagUrl" alt="" />
+                }
+                <span>{{ option.label }}</span>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="filter-section flex-1 min-w-[150px] !mb-0">
+          <label>{{ 'EXPLORE_PAGE.NATIVE_LANGUAGE' | translate }}</label>
+          <div class="custom-select-container">
+            <div class="custom-select" (click)="toggleNativeLanguageDropdown()">
+              @if (filterNativeLanguage !== 'any') {
+              <img class="select-flag" [src]="getSelectedNativeLanguageFlag()" alt="" />
+              }
+              <span>{{ getSelectedNativeLanguageLabel() }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            @if (showNativeLanguageDropdown) {
+            <div class="custom-dropdown">
+              @for (option of languageOptions; track option.value) {
+              <div class="dropdown-option" [class.selected]="filterNativeLanguage === option.value"
+                (click)="selectNativeLanguage(option.value)">
+                @if (option.flagUrl) {
+                <img class="option-flag" [src]="option.flagUrl" alt="" />
+                }
+                <span>{{ option.label }}</span>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="filter-section flex-1 min-w-[150px] !mb-0">
+          <label>{{ 'EXPLORE_PAGE.LEARNING_LANGUAGE' | translate }}</label>
+          <div class="custom-select-container">
+            <div class="custom-select" (click)="toggleLearningLanguageDropdown()">
+              @if (filterLearningLanguage !== 'any') {
+              <img class="select-flag" [src]="getSelectedLearningLanguageFlag()" alt="" />
+              }
+              <span>{{ getSelectedLearningLanguageLabel() }}</span>
+              <i class="fas fa-chevron-down"></i>
+            </div>
+            @if (showLearningLanguageDropdown) {
+            <div class="custom-dropdown">
+              @for (option of languageOptions; track option.value) {
+              <div class="dropdown-option" [class.selected]="filterLearningLanguage === option.value"
+                (click)="selectLearningLanguage(option.value)">
+                @if (option.flagUrl) {
+                <img class="option-flag" [src]="option.flagUrl" alt="" />
+                }
+                <span>{{ option.label }}</span>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Main Content Grid Area -->
+    <main class="explore-content w-full max-w-full">
+      @if (updateAvailable()) {
     <div class="p-4 mb-4 bg-blue-50 border-l-4 border-blue-500 text-blue-700" style="margin-bottom: 20px;">
       <div class="flex justify-between items-center">
         <div>
@@ -167,9 +165,13 @@
     }
 
     <!-- Ad Banner Container -->
-    <div class="ad-banner-container" style="width: 100%; min-height: 90px; margin: 15px 0; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.02); border-radius: 8px;">
-      <!-- The AdNetwork Tag will be injected here -->
-
+    <div class="ad-banner-container flex flex-col items-center justify-center w-full my-4">
+      <div class="hidden md:flex xl:hidden">
+        <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
+      </div>
+      <div class="flex md:hidden">
+        <app-adsterra-banner key="18eed32956c99770165c9a1e71978d34" [width]="300" [height]="250"></app-adsterra-banner>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -358,6 +360,14 @@
     }
     }
   </main>
+  </div>
+
+  <!-- Right Sidebar for Vertical Ad on Large Screens -->
+  <div class="hidden xl:block w-[160px] flex-shrink-0">
+    <div class="sticky top-4">
+      <app-adsterra-banner key="b270442e16d5e22ffc03954c8ddbd900" [width]="160" [height]="600"></app-adsterra-banner>
+    </div>
+  </div>
 
   <!-- Profile Modal -->
   @if (selectedUser) {
