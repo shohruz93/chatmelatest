@@ -63,12 +63,12 @@ class AdminController {
         $sortBy = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'created_at';
         $orderDir = isset($_GET['order_dir']) && strtoupper($_GET['order_dir']) === 'ASC' ? 'ASC' : 'DESC';
         
-        $allowedSortCols = ['name', 'created_at', 'last_active', 'email'];
+        $allowedSortCols = ['id', 'unique_id', 'name', 'created_at', 'last_active', 'email'];
         if (!in_array($sortBy, $allowedSortCols)) {
             $sortBy = 'created_at';
         }
 
-        $query = "SELECT id, name, first_name, family_name, email, is_admin, is_vip, vip_until, coins, xp, status, gender, avatar, created_at, last_active FROM users";
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, is_admin, is_vip, vip_until, coins, xp, status, gender, avatar, created_at, last_active FROM users";
         $countQuery = "SELECT COUNT(*) as count FROM users";
         
         $conditions = [];
@@ -77,8 +77,19 @@ class AdminController {
         $conditions[] = "1=1"; // Base condition
 
         if ($search) {
-            $conditions[] = "(name LIKE :search OR email LIKE :search)";
-            $params[':search'] = "%$search%";
+            $searchVal = "%$search%";
+            if (is_numeric($search)) {
+                $conditions[] = "(id = :search_id OR name LIKE :search_name OR email LIKE :search_email OR unique_id LIKE :search_unique)";
+                $params[':search_id'] = $search;
+                $params[':search_name'] = $searchVal;
+                $params[':search_email'] = $searchVal;
+                $params[':search_unique'] = $searchVal;
+            } else {
+                $conditions[] = "(name LIKE :search_name OR email LIKE :search_email OR unique_id LIKE :search_unique)";
+                $params[':search_name'] = $searchVal;
+                $params[':search_email'] = $searchVal;
+                $params[':search_unique'] = $searchVal;
+            }
         }
         
         if ($status === 'banned') {

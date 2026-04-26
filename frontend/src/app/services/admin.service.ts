@@ -9,6 +9,7 @@ export interface User {
   name: string;
   email: string;
   is_admin: number; // 0 or 1
+  unique_id?: string;
   avatar?: string;
   gender?: string;
   coins?: number;

@@ -95,10 +95,12 @@ import { UnixDatePipe } from '../../pipes/unix-date.pipe';
                                 <span *ngIf="user.is_admin" class="absolute -bottom-1 -right-1 w-5 h-5 bg-indigo-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-[#151921]" title="Admin">★</span>
                                 <span *ngIf="user.is_vip" class="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-[#151921]" title="VIP">💎</span>
                             </div>
-                            <div>
-                               <div class="font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ user.name }}</div>
-                               <div class="text-sm text-slate-500 dark:text-slate-400">{{ user.email }}</div>
-                            </div>
+                             <div>
+                                <div class="font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{{ user.name }}</div>
+                                <div class="text-sm text-slate-500 dark:text-slate-400">
+                                   {{ user.email }} <span class="mx-1 opacity-30">|</span> <span class="font-mono text-[10px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400">{{ user.unique_id }}</span>
+                                </div>
+                             </div>
                          </div>
                       </td>
                       <td class="px-6 py-4">
