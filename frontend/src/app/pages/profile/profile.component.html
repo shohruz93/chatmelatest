@@ -175,16 +175,18 @@
                         <span class="vip-star">⭐</span>
                         }
                     </h1>
-                    <div class="user-email">{{ profileUser?.email }}</div>
-                    @if (profileUser?.unique_id) {
-                    <div class="user-unique-id"
-                        style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <span style="font-size: 0.9rem; color: #666; font-weight: 600;">ID: {{ profileUser.unique_id
-                            }}</span>
-                        <button (click)="copyUniqueId(profileUser.unique_id)"
-                            style="background: none; border: none; cursor: pointer; font-size: 1.1rem;"
-                            title="Copy Unique ID">📋</button>
-                    </div>
+                    @if (isOwnProfile) {
+                        <div class="user-email">{{ profileUser?.email }}</div>
+                        @if (profileUser?.unique_id) {
+                        <div class="user-unique-id"
+                            style="margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <span style="font-size: 0.9rem; color: #666; font-weight: 600;">ID: {{ profileUser.unique_id
+                                }}</span>
+                            <button (click)="copyUniqueId(profileUser.unique_id)"
+                                style="background: none; border: none; cursor: pointer; font-size: 1.1rem;"
+                                title="Copy Unique ID">📋</button>
+                        </div>
+                        }
                     }
 
 
@@ -197,7 +199,6 @@
                             <span class="stat-count">{{ guestsCount }}</span>
                             <span class="stat-label">{{ 'NAV.GUESTS' | translate }}</span>
                         </a>
-                        }
                         <a class="stat-item" [routerLink]="['/dashboard/profile', profileUser.id, 'followers']">
                             <span class="stat-icon">👥</span>
                             <span class="stat-count">{{ followersCount }}</span>
@@ -208,6 +209,18 @@
                             <span class="stat-count">{{ followingCount }}</span>
                             <span class="stat-label">{{ 'PROFILE.FOLLOWING' | translate }}</span>
                         </a>
+                        } @else {
+                        <div class="stat-item non-clickable">
+                            <span class="stat-icon">👥</span>
+                            <span class="stat-count">{{ followersCount }}</span>
+                            <span class="stat-label">{{ 'PROFILE.FOLLOWERS' | translate }}</span>
+                        </div>
+                        <div class="stat-item non-clickable">
+                            <span class="stat-icon">➕</span>
+                            <span class="stat-count">{{ followingCount }}</span>
+                            <span class="stat-label">{{ 'PROFILE.FOLLOWING' | translate }}</span>
+                        </div>
+                        }
                     </div>
 
                     <!-- VIP Section (own profile only) -->

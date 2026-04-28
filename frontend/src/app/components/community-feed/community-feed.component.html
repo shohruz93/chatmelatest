@@ -27,7 +27,9 @@
         <div class="empty-icon">📱</div>
         <h3>{{ 'COMMUNITY.NO_POSTS_YET' | translate }}</h3>
         <p>{{ 'COMMUNITY.BE_FIRST_TO_SHARE' | translate }}</p>
-        <button class="btn-primary" (click)="openCreateModal()">{{ 'COMMUNITY.CREATE_POST' | translate }}</button>
+        @if (showCreateForm) {
+            <button class="btn-primary" (click)="openCreateModal()">{{ 'COMMUNITY.CREATE_POST' | translate }}</button>
+        }
     </div>
     }
 
