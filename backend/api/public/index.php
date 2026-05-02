@@ -246,6 +246,10 @@ $router->add('POST', '/coins/start-ad', function() use ($coinsController) {
     $coinsController->startAd();
 });
 
+$router->add('POST', '/coins/verify-purchase', function() use ($coinsController) {
+    $coinsController->verifyPlayPurchase();
+});
+
 // Match Routes
 $router->add('GET', '/match', function() use ($matchController) {
     $userId = $_GET['userId'] ?? 1;

@@ -193,6 +193,108 @@ class CoinsController {
     }
 
     /**
+     * POST /coins/verify-purchase
+     * Body: { purchaseToken, productId }
+     * Called by Android after a successful Google Play purchase.
+     * Verifies the purchase token with Google Play API and awards coins.
+     */
+    public function verifyPlayPurchase() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(["error" => "Unauthorized"]);
+            return;
+        }
+
+        $data = json_decode(file_get_contents("php://input"), true);
+        $purchaseToken = $data['purchaseToken'] ?? null;
+        $productId     = $data['productId'] ?? null;
+
+        if (!$purchaseToken || !$productId) {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing purchaseToken or productId"]);
+            return;
+        }
+
+        // Map productId -> coins amount
+        $coinsMap = [
+            'coins_100'  => 100,
+            'coins_1000' => 1000,
+        ];
+
+        // VIP subscription product IDs
+        $vipProducts = ['vip_1_month', 'vip_6_month'];
+
+        // Check if already processed (prevent duplicate rewards)
+        $checkQuery = "SELECT id FROM purchase_tokens WHERE token = :token";
+        $checkStmt = $this->conn->prepare($checkQuery);
+        $checkStmt->execute([':token' => $purchaseToken]);
+        if ($checkStmt->rowCount() > 0) {
+            http_response_code(409);
+            echo json_encode(["error" => "Purchase already processed"]);
+            return;
+        }
+
+        try {
+            $this->conn->beginTransaction();
+
+            // Record this purchase token to prevent duplicate processing
+            $insertToken = "INSERT INTO purchase_tokens (user_id, token, product_id, created_at) VALUES (:uid, :token, :product, NOW())";
+            $insertStmt = $this->conn->prepare($insertToken);
+            $insertStmt->execute([':uid' => $userId, ':token' => $purchaseToken, ':product' => $productId]);
+
+            if (in_array($productId, $vipProducts)) {
+                // Award VIP status
+                $months = ($productId === 'vip_6_month') ? 6 : 1;
+                $duration = $months * 30 * 24 * 60 * 60;
+                $profile = $this->user->getProfile($userId);
+                $newVipUntil = max(time(), (int)($profile['vip_until'] ?? 0)) + $duration;
+
+                $vipQuery = "UPDATE users SET is_vip = 1, vip_until = :until WHERE id = :id";
+                $vipStmt = $this->conn->prepare($vipQuery);
+                $vipStmt->execute([':until' => $newVipUntil, ':id' => $userId]);
+
+                $this->logTransaction($userId, 0, 0, 'vip_purchase', "Google Play VIP $months months");
+
+                $this->conn->commit();
+                echo json_encode([
+                    "success" => true,
+                    "type" => "vip",
+                    "vip_until" => $newVipUntil,
+                    "message" => "VIP activated for $months month(s)"
+                ]);
+
+            } elseif (isset($coinsMap[$productId])) {
+                // Award coins
+                $coinsAmount = $coinsMap[$productId];
+                $this->user->addCurrency($userId, $coinsAmount, 'coins');
+                $this->logTransaction(0, $userId, $coinsAmount, 'purchase', "Google Play: $productId");
+
+                $this->conn->commit();
+                $updatedProfile = $this->user->getProfile($userId);
+                echo json_encode([
+                    "success" => true,
+                    "type" => "coins",
+                    "coins_added" => $coinsAmount,
+                    "current_coins" => (int)$updatedProfile['coins'],
+                    "message" => "$coinsAmount coins added to your balance"
+                ]);
+            } else {
+                $this->conn->rollBack();
+                http_response_code(400);
+                echo json_encode(["error" => "Unknown product: $productId"]);
+            }
+
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            http_response_code(500);
+            echo json_encode(["error" => "Verification failed: " . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Log a coin transaction
      * History logging is disabled - no longer needed
      */
