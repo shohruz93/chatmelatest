@@ -197,8 +197,22 @@ class CoinsController {
      * History logging is disabled - no longer needed
      */
     private function logTransaction($senderId, $receiverId, $amount, $type = 'transfer', $note = null) {
-        // Transaction history recording is disabled
-        return true;
+        try {
+            $query = "INSERT INTO coin_transactions (sender_id, receiver_id, amount, type, note, created_at) 
+                      VALUES (:sid, :rid, :amount, :type, :note, NOW())";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                ':sid' => $senderId,
+                ':rid' => $receiverId,
+                ':amount' => $amount,
+                ':type' => $type,
+                ':note' => $note
+            ]);
+            return true;
+        } catch (Exception $e) {
+            error_log("Failed to log transaction: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -444,6 +458,9 @@ class CoinsController {
             $query = "UPDATE users SET is_vip = 1, vip_until = :until WHERE id = :id";
             $stmt = $this->conn->prepare($query);
             $stmt->execute([':until' => $newVipUntil, ':id' => $userId]);
+
+            // Log VIP purchase
+            $this->logTransaction($userId, 0, $cost, 'vip_purchase', "VIP for $months months");
 
             $this->conn->commit();
 
