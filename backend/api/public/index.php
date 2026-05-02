@@ -185,6 +185,10 @@ $router->add('POST', '/gamification/track', function() use ($gamificationControl
     $gamificationController->trackProgress();
 });
 
+$router->add('GET', '/gamification/leaderboard', function() use ($gamificationController) {
+    $gamificationController->getLeaderboard();
+});
+
 // Game Routes
 $router->add('POST', '/games/bet', function() use ($gameController) {
     $gameController->bet();

@@ -52,6 +52,56 @@ class GamificationController {
 
         echo json_encode($missions);
     }
+
+    // GET /gamification/leaderboard
+    public function getLeaderboard() {
+        $headers = getallheaders();
+        $userId = $this->getUserIdFromToken($headers);
+        if (!$userId) {
+            $userId = $_GET['userId'] ?? 0;
+        }
+
+        // Get Top 10 users by xp
+        $queryTop = "SELECT id, name, avatar, is_vip, xp, FLOOR(SQRT(xp / 100)) + 1 as level 
+                     FROM users 
+                     ORDER BY xp DESC 
+                     LIMIT 10";
+        $stmtTop = $this->conn->prepare($queryTop);
+        $stmtTop->execute();
+        $topUsers = $stmtTop->fetchAll(PDO::FETCH_ASSOC);
+
+        $currentUserRank = null;
+        if ($userId) {
+            // Find current user's rank
+            $queryRank = "SELECT rank FROM (
+                              SELECT id, ROW_NUMBER() OVER (ORDER BY xp DESC) as rank 
+                              FROM users 
+                          ) ranked 
+                          WHERE id = :user_id";
+            $stmtRank = $this->conn->prepare($queryRank);
+            $stmtRank->bindParam(":user_id", $userId);
+            $stmtRank->execute();
+            $rankRow = $stmtRank->fetch(PDO::FETCH_ASSOC);
+            
+            if ($rankRow) {
+                $queryUser = "SELECT id, name, avatar, is_vip, xp, FLOOR(SQRT(xp / 100)) + 1 as level FROM users WHERE id = :user_id";
+                $stmtUser = $this->conn->prepare($queryUser);
+                $stmtUser->bindParam(":user_id", $userId);
+                $stmtUser->execute();
+                $userData = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+                if ($userData) {
+                    $currentUserRank = $userData;
+                    $currentUserRank['rank'] = $rankRow['rank'];
+                }
+            }
+        }
+
+        echo json_encode([
+            "top_users" => $topUsers,
+            "current_user" => $currentUserRank
+        ]);
+    }
     
     // POST /gamification/track
     public function trackProgress() {
