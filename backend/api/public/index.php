@@ -29,6 +29,11 @@ require_once __DIR__ . '/../src/GameController.php';
 require_once __DIR__ . '/../src/GalleryController.php';
 require_once __DIR__ . '/../src/CommunityController.php';
 require_once __DIR__ . '/../src/VoiceController.php';
+require_once __DIR__ . '/../src/LearningController.php';
+require_once __DIR__ . '/../src/WordBankController.php';
+require_once __DIR__ . '/../src/StudyBuddyController.php';
+require_once __DIR__ . '/../src/ProgressController.php';
+require_once __DIR__ . '/../src/ContentController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -55,6 +60,11 @@ $gameController = new GameController();
 $galleryController = new GalleryController();
 $communityController = new CommunityController();
 $voiceController = new VoiceController($db);
+$learningController  = new LearningController();
+$wordBankController  = new WordBankController();
+$buddyController     = new StudyBuddyController();
+$progressController  = new ProgressController();
+$contentController   = new ContentController();
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -728,6 +738,138 @@ $router->add('DELETE', '/community/post', function() use ($communityController) 
         return;
     }
     $communityController->deletePost($postId, $userId);
+});
+
+// ================================================================
+// Learning Routes
+// ================================================================
+$router->add('GET', '/learning/goal', function() use ($learningController) {
+    $learningController->getGoal();
+});
+
+$router->add('POST', '/learning/goal', function() use ($learningController) {
+    $learningController->setGoal();
+});
+
+$router->add('GET', '/learning/scenarios', function() use ($learningController) {
+    $learningController->getScenarios();
+});
+
+$router->add('POST', '/learning/scenario/start', function() use ($learningController) {
+    $learningController->startScenario();
+});
+
+$router->add('POST', '/learning/scenario/complete', function() use ($learningController) {
+    $learningController->completeScenario();
+});
+
+$router->add('POST', '/learning/correction', function() use ($learningController) {
+    $learningController->submitCorrection();
+});
+
+$router->add('POST', '/learning/correction/accept', function() use ($learningController) {
+    $learningController->acceptCorrection();
+});
+
+$router->add('GET', '/learning/corrections', function() use ($learningController) {
+    $learningController->getCorrections();
+});
+
+$router->add('GET', '/learning/stats', function() use ($learningController) {
+    $learningController->getStats();
+});
+
+$router->add('POST', '/learning/streak/update', function() use ($learningController) {
+    $learningController->updateStreakEndpoint();
+});
+
+$router->add('POST', '/learning/report-spam', function() use ($learningController) {
+    $learningController->reportSpam();
+});
+
+// ================================================================
+// Word Bank Routes
+// ================================================================
+$router->add('POST', '/wordbank/save', function() use ($wordBankController) {
+    $wordBankController->saveWord();
+});
+$router->add('GET', '/wordbank/list', function() use ($wordBankController) {
+    $wordBankController->listWords();
+});
+$router->add('GET', '/wordbank/review', function() use ($wordBankController) {
+    $wordBankController->getReviewWords();
+});
+$router->add('POST', '/wordbank/review-result', function() use ($wordBankController) {
+    $wordBankController->submitReviewResult();
+});
+$router->add('DELETE', '/wordbank/word', function() use ($wordBankController) {
+    $wordBankController->deleteWord();
+});
+$router->add('GET', '/wordbank/stats', function() use ($wordBankController) {
+    $wordBankController->getStats();
+});
+
+// ================================================================
+// Study Buddy Routes
+// ================================================================
+$router->add('POST', '/buddy/request', function() use ($buddyController) {
+    $buddyController->sendRequest();
+});
+$router->add('POST', '/buddy/accept', function() use ($buddyController) {
+    $buddyController->acceptRequest();
+});
+$router->add('GET', '/buddy/my', function() use ($buddyController) {
+    $buddyController->getMyBuddies();
+});
+$router->add('POST', '/buddy/checkin', function() use ($buddyController) {
+    $buddyController->checkIn();
+});
+$router->add('GET', '/buddy/pending', function() use ($buddyController) {
+    $buddyController->getPendingRequests();
+});
+$router->add('POST', '/buddy/weekly-reset', function() use ($buddyController) {
+    $buddyController->weeklyReset();
+});
+
+// ================================================================
+// Progress Routes
+// ================================================================
+$router->add('GET', '/progress/weekly', function() use ($progressController) {
+    $progressController->getWeeklyReport();
+});
+$router->add('GET', '/progress/fluency', function() use ($progressController) {
+    $progressController->getFluencyScore();
+});
+$router->add('POST', '/progress/snapshot', function() use ($progressController) {
+    $progressController->generateSnapshot();
+});
+$router->add('GET', '/progress/history', function() use ($progressController) {
+    $progressController->getHistory();
+});
+
+// ================================================================
+// Content Routes (Slang, Challenges, Availability)
+// ================================================================
+$router->add('GET', '/content/slang', function() use ($contentController) {
+    $contentController->getSlangOfWeek();
+});
+$router->add('POST', '/content/slang/save-to-bank', function() use ($contentController) {
+    $contentController->saveSlangToBank();
+});
+$router->add('POST', '/content/challenge/send', function() use ($contentController) {
+    $contentController->sendChallenge();
+});
+$router->add('POST', '/content/challenge/respond', function() use ($contentController) {
+    $contentController->respondToChallenge();
+});
+$router->add('GET', '/content/challenge/my', function() use ($contentController) {
+    $contentController->getMyChallenges();
+});
+$router->add('POST', '/content/availability', function() use ($contentController) {
+    $contentController->setAvailability();
+});
+$router->add('GET', '/content/availability', function() use ($contentController) {
+    $contentController->getAvailability();
 });
 
 // Voice Room Routes

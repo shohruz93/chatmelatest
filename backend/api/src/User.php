@@ -151,6 +151,9 @@ class User {
         // Extract language preferences from filters
         $rawNative = $filters['native_language'] ?? '';
         $rawLearning = $filters['learning_language'] ?? '';
+        $levelFilter = $filters['level'] ?? '';
+        $goalFilter  = $filters['goal'] ?? '';
+        $minTrust    = 20; // Exclude very low trust score (spammers)
         
         // Helper to get first language
         $getFirstLang = function($val) {
@@ -216,11 +219,13 @@ class User {
              $onlineScore = "CASE WHEN last_active > (UNIX_TIMESTAMP() - 300) THEN 1 ELSE 0 END";
         }
 
-        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language, last_active, is_vip,
+        $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language,
+                  last_active, is_vip, language_level, learning_goal, trust_score,
                   ($genderScore) as gender_priority,
                   ($languageScore) as lang_score,
                   ($onlineScore) as online_priority
-                  FROM " . $this->table_name . " WHERE id != :current_user_id AND hide_from_connect = 0";
+                  FROM " . $this->table_name . " WHERE id != :current_user_id AND hide_from_connect = 0
+                  AND trust_score >= $minTrust";
         
         // Appply Filters
         if (!empty($filters['gender']) && $filters['gender'] !== 'any') {
@@ -231,6 +236,23 @@ class User {
         if (!empty($filters['location']) && $filters['location'] !== 'any') {
             $query .= " AND location = :location";
             $params[':location'] = $filters['location'];
+        }
+
+        // Level-based matching: within 1 CEFR step
+        if (!empty($levelFilter)) {
+            $levelMap = ['A1'=>0,'A2'=>1,'B1'=>2,'B2'=>3,'C1'=>4,'C2'=>5];
+            $myIdx = $levelMap[$levelFilter] ?? 0;
+            $nearLevels = [];
+            foreach ($levelMap as $lvl => $idx) {
+                if (abs($idx - $myIdx) <= 1) $nearLevels[] = "'$lvl'";
+            }
+            $query .= " AND (language_level IN (" . implode(',', $nearLevels) . ") OR language_level IS NULL)";
+        }
+
+        // Goal-based matching (optional priority)
+        if (!empty($goalFilter)) {
+            $params[':goal'] = $goalFilter;
+            // We don't hard-filter, just boost via ORDER later
         }
 
         if (!empty($filters['search'])) {
