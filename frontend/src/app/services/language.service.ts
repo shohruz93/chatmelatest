@@ -256,8 +256,16 @@ export class LanguageService {
                 'REPLY': 'Reply',
                 'TRANSLATE': 'Translate',
                 'HIDE_TRANSLATE': 'Hide Translation',
-                'CONFIRM_DELETE': 'Are you sure you want to delete this message?'
+                'CONFIRM_DELETE': 'Are you sure you want to delete this message?',
+                'AI_SUGGESTIONS': 'AI Suggestions',
+                'FIX_GRAMMAR': 'Fix Grammar',
+                'GENERATE_AI': 'Generate AI replies',
+                'ASK_AI': 'Ask AI',
+                'AI_CHAT_TITLE': 'Chat with AI Assistant',
+                'AI_CHAT_PLACEHOLDER': 'Type your question here...',
+                'AI_CHAT_EMPTY': 'Ask me anything!'
             },
+
             'DASHBOARD': {
                 'ONLINE': 'Online',
                 'PROFILE': 'Profile',
@@ -1034,8 +1042,17 @@ export class LanguageService {
                 'ON_CALL_WITH': 'В разговоре с',
                 'USER_BUSY': 'Пользователь занят',
                 'USER_OFFLINE': 'Пользователь не в сети',
-                'DECLINED': 'Вызов отклонен'
+                'DECLINED': 'Вызов отклонен',
+                'AI_SUGGESTIONS': 'Предложения ИИ',
+                'FIX_GRAMMAR': 'Исправить грамматику',
+                'GENERATE_AI': 'Сгенерировать ответы',
+                'ASK_AI': 'Спросить ИИ',
+                'AI_CHAT_TITLE': 'Чат с ИИ Ассистентом',
+                'AI_CHAT_PLACEHOLDER': 'Введите ваш вопрос...',
+                'AI_CHAT_EMPTY': 'Спрашивайте о чем угодно!'
             }
+
+
         },
         'tj': {
             'HOME': {
@@ -1257,8 +1274,17 @@ export class LanguageService {
                 'INVITE_DECLINED': 'Даъватнома рад карда шуд',
                 'WAITING_FOR_RESPONSE': 'Интизории ҷавоб',
                 'WAITING_DESC': 'Интизории қабул ё радкунии даъвати бозӣ аз ҷониби ҳамсӯҳбат...',
-                'USER_NOT_IN_ROOM': 'Истифодабаранда дар ин чат нест'
-            },
+                'USER_NOT_IN_ROOM': 'Истифодабаранда дар ин чат нест',
+                'AI_SUGGESTIONS': 'Пешниҳодҳои AI',
+                'FIX_GRAMMAR': 'Ислоҳи ҷумла',
+                'GENERATE_AI': 'Таҳияи ҷавобҳо',
+                'ASK_AI': 'Аз AI бипурс',
+                'AI_CHAT_TITLE': 'Сӯҳбат бо Ассистенти AI',
+                'AI_CHAT_PLACEHOLDER': 'Саволи худро нависед...',
+                'AI_CHAT_EMPTY': 'Аз ман ҳама чизро пурсед!'
+            }
+,
+
             'DASHBOARD': {
                 'ONLINE': 'Дар шабака',
                 'PROFILE': 'Профил',

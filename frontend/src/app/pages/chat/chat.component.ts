@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, signal, inject, ChangeDetectionStrategy, ChangeDetectorRef, effect } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { CallService } from '../../services/call.service';
 import { VoiceChatService } from '../../services/voice-chat.service';
 import { Subscription } from 'rxjs';
 import { VoiceRecorder } from '@independo/capacitor-voice-recorder';
+import { AiService, AiSuggestion } from '../../services/ai.service';
+
 
 import { TranslationService } from '../../services/translation.service';
 import { CountrySelectComponent } from '../../components/country-select/country-select.component';
@@ -58,6 +60,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     public gamificationService = inject(GamificationService);
     public callService = inject(CallService);
     public voiceService = inject(VoiceChatService);
+    private aiService = inject(AiService);
+
 
     // Signals from Service
     messages = this.chatService.orderedMessages;
@@ -190,6 +194,17 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Game Invites
     gameInvitation: any = null;
     waitingForGameResponse: boolean = false;
+
+    // AI Features
+    aiSuggestions = signal<AiSuggestion[]>([]);
+    isGeneratingAi = signal(false);
+    isFixingSentence = signal(false);
+    showAiChatModal = false;
+    aiChatMessages = signal<{role: 'user' | 'ai', content: string}[]>([]);
+    aiChatInput = '';
+    isAiTyping = signal(false);
+
+
 
     lastMessageCount: number = 0;
     private sendSound = new Audio('/mp3/tick.mp3');
@@ -333,7 +348,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.replyingToMessage = null;
         this.isCorrecting = false;
         this.socketService.emitTyping(this.roomId!, false);
+        this.aiSuggestions.set([]); // Clear suggestions after sending
     } // end sendMessage
+
 
     // Message Actions Menu
     openMsgMenu(event: Event, msg: any) {
@@ -658,8 +675,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         try {
             const status = await VoiceRecorder.requestAudioRecordingPermission();
             if (status.value) {
-                await VoiceRecorder.startRecording();
+                // Set bitrate to 128kbps as requested. Note: Plugin support may vary by platform.
+                await (VoiceRecorder as any).startRecording({
+                    bitrate: 128000
+                });
                 this.isRecording = true;
+
                 this.recordingDuration = 0;
                 this.cdr.markForCheck();
 
@@ -785,4 +806,100 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     formatDate(timestamp: number): string {
         return new Date(timestamp).toLocaleDateString();
     }
+
+    // AI Logic
+    generateAiSuggestions() {
+        if (!this.roomId) return;
+        this.isGeneratingAi.set(true);
+
+        // Prepare history
+        const history = this.messages()
+            .slice(-10)
+            .map(m => `${m.senderName || (m.type === 'sent' ? 'Me' : 'Partner')}: ${m.content}`)
+            .join('\n');
+
+        const myLang = this.languageService.currentLang();
+        const pLang = this.partner?.language || myLang; // Fallback to my lang
+
+        this.aiService.generateSuggestions(history, myLang, pLang, this.currentUser.name).subscribe({
+            next: (suggestions) => {
+                this.aiSuggestions.set(suggestions);
+                this.isGeneratingAi.set(false);
+                this.cdr.detectChanges(); // Use detectChanges for immediate UI update in OnPush
+            },
+            error: (err) => {
+                console.error('AI Suggestion error', err);
+                this.isGeneratingAi.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    useAiSuggestion(suggestion: AiSuggestion) {
+        this.newMessage = suggestion.textToSend;
+        this.aiSuggestions.set([]);
+        this.cdr.detectChanges();
+        // Optional: Send immediately? User might want to edit.
+        // this.sendMessage();
+    }
+
+    fixMySentence() {
+        if (!this.newMessage.trim() || this.isFixingSentence()) return;
+
+        this.isFixingSentence.set(true);
+        this.cdr.detectChanges();
+        this.aiService.fixSentence(this.newMessage).subscribe({
+            next: (fixed) => {
+                this.newMessage = fixed;
+                this.isFixingSentence.set(true); // Wait, should be false
+                this.isFixingSentence.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('AI Fix error', err);
+                this.isFixingSentence.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    openAiChat() {
+        this.showAiChatModal = true;
+        this.cdr.detectChanges();
+    }
+
+    closeAiChat() {
+        this.showAiChatModal = false;
+        this.cdr.detectChanges();
+    }
+
+    sendAiQuestion() {
+        if (!this.aiChatInput.trim() || this.isAiTyping()) return;
+
+        const question = this.aiChatInput.trim();
+        this.aiChatInput = '';
+        
+        const currentMsgs = this.aiChatMessages();
+        this.aiChatMessages.set([...currentMsgs, { role: 'user', content: question }]);
+        this.isAiTyping.set(true);
+        this.cdr.detectChanges();
+
+        this.aiService.askAi(question).subscribe({
+            next: (answer) => {
+                const updatedMsgs = this.aiChatMessages();
+                this.aiChatMessages.set([...updatedMsgs, { role: 'ai', content: answer }]);
+                this.isAiTyping.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('AI Chat Error:', err);
+                const updatedMsgs = this.aiChatMessages();
+                this.aiChatMessages.set([...updatedMsgs, { role: 'ai', content: 'Sorry, I am having trouble connecting right now.' }]);
+                this.isAiTyping.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
 }
+
+
