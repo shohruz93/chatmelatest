@@ -60,11 +60,15 @@ export class CommunityFeedComponent implements OnInit {
     private lastTap: number = 0;
     private readonly DOUBLE_TAP_DELAY = 300;
 
+    // NSFW setting (read from localStorage, set in profile settings)
+    nsfwAllowed: boolean = false;
+
     // View Tracking
     private observedPosts = new Set<number>();
     private viewObserver: IntersectionObserver | null = null;
 
     ngOnInit() {
+        this.nsfwAllowed = localStorage.getItem('allow_nsfw_content') === 'true';
         if (this.currentUser?.id) {
             this.communityStorage.openDb(this.currentUser.id).then(() => {
                 this.loadLocalFeed();

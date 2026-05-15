@@ -425,6 +425,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+}
+
+.nsfw-content img,
+.nsfw-content video {
+    filter: blur(25px) brightness(0.8);
+    transition: filter 0.3s ease;
+    pointer-events: none;
 }
 
 .post-actions {

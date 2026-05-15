@@ -270,21 +270,33 @@ class LearningController {
         $this->updateStreak($userId);
 
         $stmt = $this->conn->prepare("
-            SELECT u.streak_days, u.corrections_given, u.corrections_received,
-                   u.xp, u.language_level, u.learning_goal,
-                   FLOOR(SQRT(u.xp / 100)) + 1 as level,
-                   ls.total_scenarios_completed, ls.longest_streak,
-                   ls.total_corrections_made
+            SELECT COALESCE(u.streak_days, 0) as streak_days, 
+                   COALESCE(u.corrections_given, 0) as corrections_given, 
+                   COALESCE(u.corrections_received, 0) as corrections_received,
+                   COALESCE(u.xp, 0) as xp, u.language_level, u.learning_goal,
+                   FLOOR(SQRT(COALESCE(u.xp, 0) / 100)) + 1 as level,
+                   COALESCE(ls.total_scenarios_completed, 0) as total_scenarios_completed, 
+                   COALESCE(ls.longest_streak, 0) as longest_streak,
+                   COALESCE(ls.total_corrections_made, 0) as total_corrections_made
             FROM users u
             LEFT JOIN learning_stats ls ON u.id = ls.user_id
             WHERE u.id=:uid");
         $stmt->execute([':uid' => $userId]);
         $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if (!$stats) {
+            $stats = [];
+        }
+
         // Recent corrections given
         $corrStmt = $this->conn->prepare("SELECT COUNT(*) FROM message_corrections WHERE corrector_id=:uid AND DATE(created_at)=CURDATE()");
         $corrStmt->execute([':uid' => $userId]);
         $stats['corrections_today'] = (int)$corrStmt->fetchColumn();
+
+        // Words saved
+        $wordsStmt = $this->conn->prepare("SELECT COUNT(*) FROM word_bank WHERE user_id=:uid");
+        $wordsStmt->execute([':uid' => $userId]);
+        $stats['words_saved'] = (int)$wordsStmt->fetchColumn();
 
         echo json_encode($stats ?: (object)[]);
     }

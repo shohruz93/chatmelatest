@@ -155,6 +155,19 @@
 
 
 
+                    <div class="form-group settings-section">
+                        <label class="settings-label">{{ 'PROFILE.CONTENT_SETTINGS' | translate }}</label>
+                        <div class="toggle-row" (click)="toggleNsfwAllowed()">
+                            <div class="toggle-info">
+                                <span class="toggle-title">{{ 'PROFILE.ALLOW_18_PLUS' | translate }}</span>
+                                <span class="toggle-desc">{{ 'PROFILE.ALLOW_18_PLUS_DESC' | translate }}</span>
+                            </div>
+                            <div class="toggle-switch" [class.on]="nsfwAllowed">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="edit-actions">
                         <button class="btn-cancel" (click)="toggleEdit()">{{ 'COMMON.CANCEL' | translate }}</button>
                         <button class="btn-save" (click)="saveProfile()" [disabled]="loading">

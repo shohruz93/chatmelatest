@@ -27,6 +27,7 @@ import { Title } from '@angular/platform-browser';
                 <th class="px-6 py-4">User</th>
                 <th class="px-6 py-4">Content Type</th>
                 <th class="px-6 py-4">Preview</th>
+                <th class="px-6 py-4 text-center">18+</th>
                 <th class="px-6 py-4">Created At</th>
                 <th class="px-6 py-4 text-right">Actions</th>
               </tr>
@@ -65,6 +66,14 @@ import { Title } from '@angular/platform-browser';
                         }
                       </div>
                     </button>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex justify-center">
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" [checked]="post.is_18_plus == 1" (change)="toggle18Plus(post)">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-red-500"></div>
+                      </label>
+                    </div>
                   </td>
                   <td class="px-6 py-4">
                     <div class="text-xs text-slate-500 dark:text-slate-400">
@@ -241,6 +250,21 @@ export class AdminCommunityComponent implements OnInit {
         }
       });
     }
+  }
+
+  toggle18Plus(post: any) {
+    const newStatus = post.is_18_plus == 1 ? 0 : 1;
+    this.adminService.togglePost18Plus(post.id, newStatus).subscribe({
+      next: () => {
+        post.is_18_plus = newStatus;
+      },
+      error: (err) => {
+        console.error('Error toggling 18+ status:', err);
+        alert('Failed to update 18+ status');
+        // Revert UI if needed. We could bind it differently, but forcing checked is enough if we reload.
+        // As it's simple, we just alert.
+      }
+    });
   }
 
   getAvatarUrl(avatar: string): string {

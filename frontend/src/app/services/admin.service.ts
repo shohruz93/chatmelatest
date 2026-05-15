@@ -110,6 +110,10 @@ export class AdminService {
     return this.http.post(`${this.apiUrl}/admin/community/posts/delete`, { post_id: postId });
   }
 
+  togglePost18Plus(postId: number, is18Plus: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/community/posts/toggle-18-plus`, { post_id: postId, is_18_plus: is18Plus });
+  }
+
   addCoins(userId: number, amount: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/users/coins`, { user_id: userId, amount });
   }

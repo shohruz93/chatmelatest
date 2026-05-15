@@ -557,6 +557,10 @@ $router->add('POST', '/admin/community/posts/delete', function() use ($adminCont
     $adminController->deleteCommunityPost();
 });
 
+$router->add('POST', '/admin/community/posts/toggle-18-plus', function() use ($adminController) {
+    $adminController->togglePost18Plus();
+});
+
 // App Version Check (Public)
 $router->add('GET', '/app/version', function() use ($appVersion) {
     $platform = $_GET['platform'] ?? '';

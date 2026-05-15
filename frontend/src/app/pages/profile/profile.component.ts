@@ -112,6 +112,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     followingCount: number = 0;
     guestsCount: number = 0;
 
+    // NSFW / 18+ content setting
+    nsfwAllowed: boolean = false;
+
     genderOptions = [
         { value: '', label: 'Prefer not to say' },
         { value: 'male', label: 'Male' },
@@ -194,6 +197,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     ngOnInit() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         this.isDarkMode.set(savedTheme === 'dark');
+        this.nsfwAllowed = localStorage.getItem('allow_nsfw_content') === 'true';
 
         try {
             this.isWeb = !Capacitor.isNativePlatform();
@@ -634,6 +638,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isDarkMode.set(!this.isDarkMode());
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+    }
+
+    toggleNsfwAllowed() {
+        this.nsfwAllowed = !this.nsfwAllowed;
+        localStorage.setItem('allow_nsfw_content', this.nsfwAllowed ? 'true' : 'false');
     }
 
     getCountryFlagUrl(countryName: string): string {

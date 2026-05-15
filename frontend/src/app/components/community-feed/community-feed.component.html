@@ -81,13 +81,13 @@
 
             <!-- Media Content -->
             @if (post.content_type === 'image' && post.media_path) {
-            <div class="post-media">
+            <div class="post-media" [class.nsfw-content]="post.is_18_plus == 1 && !nsfwAllowed">
                 <img [src]="getMediaUrl(post.media_path)" alt="Post image" loading="lazy">
             </div>
             }
 
             @if (post.content_type === 'video' && post.media_path) {
-            <div class="post-media">
+            <div class="post-media" [class.nsfw-content]="post.is_18_plus == 1 && !nsfwAllowed">
                 <video [src]="getMediaUrl(post.media_path)" controls preload="metadata"
                     (click)="$event.stopPropagation()"></video>
             </div>

@@ -538,6 +538,86 @@ input[type="text"] {
     color: #ef4444;
 }
 
+/* Content Settings Toggle */
+.settings-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.settings-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+.toggle-row:hover {
+    background: var(--bg-secondary);
+}
+
+.toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.toggle-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.toggle-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--border-color);
+    border-radius: 12px;
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+}
+
+.toggle-switch.on {
+    background: var(--primary-color);
+}
+
+.toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.toggle-switch.on .toggle-knob {
+    transform: translateX(20px);
+}
+
 .edit-actions {
     display: flex;
     justify-content: flex-end;

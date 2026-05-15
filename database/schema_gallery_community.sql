@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS community_posts (
     text_content TEXT,
     media_path VARCHAR(512),
     video_duration INT DEFAULT 0 COMMENT 'Duration in seconds, max 60',
+    is_18_plus TINYINT(1) DEFAULT 0,
     likes_count INT DEFAULT 0,
     comments_count INT DEFAULT 0,
     views_count INT DEFAULT 0,

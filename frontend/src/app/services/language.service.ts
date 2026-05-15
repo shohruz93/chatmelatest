@@ -423,7 +423,10 @@ export class LanguageService {
                 'GET_APP_DESC': 'Experience ChatMe on your mobile device for the best experience.',
                 'LOGOUT_CONFIRM_TITLE': 'Logout',
                 'LOGOUT_CONFIRM_MESSAGE': 'Are you sure you want to logout? You\'ll need to sign in again to access your account.',
-                'STAY': 'Stay'
+                'STAY': 'Stay',
+                'CONTENT_SETTINGS': 'Content Settings',
+                'ALLOW_18_PLUS': 'Show 18+ Content',
+                'ALLOW_18_PLUS_DESC': 'Show adult-rated posts in your feed (off by default)'
             },
             'GALLERY': {
                 'TITLE': 'Gallery',
@@ -800,7 +803,10 @@ export class LanguageService {
                 'USER_PREFIX': 'Польз. #',
                 'PLAYER_PREFIX': 'Игрок #',
                 'COMPLETE_PROFILE': 'Заполните профиль',
-                'COMPLETE_PROFILE_DESC': 'Пожалуйста, выберите ваш пол и языки для продолжения. Это поможет нам подобрать вам подходящих людей.'
+                'COMPLETE_PROFILE_DESC': 'Пожалуйста, выберите ваш пол и языки для продолжения. Это поможет нам подобрать вам подходящих людей.',
+                'CONTENT_SETTINGS': 'Настройки контента',
+                'ALLOW_18_PLUS': 'Показывать контент 18+',
+                'ALLOW_18_PLUS_DESC': 'Показывать публикации для взрослых в ленте (выключено по умолчанию)'
             },
             'VOICE': {
                 'CONNECTING': 'Подключение...',
@@ -1207,7 +1213,10 @@ export class LanguageService {
                 'LAST_ONLINE': 'Охирин бор дар шабака',
                 'REVIEWS': 'тафсирҳо',
                 'USER_PREFIX': 'Корбар #',
-                'PLAYER_PREFIX': 'Бозингар #'
+                'PLAYER_PREFIX': 'Бозингар #',
+                'CONTENT_SETTINGS': 'Танзимоти мундариҷа',
+                'ALLOW_18_PLUS': 'Намоиши мундариҷаи 18+',
+                'ALLOW_18_PLUS_DESC': 'Намоиши постҳои 18+ дар лента (пешфарз ғайрифаъол)'
             },
             'VOICE': {
                 'CONNECTING': 'Пайвастшавӣ...',

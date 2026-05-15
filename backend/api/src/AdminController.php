@@ -670,6 +670,27 @@ class AdminController {
             echo json_encode(['error' => 'Failed to delete post']);
         }
     }
+
+    public function togglePost18Plus() {
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->post_id) || !isset($data->is_18_plus)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Post ID and is_18_plus status required']);
+            return;
+        }
+
+        $query = "UPDATE community_posts SET is_18_plus = :is_18_plus WHERE id = :id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(":is_18_plus", $data->is_18_plus, PDO::PARAM_INT);
+        $stmt->bindParam(":id", $data->post_id, PDO::PARAM_INT);
+        
+        if($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Post 18+ status updated']);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to update 18+ status']);
+        }
+    }
 }
 
 
