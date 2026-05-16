@@ -17,21 +17,21 @@
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <NavigationView x:ConnectionId='2' x:Name="MainNav" PaneDisplayMode="LeftCompact" IsBackButtonVisible="Collapsed"                                            >
+        <NavigationView x:ConnectionId='2' x:Name="MainNav" PaneDisplayMode="LeftCompact" IsBackButtonVisible="Collapsed" IsSettingsVisible="False"                                            >
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Explore" Tag="Explore">
+                <NavigationViewItem Content="Паёмҳо" Tag="Messages">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8F2;" FontFamily="Segoe Fluent Icons"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                
+                <NavigationViewItem Content="Чустуҷӯ" Tag="Explore">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE721;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
 
-                <NavigationViewItem Content="Messages" Tag="Messages">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE8F2;" FontFamily="Segoe Fluent Icons"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-
-                <NavigationViewItem Content="Guests" Tag="Guests">
+                <NavigationViewItem Content="Меҳмонон" Tag="Guests">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE716;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
@@ -42,20 +42,44 @@
                         <FontIcon Glyph="&#xE1D6;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                
+                <NavigationViewItem Content="Омӯзиш" Tag="Learning">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE82D;" FontFamily="Segoe Fluent Icons"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Пешсафон" Tag="Leaderboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE734;" FontFamily="Segoe Fluent Icons"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Профил" Tag="Profile">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE77B;" FontFamily="Segoe Fluent Icons"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+
+                <NavigationViewItem Content="Панели администратор" Tag="Admin">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE7EF;" FontFamily="Segoe Fluent Icons"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
             </NavigationView.MenuItems>
             
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem Content="Contact Admin" Tag="ContactAdmin">
+                <NavigationViewItem Content="Тамос бо админ" Tag="ContactAdmin">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE7F6;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Language" Tag="Language">
+                <NavigationViewItem Content="Забон" Tag="Language">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE12B;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:ConnectionId='3' Content="Toggle Theme" Tag="Theme"                             >
+                <NavigationViewItem x:ConnectionId='3' Content="Мавзӯъ" Tag="Theme"                             >
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE706;" FontFamily="Segoe Fluent Icons"/>
                     </NavigationViewItem.Icon>
@@ -77,60 +101,45 @@
                     </Grid.RowDefinitions>
 
                     <!-- Profile Header With Stats (Coins/XP) -->
-                    <Grid Padding="16,16,16,8">
+                    <Grid Padding="16,16,16,8" Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         
-                        <PersonPicture x:ConnectionId='27' x:Name="MyAvatar" Width="48" Height="48" Grid.Column="0" ProfilePicture="ms-appx:///Assets/placeholder.png"/>
-                        
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
-                            <!-- User Name -->
-                            <TextBlock x:ConnectionId='30' x:Name="MyNameText" Text="Chatme User" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                            
-                            <!-- Stats Badge Area -->
-                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="12">
-                                <!-- Coins -->
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="🪙" FontSize="12" Margin="0,0,2,0"/>
-                                    <TextBlock x:ConnectionId='32' x:Name="MyCoinsText" Text="0" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold"/>
+                        <Button x:ConnectionId='136' Background="Transparent" BorderThickness="0" Padding="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"                              >
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <PersonPicture x:ConnectionId='137' x:Name="MyAvatar" Width="48" Height="48" Grid.Column="0" ProfilePicture="ms-appx:///Assets/placeholder.png"/>
+                                
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                                    <!-- User Name -->
+                                    <TextBlock x:ConnectionId='138' x:Name="MyNameText" Text="Chatme Support" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <!-- Stats Badge Area -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Spacing="12">
+                                        <!-- Coins -->
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="🟠" FontSize="10" VerticalAlignment="Center"/>
+                                            <TextBlock x:ConnectionId='140' x:Name="MyCoinsText" Text="1441" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <!-- XP -->
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock Text="⚡" FontSize="10" Foreground="#d946ef" VerticalAlignment="Center"/>
+                                            <TextBlock x:ConnectionId='139' x:Name="MyXpText" Text="1220" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </StackPanel>
                                 </StackPanel>
-                                <!-- XP -->
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="⚡" FontSize="12" Margin="0,0,2,0"/>
-                                    <TextBlock x:ConnectionId='31' x:Name="MyXpText" Text="0" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <!-- Actions / Menu -->
-                        <Grid Grid.Column="2" VerticalAlignment="Center">
-                            <Button Background="Transparent" BorderThickness="0" Padding="8">
-                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE713;" FontSize="16"/>
-                                <Button.Flyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem x:ConnectionId='28' Text="My Profile" Tag="Profile"                                          >
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon Glyph="&#xE77B;" FontFamily="Segoe Fluent Icons"/>
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                        <MenuFlyoutSeparator/>
-                                        <MenuFlyoutItem x:ConnectionId='29' x:Name="LogoutMenuItem" Text="Logout"                             >
-                                            <MenuFlyoutItem.Icon>
-                                                <FontIcon Glyph="&#xF3B1;" FontFamily="Segoe Fluent Icons"/>
-                                            </MenuFlyoutItem.Icon>
-                                        </MenuFlyoutItem>
-                                    </MenuFlyout>
-                                </Button.Flyout>
-                            </Button>
-                        </Grid>
+                            </Grid>
+                        </Button>
                     </Grid>
 
                         <!-- Search Bar -->
                         <Grid Grid.Row="1" Padding="16,0,16,12">
-                            <TextBox x:ConnectionId='26' x:Name="SearchBox" PlaceholderText="Search chats..." CornerRadius="16">
+                            <TextBox x:ConnectionId='135' x:Name="SearchBox" PlaceholderText="Search chats..." CornerRadius="16">
                                 <TextBox.Header>
                                     <ContentPresenter Visibility="Collapsed"/>
                                 </TextBox.Header>
@@ -139,10 +148,10 @@
                         </Grid>
 
                         <!-- Conversation List -->
-                        <ListView x:ConnectionId='17' x:Name="ChatListView" Grid.Row="2"                                                  Padding="8,0,8,0">
+                        <ListView x:ConnectionId='126' x:Name="ChatListView" Grid.Row="2"                                                  Padding="8,0,8,0">
                             <ListView.ItemTemplate>
                                 <DataTemplate                                         >
-                                    <Grid x:ConnectionId='19' Padding="8" CornerRadius="8">
+                                    <Grid x:ConnectionId='128' Padding="8" CornerRadius="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
@@ -150,21 +159,21 @@
                                         </Grid.ColumnDefinitions>
 
                                         <!-- Avatar -->
-                                        <PersonPicture x:ConnectionId='20' Grid.Column="0" Height="48" Width="48"                                                                        />
+                                        <PersonPicture x:ConnectionId='129' Grid.Column="0" Height="48" Width="48"                                                                        />
 
                                         <!-- Details -->
                                         <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
-                                            <TextBlock x:ConnectionId='24'                             FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock x:ConnectionId='25'                             FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                                            <TextBlock x:ConnectionId='133'                             FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock x:ConnectionId='134'                             FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
                                                        TextTrimming="CharacterEllipsis" MaxLines="1" Margin="0,2,0,0"/>
                                         </StackPanel>
 
                                         <!-- Time & Badge -->
                                         <StackPanel Grid.Column="2" VerticalAlignment="Top" Margin="0,4,0,0" HorizontalAlignment="Right">
-                                            <TextBlock x:ConnectionId='21'                               FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Right"/>
-                                            <Border x:ConnectionId='22' Background="#ef4444" CornerRadius="10" MinWidth="20" Height="20" 
+                                            <TextBlock x:ConnectionId='130'                               FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Right"/>
+                                            <Border x:ConnectionId='131' Background="#ef4444" CornerRadius="10" MinWidth="20" Height="20" 
                                                     HorizontalAlignment="Right" Margin="0,6,0,0"                                       >
-                                                <TextBlock x:ConnectionId='23'                                 Foreground="White" FontSize="11" FontWeight="Bold" 
+                                                <TextBlock x:ConnectionId='132'                                 Foreground="White" FontSize="11" FontWeight="Bold" 
                                                            HorizontalAlignment="Center" VerticalAlignment="Center" Margin="6,0,6,0"/>
                                             </Border>
                                         </StackPanel>
@@ -181,118 +190,775 @@
                         </ListView>
                     </Grid>
 
-                <!-- Main Chat Area (Right Pane) -->
+                <!-- Main Content Area (Right Pane) -->
                 <Grid Grid.Column="1" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-                    <!-- Empty State -->
-                    <StackPanel x:ConnectionId='4' x:Name="EmptyStatePanel" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible">
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8F2;" FontSize="64" Foreground="{ThemeResource TextFillColorTertiaryBrush}" Margin="0,0,0,16"/>
-                        <TextBlock Text="Select a chat to start messaging" FontSize="18" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontWeight="SemiBold"/>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Tab Tabs -->
+                        <RowDefinition Height="Auto"/> <!-- Explore Header -->
+                        <RowDefinition Height="*"/>    <!-- Content Area -->
+                    </Grid.RowDefinitions>
 
-                    <!-- Active Chat -->
-                    <Grid x:ConnectionId='5' x:Name="ActiveChatPanel" Visibility="Collapsed">
+                    <!-- Web-style Tabs (Users / Community) -->
+                    <Grid x:ConnectionId='4' Grid.Row="0" x:Name="TabSelectorGrid" Margin="24,24,24,0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button x:ConnectionId='124' x:Name="UsersTabButton" Grid.Column="0" Content="👥 Корбарон" HorizontalAlignment="Stretch" Padding="12" CornerRadius="12" Background="{ThemeResource SystemAccentColorBrush}" Foreground="White" FontWeight="SemiBold"                        />
+                        <Button x:ConnectionId='125' x:Name="CommunityTabButton" Grid.Column="1" Content="📱 Ҷамъият" HorizontalAlignment="Stretch" Padding="12" CornerRadius="12" Background="Transparent" BorderThickness="0" Foreground="{ThemeResource TextFillColorSecondaryBrush}"                        />
+                    </Grid>
+
+                    <!-- VIEW: EXPLORE -->
+                    <Grid x:ConnectionId='5' x:Name="ExploreView" Grid.Row="1" Grid.RowSpan="2">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/> <!-- Header -->
-                            <RowDefinition Height="*"/>    <!-- Messages -->
-                            <RowDefinition Height="Auto"/> <!-- Input -->
+                            <RowDefinition Height="Auto"/> <!-- Explore Header -->
+                            <RowDefinition Height="*"/>    <!-- Content Area -->
                         </Grid.RowDefinitions>
 
-                        <!-- Chat Header -->
-                        <Border Grid.Row="0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" Padding="16,12" Background="{ThemeResource LayerFillColorDefaultBrush}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                        <!-- Explore Header -->
+                        <Grid Grid.Row="0" Padding="24,32,24,16">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Чустуҷӯи корбарон" FontSize="32" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock x:ConnectionId='123' x:Name="UserCountText" Text="... корбар ёфт шуд" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,4,0,0"/>
+                                    </StackPanel>
 
-                                <PersonPicture x:ConnectionId='14' x:Name="ActiveChatAvatar" Grid.Column="0" Height="40" Width="40" />
-                                
-                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock x:ConnectionId='15' x:Name="ChatHeaderName" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock x:ConnectionId='16' x:Name="ChatHeaderStatus" Text="Online" FontSize="12" Foreground="{ThemeResource SystemAccentColor}" Margin="0,2,0,0"/>
-                                </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                                        <Button x:ConnectionId='122' x:Name="RandomConnectButton" Padding="16,10" CornerRadius="12" Background="{StaticResource PrimaryGradient}" BorderThickness="0"                                  >
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="&#xE1D6;" FontSize="16" Foreground="White"/>
+                                                <TextBlock Text="Пайвастшавии тасодуфӣ" Foreground="White" FontWeight="SemiBold"/>
+                                            </StackPanel>
+                                        </Button>
+                                        
+                                        <Button Content="Филтрҳо" Padding="16,10" CornerRadius="12" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
 
-                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                                    <Button Background="Transparent" BorderThickness="0" Padding="10">
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE717;" FontSize="16"/>
-                                    </Button>
-                                    <Button Background="Transparent" BorderThickness="0" Padding="10">
-                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE712;" FontSize="16"/>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                        <ScrollViewer Grid.Row="1" Padding="24,0,24,24">
+                            <ItemsControl x:ConnectionId='111' x:Name="UsersGrid">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate                                        >
+                                        <Border x:ConnectionId='113' Margin="12" Width="300" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="20" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" Padding="24">
+                                            <StackPanel Spacing="16">
+                                                <!-- Avatar & Status -->
+                                                <Grid HorizontalAlignment="Center">
+                                                    <PersonPicture x:ConnectionId='120' Width="100" Height="100"                                 />
+                                                    <Ellipse x:ConnectionId='121' Width="18" Height="18" Fill="#22c55e" Stroke="{ThemeResource LayerFillColorDefaultBrush}" StrokeThickness="3" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,8,8"                                         />
+                                                </Grid>
 
-                        <!-- Messages Area -->
-                        <ListView x:ConnectionId='6' x:Name="MessageListView" Grid.Row="1" Padding="16,16,16,8">
-                            <ListView.ItemTemplate>
-                                <DataTemplate                                    >
-                                    <Grid x:ConnectionId='10' Margin="0,4,0,4">
-                                        <!-- Message Bubble -->
-                                        <Border x:ConnectionId='11'                                          
-                                                                                      
-                                                                                     
-                                                                                  
-                                                                                          
-                                                Padding="12,12" 
-                                                MaxWidth="500"
-                                                Margin="0,4,0,4">
-                                            <StackPanel>
-                                                <TextBlock x:ConnectionId='12'                         TextWrapping="Wrap"                                 FontSize="15" LineHeight="24"/>
-                                                <!-- Time -->
-                                                <TextBlock x:ConnectionId='13'                            
-                                                           FontSize="10" 
-                                                                                           
-                                                           HorizontalAlignment="Right" 
-                                                           Margin="0,4,0,0" 
-                                                           Opacity="0.8"/>
+                                                <!-- User Info -->
+                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                                    <TextBlock x:ConnectionId='117'                      FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                    
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                                        <Border Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="8" Padding="8,4" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                <FontIcon Glyph="&#xE819;" FontSize="12" Foreground="{ThemeResource SystemAccentColorBrush}"/>
+                                                                <TextBlock x:ConnectionId='119'                              FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                        <TextBlock Text="•" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                            <FontIcon Glyph="&#xE77B;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                            <TextBlock x:ConnectionId='118'                        FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <!-- Bio -->
+                                                <TextBlock x:ConnectionId='114'                     FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center" MaxLines="3" Height="60"/>
+
+                                                <!-- Languages (Native) -->
+                                                <StackPanel Spacing="8">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <FontIcon Glyph="&#xE12B;" FontSize="14" Foreground="{ThemeResource SystemAccentColorBrush}"/>
+                                                        <TextBlock Text="Забони модарӣ:" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                                    </StackPanel>
+                                                    <Border Padding="8,4" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" HorizontalAlignment="Left">
+                                                        <TextBlock x:ConnectionId='116'                                FontSize="11" FontWeight="Bold"/>
+                                                    </Border>
+                                                </StackPanel>
+
+                                                <!-- Send Message Button -->
+                                                <Button x:ConnectionId='115' HorizontalAlignment="Stretch" Padding="0,12" CornerRadius="12" Background="{StaticResource PrimaryGradient}" BorderThickness="0" Margin="0,8,0,0"
+                                                                                                       >
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon Glyph="&#xE724;" FontSize="16" Foreground="White" RenderTransformOrigin="0.5,0.5">
+                                                            <FontIcon.RenderTransform>
+                                                                <RotateTransform Angle="-45"/>
+                                                            </FontIcon.RenderTransform>
+                                                        </FontIcon>
+                                                        <TextBlock Text="Паём навиштан" Foreground="White" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                </Button>
                                             </StackPanel>
                                         </Border>
-                                    </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- VIEW: COMMUNITY -->
+                    <Grid x:ConnectionId='6' x:Name="CommunityView" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Filter Bar -->
+                        <Border Grid.Row="0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" Padding="16,8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Content="Навтарин" Style="{StaticResource AccentButtonStyle}" Padding="16,6"/>
+                                <Button Content="Машҳур" Padding="16,6" Background="Transparent" BorderThickness="0"/>
+                                <Button Content="Пурбаҳс" Padding="16,6" Background="Transparent" BorderThickness="0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <ListView x:ConnectionId='100' x:Name="CommunityFeedListView" Grid.Row="1" Padding="16" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate                                          >
+                                    <Border x:ConnectionId='102' Margin="0,0,0,16" Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" MaxWidth="600" HorizontalAlignment="Left">
+                                        <StackPanel Spacing="12">
+                                            <!-- Post Header -->
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <PersonPicture x:ConnectionId='108' Grid.Column="0" Width="40" Height="40"                                     />
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock x:ConnectionId='109'                          FontWeight="SemiBold" FontSize="15"/>
+                                                    <TextBlock x:ConnectionId='110'                                 FontSize="12" Opacity="0.6"/>
+                                                </StackPanel>
+                                            </Grid>
+
+                                            <!-- Post Text -->
+                                            <TextBlock x:ConnectionId='103'                                                                  TextWrapping="Wrap" FontSize="15" LineHeight="22"/>
+
+                                            <!-- Post Media -->
+                                            <Border x:ConnectionId='104' CornerRadius="8"                                      >
+                                                <Image x:ConnectionId='107'                                Stretch="UniformToFill" MaxHeight="400"/>
+                                            </Border>
+
+                                            <!-- Post Actions -->
+                                            <StackPanel Orientation="Horizontal" Spacing="24" Opacity="0.7">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xEB52;" FontSize="16" FontFamily="Segoe Fluent Icons"/>
+                                                    <TextBlock x:ConnectionId='106'                            VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xE8BD;" FontSize="16" FontFamily="Segoe Fluent Icons"/>
+                                                    <TextBlock x:ConnectionId='105'                               VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    <!-- Disable hover/selection effects for message bubbles -->
-                                    <Setter Property="IsHitTestVisible" Value="False"/>
+                                    <Setter Property="Padding" Value="0"/>
                                 </Style>
                             </ListView.ItemContainerStyle>
                         </ListView>
+                    </Grid>
 
-                        <!-- Input Area -->
-                        <Border Grid.Row="2" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="0,1,0,0" Padding="16,12">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+                    <!-- VIEW: LEARNING -->
+                    <Grid x:ConnectionId='7' x:Name="LearningView" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                                <Button Grid.Column="0" Background="Transparent" BorderThickness="0" Padding="10" Margin="0,0,8,0">
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE723;" FontSize="18"/>
-                                </Button>
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Padding="24,32,24,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="📚 Омӯзиш" FontSize="32" FontWeight="Bold"/>
+                            <Button x:ConnectionId='99' Grid.Column="1" x:Name="AddFlashcardButton" Content="+ Иловаи корт" CornerRadius="12" Padding="16,10" Background="{StaticResource PrimaryGradient}" Foreground="White" BorderThickness="0"                                 />
+                        </Grid>
 
-                                <TextBox x:ConnectionId='7' x:Name="MessageInput" Grid.Column="1" 
-                                         PlaceholderText="Type a message..." 
-                                         CornerRadius="24" 
-                                         Padding="12,8,12,8"
-                                         TextWrapping="Wrap" 
-                                         AcceptsReturn="True" 
-                                         MaxHeight="100"
-                                                                       
-                                         VerticalAlignment="Center"
-                                         BorderThickness="1"
-                                         BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"/>
+                        <!-- Stats -->
+                        <Grid Grid.Row="1" Padding="24,0,24,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" Margin="0,0,8,0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="🔥" FontSize="24" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='98' x:Name="StreakText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Силсила" FontSize="12" Opacity="0.6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" Margin="4,0,4,0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="⚡" FontSize="24" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='97' x:Name="LearningXpText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="XP" FontSize="12" Opacity="0.6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" Margin="4,0,4,0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="🗂️" FontSize="24" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='96' x:Name="TotalCardsText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Кортҳо" FontSize="12" Opacity="0.6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="3" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" Margin="8,0,0,0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="✍️" FontSize="24" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='95' x:Name="CorrectionsText" Text="0" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Ислоҳотҳо" FontSize="12" Opacity="0.6" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
-                                <Button x:ConnectionId='8' x:Name="SendButton" Grid.Column="2" 
-                                        CornerRadius="20" Width="40" Height="40" Padding="0" 
-                                        Margin="12,0,0,0"                          Background="{StaticResource PrimaryGradient}" Foreground="White" BorderThickness="0">
-                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE724;" FontSize="16"/>
-                                </Button>
-                            </Grid>
-                        </Border>
+                        <!-- Flashcard Study Area -->
+                        <Grid Grid.Row="2" Padding="24,0,24,24">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Study Card -->
+                            <Border x:ConnectionId='75' x:Name="FlashcardBorder" Grid.Row="0" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="24" Padding="48" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" MinHeight="200" Margin="0,0,0,16"                                >
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                    <TextBlock x:ConnectionId='91' x:Name="FlashcardReadyText" Text="Ба омӯзиш тайёред?" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='92' x:Name="FlashcardDueText" Text="" FontSize="16" Opacity="0.6" HorizontalAlignment="Center"/>
+                                    <TextBlock x:ConnectionId='93' x:Name="FlashcardContentText" Text="" FontSize="32" FontWeight="Bold" HorizontalAlignment="Center" Visibility="Collapsed"/>
+                                    <TextBlock x:ConnectionId='94' x:Name="FlashcardHintText" Text="Барои гардонидан клик кунед" FontSize="13" Opacity="0.4" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Buttons -->
+                            <StackPanel x:ConnectionId='76' x:Name="StartStudyPanel" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,0,0,24">
+                                <Button x:ConnectionId='90' x:Name="StartStudyButton" Content="▶ Оғози сессия" CornerRadius="14" Padding="24,12" Background="{StaticResource PrimaryGradient}" Foreground="White" BorderThickness="0"                               />
+                            </StackPanel>
+
+                            <StackPanel x:ConnectionId='77' x:Name="GradeButtonsPanel" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,0,0,24" Visibility="Collapsed">
+                                <Button x:ConnectionId='84' Content="0" Width="45" Height="45" CornerRadius="10" Background="#ef4444" Foreground="White"                           Tag="0"/>
+                                <Button x:ConnectionId='85' Content="1" Width="45" Height="45" CornerRadius="10" Background="#f97316" Foreground="White"                           Tag="1"/>
+                                <Button x:ConnectionId='86' Content="2" Width="45" Height="45" CornerRadius="10" Background="#eab308" Foreground="White"                           Tag="2"/>
+                                <Button x:ConnectionId='87' Content="3" Width="45" Height="45" CornerRadius="10" Background="#84cc16" Foreground="White"                           Tag="3"/>
+                                <Button x:ConnectionId='88' Content="4" Width="45" Height="45" CornerRadius="10" Background="#22c55e" Foreground="White"                           Tag="4"/>
+                                <Button x:ConnectionId='89' Content="5" Width="45" Height="45" CornerRadius="10" Background="#10b981" Foreground="White"                           Tag="5"/>
+                            </StackPanel>
+
+                            <!-- My Cards List -->
+                            <ScrollViewer Grid.Row="2">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Кортҳои ман" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <ItemsControl x:ConnectionId='78' x:Name="FlashcardsList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate                                      >
+                                                <Border x:ConnectionId='80' Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,8" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock x:ConnectionId='81' Grid.Column="0"                       FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                        <TextBlock x:ConnectionId='82' Grid.Column="1"                      Opacity="0.6" VerticalAlignment="Center"/>
+                                                        <Button x:ConnectionId='83' Grid.Column="2" Content="✕" Background="Transparent" BorderThickness="0" Foreground="#ef4444"                                                />
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </Grid>
+
+                    <!-- VIEW: LEADERBOARD -->
+                    <Grid x:ConnectionId='8' x:Name="LeaderboardView" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Padding="24,32,24,24">
+                            <StackPanel>
+                                <TextBlock Text="🏆 Пешсафон" FontSize="32" FontWeight="Bold"/>
+                                <TextBlock Text="Беҳтарин корбарон аз рӯи XP" FontSize="14" Opacity="0.6" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- My Rank Card -->
+                        <ScrollViewer Grid.Row="1" Padding="24,0,24,24">
+                            <StackPanel Spacing="8">
+                                <Border x:ConnectionId='61' x:Name="MyRankCard" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" BorderBrush="#6366f1" BorderThickness="2" Visibility="Collapsed" Margin="0,0,0,16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="#6366f1" CornerRadius="20" Width="40" Height="40" Margin="0,0,12,0">
+                                            <TextBlock x:ConnectionId='74' x:Name="MyRankText" Text="#?" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <PersonPicture x:ConnectionId='70' Grid.Column="1" x:Name="MyLeaderAvatar" Width="48" Height="48" Margin="0,0,12,0"/>
+                                        <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                            <TextBlock x:ConnectionId='72' x:Name="MyLeaderNameText" Text="" FontWeight="Bold" FontSize="16"/>
+                                            <TextBlock x:ConnectionId='73' x:Name="MyLeaderLevelText" Text="" FontSize="12" Opacity="0.6"/>
+                                        </StackPanel>
+                                        <TextBlock x:ConnectionId='71' Grid.Column="3" x:Name="MyLeaderXpText" Text="" FontWeight="Bold" FontSize="18" Foreground="#f59e0b" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                                <ItemsControl x:ConnectionId='62' x:Name="LeaderboardList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate                                            >
+                                            <Border x:ConnectionId='64' Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="16" Margin="0,0,0,8" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="50"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock x:ConnectionId='65' Grid.Column="0"                             FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <PersonPicture x:ConnectionId='66' Grid.Column="1" Width="48" Height="48"                                        Margin="0,0,12,0"/>
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                        <TextBlock x:ConnectionId='68'                      FontWeight="SemiBold" FontSize="15"/>
+                                                        <TextBlock x:ConnectionId='69'                           FontSize="12" Opacity="0.6"/>
+                                                    </StackPanel>
+                                                    <TextBlock x:ConnectionId='67' Grid.Column="3"                        FontWeight="Bold" FontSize="18" Foreground="#f59e0b" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- VIEW: GUESTS -->
+                    <Grid x:ConnectionId='9' x:Name="GuestsView" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Grid Grid.Row="0" Padding="24,32,24,16">
+                            <TextBlock Text="Меҳмонони охирин" FontSize="32" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}"/>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1" Padding="24,0,24,24">
+                            <ItemsControl x:ConnectionId='54' x:Name="GuestsGrid">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate                                  >
+                                        <Border x:ConnectionId='56' Margin="0,0,0,8" Padding="16" Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <PersonPicture x:ConnectionId='57' Grid.Column="0" Width="40" Height="40"                                    />
+                                                <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock x:ConnectionId='59'                            FontWeight="SemiBold"/>
+                                                    <TextBlock x:ConnectionId='60'                                FontSize="12" Opacity="0.6"/>
+                                                </StackPanel>
+                                                <TextBlock x:ConnectionId='58' Grid.Column="2"                               VerticalAlignment="Center" Opacity="0.7"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <Grid x:ConnectionId='10' x:Name="ProfileView" Grid.Row="0" Grid.RowSpan="3" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                        <ScrollViewer Padding="32">
+                            <StackPanel MaxWidth="600" HorizontalAlignment="Left" Spacing="24">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Профил" FontSize="32" FontWeight="Bold" Grid.Column="0"/>
+                                    <Button x:ConnectionId='53' Grid.Column="1"                            Background="Transparent" BorderThickness="0" Padding="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE8FB;" FontSize="16" Foreground="#ef4444"/>
+                                            <TextBlock Text="Баромадан" Foreground="#ef4444" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                                
+                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="20" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" Padding="0">
+                                    <StackPanel>
+                                        <!-- Top Header Image Placeholder / Gradient -->
+                                        <Border Height="120" Background="{StaticResource PrimaryGradient}" CornerRadius="20,20,0,0">
+                                            <Grid>
+                                                <Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="16" Background="White" Opacity="0.9" CornerRadius="8" Padding="12,6" BorderThickness="0">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon Glyph="&#xE70F;" FontSize="14"/>
+                                                        <TextBlock Text="Вироиш" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Avatar & Name Area -->
+                                        <Grid Margin="24,-50,24,0">
+                                            <StackPanel>
+                                                <Grid HorizontalAlignment="Left">
+                                                    <PersonPicture x:ConnectionId='51' x:Name="ProfilePageAvatar" Width="100" Height="100" BorderBrush="White" BorderThickness="4"/>
+                                                    <Border x:ConnectionId='52' x:Name="ProfilePageVipBadge" Background="#f59e0b" Width="24" Height="24" CornerRadius="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,5,5" Visibility="Collapsed">
+                                                        <FontIcon Glyph="&#xE735;" FontSize="12" Foreground="White"/>
+                                                    </Border>
+                                                </Grid>
+                                                
+                                                <StackPanel Margin="0,12,0,0">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <TextBlock x:ConnectionId='49' x:Name="ProfilePageName" FontSize="28" FontWeight="Bold"/>
+                                                        <TextBlock x:ConnectionId='50' x:Name="ProfilePageVipStar" Text="⭐" Foreground="#f59e0b" VerticalAlignment="Center" FontSize="20" Visibility="Collapsed"/>
+                                                    </StackPanel>
+                                                    <TextBlock x:ConnectionId='47' x:Name="ProfilePageEmail" FontSize="14" Opacity="0.6"/>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                                                        <Border Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="8" Padding="12,4" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                                            <TextBlock x:ConnectionId='48' x:Name="ProfilePageUniqueId" FontSize="13" FontWeight="Bold" Opacity="0.8"/>
+                                                        </Border>
+                                                        <Button Background="Transparent" BorderThickness="0" Padding="8,4">
+                                                            <FontIcon Glyph="&#xE8C8;" FontSize="14" Opacity="0.5"/>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- Stats Bar -->
+                                        <Grid Margin="24,24,24,24">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="4">
+                                                <TextBlock Text="👁️" FontSize="20" HorizontalAlignment="Center"/>
+                                                <TextBlock x:ConnectionId='46' x:Name="ProfilePageGuestsCount" Text="0" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Меҳмонон" FontSize="12" Opacity="0.5" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="4">
+                                                <TextBlock Text="👥" FontSize="20" HorizontalAlignment="Center"/>
+                                                <TextBlock x:ConnectionId='45' x:Name="ProfilePageFollowersCount" Text="0" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Обуначиҳо" FontSize="12" Opacity="0.5" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
+                                                <TextBlock Text="➕" FontSize="20" HorizontalAlignment="Center"/>
+                                                <TextBlock x:ConnectionId='44' x:Name="ProfilePageFollowingCount" Text="0" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Обунаҳо" FontSize="12" Opacity="0.5" HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <MenuFlyoutSeparator Margin="24,0"/>
+
+                                        <!-- VIP Promo Section -->
+                                        <Grid x:ConnectionId='39' x:Name="VipPromoSection" Margin="24,24,24,0">
+                                            <Border CornerRadius="16" Background="{ThemeResource LayerFillColorAltBrush}" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1" Padding="20">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Background="#fef3c7" Width="48" Height="48" CornerRadius="24" Grid.Column="0">
+                                                        <FontIcon Glyph="&#xE735;" Foreground="#d97706" FontSize="20"/>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="VIP Membership" FontWeight="Bold" FontSize="16"/>
+                                                        <TextBlock x:ConnectionId='43' x:Name="VipExpiryText" Text="⭐ Ситораи тиллоӣ · 🔒 Махфият · 🚫 Бе таблиғ" FontSize="12" Opacity="0.6"/>
+                                                    </StackPanel>
+                                                    <Button x:ConnectionId='42' Grid.Column="2" x:Name="GetVipBtn" Content="Гирифтан" Background="#f59e0b" Foreground="White" FontWeight="Bold" CornerRadius="8" Padding="16,8" BorderThickness="0"/>
+                                                </Grid>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- Active Stats (Coins/XP) - Wallet Style -->
+                                        <Grid Margin="24,24,24,24">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Margin="0,0,8,0" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="16" Padding="16">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="Коинҳо" FontSize="12" Opacity="0.6"/>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <TextBlock Text="🪙" FontSize="20"/>
+                                                        <TextBlock x:ConnectionId='41' x:Name="ProfilePageCoins" FontSize="24" FontWeight="Bold" Foreground="#f59e0b"/>
+                                                    </StackPanel>
+                                                    <Button Content="Пур кардан" FontSize="11" Padding="8,2" Margin="0,8,0,0" Background="Transparent" BorderThickness="1"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <Border Grid.Column="1" Margin="8,0,0,0" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="16" Padding="16">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="Таҷриба (XP)" FontSize="12" Opacity="0.6"/>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <TextBlock Text="⚡" FontSize="20"/>
+                                                        <TextBlock x:ConnectionId='40' x:Name="ProfilePageXp" FontSize="24" FontWeight="Bold" Foreground="#d946ef"/>
+                                                    </StackPanel>
+                                                    <Button Content="Вазифаҳо" FontSize="11" Padding="8,2" Margin="0,8,0,0" Background="Transparent" BorderThickness="1"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Details Section -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Дар бораи ман" FontSize="20" FontWeight="Bold"/>
+                                    <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="16" Padding="20" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                        <StackPanel Spacing="12">
+                                            <TextBlock x:ConnectionId='34' x:Name="ProfilePageBio" TextWrapping="Wrap" Opacity="0.8" Margin="0,0,0,8" Visibility="Collapsed"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <FontIcon Glyph="&#xE77B;" Opacity="0.5" FontSize="16"/>
+                                                <TextBlock Text="Ҷинс:" FontWeight="SemiBold" Width="100"/>
+                                                <TextBlock x:ConnectionId='38' x:Name="ProfilePageGender" Text="Муайян нашудааст"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <FontIcon Glyph="&#xE128;" Opacity="0.5" FontSize="16"/>
+                                                <TextBlock Text="Макон:" FontWeight="SemiBold" Width="100"/>
+                                                <TextBlock x:ConnectionId='37' x:Name="ProfilePageLocation" Text="Тоҷикистон"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <FontIcon Glyph="&#xE12B;" Opacity="0.5" FontSize="16"/>
+                                                <TextBlock Text="Забони модарӣ:" FontWeight="SemiBold" Width="120"/>
+                                                <TextBlock x:ConnectionId='36' x:Name="ProfilePageNativeLang" Text="Тоҷикӣ"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <FontIcon Glyph="&#xE12B;" Opacity="0.5" FontSize="16"/>
+                                                <TextBlock Text="Забони омӯзиш:" FontWeight="SemiBold" Width="120"/>
+                                                <TextBlock x:ConnectionId='35' x:Name="ProfilePageLearningLang" Text="English"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Interests Section -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Шавқу рағбатҳо" FontSize="20" FontWeight="Bold"/>
+                                    <VariableSizedWrapGrid x:ConnectionId='33' x:Name="ProfileInterestsGrid" Orientation="Horizontal" ItemWidth="120">
+                                        <!-- Will be populated dynamically or fallback to placeholders -->
+                                        <Border Margin="0,0,8,8" Background="{ThemeResource LayerFillColorAltBrush}" CornerRadius="20" Padding="12,6" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="⚽"/>
+                                                <TextBlock Text="Футбол" FontSize="13"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </VariableSizedWrapGrid>
+                                </StackPanel>
+
+                                <!-- Community Posts Section -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Паёмҳои ман" FontSize="20" FontWeight="Bold"/>
+                                    <ItemsControl x:ConnectionId='31' x:Name="ProfilePostsList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <!-- Simple version of post bubble -->
+                                                <Border Background="{ThemeResource LayerFillColorDefaultBrush}" CornerRadius="12" Padding="16" Margin="0,0,0,12" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="1">
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="{Binding TextContent}" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding CreatedAtString}" FontSize="11" Opacity="0.5" HorizontalAlignment="Right"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <TextBlock Text="Шумо ба охири профил расидед." FontSize="14" Opacity="0.4" HorizontalAlignment="Center" Margin="0,32,0,32"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- VIEW: VOICEROOMS -->
+                    <Grid x:ConnectionId='11' x:Name="VoiceRoomsView" Grid.Row="1" Grid.RowSpan="2" Visibility="Collapsed">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                            <FontIcon Glyph="&#xE1D6;" FontSize="64" Opacity="0.2"/>
+                            <TextBlock Text="Voice Rooms" FontSize="24" FontWeight="Bold" Opacity="0.5" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Ин хусусият дар версияҳои оянда дастрас хоҳад шуд" FontSize="14" Opacity="0.4" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- VIEW: MESSAGES (Active Chat) -->
+                    <Grid x:ConnectionId='12' x:Name="MessagesView" Grid.Row="0" Grid.RowSpan="3" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                        <!-- Empty State (When no chat selected) -->
+                        <Grid x:ConnectionId='13' x:Name="EmptyChatState" Visibility="Visible">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                                <FontIcon Glyph="&#xE119;" FontSize="64" Opacity="0.2"/>
+                                <TextBlock Text="Барои оғози чат касеро интихоб кунед" FontSize="16" Opacity="0.5"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:ConnectionId='14' x:Name="ActiveChatContent" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Chat Header (Angular Style) -->
+                            <Border Grid.Row="0" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="0,0,0,1" Padding="16,12" Background="{ThemeResource LayerFillColorDefaultBrush}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0">
+                                        <PersonPicture x:ConnectionId='29' x:Name="ActiveChatAvatar" Height="44" Width="44" />
+                                        <Border x:ConnectionId='30' x:Name="PartnerOnlineIndicator" Background="#22c55e" Width="12" Height="12" CornerRadius="6" VerticalAlignment="Bottom" HorizontalAlignment="Right" BorderBrush="{ThemeResource LayerFillColorDefaultBrush}" BorderThickness="2" Margin="0,0,0,2"/>
+                                    </Grid>
+                                    
+                                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <TextBlock x:ConnectionId='27' x:Name="ChatHeaderName" FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock x:ConnectionId='28' x:Name="VipStarHeader" Text="⭐" Visibility="Collapsed" Foreground="#f59e0b" VerticalAlignment="Center" FontSize="14"/>
+                                        </StackPanel>
+                                        <TextBlock x:ConnectionId='26' x:Name="ChatHeaderStatus" Text="Online" FontSize="12" Opacity="0.6" Margin="0,2,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                        <Button Background="Transparent" BorderThickness="0" Padding="10" ToolTipService.ToolTip="Voice Call">
+                                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE717;" FontSize="18" Opacity="0.7"/>
+                                        </Button>
+                                        <Button Background="Transparent" BorderThickness="0" Padding="10" ToolTipService.ToolTip="Actions">
+                                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE945;" FontSize="18" Opacity="0.7"/>
+                                            <Button.Flyout>
+                                                <MenuFlyout>
+                                                    <MenuFlyoutItem Text="Ask AI" Tag="AskAi">
+                                                        <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE99A;"/></MenuFlyoutItem.Icon>
+                                                    </MenuFlyoutItem>
+                                                    <MenuFlyoutItem Text="Send Coins" Tag="SendCoins">
+                                                        <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE945;"/></MenuFlyoutItem.Icon>
+                                                    </MenuFlyoutItem>
+                                                </MenuFlyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Messages Area -->
+                            <ListView x:ConnectionId='15' x:Name="MessageListView" Grid.Row="1" Padding="16,8" SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate                                    >
+                                        <Grid x:ConnectionId='21' Margin="0,2,0,2"                                         >
+                                            <StackPanel Spacing="2">
+                                                <Border x:ConnectionId='22'                                       
+                                                                                             
+                                                                                          
+                                                                                                  
+                                                        Padding="12,10" 
+                                                        MaxWidth="500">
+                                                    <StackPanel>
+                                                        <TextBlock x:ConnectionId='23'                         TextWrapping="Wrap"                                 FontSize="15" LineHeight="22"/>
+                                                        
+                                                        <!-- Metadata (Time + Status) -->
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4" Margin="0,4,0,-2" Opacity="0.7">
+                                                            <TextBlock x:ConnectionId='24'                            FontSize="10"                                />
+                                                            <TextBlock x:ConnectionId='25'                            FontSize="10"                                                                         />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                        <Setter Property="MinWidth" Value="0"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                            </ListView>
+
+                            <!-- Footer / Input (Angular Style) -->
+                            <Border Grid.Row="2" Padding="16,12" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0" Background="Transparent" BorderThickness="0" Width="40" Height="40" CornerRadius="20" Padding="0">
+                                        <FontIcon Glyph="&#xE710;" FontSize="18" Opacity="0.6"/>
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem Text="Image">
+                                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xEB9F;"/></MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutItem Text="Voice">
+                                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE720;"/></MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                                <MenuFlyoutItem Text="Sticker">
+                                                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE11D;"/></MenuFlyoutItem.Icon>
+                                                </MenuFlyoutItem>
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+
+                                    <Grid Grid.Column="1">
+                                        <TextBox x:ConnectionId='17' x:Name="MessageInput" PlaceholderText="Паём нависед..." 
+                                                 AcceptsReturn="False"                                
+                                                 CornerRadius="20" Padding="12,8,80,8" VerticalAlignment="Center"/>
+                                        
+                                        <!-- AI Action Buttons Overlay -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" Spacing="4">
+                                            <Button x:ConnectionId='18' x:Name="AiFixBtn" Background="Transparent" BorderThickness="0" Width="32" Height="32" Padding="0" ToolTipService.ToolTip="Fix Grammar">
+                                                <TextBlock Text="🪄" FontSize="14"/>
+                                            </Button>
+                                            <Button x:ConnectionId='19' x:Name="AiSuggestBtn" Background="Transparent" BorderThickness="0" Width="32" Height="32" Padding="0" ToolTipService.ToolTip="Generate Suggestions">
+                                                <TextBlock Text="✨" FontSize="14"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Button x:ConnectionId='16' Grid.Column="2" Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryGradient}" BorderThickness="0"                          Padding="0">
+                                        <FontIcon Glyph="&#xE724;" FontSize="18" Foreground="White" RenderTransformOrigin="0.5,0.5">
+                                            <FontIcon.RenderTransform>
+                                                <RotateTransform Angle="-45"/>
+                                            </FontIcon.RenderTransform>
+                                        </FontIcon>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>

@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Navigation;
+using Newtonsoft.Json;
 
 namespace ChatmeWindows
 {
@@ -39,7 +40,7 @@ namespace ChatmeWindows
                 if (System.IO.File.Exists(settingsPath))
                 {
                     string json = System.IO.File.ReadAllText(settingsPath);
-                    savedUser = System.Text.Json.JsonSerializer.Deserialize<ChatmeWindows.Services.AuthResponse>(json);
+                    savedUser = JsonConvert.DeserializeObject<ChatmeWindows.Services.AuthResponse>(json);
                     
                     if (savedUser != null && !string.IsNullOrEmpty(savedUser.Token))
                     {

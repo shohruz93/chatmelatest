@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChatmeWindows")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e263c7de4d230f8b5617117bad674194d45ec70")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+84e64ebf733d071d8fe549f2b200bceb6e61957f")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChatmeWindows")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChatmeWindows")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

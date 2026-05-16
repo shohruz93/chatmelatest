@@ -12,13 +12,57 @@ namespace ChatmeWindows.Services
 {
     public class GoogleAuthService
     {
-        // Read secrets from environment variables or configuration to avoid committing them to source control.
-        private static string ClientId => Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID") ?? "YOUR_GOOGLE_CLIENT_ID"; 
-        private static string ClientSecret => Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET") ?? "YOUR_GOOGLE_CLIENT_SECRET";
+        // Place your Google OAuth credentials in:
+        // %LOCALAPPDATA%\ChatmeWindows\google_oauth.json
+        // Content: { "client_id": "YOUR_ID.apps.googleusercontent.com", "client_secret": "YOUR_SECRET" }
+        //
+        // IMPORTANT: In Google Cloud Console:
+        //   1. Create a credential of type "Desktop app" (NOT Web app)
+        //   2. Add http://127.0.0.1:7777/ to "Authorized redirect URIs"
+
+        private static (string clientId, string clientSecret) LoadCredentials()
+        {
+            // Try config file first
+            try
+            {
+                string configPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "ChatmeWindows", "google_oauth.json");
+
+                if (System.IO.File.Exists(configPath))
+                {
+                    var json = System.IO.File.ReadAllText(configPath);
+                    using var doc = System.Text.Json.JsonDocument.Parse(json);
+                    var root = doc.RootElement;
+                    string id = root.GetProperty("client_id").GetString() ?? "";
+                    string secret = root.GetProperty("client_secret").GetString() ?? "";
+                    if (!string.IsNullOrEmpty(id)) return (id, secret);
+                }
+            }
+            catch { }
+
+            // Built-in credentials (Desktop / installed app)
+            return (
+                "913664143897-cspfn5i09414ic379dhbejhinh8p3vat.apps.googleusercontent.com",
+                "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"
+            );
+        }
 
         // Use a fixed loopback redirect URI and PKCE-enabled Authorization Code flow.
         public async Task<string?> AuthenticateAsync()
         {
+            var (clientId, clientSecret) = LoadCredentials();
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                throw new Exception(
+                    "Google OAuth credentials not found.\n\n" +
+                    "Please create the file:\n" +
+                    "%LOCALAPPDATA%\\ChatmeWindows\\google_oauth.json\n\n" +
+                    "Content:\n" +
+                    "{\n  \"client_id\": \"YOUR_ID.apps.googleusercontent.com\",\n  \"client_secret\": \"YOUR_SECRET\"\n}\n\n" +
+                    "Get these from Google Cloud Console → APIs & Services → Credentials → Desktop App.");
+            }
+
             string redirectUri = "http://127.0.0.1:7777/";
             using var listener = new HttpListener();
             listener.Prefixes.Add(redirectUri);
@@ -35,7 +79,7 @@ namespace ChatmeWindows.Services
             string codeChallenge = ComputeCodeChallenge(codeVerifier);
 
             string authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
-                             $"client_id={ClientId}&" +
+                             $"client_id={clientId}&" +
                              $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
                              $"response_type=code&" +
                              $"scope=openid%20email%20profile&" +
@@ -66,8 +110,8 @@ namespace ChatmeWindows.Services
             // Exchange code for tokens
             using var http = new HttpClient();
             var data = new[] {
-                new KeyValuePair<string,string>("client_id", ClientId),
-                new KeyValuePair<string,string>("client_secret", ClientSecret),
+                new KeyValuePair<string,string>("client_id", clientId),
+                new KeyValuePair<string,string>("client_secret", clientSecret),
                 new KeyValuePair<string,string>("code", code),
                 new KeyValuePair<string,string>("grant_type", "authorization_code"),
                 new KeyValuePair<string,string>("redirect_uri", redirectUri),

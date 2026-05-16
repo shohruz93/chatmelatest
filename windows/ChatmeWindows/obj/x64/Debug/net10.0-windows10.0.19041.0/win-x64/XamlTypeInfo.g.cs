@@ -14,10 +14,10 @@ namespace ChatmeWindows
 {
     public partial class App : global::Microsoft.UI.Xaml.Markup.IXamlMetadataProvider
     {
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
         private global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMetaDataProvider __appProvider;
 
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         private global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMetaDataProvider _AppProvider
         {
@@ -34,7 +34,7 @@ namespace ChatmeWindows
         /// <summary>
         /// GetXamlType(Type)
         /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::Microsoft.UI.Xaml.Markup.IXamlType GetXamlType(global::System.Type type)
         {
@@ -44,7 +44,7 @@ namespace ChatmeWindows
         /// <summary>
         /// GetXamlType(String)
         /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::Microsoft.UI.Xaml.Markup.IXamlType GetXamlType(string fullName)
         {
@@ -54,7 +54,7 @@ namespace ChatmeWindows
         /// <summary>
         /// GetXmlnsDefinitions()
         /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+        [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::Microsoft.UI.Xaml.Markup.XmlnsDefinition[] GetXmlnsDefinitions()
         {
@@ -68,7 +68,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
     /// <summary>
     /// Main class for providing metadata for the app or library
     /// </summary>
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     public sealed partial class XamlMetaDataProvider : global::Microsoft.UI.Xaml.Markup.IXamlMetadataProvider
     {
@@ -112,7 +112,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
         }
     }
 
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     internal partial class XamlTypeInfoProvider
     {
@@ -226,7 +226,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
         
         private void InitTypeTables()
         {
-            _typeNameTable = new string[61];
+            _typeNameTable = new string[76];
             _typeNameTable[0] = "Microsoft.UI.Xaml.Controls.XamlControlsResources";
             _typeNameTable[1] = "Microsoft.UI.Xaml.ResourceDictionary";
             _typeNameTable[2] = "Object";
@@ -282,14 +282,29 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
             _typeNameTable[52] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.MessageViewModel>";
             _typeNameTable[53] = "ChatmeWindows.Views.MessageViewModel";
             _typeNameTable[54] = "System.DateTime";
-            _typeNameTable[55] = "Microsoft.UI.Xaml.HorizontalAlignment";
-            _typeNameTable[56] = "Microsoft.UI.Xaml.Media.Brush";
+            _typeNameTable[55] = "Microsoft.UI.Xaml.Media.Brush";
+            _typeNameTable[56] = "Microsoft.UI.Xaml.HorizontalAlignment";
             _typeNameTable[57] = "Microsoft.UI.Xaml.Thickness";
             _typeNameTable[58] = "Microsoft.UI.Xaml.CornerRadius";
-            _typeNameTable[59] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
-            _typeNameTable[60] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
+            _typeNameTable[59] = "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.ExploreUserViewModel>";
+            _typeNameTable[60] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.ExploreUserViewModel>";
+            _typeNameTable[61] = "ChatmeWindows.Views.ExploreUserViewModel";
+            _typeNameTable[62] = "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.GuestViewModel>";
+            _typeNameTable[63] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.GuestViewModel>";
+            _typeNameTable[64] = "ChatmeWindows.Views.GuestViewModel";
+            _typeNameTable[65] = "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.CommunityPostViewModel>";
+            _typeNameTable[66] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.CommunityPostViewModel>";
+            _typeNameTable[67] = "ChatmeWindows.Views.CommunityPostViewModel";
+            _typeNameTable[68] = "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.FlashcardViewModel>";
+            _typeNameTable[69] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.FlashcardViewModel>";
+            _typeNameTable[70] = "ChatmeWindows.Views.FlashcardViewModel";
+            _typeNameTable[71] = "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.LeaderboardItemViewModel>";
+            _typeNameTable[72] = "System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.LeaderboardItemViewModel>";
+            _typeNameTable[73] = "ChatmeWindows.Views.LeaderboardItemViewModel";
+            _typeNameTable[74] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
+            _typeNameTable[75] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
 
-            _typeTable = new global::System.Type[61];
+            _typeTable = new global::System.Type[76];
             _typeTable[0] = typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources);
             _typeTable[1] = typeof(global::Microsoft.UI.Xaml.ResourceDictionary);
             _typeTable[2] = typeof(global::System.Object);
@@ -345,12 +360,27 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
             _typeTable[52] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.MessageViewModel>);
             _typeTable[53] = typeof(global::ChatmeWindows.Views.MessageViewModel);
             _typeTable[54] = typeof(global::System.DateTime);
-            _typeTable[55] = typeof(global::Microsoft.UI.Xaml.HorizontalAlignment);
-            _typeTable[56] = typeof(global::Microsoft.UI.Xaml.Media.Brush);
+            _typeTable[55] = typeof(global::Microsoft.UI.Xaml.Media.Brush);
+            _typeTable[56] = typeof(global::Microsoft.UI.Xaml.HorizontalAlignment);
             _typeTable[57] = typeof(global::Microsoft.UI.Xaml.Thickness);
             _typeTable[58] = typeof(global::Microsoft.UI.Xaml.CornerRadius);
-            _typeTable[59] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
-            _typeTable[60] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
+            _typeTable[59] = typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.ExploreUserViewModel>);
+            _typeTable[60] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.ExploreUserViewModel>);
+            _typeTable[61] = typeof(global::ChatmeWindows.Views.ExploreUserViewModel);
+            _typeTable[62] = typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.GuestViewModel>);
+            _typeTable[63] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.GuestViewModel>);
+            _typeTable[64] = typeof(global::ChatmeWindows.Views.GuestViewModel);
+            _typeTable[65] = typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.CommunityPostViewModel>);
+            _typeTable[66] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.CommunityPostViewModel>);
+            _typeTable[67] = typeof(global::ChatmeWindows.Views.CommunityPostViewModel);
+            _typeTable[68] = typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.FlashcardViewModel>);
+            _typeTable[69] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.FlashcardViewModel>);
+            _typeTable[70] = typeof(global::ChatmeWindows.Views.FlashcardViewModel);
+            _typeTable[71] = typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.LeaderboardItemViewModel>);
+            _typeTable[72] = typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.LeaderboardItemViewModel>);
+            _typeTable[73] = typeof(global::ChatmeWindows.Views.LeaderboardItemViewModel);
+            _typeTable[74] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
+            _typeTable[75] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -400,7 +430,17 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
         private object Activate_46_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.ConversationViewModel>(); }
         private object Activate_51_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.MessageViewModel>(); }
         private object Activate_52_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.MessageViewModel>(); }
-        private object Activate_59_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
+        private object Activate_59_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.ExploreUserViewModel>(); }
+        private object Activate_60_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.ExploreUserViewModel>(); }
+        private object Activate_62_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.GuestViewModel>(); }
+        private object Activate_63_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.GuestViewModel>(); }
+        private object Activate_65_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.CommunityPostViewModel>(); }
+        private object Activate_66_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.CommunityPostViewModel>(); }
+        private object Activate_68_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.FlashcardViewModel>(); }
+        private object Activate_69_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.FlashcardViewModel>(); }
+        private object Activate_71_ObservableCollection() { return new global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.LeaderboardItemViewModel>(); }
+        private object Activate_72_Collection() { return new global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.LeaderboardItemViewModel>(); }
+        private object Activate_74_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
         private void StaticInitializer_0_XamlControlsResources() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources).TypeHandle);
         private void StaticInitializer_4_Color() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Windows.UI.Color).TypeHandle);
         private void StaticInitializer_5_ValueType() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.ValueType).TypeHandle);
@@ -436,8 +476,23 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
         private void StaticInitializer_54_DateTime() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.DateTime).TypeHandle);
         private void StaticInitializer_57_Thickness() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Thickness).TypeHandle);
         private void StaticInitializer_58_CornerRadius() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.CornerRadius).TypeHandle);
-        private void StaticInitializer_59_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
-        private void StaticInitializer_60_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
+        private void StaticInitializer_59_ObservableCollection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.ExploreUserViewModel>).TypeHandle);
+        private void StaticInitializer_60_Collection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.ExploreUserViewModel>).TypeHandle);
+        private void StaticInitializer_61_ExploreUserViewModel() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::ChatmeWindows.Views.ExploreUserViewModel).TypeHandle);
+        private void StaticInitializer_62_ObservableCollection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.GuestViewModel>).TypeHandle);
+        private void StaticInitializer_63_Collection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.GuestViewModel>).TypeHandle);
+        private void StaticInitializer_64_GuestViewModel() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::ChatmeWindows.Views.GuestViewModel).TypeHandle);
+        private void StaticInitializer_65_ObservableCollection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.CommunityPostViewModel>).TypeHandle);
+        private void StaticInitializer_66_Collection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.CommunityPostViewModel>).TypeHandle);
+        private void StaticInitializer_67_CommunityPostViewModel() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::ChatmeWindows.Views.CommunityPostViewModel).TypeHandle);
+        private void StaticInitializer_68_ObservableCollection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.FlashcardViewModel>).TypeHandle);
+        private void StaticInitializer_69_Collection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.FlashcardViewModel>).TypeHandle);
+        private void StaticInitializer_70_FlashcardViewModel() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::ChatmeWindows.Views.FlashcardViewModel).TypeHandle);
+        private void StaticInitializer_71_ObservableCollection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.ObservableCollection<global::ChatmeWindows.Views.LeaderboardItemViewModel>).TypeHandle);
+        private void StaticInitializer_72_Collection() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.ObjectModel.Collection<global::ChatmeWindows.Views.LeaderboardItemViewModel>).TypeHandle);
+        private void StaticInitializer_73_LeaderboardItemViewModel() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::ChatmeWindows.Views.LeaderboardItemViewModel).TypeHandle);
+        private void StaticInitializer_74_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
+        private void StaticInitializer_75_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
         private void MapAdd_0_XamlControlsResources(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.Object, global::System.Object>)instance;
@@ -475,7 +530,67 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
             var newItem = (global::ChatmeWindows.Views.MessageViewModel)item;
             collection.Add(newItem);
         }
-        private void VectorAdd_60_IList(object instance, object item)
+        private void VectorAdd_59_ObservableCollection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.ExploreUserViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.ExploreUserViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_60_Collection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.ExploreUserViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.ExploreUserViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_62_ObservableCollection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.GuestViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.GuestViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_63_Collection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.GuestViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.GuestViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_65_ObservableCollection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.CommunityPostViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.CommunityPostViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_66_Collection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.CommunityPostViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.CommunityPostViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_68_ObservableCollection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.FlashcardViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.FlashcardViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_69_Collection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.FlashcardViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.FlashcardViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_71_ObservableCollection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.LeaderboardItemViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.LeaderboardItemViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_72_Collection(object instance, object item)
+        {
+            var collection = (global::System.Collections.Generic.ICollection<global::ChatmeWindows.Views.LeaderboardItemViewModel>)instance;
+            var newItem = (global::ChatmeWindows.Views.LeaderboardItemViewModel)item;
+            collection.Add(newItem);
+        }
+        private void VectorAdd_75_IList(object instance, object item)
         {
             var collection = (global::System.Collections.Generic.ICollection<global::Microsoft.UI.Xaml.Controls.TreeViewNode>)instance;
             var newItem = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)item;
@@ -605,6 +720,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 userType.StaticInitializer = StaticInitializer_18_NavigationView;
                 userType.AddMemberName("PaneDisplayMode");
                 userType.AddMemberName("IsBackButtonVisible");
+                userType.AddMemberName("IsSettingsVisible");
                 userType.AddMemberName("MenuItems");
                 userType.AddMemberName("FooterMenuItems");
                 userType.AddMemberName("AlwaysShowHeader");
@@ -621,7 +737,6 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 userType.AddMemberName("IsPaneOpen");
                 userType.AddMemberName("IsPaneToggleButtonVisible");
                 userType.AddMemberName("IsPaneVisible");
-                userType.AddMemberName("IsSettingsVisible");
                 userType.AddMemberName("IsTitleBarAutoPaddingEnabled");
                 userType.AddMemberName("MenuItemContainerStyle");
                 userType.AddMemberName("MenuItemContainerStyleSelector");
@@ -826,6 +941,12 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 userType.StaticInitializer = StaticInitializer_44_MainPage;
                 userType.AddMemberName("Conversations");
                 userType.AddMemberName("Messages");
+                userType.AddMemberName("ExploreUsers");
+                userType.AddMemberName("Guests");
+                userType.AddMemberName("CommunityPosts");
+                userType.AddMemberName("Flashcards");
+                userType.AddMemberName("LeaderboardItems");
+                userType.AddMemberName("ProfilePosts");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
@@ -859,6 +980,10 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 userType.AddMemberName("FormattedTime");
                 userType.AddMemberName("UnreadVisibility");
                 userType.AddMemberName("UnreadCountText");
+                userType.AddMemberName("IsVip");
+                userType.AddMemberName("IsOnline");
+                userType.AddMemberName("VipVisibility");
+                userType.AddMemberName("OnlineVisibility");
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
@@ -902,7 +1027,12 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 userType.AddMemberName("Content");
                 userType.AddMemberName("IsMe");
                 userType.AddMemberName("CreatedAt");
+                userType.AddMemberName("Status");
+                userType.AddMemberName("MessageType");
                 userType.AddMemberName("TimeString");
+                userType.AddMemberName("StatusIcon");
+                userType.AddMemberName("StatusVisibility");
+                userType.AddMemberName("StatusColor");
                 userType.AddMemberName("Alignment");
                 userType.AddMemberName("BackgroundBrush");
                 userType.AddMemberName("BorderBrush");
@@ -921,11 +1051,11 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 55:   //  Microsoft.UI.Xaml.HorizontalAlignment
+            case 55:   //  Microsoft.UI.Xaml.Media.Brush
                 xamlType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 56:   //  Microsoft.UI.Xaml.Media.Brush
+            case 56:   //  Microsoft.UI.Xaml.HorizontalAlignment
                 xamlType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
@@ -943,10 +1073,162 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 59:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
+            case 59:   //  System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.ExploreUserViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.ExploreUserViewModel>"));
+                userType.StaticInitializer = StaticInitializer_59_ObservableCollection;
+                userType.CollectionAdd = VectorAdd_59_ObservableCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 60:   //  System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.ExploreUserViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_60_Collection;
+                userType.StaticInitializer = StaticInitializer_60_Collection;
+                userType.CollectionAdd = VectorAdd_60_Collection;
+                xamlType = userType;
+                break;
+
+            case 61:   //  ChatmeWindows.Views.ExploreUserViewModel
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.StaticInitializer = StaticInitializer_61_ExploreUserViewModel;
+                userType.AddMemberName("Id");
+                userType.AddMemberName("Name");
+                userType.AddMemberName("AvatarUrlString");
+                userType.AddMemberName("Gender");
+                userType.AddMemberName("LocationName");
+                userType.AddMemberName("Bio");
+                userType.AddMemberName("NativeLanguage");
+                userType.AddMemberName("IsOnline");
+                userType.AddMemberName("Avatar");
+                userType.AddMemberName("IsOnlineVisibility");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 62:   //  System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.GuestViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.GuestViewModel>"));
+                userType.StaticInitializer = StaticInitializer_62_ObservableCollection;
+                userType.CollectionAdd = VectorAdd_62_ObservableCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 63:   //  System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.GuestViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_63_Collection;
+                userType.StaticInitializer = StaticInitializer_63_Collection;
+                userType.CollectionAdd = VectorAdd_63_Collection;
+                xamlType = userType;
+                break;
+
+            case 64:   //  ChatmeWindows.Views.GuestViewModel
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.StaticInitializer = StaticInitializer_64_GuestViewModel;
+                userType.AddMemberName("ViewerName");
+                userType.AddMemberName("AvatarUrlString");
+                userType.AddMemberName("ViewCount");
+                userType.AddMemberName("LastViewedTime");
+                userType.AddMemberName("ViewCountText");
+                userType.AddMemberName("AvatarUrl");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 65:   //  System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.CommunityPostViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.CommunityPostViewModel>"));
+                userType.StaticInitializer = StaticInitializer_65_ObservableCollection;
+                userType.CollectionAdd = VectorAdd_65_ObservableCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 66:   //  System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.CommunityPostViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_66_Collection;
+                userType.StaticInitializer = StaticInitializer_66_Collection;
+                userType.CollectionAdd = VectorAdd_66_Collection;
+                xamlType = userType;
+                break;
+
+            case 67:   //  ChatmeWindows.Views.CommunityPostViewModel
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.StaticInitializer = StaticInitializer_67_CommunityPostViewModel;
+                userType.AddMemberName("Id");
+                userType.AddMemberName("UserName");
+                userType.AddMemberName("UserAvatarString");
+                userType.AddMemberName("ContentType");
+                userType.AddMemberName("TextContent");
+                userType.AddMemberName("MediaUrlString");
+                userType.AddMemberName("LikesCount");
+                userType.AddMemberName("CommentsCount");
+                userType.AddMemberName("CreatedAtString");
+                userType.AddMemberName("UserAvatar");
+                userType.AddMemberName("MediaContent");
+                userType.AddMemberName("TextVisibility");
+                userType.AddMemberName("MediaVisibility");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 68:   //  System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.FlashcardViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.FlashcardViewModel>"));
+                userType.StaticInitializer = StaticInitializer_68_ObservableCollection;
+                userType.CollectionAdd = VectorAdd_68_ObservableCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 69:   //  System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.FlashcardViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_69_Collection;
+                userType.StaticInitializer = StaticInitializer_69_Collection;
+                userType.CollectionAdd = VectorAdd_69_Collection;
+                xamlType = userType;
+                break;
+
+            case 70:   //  ChatmeWindows.Views.FlashcardViewModel
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.StaticInitializer = StaticInitializer_70_FlashcardViewModel;
+                userType.AddMemberName("Id");
+                userType.AddMemberName("Front");
+                userType.AddMemberName("Back");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 71:   //  System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.LeaderboardItemViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.LeaderboardItemViewModel>"));
+                userType.StaticInitializer = StaticInitializer_71_ObservableCollection;
+                userType.CollectionAdd = VectorAdd_71_ObservableCollection;
+                userType.SetIsReturnTypeStub();
+                xamlType = userType;
+                break;
+
+            case 72:   //  System.Collections.ObjectModel.Collection`1<ChatmeWindows.Views.LeaderboardItemViewModel>
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.Activator = Activate_72_Collection;
+                userType.StaticInitializer = StaticInitializer_72_Collection;
+                userType.CollectionAdd = VectorAdd_72_Collection;
+                xamlType = userType;
+                break;
+
+            case 73:   //  ChatmeWindows.Views.LeaderboardItemViewModel
+                userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
+                userType.StaticInitializer = StaticInitializer_73_LeaderboardItemViewModel;
+                userType.AddMemberName("Name");
+                userType.AddMemberName("RankDisplay");
+                userType.AddMemberName("LevelText");
+                userType.AddMemberName("XpText");
+                userType.AddMemberName("AvatarSource");
+                userType.SetIsLocalType();
+                xamlType = userType;
+                break;
+
+            case 74:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
                 userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.DependencyObject"));
-                userType.Activator = Activate_59_TreeViewNode;
-                userType.StaticInitializer = StaticInitializer_59_TreeViewNode;
+                userType.Activator = Activate_74_TreeViewNode;
+                userType.StaticInitializer = StaticInitializer_74_TreeViewNode;
                 userType.AddMemberName("Children");
                 userType.AddMemberName("Content");
                 userType.AddMemberName("Depth");
@@ -958,10 +1240,10 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 60:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
+            case 75:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
                 userType = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType(this, typeName, type, null);
-                userType.StaticInitializer = StaticInitializer_60_IList;
-                userType.CollectionAdd = VectorAdd_60_IList;
+                userType.StaticInitializer = StaticInitializer_75_IList;
+                userType.CollectionAdd = VectorAdd_75_IList;
                 userType.SetIsReturnTypeStub();
                 xamlType = userType;
                 break;
@@ -1149,160 +1431,160 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.IsBackButtonVisible = (global::Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible)Value;
         }
-        private object get_13_NavigationView_MenuItems(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.MenuItems;
-        }
-        private object get_14_NavigationView_FooterMenuItems(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.FooterMenuItems;
-        }
-        private object get_15_NavigationView_AlwaysShowHeader(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.AlwaysShowHeader;
-        }
-        private void set_15_NavigationView_AlwaysShowHeader(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.AlwaysShowHeader = (global::System.Boolean)Value;
-        }
-        private object get_16_NavigationView_AutoSuggestBox(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.AutoSuggestBox;
-        }
-        private void set_16_NavigationView_AutoSuggestBox(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.AutoSuggestBox = (global::Microsoft.UI.Xaml.Controls.AutoSuggestBox)Value;
-        }
-        private object get_17_NavigationView_CompactModeThresholdWidth(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.CompactModeThresholdWidth;
-        }
-        private void set_17_NavigationView_CompactModeThresholdWidth(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.CompactModeThresholdWidth = (global::System.Double)Value;
-        }
-        private object get_18_NavigationView_CompactPaneLength(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.CompactPaneLength;
-        }
-        private void set_18_NavigationView_CompactPaneLength(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.CompactPaneLength = (global::System.Double)Value;
-        }
-        private object get_19_NavigationView_ContentOverlay(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.ContentOverlay;
-        }
-        private void set_19_NavigationView_ContentOverlay(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.ContentOverlay = (global::Microsoft.UI.Xaml.UIElement)Value;
-        }
-        private object get_20_NavigationView_DisplayMode(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.DisplayMode;
-        }
-        private object get_21_NavigationView_ExpandedModeThresholdWidth(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.ExpandedModeThresholdWidth;
-        }
-        private void set_21_NavigationView_ExpandedModeThresholdWidth(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.ExpandedModeThresholdWidth = (global::System.Double)Value;
-        }
-        private object get_22_NavigationView_FooterMenuItemsSource(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.FooterMenuItemsSource;
-        }
-        private void set_22_NavigationView_FooterMenuItemsSource(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.FooterMenuItemsSource = (global::System.Object)Value;
-        }
-        private object get_23_NavigationView_Header(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.Header;
-        }
-        private void set_23_NavigationView_Header(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.Header = (global::System.Object)Value;
-        }
-        private object get_24_NavigationView_HeaderTemplate(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.HeaderTemplate;
-        }
-        private void set_24_NavigationView_HeaderTemplate(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.HeaderTemplate = (global::Microsoft.UI.Xaml.DataTemplate)Value;
-        }
-        private object get_25_NavigationView_IsBackEnabled(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.IsBackEnabled;
-        }
-        private void set_25_NavigationView_IsBackEnabled(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.IsBackEnabled = (global::System.Boolean)Value;
-        }
-        private object get_26_NavigationView_IsPaneOpen(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.IsPaneOpen;
-        }
-        private void set_26_NavigationView_IsPaneOpen(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.IsPaneOpen = (global::System.Boolean)Value;
-        }
-        private object get_27_NavigationView_IsPaneToggleButtonVisible(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.IsPaneToggleButtonVisible;
-        }
-        private void set_27_NavigationView_IsPaneToggleButtonVisible(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.IsPaneToggleButtonVisible = (global::System.Boolean)Value;
-        }
-        private object get_28_NavigationView_IsPaneVisible(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.IsPaneVisible;
-        }
-        private void set_28_NavigationView_IsPaneVisible(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.IsPaneVisible = (global::System.Boolean)Value;
-        }
-        private object get_29_NavigationView_IsSettingsVisible(object instance)
+        private object get_13_NavigationView_IsSettingsVisible(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.IsSettingsVisible;
         }
-        private void set_29_NavigationView_IsSettingsVisible(object instance, object Value)
+        private void set_13_NavigationView_IsSettingsVisible(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.IsSettingsVisible = (global::System.Boolean)Value;
+        }
+        private object get_14_NavigationView_MenuItems(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.MenuItems;
+        }
+        private object get_15_NavigationView_FooterMenuItems(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.FooterMenuItems;
+        }
+        private object get_16_NavigationView_AlwaysShowHeader(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.AlwaysShowHeader;
+        }
+        private void set_16_NavigationView_AlwaysShowHeader(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.AlwaysShowHeader = (global::System.Boolean)Value;
+        }
+        private object get_17_NavigationView_AutoSuggestBox(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.AutoSuggestBox;
+        }
+        private void set_17_NavigationView_AutoSuggestBox(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.AutoSuggestBox = (global::Microsoft.UI.Xaml.Controls.AutoSuggestBox)Value;
+        }
+        private object get_18_NavigationView_CompactModeThresholdWidth(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.CompactModeThresholdWidth;
+        }
+        private void set_18_NavigationView_CompactModeThresholdWidth(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.CompactModeThresholdWidth = (global::System.Double)Value;
+        }
+        private object get_19_NavigationView_CompactPaneLength(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.CompactPaneLength;
+        }
+        private void set_19_NavigationView_CompactPaneLength(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.CompactPaneLength = (global::System.Double)Value;
+        }
+        private object get_20_NavigationView_ContentOverlay(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.ContentOverlay;
+        }
+        private void set_20_NavigationView_ContentOverlay(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.ContentOverlay = (global::Microsoft.UI.Xaml.UIElement)Value;
+        }
+        private object get_21_NavigationView_DisplayMode(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.DisplayMode;
+        }
+        private object get_22_NavigationView_ExpandedModeThresholdWidth(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.ExpandedModeThresholdWidth;
+        }
+        private void set_22_NavigationView_ExpandedModeThresholdWidth(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.ExpandedModeThresholdWidth = (global::System.Double)Value;
+        }
+        private object get_23_NavigationView_FooterMenuItemsSource(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.FooterMenuItemsSource;
+        }
+        private void set_23_NavigationView_FooterMenuItemsSource(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.FooterMenuItemsSource = (global::System.Object)Value;
+        }
+        private object get_24_NavigationView_Header(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.Header;
+        }
+        private void set_24_NavigationView_Header(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.Header = (global::System.Object)Value;
+        }
+        private object get_25_NavigationView_HeaderTemplate(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.HeaderTemplate;
+        }
+        private void set_25_NavigationView_HeaderTemplate(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.HeaderTemplate = (global::Microsoft.UI.Xaml.DataTemplate)Value;
+        }
+        private object get_26_NavigationView_IsBackEnabled(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.IsBackEnabled;
+        }
+        private void set_26_NavigationView_IsBackEnabled(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.IsBackEnabled = (global::System.Boolean)Value;
+        }
+        private object get_27_NavigationView_IsPaneOpen(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.IsPaneOpen;
+        }
+        private void set_27_NavigationView_IsPaneOpen(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.IsPaneOpen = (global::System.Boolean)Value;
+        }
+        private object get_28_NavigationView_IsPaneToggleButtonVisible(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.IsPaneToggleButtonVisible;
+        }
+        private void set_28_NavigationView_IsPaneToggleButtonVisible(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.IsPaneToggleButtonVisible = (global::System.Boolean)Value;
+        }
+        private object get_29_NavigationView_IsPaneVisible(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.IsPaneVisible;
+        }
+        private void set_29_NavigationView_IsPaneVisible(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.IsPaneVisible = (global::System.Boolean)Value;
         }
         private object get_30_NavigationView_IsTitleBarAutoPaddingEnabled(object instance)
         {
@@ -1754,127 +2036,512 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
             var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
             return that.UnreadCountText;
         }
-        private object get_80_MainPage_Messages(object instance)
+        private object get_80_ConversationViewModel_IsVip(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            return that.IsVip;
+        }
+        private void set_80_ConversationViewModel_IsVip(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            that.IsVip = (global::System.Boolean)Value;
+        }
+        private object get_81_ConversationViewModel_IsOnline(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            return that.IsOnline;
+        }
+        private void set_81_ConversationViewModel_IsOnline(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            that.IsOnline = (global::System.Boolean)Value;
+        }
+        private object get_82_ConversationViewModel_VipVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            return that.VipVisibility;
+        }
+        private object get_83_ConversationViewModel_OnlineVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ConversationViewModel)instance;
+            return that.OnlineVisibility;
+        }
+        private object get_84_MainPage_Messages(object instance)
         {
             var that = (global::ChatmeWindows.Views.MainPage)instance;
             return that.Messages;
         }
-        private object get_81_MessageViewModel_Content(object instance)
+        private object get_85_MessageViewModel_Content(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.Content;
         }
-        private void set_81_MessageViewModel_Content(object instance, object Value)
+        private void set_85_MessageViewModel_Content(object instance, object Value)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             that.Content = (global::System.String)Value;
         }
-        private object get_82_MessageViewModel_IsMe(object instance)
+        private object get_86_MessageViewModel_IsMe(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.IsMe;
         }
-        private void set_82_MessageViewModel_IsMe(object instance, object Value)
+        private void set_86_MessageViewModel_IsMe(object instance, object Value)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             that.IsMe = (global::System.Boolean)Value;
         }
-        private object get_83_MessageViewModel_CreatedAt(object instance)
+        private object get_87_MessageViewModel_CreatedAt(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.CreatedAt;
         }
-        private void set_83_MessageViewModel_CreatedAt(object instance, object Value)
+        private void set_87_MessageViewModel_CreatedAt(object instance, object Value)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             that.CreatedAt = (global::System.DateTime)Value;
         }
-        private object get_84_MessageViewModel_TimeString(object instance)
+        private object get_88_MessageViewModel_Status(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            return that.Status;
+        }
+        private void set_88_MessageViewModel_Status(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            that.Status = (global::System.String)Value;
+        }
+        private object get_89_MessageViewModel_MessageType(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            return that.MessageType;
+        }
+        private void set_89_MessageViewModel_MessageType(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            that.MessageType = (global::System.String)Value;
+        }
+        private object get_90_MessageViewModel_TimeString(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.TimeString;
         }
-        private object get_85_MessageViewModel_Alignment(object instance)
+        private object get_91_MessageViewModel_StatusIcon(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            return that.StatusIcon;
+        }
+        private object get_92_MessageViewModel_StatusVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            return that.StatusVisibility;
+        }
+        private object get_93_MessageViewModel_StatusColor(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
+            return that.StatusColor;
+        }
+        private object get_94_MessageViewModel_Alignment(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.Alignment;
         }
-        private object get_86_MessageViewModel_BackgroundBrush(object instance)
+        private object get_95_MessageViewModel_BackgroundBrush(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.BackgroundBrush;
         }
-        private object get_87_MessageViewModel_BorderBrush(object instance)
+        private object get_96_MessageViewModel_BorderBrush(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.BorderBrush;
         }
-        private object get_88_MessageViewModel_BorderThickness(object instance)
+        private object get_97_MessageViewModel_BorderThickness(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.BorderThickness;
         }
-        private object get_89_MessageViewModel_TextColor(object instance)
+        private object get_98_MessageViewModel_TextColor(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.TextColor;
         }
-        private object get_90_MessageViewModel_TimeColor(object instance)
+        private object get_99_MessageViewModel_TimeColor(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.TimeColor;
         }
-        private object get_91_MessageViewModel_BubbleRadius(object instance)
+        private object get_100_MessageViewModel_BubbleRadius(object instance)
         {
             var that = (global::ChatmeWindows.Views.MessageViewModel)instance;
             return that.BubbleRadius;
         }
-        private object get_92_TreeViewNode_Children(object instance)
+        private object get_101_MainPage_ExploreUsers(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.ExploreUsers;
+        }
+        private object get_102_ExploreUserViewModel_Id(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.Id;
+        }
+        private void set_102_ExploreUserViewModel_Id(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.Id = (global::System.Int32)Value;
+        }
+        private object get_103_ExploreUserViewModel_Name(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.Name;
+        }
+        private void set_103_ExploreUserViewModel_Name(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.Name = (global::System.String)Value;
+        }
+        private object get_104_ExploreUserViewModel_AvatarUrlString(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.AvatarUrlString;
+        }
+        private void set_104_ExploreUserViewModel_AvatarUrlString(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.AvatarUrlString = (global::System.String)Value;
+        }
+        private object get_105_ExploreUserViewModel_Gender(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.Gender;
+        }
+        private void set_105_ExploreUserViewModel_Gender(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.Gender = (global::System.String)Value;
+        }
+        private object get_106_ExploreUserViewModel_LocationName(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.LocationName;
+        }
+        private void set_106_ExploreUserViewModel_LocationName(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.LocationName = (global::System.String)Value;
+        }
+        private object get_107_ExploreUserViewModel_Bio(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.Bio;
+        }
+        private void set_107_ExploreUserViewModel_Bio(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.Bio = (global::System.String)Value;
+        }
+        private object get_108_ExploreUserViewModel_NativeLanguage(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.NativeLanguage;
+        }
+        private void set_108_ExploreUserViewModel_NativeLanguage(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.NativeLanguage = (global::System.String)Value;
+        }
+        private object get_109_ExploreUserViewModel_IsOnline(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.IsOnline;
+        }
+        private void set_109_ExploreUserViewModel_IsOnline(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            that.IsOnline = (global::System.Boolean)Value;
+        }
+        private object get_110_ExploreUserViewModel_Avatar(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.Avatar;
+        }
+        private object get_111_ExploreUserViewModel_IsOnlineVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.ExploreUserViewModel)instance;
+            return that.IsOnlineVisibility;
+        }
+        private object get_112_MainPage_Guests(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.Guests;
+        }
+        private object get_113_GuestViewModel_ViewerName(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.ViewerName;
+        }
+        private void set_113_GuestViewModel_ViewerName(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            that.ViewerName = (global::System.String)Value;
+        }
+        private object get_114_GuestViewModel_AvatarUrlString(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.AvatarUrlString;
+        }
+        private void set_114_GuestViewModel_AvatarUrlString(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            that.AvatarUrlString = (global::System.String)Value;
+        }
+        private object get_115_GuestViewModel_ViewCount(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.ViewCount;
+        }
+        private void set_115_GuestViewModel_ViewCount(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            that.ViewCount = (global::System.Int32)Value;
+        }
+        private object get_116_GuestViewModel_LastViewedTime(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.LastViewedTime;
+        }
+        private void set_116_GuestViewModel_LastViewedTime(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            that.LastViewedTime = (global::System.String)Value;
+        }
+        private object get_117_GuestViewModel_ViewCountText(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.ViewCountText;
+        }
+        private object get_118_GuestViewModel_AvatarUrl(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.GuestViewModel)instance;
+            return that.AvatarUrl;
+        }
+        private object get_119_MainPage_CommunityPosts(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.CommunityPosts;
+        }
+        private object get_120_CommunityPostViewModel_Id(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.Id;
+        }
+        private void set_120_CommunityPostViewModel_Id(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.Id = (global::System.Int32)Value;
+        }
+        private object get_121_CommunityPostViewModel_UserName(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.UserName;
+        }
+        private void set_121_CommunityPostViewModel_UserName(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.UserName = (global::System.String)Value;
+        }
+        private object get_122_CommunityPostViewModel_UserAvatarString(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.UserAvatarString;
+        }
+        private void set_122_CommunityPostViewModel_UserAvatarString(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.UserAvatarString = (global::System.String)Value;
+        }
+        private object get_123_CommunityPostViewModel_ContentType(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.ContentType;
+        }
+        private void set_123_CommunityPostViewModel_ContentType(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.ContentType = (global::System.String)Value;
+        }
+        private object get_124_CommunityPostViewModel_TextContent(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.TextContent;
+        }
+        private void set_124_CommunityPostViewModel_TextContent(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.TextContent = (global::System.String)Value;
+        }
+        private object get_125_CommunityPostViewModel_MediaUrlString(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.MediaUrlString;
+        }
+        private void set_125_CommunityPostViewModel_MediaUrlString(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.MediaUrlString = (global::System.String)Value;
+        }
+        private object get_126_CommunityPostViewModel_LikesCount(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.LikesCount;
+        }
+        private void set_126_CommunityPostViewModel_LikesCount(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.LikesCount = (global::System.Int32)Value;
+        }
+        private object get_127_CommunityPostViewModel_CommentsCount(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.CommentsCount;
+        }
+        private void set_127_CommunityPostViewModel_CommentsCount(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.CommentsCount = (global::System.Int32)Value;
+        }
+        private object get_128_CommunityPostViewModel_CreatedAtString(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.CreatedAtString;
+        }
+        private void set_128_CommunityPostViewModel_CreatedAtString(object instance, object Value)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            that.CreatedAtString = (global::System.String)Value;
+        }
+        private object get_129_CommunityPostViewModel_UserAvatar(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.UserAvatar;
+        }
+        private object get_130_CommunityPostViewModel_MediaContent(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.MediaContent;
+        }
+        private object get_131_CommunityPostViewModel_TextVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.TextVisibility;
+        }
+        private object get_132_CommunityPostViewModel_MediaVisibility(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.CommunityPostViewModel)instance;
+            return that.MediaVisibility;
+        }
+        private object get_133_MainPage_Flashcards(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.Flashcards;
+        }
+        private object get_134_FlashcardViewModel_Id(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.FlashcardViewModel)instance;
+            return that.Id;
+        }
+        private object get_135_FlashcardViewModel_Front(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.FlashcardViewModel)instance;
+            return that.Front;
+        }
+        private object get_136_FlashcardViewModel_Back(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.FlashcardViewModel)instance;
+            return that.Back;
+        }
+        private object get_137_MainPage_LeaderboardItems(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.LeaderboardItems;
+        }
+        private object get_138_LeaderboardItemViewModel_Name(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.LeaderboardItemViewModel)instance;
+            return that.Name;
+        }
+        private object get_139_LeaderboardItemViewModel_RankDisplay(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.LeaderboardItemViewModel)instance;
+            return that.RankDisplay;
+        }
+        private object get_140_LeaderboardItemViewModel_LevelText(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.LeaderboardItemViewModel)instance;
+            return that.LevelText;
+        }
+        private object get_141_LeaderboardItemViewModel_XpText(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.LeaderboardItemViewModel)instance;
+            return that.XpText;
+        }
+        private object get_142_LeaderboardItemViewModel_AvatarSource(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.LeaderboardItemViewModel)instance;
+            return that.AvatarSource;
+        }
+        private object get_143_MainPage_ProfilePosts(object instance)
+        {
+            var that = (global::ChatmeWindows.Views.MainPage)instance;
+            return that.ProfilePosts;
+        }
+        private object get_144_TreeViewNode_Children(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Children;
         }
-        private object get_93_TreeViewNode_Content(object instance)
+        private object get_145_TreeViewNode_Content(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Content;
         }
-        private void set_93_TreeViewNode_Content(object instance, object Value)
+        private void set_145_TreeViewNode_Content(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.Content = (global::System.Object)Value;
         }
-        private object get_94_TreeViewNode_Depth(object instance)
+        private object get_146_TreeViewNode_Depth(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Depth;
         }
-        private object get_95_TreeViewNode_HasChildren(object instance)
+        private object get_147_TreeViewNode_HasChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasChildren;
         }
-        private object get_96_TreeViewNode_HasUnrealizedChildren(object instance)
+        private object get_148_TreeViewNode_HasUnrealizedChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasUnrealizedChildren;
         }
-        private void set_96_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
+        private void set_148_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.HasUnrealizedChildren = (global::System.Boolean)Value;
         }
-        private object get_97_TreeViewNode_IsExpanded(object instance)
+        private object get_149_TreeViewNode_IsExpanded(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.IsExpanded;
         }
-        private void set_97_TreeViewNode_IsExpanded(object instance, object Value)
+        private void set_149_TreeViewNode_IsExpanded(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.IsExpanded = (global::System.Boolean)Value;
         }
-        private object get_98_TreeViewNode_Parent(object instance)
+        private object get_150_TreeViewNode_Parent(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Parent;
@@ -1973,124 +2640,124 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 xamlMember.Getter = get_12_NavigationView_IsBackButtonVisible;
                 xamlMember.Setter = set_12_NavigationView_IsBackButtonVisible;
                 break;
+            case "Microsoft.UI.Xaml.Controls.NavigationView.IsSettingsVisible":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsSettingsVisible", "Boolean");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_13_NavigationView_IsSettingsVisible;
+                xamlMember.Setter = set_13_NavigationView_IsSettingsVisible;
+                break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.MenuItems":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "MenuItems", "System.Collections.Generic.IList`1<Object>");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_13_NavigationView_MenuItems;
+                xamlMember.Getter = get_14_NavigationView_MenuItems;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.FooterMenuItems":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "FooterMenuItems", "System.Collections.Generic.IList`1<Object>");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_14_NavigationView_FooterMenuItems;
+                xamlMember.Getter = get_15_NavigationView_FooterMenuItems;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.AlwaysShowHeader":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AlwaysShowHeader", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_15_NavigationView_AlwaysShowHeader;
-                xamlMember.Setter = set_15_NavigationView_AlwaysShowHeader;
+                xamlMember.Getter = get_16_NavigationView_AlwaysShowHeader;
+                xamlMember.Setter = set_16_NavigationView_AlwaysShowHeader;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.AutoSuggestBox":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AutoSuggestBox", "Microsoft.UI.Xaml.Controls.AutoSuggestBox");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_16_NavigationView_AutoSuggestBox;
-                xamlMember.Setter = set_16_NavigationView_AutoSuggestBox;
+                xamlMember.Getter = get_17_NavigationView_AutoSuggestBox;
+                xamlMember.Setter = set_17_NavigationView_AutoSuggestBox;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.CompactModeThresholdWidth":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CompactModeThresholdWidth", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_17_NavigationView_CompactModeThresholdWidth;
-                xamlMember.Setter = set_17_NavigationView_CompactModeThresholdWidth;
+                xamlMember.Getter = get_18_NavigationView_CompactModeThresholdWidth;
+                xamlMember.Setter = set_18_NavigationView_CompactModeThresholdWidth;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.CompactPaneLength":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CompactPaneLength", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_18_NavigationView_CompactPaneLength;
-                xamlMember.Setter = set_18_NavigationView_CompactPaneLength;
+                xamlMember.Getter = get_19_NavigationView_CompactPaneLength;
+                xamlMember.Setter = set_19_NavigationView_CompactPaneLength;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.ContentOverlay":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ContentOverlay", "Microsoft.UI.Xaml.UIElement");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_19_NavigationView_ContentOverlay;
-                xamlMember.Setter = set_19_NavigationView_ContentOverlay;
+                xamlMember.Getter = get_20_NavigationView_ContentOverlay;
+                xamlMember.Setter = set_20_NavigationView_ContentOverlay;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.DisplayMode":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "DisplayMode", "Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_20_NavigationView_DisplayMode;
+                xamlMember.Getter = get_21_NavigationView_DisplayMode;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.ExpandedModeThresholdWidth":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ExpandedModeThresholdWidth", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_21_NavigationView_ExpandedModeThresholdWidth;
-                xamlMember.Setter = set_21_NavigationView_ExpandedModeThresholdWidth;
+                xamlMember.Getter = get_22_NavigationView_ExpandedModeThresholdWidth;
+                xamlMember.Setter = set_22_NavigationView_ExpandedModeThresholdWidth;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.FooterMenuItemsSource":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "FooterMenuItemsSource", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_22_NavigationView_FooterMenuItemsSource;
-                xamlMember.Setter = set_22_NavigationView_FooterMenuItemsSource;
+                xamlMember.Getter = get_23_NavigationView_FooterMenuItemsSource;
+                xamlMember.Setter = set_23_NavigationView_FooterMenuItemsSource;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.Header":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Header", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_23_NavigationView_Header;
-                xamlMember.Setter = set_23_NavigationView_Header;
+                xamlMember.Getter = get_24_NavigationView_Header;
+                xamlMember.Setter = set_24_NavigationView_Header;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.HeaderTemplate":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "HeaderTemplate", "Microsoft.UI.Xaml.DataTemplate");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_24_NavigationView_HeaderTemplate;
-                xamlMember.Setter = set_24_NavigationView_HeaderTemplate;
+                xamlMember.Getter = get_25_NavigationView_HeaderTemplate;
+                xamlMember.Setter = set_25_NavigationView_HeaderTemplate;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsBackEnabled":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsBackEnabled", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_25_NavigationView_IsBackEnabled;
-                xamlMember.Setter = set_25_NavigationView_IsBackEnabled;
+                xamlMember.Getter = get_26_NavigationView_IsBackEnabled;
+                xamlMember.Setter = set_26_NavigationView_IsBackEnabled;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsPaneOpen":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsPaneOpen", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_26_NavigationView_IsPaneOpen;
-                xamlMember.Setter = set_26_NavigationView_IsPaneOpen;
+                xamlMember.Getter = get_27_NavigationView_IsPaneOpen;
+                xamlMember.Setter = set_27_NavigationView_IsPaneOpen;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsPaneToggleButtonVisible":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsPaneToggleButtonVisible", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_27_NavigationView_IsPaneToggleButtonVisible;
-                xamlMember.Setter = set_27_NavigationView_IsPaneToggleButtonVisible;
+                xamlMember.Getter = get_28_NavigationView_IsPaneToggleButtonVisible;
+                xamlMember.Setter = set_28_NavigationView_IsPaneToggleButtonVisible;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsPaneVisible":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsPaneVisible", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_28_NavigationView_IsPaneVisible;
-                xamlMember.Setter = set_28_NavigationView_IsPaneVisible;
-                break;
-            case "Microsoft.UI.Xaml.Controls.NavigationView.IsSettingsVisible":
-                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
-                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsSettingsVisible", "Boolean");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_29_NavigationView_IsSettingsVisible;
-                xamlMember.Setter = set_29_NavigationView_IsSettingsVisible;
+                xamlMember.Getter = get_29_NavigationView_IsPaneVisible;
+                xamlMember.Setter = set_29_NavigationView_IsPaneVisible;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsTitleBarAutoPaddingEnabled":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
@@ -2430,122 +3097,434 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
                 xamlMember.Getter = get_79_ConversationViewModel_UnreadCountText;
                 xamlMember.SetIsReadOnly();
                 break;
+            case "ChatmeWindows.Views.ConversationViewModel.IsVip":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ConversationViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsVip", "Boolean");
+                xamlMember.Getter = get_80_ConversationViewModel_IsVip;
+                xamlMember.Setter = set_80_ConversationViewModel_IsVip;
+                break;
+            case "ChatmeWindows.Views.ConversationViewModel.IsOnline":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ConversationViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsOnline", "Boolean");
+                xamlMember.Getter = get_81_ConversationViewModel_IsOnline;
+                xamlMember.Setter = set_81_ConversationViewModel_IsOnline;
+                break;
+            case "ChatmeWindows.Views.ConversationViewModel.VipVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ConversationViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "VipVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_82_ConversationViewModel_VipVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.ConversationViewModel.OnlineVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ConversationViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "OnlineVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_83_ConversationViewModel_OnlineVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
             case "ChatmeWindows.Views.MainPage.Messages":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Messages", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.MessageViewModel>");
-                xamlMember.Getter = get_80_MainPage_Messages;
+                xamlMember.Getter = get_84_MainPage_Messages;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.Content":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Content", "String");
-                xamlMember.Getter = get_81_MessageViewModel_Content;
-                xamlMember.Setter = set_81_MessageViewModel_Content;
+                xamlMember.Getter = get_85_MessageViewModel_Content;
+                xamlMember.Setter = set_85_MessageViewModel_Content;
                 break;
             case "ChatmeWindows.Views.MessageViewModel.IsMe":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsMe", "Boolean");
-                xamlMember.Getter = get_82_MessageViewModel_IsMe;
-                xamlMember.Setter = set_82_MessageViewModel_IsMe;
+                xamlMember.Getter = get_86_MessageViewModel_IsMe;
+                xamlMember.Setter = set_86_MessageViewModel_IsMe;
                 break;
             case "ChatmeWindows.Views.MessageViewModel.CreatedAt":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CreatedAt", "System.DateTime");
-                xamlMember.Getter = get_83_MessageViewModel_CreatedAt;
-                xamlMember.Setter = set_83_MessageViewModel_CreatedAt;
+                xamlMember.Getter = get_87_MessageViewModel_CreatedAt;
+                xamlMember.Setter = set_87_MessageViewModel_CreatedAt;
+                break;
+            case "ChatmeWindows.Views.MessageViewModel.Status":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Status", "String");
+                xamlMember.Getter = get_88_MessageViewModel_Status;
+                xamlMember.Setter = set_88_MessageViewModel_Status;
+                break;
+            case "ChatmeWindows.Views.MessageViewModel.MessageType":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "MessageType", "String");
+                xamlMember.Getter = get_89_MessageViewModel_MessageType;
+                xamlMember.Setter = set_89_MessageViewModel_MessageType;
                 break;
             case "ChatmeWindows.Views.MessageViewModel.TimeString":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "TimeString", "String");
-                xamlMember.Getter = get_84_MessageViewModel_TimeString;
+                xamlMember.Getter = get_90_MessageViewModel_TimeString;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MessageViewModel.StatusIcon":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "StatusIcon", "String");
+                xamlMember.Getter = get_91_MessageViewModel_StatusIcon;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MessageViewModel.StatusVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "StatusVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_92_MessageViewModel_StatusVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MessageViewModel.StatusColor":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "StatusColor", "Microsoft.UI.Xaml.Media.Brush");
+                xamlMember.Getter = get_93_MessageViewModel_StatusColor;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.Alignment":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Alignment", "Microsoft.UI.Xaml.HorizontalAlignment");
-                xamlMember.Getter = get_85_MessageViewModel_Alignment;
+                xamlMember.Getter = get_94_MessageViewModel_Alignment;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.BackgroundBrush":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "BackgroundBrush", "Microsoft.UI.Xaml.Media.Brush");
-                xamlMember.Getter = get_86_MessageViewModel_BackgroundBrush;
+                xamlMember.Getter = get_95_MessageViewModel_BackgroundBrush;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.BorderBrush":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "BorderBrush", "Microsoft.UI.Xaml.Media.Brush");
-                xamlMember.Getter = get_87_MessageViewModel_BorderBrush;
+                xamlMember.Getter = get_96_MessageViewModel_BorderBrush;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.BorderThickness":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "BorderThickness", "Microsoft.UI.Xaml.Thickness");
-                xamlMember.Getter = get_88_MessageViewModel_BorderThickness;
+                xamlMember.Getter = get_97_MessageViewModel_BorderThickness;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.TextColor":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "TextColor", "Microsoft.UI.Xaml.Media.Brush");
-                xamlMember.Getter = get_89_MessageViewModel_TextColor;
+                xamlMember.Getter = get_98_MessageViewModel_TextColor;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.TimeColor":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "TimeColor", "Microsoft.UI.Xaml.Media.Brush");
-                xamlMember.Getter = get_90_MessageViewModel_TimeColor;
+                xamlMember.Getter = get_99_MessageViewModel_TimeColor;
                 xamlMember.SetIsReadOnly();
                 break;
             case "ChatmeWindows.Views.MessageViewModel.BubbleRadius":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MessageViewModel");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "BubbleRadius", "Microsoft.UI.Xaml.CornerRadius");
-                xamlMember.Getter = get_91_MessageViewModel_BubbleRadius;
+                xamlMember.Getter = get_100_MessageViewModel_BubbleRadius;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.ExploreUsers":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ExploreUsers", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.ExploreUserViewModel>");
+                xamlMember.Getter = get_101_MainPage_ExploreUsers;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.Id":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Id", "Int32");
+                xamlMember.Getter = get_102_ExploreUserViewModel_Id;
+                xamlMember.Setter = set_102_ExploreUserViewModel_Id;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.Name":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Name", "String");
+                xamlMember.Getter = get_103_ExploreUserViewModel_Name;
+                xamlMember.Setter = set_103_ExploreUserViewModel_Name;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.AvatarUrlString":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AvatarUrlString", "String");
+                xamlMember.Getter = get_104_ExploreUserViewModel_AvatarUrlString;
+                xamlMember.Setter = set_104_ExploreUserViewModel_AvatarUrlString;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.Gender":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Gender", "String");
+                xamlMember.Getter = get_105_ExploreUserViewModel_Gender;
+                xamlMember.Setter = set_105_ExploreUserViewModel_Gender;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.LocationName":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "LocationName", "String");
+                xamlMember.Getter = get_106_ExploreUserViewModel_LocationName;
+                xamlMember.Setter = set_106_ExploreUserViewModel_LocationName;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.Bio":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Bio", "String");
+                xamlMember.Getter = get_107_ExploreUserViewModel_Bio;
+                xamlMember.Setter = set_107_ExploreUserViewModel_Bio;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.NativeLanguage":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "NativeLanguage", "String");
+                xamlMember.Getter = get_108_ExploreUserViewModel_NativeLanguage;
+                xamlMember.Setter = set_108_ExploreUserViewModel_NativeLanguage;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.IsOnline":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsOnline", "Boolean");
+                xamlMember.Getter = get_109_ExploreUserViewModel_IsOnline;
+                xamlMember.Setter = set_109_ExploreUserViewModel_IsOnline;
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.Avatar":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Avatar", "Microsoft.UI.Xaml.Media.ImageSource");
+                xamlMember.Getter = get_110_ExploreUserViewModel_Avatar;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.ExploreUserViewModel.IsOnlineVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.ExploreUserViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsOnlineVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_111_ExploreUserViewModel_IsOnlineVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.Guests":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Guests", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.GuestViewModel>");
+                xamlMember.Getter = get_112_MainPage_Guests;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.ViewerName":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ViewerName", "String");
+                xamlMember.Getter = get_113_GuestViewModel_ViewerName;
+                xamlMember.Setter = set_113_GuestViewModel_ViewerName;
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.AvatarUrlString":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AvatarUrlString", "String");
+                xamlMember.Getter = get_114_GuestViewModel_AvatarUrlString;
+                xamlMember.Setter = set_114_GuestViewModel_AvatarUrlString;
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.ViewCount":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ViewCount", "Int32");
+                xamlMember.Getter = get_115_GuestViewModel_ViewCount;
+                xamlMember.Setter = set_115_GuestViewModel_ViewCount;
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.LastViewedTime":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "LastViewedTime", "String");
+                xamlMember.Getter = get_116_GuestViewModel_LastViewedTime;
+                xamlMember.Setter = set_116_GuestViewModel_LastViewedTime;
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.ViewCountText":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ViewCountText", "String");
+                xamlMember.Getter = get_117_GuestViewModel_ViewCountText;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.GuestViewModel.AvatarUrl":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.GuestViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AvatarUrl", "Microsoft.UI.Xaml.Media.ImageSource");
+                xamlMember.Getter = get_118_GuestViewModel_AvatarUrl;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.CommunityPosts":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CommunityPosts", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.CommunityPostViewModel>");
+                xamlMember.Getter = get_119_MainPage_CommunityPosts;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.Id":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Id", "Int32");
+                xamlMember.Getter = get_120_CommunityPostViewModel_Id;
+                xamlMember.Setter = set_120_CommunityPostViewModel_Id;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.UserName":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "UserName", "String");
+                xamlMember.Getter = get_121_CommunityPostViewModel_UserName;
+                xamlMember.Setter = set_121_CommunityPostViewModel_UserName;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.UserAvatarString":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "UserAvatarString", "String");
+                xamlMember.Getter = get_122_CommunityPostViewModel_UserAvatarString;
+                xamlMember.Setter = set_122_CommunityPostViewModel_UserAvatarString;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.ContentType":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ContentType", "String");
+                xamlMember.Getter = get_123_CommunityPostViewModel_ContentType;
+                xamlMember.Setter = set_123_CommunityPostViewModel_ContentType;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.TextContent":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "TextContent", "String");
+                xamlMember.Getter = get_124_CommunityPostViewModel_TextContent;
+                xamlMember.Setter = set_124_CommunityPostViewModel_TextContent;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.MediaUrlString":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "MediaUrlString", "String");
+                xamlMember.Getter = get_125_CommunityPostViewModel_MediaUrlString;
+                xamlMember.Setter = set_125_CommunityPostViewModel_MediaUrlString;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.LikesCount":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "LikesCount", "Int32");
+                xamlMember.Getter = get_126_CommunityPostViewModel_LikesCount;
+                xamlMember.Setter = set_126_CommunityPostViewModel_LikesCount;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.CommentsCount":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CommentsCount", "Int32");
+                xamlMember.Getter = get_127_CommunityPostViewModel_CommentsCount;
+                xamlMember.Setter = set_127_CommunityPostViewModel_CommentsCount;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.CreatedAtString":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "CreatedAtString", "String");
+                xamlMember.Getter = get_128_CommunityPostViewModel_CreatedAtString;
+                xamlMember.Setter = set_128_CommunityPostViewModel_CreatedAtString;
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.UserAvatar":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "UserAvatar", "Microsoft.UI.Xaml.Media.ImageSource");
+                xamlMember.Getter = get_129_CommunityPostViewModel_UserAvatar;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.MediaContent":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "MediaContent", "Microsoft.UI.Xaml.Media.ImageSource");
+                xamlMember.Getter = get_130_CommunityPostViewModel_MediaContent;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.TextVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "TextVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_131_CommunityPostViewModel_TextVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.CommunityPostViewModel.MediaVisibility":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.CommunityPostViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "MediaVisibility", "Microsoft.UI.Xaml.Visibility");
+                xamlMember.Getter = get_132_CommunityPostViewModel_MediaVisibility;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.Flashcards":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Flashcards", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.FlashcardViewModel>");
+                xamlMember.Getter = get_133_MainPage_Flashcards;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.FlashcardViewModel.Id":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.FlashcardViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Id", "Int32");
+                xamlMember.Getter = get_134_FlashcardViewModel_Id;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.FlashcardViewModel.Front":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.FlashcardViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Front", "String");
+                xamlMember.Getter = get_135_FlashcardViewModel_Front;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.FlashcardViewModel.Back":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.FlashcardViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Back", "String");
+                xamlMember.Getter = get_136_FlashcardViewModel_Back;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.LeaderboardItems":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "LeaderboardItems", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.LeaderboardItemViewModel>");
+                xamlMember.Getter = get_137_MainPage_LeaderboardItems;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.LeaderboardItemViewModel.Name":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.LeaderboardItemViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Name", "String");
+                xamlMember.Getter = get_138_LeaderboardItemViewModel_Name;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.LeaderboardItemViewModel.RankDisplay":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.LeaderboardItemViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "RankDisplay", "String");
+                xamlMember.Getter = get_139_LeaderboardItemViewModel_RankDisplay;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.LeaderboardItemViewModel.LevelText":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.LeaderboardItemViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "LevelText", "String");
+                xamlMember.Getter = get_140_LeaderboardItemViewModel_LevelText;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.LeaderboardItemViewModel.XpText":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.LeaderboardItemViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "XpText", "String");
+                xamlMember.Getter = get_141_LeaderboardItemViewModel_XpText;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.LeaderboardItemViewModel.AvatarSource":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.LeaderboardItemViewModel");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "AvatarSource", "Microsoft.UI.Xaml.Media.ImageSource");
+                xamlMember.Getter = get_142_LeaderboardItemViewModel_AvatarSource;
+                xamlMember.SetIsReadOnly();
+                break;
+            case "ChatmeWindows.Views.MainPage.ProfilePosts":
+                userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("ChatmeWindows.Views.MainPage");
+                xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "ProfilePosts", "System.Collections.ObjectModel.ObservableCollection`1<ChatmeWindows.Views.CommunityPostViewModel>");
+                xamlMember.Getter = get_143_MainPage_ProfilePosts;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Children":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Children", "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>");
-                xamlMember.Getter = get_92_TreeViewNode_Children;
+                xamlMember.Getter = get_144_TreeViewNode_Children;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Content":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Content", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_93_TreeViewNode_Content;
-                xamlMember.Setter = set_93_TreeViewNode_Content;
+                xamlMember.Getter = get_145_TreeViewNode_Content;
+                xamlMember.Setter = set_145_TreeViewNode_Content;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Depth":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Depth", "Int32");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_94_TreeViewNode_Depth;
+                xamlMember.Getter = get_146_TreeViewNode_Depth;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasChildren":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "HasChildren", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_95_TreeViewNode_HasChildren;
+                xamlMember.Getter = get_147_TreeViewNode_HasChildren;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasUnrealizedChildren":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "HasUnrealizedChildren", "Boolean");
-                xamlMember.Getter = get_96_TreeViewNode_HasUnrealizedChildren;
-                xamlMember.Setter = set_96_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Getter = get_148_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Setter = set_148_TreeViewNode_HasUnrealizedChildren;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.IsExpanded":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "IsExpanded", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_97_TreeViewNode_IsExpanded;
-                xamlMember.Setter = set_97_TreeViewNode_IsExpanded;
+                xamlMember.Getter = get_149_TreeViewNode_IsExpanded;
+                xamlMember.Setter = set_149_TreeViewNode_IsExpanded;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Parent":
                 userType = (global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlMember(this, "Parent", "Microsoft.UI.Xaml.Controls.TreeViewNode");
-                xamlMember.Getter = get_98_TreeViewNode_Parent;
+                xamlMember.Getter = get_150_TreeViewNode_Parent;
                 xamlMember.SetIsReadOnly();
                 break;
             }
@@ -2553,7 +3532,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
         }
     }
 
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     internal partial class XamlSystemBaseType : global::Microsoft.UI.Xaml.Markup.IXamlType
     {
@@ -2605,7 +3584,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
     internal delegate object CreateFromStringMethod(string args);
     internal delegate object BoxInstanceMethod(object instance);
 
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     internal partial class XamlUserType : global::ChatmeWindows.ChatmeWindows_XamlTypeInfo.XamlSystemBaseType
         , global::Microsoft.UI.Xaml.Markup.IXamlType
@@ -2838,7 +3817,7 @@ namespace ChatmeWindows.ChatmeWindows_XamlTypeInfo
     internal delegate object Getter(object instance);
     internal delegate void Setter(object instance, object value);
 
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2602")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.UI.Xaml.Markup.Compiler"," 3.0.0.2605")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     internal partial class XamlMember : global::Microsoft.UI.Xaml.Markup.IXamlMember
     {

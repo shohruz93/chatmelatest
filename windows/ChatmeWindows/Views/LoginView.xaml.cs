@@ -217,16 +217,32 @@ namespace ChatmeWindows.Views
             {
                 string settingsPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ChatmeWindows", "session.json");
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(settingsPath)!);
-                string json = System.Text.Json.JsonSerializer.Serialize(response);
+                string json = Newtonsoft.Json.JsonConvert.SerializeObject(response);
                 System.IO.File.WriteAllText(settingsPath, json);
 
-                // Save critical UI fields directly to LocalSettings for fast retrieval
+                // Save critical UI fields directly to LocalSettings and a fallback file for fast retrieval
+                var settingsDict = new Dictionary<string, string>
+                {
+                    { "UserName", response.User.Name },
+                    { "UserPhoto", (!string.IsNullOrEmpty(response.User.PhotoUrl) ? response.User.PhotoUrl : response.User.PhotoUrlFallback) ?? "" },
+                    { "UserCoins", response.User.Coins.ToString() },
+                    { "UserXp", response.User.Xp.ToString() }
+                };
+
                 try 
                 {
-                    ApplicationData.Current.LocalSettings.Values["UserName"] = response.User.Name;
-                    ApplicationData.Current.LocalSettings.Values["UserPhoto"] = response.User.PhotoUrl;
-                    ApplicationData.Current.LocalSettings.Values["UserCoins"] = response.User.Coins.ToString();
-                    ApplicationData.Current.LocalSettings.Values["UserXp"] = response.User.Xp.ToString();
+                    foreach (var kvp in settingsDict)
+                    {
+                        ApplicationData.Current.LocalSettings.Values[kvp.Key] = kvp.Value;
+                    }
+                }
+                catch { }
+
+                // Fallback for unpackaged apps
+                try
+                {
+                    string localSettingsPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(settingsPath)!, "localsettings.json");
+                    System.IO.File.WriteAllText(localSettingsPath, System.Text.Json.JsonSerializer.Serialize(settingsDict));
                 }
                 catch { }
             }
