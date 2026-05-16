@@ -295,6 +295,7 @@ export class LanguageService {
             },
             'NAV': {
                 'DASHBOARD': 'Dashboard',
+                'LEADERBOARD': 'Leaderboard',
                 'CHAT': 'Chat',
                 'PROFILE': 'Profile',
                 'COMMUNITY': 'Community',
@@ -311,6 +312,9 @@ export class LanguageService {
                 'LIGHT_MODE': 'Light Mode',
                 'DARK_MODE': 'Dark Mode',
                 'GO_TO_PROFILE': 'Go to Profile'
+            },
+            'LEADERBOARD': {
+                'DESCRIPTION': 'Top users by XP. Climb the ranks by playing and learning!'
             },
             'GAMES': {
                 'TITLE': 'Games',
@@ -777,6 +781,7 @@ export class LanguageService {
             },
             'NAV': {
                 'DASHBOARD': 'Панель',
+                'LEADERBOARD': 'Таблица лидеров',
                 'CHAT': 'Чат',
                 'PROFILE': 'Профиль',
                 'COMMUNITY': 'Сообщество',
@@ -792,6 +797,9 @@ export class LanguageService {
                 'CONTACT_ADMIN': 'Связаться с админом',
                 'LIGHT_MODE': 'Светлая тема',
                 'DARK_MODE': 'Тёмная тема'
+            },
+            'LEADERBOARD': {
+                'DESCRIPTION': 'Лучшие пользователи по опыту (XP). Играйте и учитесь, чтобы подняться в рейтинге!'
             },
             'LEARNING': {
                 'ADD_CARD': 'Добавить карточку',
@@ -1206,6 +1214,7 @@ export class LanguageService {
             },
             'NAV': {
                 'DASHBOARD': 'Панел',
+                'LEADERBOARD': 'Пешсафон',
                 'CHAT': 'Чат',
                 'PROFILE': 'Профил',
                 'COMMUNITY': 'Ҷамъият',
@@ -1221,6 +1230,9 @@ export class LanguageService {
                 'CONTACT_ADMIN': 'Тамос бо админ',
                 'LIGHT_MODE': 'Реҷаи равшан',
                 'DARK_MODE': 'Реҷаи торик'
+            },
+            'LEADERBOARD': {
+                'DESCRIPTION': 'Беҳтарин корбарон аз рӯи хол (XP). Бозӣ кунед ва омӯзед то пешсаф шавед!'
             },
             'LEARNING': {
                 'ADD_CARD': 'Иловаи корт',

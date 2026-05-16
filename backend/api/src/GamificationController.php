@@ -61,11 +61,11 @@ class GamificationController {
             $userId = $_GET['userId'] ?? 0;
         }
 
-        // Get Top 10 users by xp
+        // Get Top 50 users by xp
         $queryTop = "SELECT id, name, avatar, is_vip, xp, FLOOR(SQRT(xp / 100)) + 1 as level 
                      FROM users 
                      ORDER BY xp DESC 
-                     LIMIT 10";
+                     LIMIT 50";
         $stmtTop = $this->conn->prepare($queryTop);
         $stmtTop->execute();
         $topUsers = $stmtTop->fetchAll(PDO::FETCH_ASSOC);

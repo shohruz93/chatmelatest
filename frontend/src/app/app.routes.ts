@@ -88,6 +88,10 @@ export const routes: Routes = [
             {
                 path: 'learning',
                 loadComponent: () => import('./pages/learning/learning.component').then(m => m.LearningComponent)
+            },
+            {
+                path: 'leaderboard',
+                loadComponent: () => import('./pages/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
             }
         ]
     },

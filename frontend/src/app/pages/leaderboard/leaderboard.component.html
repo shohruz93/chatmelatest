@@ -1,0 +1,47 @@
+<div class="leaderboard-container">
+    <div class="header">
+        <h1>🏆 {{ 'NAV.LEADERBOARD' | translate }}</h1>
+        <p>{{ 'LEADERBOARD.DESCRIPTION' | translate }}</p>
+    </div>
+
+    @if (currentUser()) {
+        <div class="current-user-card">
+            <div class="rank-badge current">#{{ currentUser().rank }}</div>
+            <img [src]="getAvatarUrl(currentUser().avatar)" class="avatar" alt="Avatar">
+            <div class="user-info">
+                <h3>{{ currentUser().name }}</h3>
+                <span class="level-badge">Lvl {{ currentUser().level }}</span>
+            </div>
+            <div class="xp-info">
+                <span class="xp-value">{{ currentUser().xp }} XP</span>
+            </div>
+        </div>
+    }
+
+    <div class="leaderboard-list">
+        @for (user of topUsers(); track user.id; let i = $index) {
+            <div class="leaderboard-item" [class.top-3]="i < 3">
+                <div class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                    @if (i === 0) { 🥇 }
+                    @else if (i === 1) { 🥈 }
+                    @else if (i === 2) { 🥉 }
+                    @else { #{{ i + 1 }} }
+                </div>
+                
+                <img [src]="getAvatarUrl(user.avatar)" class="avatar" alt="Avatar">
+                
+                <div class="user-info" [routerLink]="['/dashboard/profile', user.id]" style="cursor: pointer;">
+                    <h3>
+                        {{ user.name }}
+                        @if (user.is_vip == 1) { <span class="vip-badge">VIP</span> }
+                    </h3>
+                    <span class="level-badge">Lvl {{ user.level }}</span>
+                </div>
+                
+                <div class="xp-info">
+                    <span class="xp-value">{{ user.xp }} XP</span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

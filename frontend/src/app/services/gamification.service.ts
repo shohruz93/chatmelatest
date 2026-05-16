@@ -43,6 +43,10 @@ export class GamificationService {
         return this.http.get<Mission[]>(`${this.apiUrl}/gamification/missions`, { headers: this.getHeaders() });
     }
 
+    getLeaderboard(): Observable<{top_users: any[], current_user: any}> {
+        return this.http.get<{top_users: any[], current_user: any}>(`${this.apiUrl}/gamification/leaderboard`, { headers: this.getHeaders() });
+    }
+
     claimMission(userMissionId: number): Observable<any> {
         return this.http.post(`${this.apiUrl}/gamification/claim`, { user_mission_id: userMissionId }, { headers: this.getHeaders() }).pipe(
             tap((res: any) => {
