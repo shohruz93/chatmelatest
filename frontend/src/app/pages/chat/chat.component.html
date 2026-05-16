@@ -214,6 +214,25 @@
                     </div>
                     }
 
+                    <!-- AI Tools -->
+                    <div class="msg-ai-tools">
+                        @if (msg.messageType === 'text') {
+                            <button class="btn-msg-ai" (click)="$event.stopPropagation(); speakMessage(msg)" [disabled]="isMessageSpeaking()[msg.id]" title="Listen">
+                                @if (isMessageSpeaking()[msg.id]) { <span class="spinner-tiny"></span> } @else { 🔊 }
+                            </button>
+                            <button class="btn-msg-ai" (click)="$event.stopPropagation(); explainMessage(msg)" [disabled]="isMessageExplaining()[msg.id]" title="Explain">
+                                @if (isMessageExplaining()[msg.id]) { <span class="spinner-tiny"></span> } @else { 💡 }
+                            </button>
+                        }
+                    </div>
+
+                    @if (messageExplanations()[msg.id]) {
+                        <div class="msg-ai-explanation glass-panel">
+                            <button class="btn-close-expl" (click)="closeExplanation(msg.id)">✕</button>
+                            <p>{{ messageExplanations()[msg.id] }}</p>
+                        </div>
+                    }
+
                     <!-- Metadata -->
                     <div class="message-meta">
                         <span class="message-time">{{ msg.createdAt | date:'shortTime' }}</span>

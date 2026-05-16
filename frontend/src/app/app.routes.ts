@@ -74,6 +74,18 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/games/checkers/checkers.component').then(m => m.CheckersComponent)
             },
             {
+                path: 'games/arrows',
+                loadComponent: () => import('./pages/games/arrows/arrows.component').then(m => m.ArrowsComponent)
+            },
+            {
+                path: 'games/quiz',
+                loadComponent: () => import('./pages/games/language-game/language-game.component').then(m => m.LanguageGameComponent)
+            },
+            {
+                path: 'games/anagram',
+                loadComponent: () => import('./pages/games/language-game/language-game.component').then(m => m.LanguageGameComponent)
+            },
+            {
                 path: 'voice-rooms',
                 loadComponent: () => import('./pages/voice-rooms-list/voice-rooms-list.component').then(m => m.VoiceRoomsListComponent)
             },

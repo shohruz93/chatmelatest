@@ -203,6 +203,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     aiChatMessages = signal<{role: 'user' | 'ai', content: string}[]>([]);
     aiChatInput = '';
     isAiTyping = signal(false);
+    
+    // Per-message AI states
+    isMessageSpeaking = signal<{[key: string]: boolean}>({});
+    isMessageExplaining = signal<{[key: string]: boolean}>({});
+    messageExplanations = signal<{[key: string]: string}>({});
 
 
 
@@ -476,6 +481,38 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     toggleStickerPicker() {
         this.showStickerPicker = !this.showStickerPicker;
+    }
+
+    speakMessage(msg: any) {
+        const text = msg.content;
+        this.isMessageSpeaking.update(map => ({...map, [msg.id]: true}));
+        this.aiService.textToSpeech(text).then(() => {
+            this.isMessageSpeaking.update(map => ({...map, [msg.id]: false}));
+        }).catch(() => {
+            this.isMessageSpeaking.update(map => ({...map, [msg.id]: false}));
+        });
+    }
+
+    explainMessage(msg: any) {
+        const lang = this.languageService.currentLang();
+        this.isMessageExplaining.update(map => ({...map, [msg.id]: true}));
+        this.aiService.explainWord(msg.content, '', lang).subscribe({
+            next: (res) => {
+                this.messageExplanations.update(map => ({...map, [msg.id]: res}));
+                this.isMessageExplaining.update(map => ({...map, [msg.id]: false}));
+            },
+            error: () => {
+                this.isMessageExplaining.update(map => ({...map, [msg.id]: false}));
+            }
+        });
+    }
+
+    closeExplanation(msgId: string) {
+        this.messageExplanations.update(m => {
+            const newMap = { ...m };
+            delete newMap[msgId];
+            return newMap;
+        });
     }
 
     /* Keep necessary method stubs to prevent template errors until we cleanup template */

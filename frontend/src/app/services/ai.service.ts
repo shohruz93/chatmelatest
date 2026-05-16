@@ -15,6 +15,10 @@ declare var puter: any;
 export class AiService {
 
     private chat(prompt: string, isFix: boolean = false): Observable<string> {
+        if (typeof puter !== 'undefined') {
+            puter.quiet = true;
+        }
+
         if (typeof puter === 'undefined' || !puter.ai) {
             return throwError(() => new Error('Puter.js not loaded'));
         }
@@ -67,8 +71,6 @@ export class AiService {
 
         return this.chat(prompt).pipe(
             map(response => {
-                console.log('AI Raw Response:', response);
-                
                 // Try to split by newlines first
                 let lines = response.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 
@@ -98,7 +100,6 @@ export class AiService {
                     .filter(s => s.textToSend.length > 2 && !s.textToSend.toLowerCase().includes('instruction:'))
                     .slice(0, 3);
                 
-                console.log('Parsed Suggestions Final:', suggestions);
                 return suggestions;
             })
         );
@@ -108,6 +109,89 @@ export class AiService {
 
     askAi(question: string): Observable<string> {
         return this.chat(question);
+    }
+
+    generateImage(prompt: string): Observable<string> {
+        if (typeof puter === 'undefined' || !puter.ai) {
+            return throwError(() => new Error('Puter.js not loaded'));
+        }
+        // Explicitly specifying model to avoid "Missing model" error
+        return from(puter.ai.txt2img(prompt, { model: 'gpt-image-1-mini' })).pipe(
+            map((res: any) => {
+                // Puter.js txt2img often returns an HTMLImageElement
+                if (res instanceof HTMLImageElement) return res.src;
+                if (res?.src) return res.src;
+                // If it's a blob, we need to create a URL
+                if (res instanceof Blob) return URL.createObjectURL(res);
+                // If it's a string (URL)
+                if (typeof res === 'string') return res;
+                return res;
+            }),
+            catchError(err => {
+                console.error('Puter AI txt2img Error:', err);
+                return throwError(() => err);
+            })
+        );
+    }
+
+    textToSpeech(text: string): Promise<any> {
+        if (typeof puter === 'undefined' || !puter.ai) {
+            console.error('Puter.js not loaded');
+            return Promise.reject('Puter.js not loaded');
+        }
+        
+        // Using elevenlabs for better multilingual support (including Tajik)
+        return puter.ai.txt2speech(text, { 
+            provider: 'elevenlabs', 
+            model: 'eleven_multilingual_v2' 
+        }).then((res: any) => {
+            let audio: HTMLAudioElement;
+            if (res && typeof res.play === 'function') {
+                audio = res;
+            } else if (typeof res === 'string') {
+                audio = new Audio(res);
+            } else if (res instanceof Blob) {
+                audio = new Audio(URL.createObjectURL(res));
+            } else {
+                throw new Error('Unsupported audio format from Puter');
+            }
+            
+            audio.currentTime = 0; // Reset to start
+            return audio.play();
+        }).catch((err: any) => {
+            console.error('TTS execution failed:', err);
+            throw err;
+        });
+    }
+
+    explainWord(word: string, translation: string = '', targetLang: string = 'en'): Observable<string> {
+        const langNames: any = {
+            'en': 'English',
+            'ru': 'Russian',
+            'tj': 'Tajik (Тоҷикӣ)',
+            'es': 'Spanish',
+            'ar': 'Arabic',
+            'fr': 'French',
+            'de': 'German',
+            'zh': 'Chinese',
+            'hi': 'Hindi',
+            'fa': 'Persian'
+        };
+        const langName = langNames[targetLang] || 'English';
+
+        const prompt = `You are a professional language tutor. 
+        Your task is to explain the foreign word/phrase: "${word}".
+        The student's native language is: ${langName}.
+        Known translation: "${translation}".
+        
+        Requirements:
+        1. Provide the meaning of the foreign word "${word}" in ${langName}.
+        2. Provide grammar notes for "${word}" in ${langName}.
+        3. Provide an example sentence using "${word}" and its translation in ${langName}.
+        
+        CRITICAL: Your entire response MUST be written in the ${langName} language. 
+        Do not explain "${translation}". Instead, use ${langName} to explain the usage and meaning of "${word}".`;
+        return this.chat(prompt);
     }
 }
 

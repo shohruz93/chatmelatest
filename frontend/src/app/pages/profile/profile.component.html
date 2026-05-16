@@ -203,9 +203,15 @@
                     }
 
 
-                    <!-- Stats Bar: Guests, Followers, Following -->
+                    <!-- Stats Bar: Games, Guests, Followers, Following -->
                     <div class="profile-stats-bar">
                         @if (isOwnProfile) {
+                        <a class="stat-item" [routerLink]="['/dashboard/games']"
+                            title="{{ 'NAV.GAMES' | translate }}">
+                            <span class="stat-icon">🎮</span>
+                            <span class="stat-count">✨</span>
+                            <span class="stat-label">{{ 'NAV.GAMES' | translate }}</span>
+                        </a>
                         <a class="stat-item" [routerLink]="['/dashboard/guests']"
                             title="{{ 'NAV.GUESTS' | translate }}">
                             <span class="stat-icon">👁️</span>
@@ -223,6 +229,12 @@
                             <span class="stat-label">{{ 'PROFILE.FOLLOWING' | translate }}</span>
                         </a>
                         } @else {
+                        <a class="stat-item" [routerLink]="['/dashboard/games']"
+                            title="{{ 'NAV.GAMES' | translate }}">
+                            <span class="stat-icon">🎮</span>
+                            <span class="stat-count">✨</span>
+                            <span class="stat-label">{{ 'NAV.GAMES' | translate }}</span>
+                        </a>
                         <div class="stat-item non-clickable">
                             <span class="stat-icon">👥</span>
                             <span class="stat-count">{{ followersCount }}</span>

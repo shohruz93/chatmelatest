@@ -16,18 +16,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       </div>
 
       <div class="games-grid">
-        @if (invitation()) {
-          <div class="invitation-overlay">
-            <div class="invitation-card">
-              <h3>{{ 'GAMES.INVITE_TITLE' | translate }}</h3>
-              <p>{{ 'PROFILE.USER_PREFIX' | translate }}{{ invitation().fromUserId }} {{ 'GAMES.INVITE_RECEIVED' | translate }} {{ invitation().amount }} 🪙</p>
-              <div class="actions">
-                <button class="accept-btn" (click)="acceptInvite()">{{ 'CHECKERS.ACCEPT' | translate }}</button>
-                <button class="reject-btn" (click)="rejectInvite()">{{ 'CHECKERS.REJECT' | translate }}</button>
-              </div>
-            </div>
-          </div>
-        }
+
 
         <div class="game-card checkers">
           <div class="game-icon">🏁</div>
@@ -37,8 +26,33 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
             <button class="play-btn" routerLink="checkers">{{ 'GAMES.PLAY_NOW' | translate }}</button>
           </div>
         </div>
-        
-        <!-- Future games can be added here -->
+
+        <div class="game-card arrows">
+          <div class="game-icon">🏹</div>
+          <div class="game-info">
+            <h3>{{ 'GAMES.ARROWS' | translate }}</h3>
+            <p>{{ 'GAMES.ARROWS_DESC' | translate }}</p>
+            <button class="play-btn" routerLink="arrows">{{ 'GAMES.PLAY_NOW' | translate }}</button>
+          </div>
+        </div>
+
+        <div class="game-card quiz">
+          <div class="game-icon">📝</div>
+          <div class="game-info">
+            <h3>{{ 'GAMES.QUIZ' | translate }}</h3>
+            <p>{{ 'GAMES.QUIZ_DESC' | translate }}</p>
+            <button class="play-btn" routerLink="quiz">{{ 'GAMES.PLAY_NOW' | translate }}</button>
+          </div>
+        </div>
+
+        <div class="game-card anagram">
+          <div class="game-icon">🔤</div>
+          <div class="game-info">
+            <h3>{{ 'GAMES.ANAGRAM' | translate }}</h3>
+            <p>{{ 'GAMES.ANAGRAM_DESC' | translate }}</p>
+            <button class="play-btn" routerLink="anagram">{{ 'GAMES.PLAY_NOW' | translate }}</button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -131,26 +145,6 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     .reject-btn { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
   `]
 })
-export class GamesComponent implements OnInit {
-  private socket = inject(SocketService);
+export class GamesComponent {
   private router = inject(Router);
-
-  invitation = signal<any>(null);
-
-  ngOnInit() {
-    this.socket.checkersInvite$.subscribe(invite => {
-      this.invitation.set(invite);
-    });
-  }
-
-  acceptInvite() {
-    const invite = this.invitation();
-    if (invite) {
-      this.router.navigate(['/dashboard/games/checkers']);
-    }
-  }
-
-  rejectInvite() {
-    this.invitation.set(null);
-  }
 }

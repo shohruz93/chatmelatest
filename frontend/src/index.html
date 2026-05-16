@@ -29,6 +29,22 @@
   <link rel="icon" type="image/x-icon" href="favicon.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script>
+    // Silence Puter.js welcome message
+    (function() {
+      const originalLog = console.log;
+      console.log = function(...args) {
+        if (args[0] && typeof args[0] === 'string' && 
+            (args[0].includes('puter.quiet') || 
+             args[0].includes('Puter App Store') || 
+             args[0].includes('____  _   _'))) {
+          return;
+        }
+        originalLog.apply(console, args);
+      };
+      window.puter = { quiet: true };
+    })();
+  </script>
   <script src="https://js.puter.com/v2/"></script>
 
 </head>

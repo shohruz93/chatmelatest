@@ -39,6 +39,11 @@ export class LearningComponent implements OnInit {
     aiMessage = '';
     aiChatHistory = signal<{sender: 'user' | 'ai', text: string}[]>([]);
     isAiTyping = signal(false);
+    aiImage = signal<string | null>(null);
+    isGeneratingImage = signal(false);
+    aiExplanation = signal<string | null>(null);
+    isExplaining = signal(false);
+    isSpeaking = signal(false);
 
     ngOnInit() {
         this.loadData();
@@ -79,6 +84,46 @@ export class LearningComponent implements OnInit {
 
     flipCard() {
         this.showAnswer.set(true);
+        this.aiImage.set(null);
+        this.aiExplanation.set(null);
+    }
+
+    speak(text: string) {
+        this.isSpeaking.set(true);
+        this.aiService.textToSpeech(text).then(() => {
+            this.isSpeaking.set(false);
+        }).catch(() => {
+            this.isSpeaking.set(false);
+        });
+    }
+
+    generateAiImage() {
+        const card = this.dueCards()[this.currentIndex()];
+        this.isGeneratingImage.set(true);
+        this.aiService.generateImage(`A simple illustration or icon representing "${card.front}"`).subscribe({
+            next: (url) => {
+                this.aiImage.set(url);
+                this.isGeneratingImage.set(false);
+            },
+            error: () => this.isGeneratingImage.set(false)
+        });
+    }
+
+    getAiExplanation() {
+        const card = this.dueCards()[this.currentIndex()];
+        const lang = this.languageService.currentLang();
+        this.aiExplanation.set(null); // Clear previous
+        this.isExplaining.set(true);
+        this.aiService.explainWord(card.front, card.back, lang).subscribe({
+            next: (res) => {
+                this.aiExplanation.set(res);
+                this.isExplaining.set(false);
+            },
+            error: () => {
+                this.aiExplanation.set("Бубахшед, шарҳро омода карда нашуд.");
+                this.isExplaining.set(false);
+            }
+        });
     }
 
     submitGrade(grade: number) {

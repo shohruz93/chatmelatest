@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, ElementRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,1248 +9,867 @@ import { AuthService } from '../../../services/auth.service';
 import { GamificationService } from '../../../services/gamification.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslatePipe } from '../../../pipes/translate.pipe';
-import { VoiceChatService } from '../../../services/voice-chat.service';
-import * as Phaser from 'phaser';
 
-@Component({
-  selector: 'app-checkers',
-  standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
-  template: `
-    <div class="checkers-wrapper">
-      <!-- Matchmaking / Lobby UI -->
-      @if (!gameStarted()) {
-        <div class="lobby-container">
-          <h2>{{ 'CHECKERS.LOBBY' | translate }}</h2>
-          <div class="coin-balance">{{ 'CHECKERS.BALANCE' | translate }}: {{ coins() }} 🪙</div>
-          
-          <div class="bet-input">
-            <label>{{ 'CHECKERS.BET_AMOUNT' | translate }}:</label>
-            <input type="number" [(ngModel)]="betAmount" min="10" max="1000" step="10">
-          </div>
+enum PieceColor { WHITE = 1, BLACK = 2 }
 
-          @if (invitation()) {
-            <div class="invitation-card">
-              <p>{{ 'PROFILE.USER_PREFIX' | translate }}{{ invitation().fromUserId }} {{ 'CHECKERS.INVITED_YOU' | translate }} {{ invitation().amount }} 🪙</p>
-              <div class="actions">
-                <button class="accept-btn" (click)="acceptInvite()">{{ 'CHECKERS.ACCEPT' | translate }}</button>
-                <button class="reject-btn" (click)="rejectInvite()">{{ 'CHECKERS.REJECT' | translate }}</button>
-              </div>
-            </div>
-          } @else {
-            <div class="online-users">
-                <h3>{{ 'CHECKERS.ONLINE_PLAYERS' | translate }}</h3>
-                @for (userId of onlinePlayers(); track userId) {
-                    @if (userId !== currentUserId) {
-                        <div class="user-row">
-                            <span>{{ 'PROFILE.PLAYER_PREFIX' | translate }}{{ userId }}</span>
-                            @if (waitingForInviteTo() === userId) {
-                                <div class="waiting-accept">
-                                    <span>{{ 'CHECKERS.WAITING_ACCEPT' | translate }}</span>
-                                    <div class="dots"><span>.</span><span>.</span><span>.</span></div>
-                                </div>
-                            } @else {
-                                <button class="invite-btn" (click)="sendInvite(userId)">{{ 'CHECKERS.INVITE' | translate }}</button>
-                            }
-                        </div>
-                    }
-                } @empty {
-                    <p>{{ 'CHECKERS.NO_PLAYERS' | translate }}</p>
-                }
-            </div>
-          }
-        </div>
-      }
-
-      <!-- Game UI -->
-      <div class="game-area" [class.hidden]="!gameStarted()">
-        <!-- Mobile Player Info - Top -->
-        <div class="mobile-player-info">
-          <div class="player-badge" [class.active]="currentTurn() === redPlayerId()" [class.red-player]="true">
-            <span class="player-color red"></span>
-            <span class="player-name">{{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}</span>
-          </div>
-          <div class="vs-badge">VS</div>
-          <div class="player-badge" [class.active]="currentTurn() === blackPlayerId()" [class.black-player]="true">
-            <span class="player-color black"></span>
-            <span class="player-name">{{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}</span>
-          </div>
-        </div>
-
-        <div class="canvas-wrapper">
-          <div id="checkers-container" #gameContainer></div>
-        </div>
-        
-        <div class="game-sidebar">
-          <div class="game-info desktop-only">
-            <div class="player-info">
-              <div class="p-red" [class.active]="currentTurn() === redPlayerId()">
-                <span class="player-color-dot red"></span>
-                {{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}
-              </div>
-              <div class="p-black" [class.active]="currentTurn() === blackPlayerId()">
-                <span class="player-color-dot black"></span>
-                {{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : partnerNameTranslated }}
-              </div>
-            </div>
-            <div class="turn-indicator" [class.my-turn]="isMyTurn()">
-              {{ isMyTurn() ? ('CHECKERS.YOUR_TURN' | translate) : ('CHECKERS.WAITING' | translate) }}
-            </div>
-            
-            <!-- Voice Chat Controls -->
-            <button class="voice-btn" [class.active]="voiceChat.isActive()" [class.muted]="voiceChat.isMuted()" [class.connecting]="voiceChat.isConnecting()" (click)="toggleMic()" [disabled]="voiceChat.isConnecting()">
-               <i class="voice-icon">{{ voiceChat.isMuted() ? '🔇' : (voiceChat.isActive() ? '🎙️' : '📞') }}</i>
-               {{ voiceChat.isConnecting() ? ('VOICE.CONNECTING' | translate) : (voiceChat.isActive() ? (voiceChat.isMuted() ? ('VOICE.UNMUTE' | translate) : ('VOICE.MUTE' | translate)) : ('VOICE.START_CALL' | translate)) }}
-            </button>
-            
-            @if (voiceChat.connectionError()) {
-              <div class="voice-error">
-                {{ voiceChat.connectionError() }}
-                <button class="retry-btn" (click)="retryVoiceConnection()">{{ 'COMMON.RETRY' | translate }}</button>
-              </div>
-            }
-          </div>
-
-          <div class="game-chat">
-            <div class="chat-messages" #chatScroll>
-              @for (msg of chatMessages(); track $index) {
-                <div class="chat-msg" [class.own]="msg.senderId === currentUserId">
-                  <span class="sender">#{{ msg.senderId }}:</span>
-                  <span class="text">{{ msg.translatedText || msg.message }}</span>
-                  @if (!msg.translatedText && msg.senderId !== currentUserId) {
-                    <button class="translate-btn" (click)="translateMessage(msg)">
-                      <i class="translate-icon">🌐</i>
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-            <div class="chat-input">
-              <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendChat()" placeholder="{{ 'CHECKERS.TYPE_MESSAGE' | translate }}">
-              <button (click)="sendChat()">{{ 'CHECKERS.SEND' | translate }}</button>
-            </div>
-          </div>
-
-          <button class="leave-btn" (click)="leaveGame()">{{ 'CHECKERS.LEAVE' | translate }}</button>
-        </div>
-      </div>
-
-      <!-- Game Result Modal -->
-      @if (showGameResult()) {
-        <div class="result-modal-overlay">
-          <div class="result-modal">
-            <div class="result-icon" [class.win]="gameResultWin()" [class.lose]="!gameResultWin()">
-              {{ gameResultWin() ? '🏆' : '😔' }}
-            </div>
-            <h2 class="result-title" [class.win]="gameResultWin()" [class.lose]="!gameResultWin()">
-              {{ gameResultWin() ? ('CHECKERS.VICTORY' | translate) : ('CHECKERS.LOSE' | translate) }}
-            </h2>
-            @if (gameResultWin()) {
-              <div class="result-coins">+{{ betAmount * 2 }} 🪙</div>
-            }
-            <button class="result-btn" (click)="closeResultAndNavigate()">{{ 'COMMON.CLOSE' | translate }}</button>
-          </div>
-        </div>
-      }
-    </div>
-  `,
-  styles: [`
-    .checkers-wrapper {
-      width: 100%;
-      min-height: calc(100vh - 70px);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start; /* Changed from center to allow scrolling if needed */
-      background: #1a1a1a;
-      color: white;
-      padding: 20px;
-      overflow-y: auto; /* Enable vertical scroll if content overflows */
-    }
-    .lobby-container {
-      background: #2a2a2a;
-      padding: 30px;
-      border-radius: 15px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      margin-top: 20px;
-    }
-    .coin-balance { font-size: 1.2rem; margin: 15px 0; color: #fbbf24; }
-    .bet-input { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;}
-    .bet-input input { padding: 8px; border-radius: 5px; border: none; width: 100px; background: #333; color: white; }
-    
-    .online-users { text-align: left; background: #1a1a1a; padding: 15px; border-radius: 10px; margin-top: 20px; max-height: 300px; overflow-y: auto; }
-    .user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; flex-wrap: wrap; gap: 10px;}
-    .invite-btn, .accept-btn { background: #6366f1; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
-    .reject-btn { background: #ef4444; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; margin-left: 10px; white-space: nowrap; }
-    .invitation-card { background: #374151; padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #6366f1; }
-
-    .game-area { display: flex; gap: 20px; max-width: 1200px; width: 100%; justify-content: center; }
-    .canvas-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-width: 0;
-        flex: 1 1 auto;
-    }
-    .hidden { display: none; }
-    #checkers-container { 
-        background: #000; 
-        border-radius: 10px; 
-        overflow: hidden; 
-        border: 4px solid #333;
-        width: 100%;
-        max-width: 600px; /* Max size for desktop */
-        aspect-ratio: 1 / 1;
-        position: relative;
-    }
-    /* Ensure canvas fits inside container */
-    ::ng-deep #checkers-container canvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-    }
-    
-    .game-sidebar { 
-        width: 300px; 
-        display: flex; 
-        flex-direction: column; 
-        gap: 20px; 
-        flex-shrink: 0;
-    }
-    
-    .game-info { background: #2a2a2a; padding: 15px; border-radius: 10px; }
-    .player-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-    .p-red, .p-black { padding: 8px; border-radius: 5px; background: #333; font-size: 0.9rem; }
-    .active { border: 2px solid #6366f1; background: #374151; }
-    .turn-indicator { text-align: center; font-weight: bold; padding: 10px; border-radius: 5px; background: #333; margin-bottom: 10px; }
-    .my-turn { background: #059669; color: white; animation: pulse 1.5s infinite; }
-
-    .voice-btn {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: none;
-        background: #374151;
-        color: white;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-    .voice-btn:hover { background: #4b5563; }
-    .voice-btn.active { background: #059669; }
-    .voice-btn.muted { background: #ef4444; }
-    .voice-btn.connecting { background: #f59e0b; cursor: wait; }
-    .voice-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .voice-error {
-        background: #fee2e2;
-        color: #991b1b;
-        padding: 8px 12px;
-        border-radius: 8px;
-        margin-top: 8px;
-        font-size: 0.85rem;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .retry-btn {
-        background: #ef4444;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: background 0.2s;
-    }
-
-    .retry-btn:hover {
-        background: #dc2626;
-    }
-
-    .game-chat { flex-grow: 1; background: #2a2a2a; border-radius: 10px; display: flex; flex-direction: column; height: 400px; min-height: 300px; }
-    .chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .chat-msg { background: #374151; padding: 8px 30px 8px 8px; border-radius: 8px; max-width: 90%; align-self: flex-start; position: relative; word-break: break-word; font-size: 0.9rem; }
-    .chat-msg.own { background: #6366f1; align-self: flex-end; padding-right: 8px; }
-    .sender { font-size: 0.75rem; display: block; opacity: 0.7; margin-bottom: 2px; }
-    .translate-btn {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        background: transparent;
-        border: none;
-        color: #94a3b8;
-        cursor: pointer;
-        font-size: 0.8rem;
-        padding: 2px;
-        border-radius: 4px;
-        transition: all 0.2s;
-    }
-    .translate-btn:hover { color: white; background: rgba(255,255,255,0.1); }
-    .chat-input { display: flex; padding: 10px; gap: 5px; }
-    .chat-input input { flex-grow: 1; background: #333; border: none; color: white; padding: 8px; border-radius: 5px; min-width: 0; }
-    .chat-input button { background: #6366f1; border: none; color: white; padding: 0 15px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
-
-    .leave-btn { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: auto; }
-
-    @media (max-width: 950px) {
-        .game-area { flex-direction: column; align-items: center; }
-        .game-sidebar { width: 100%; max-width: 600px; order: 2; }
-        .canvas-wrapper { width: 100%; max-width: 600px; order: 1; }
-        .checkers-wrapper { padding: 10px; padding-top: 80px; align-items: flex-start; }
-        .game-chat { height: 300px; }
-    }
-
-    @media (max-width: 500px) {
-        .checkers-wrapper { padding: 5px; padding-top: 70px; }
-        .lobby-container { padding: 20px 15px; }
-        .coin-balance { font-size: 1rem; }
-        .game-chat { height: 250px; }
-        .chat-input { padding: 5px; }
-        .chat-input button { padding: 0 10px; font-size: 0.9rem; }
-        
-        .user-row { flex-direction: column; align-items: flex-start; gap: 5px; }
-        .user-row button { width: 100%; }
-        .user-row span { width: 100%; }
-        
-        /* Adjust game board size for very small screens if needed, 
-           although aspect-ratio: 1/1 with max-width: 100% should handle it. */
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-      100% { transform: scale(1); }
-    }
-
-    .waiting-accept {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: #6366f1;
-      font-weight: 600;
-      font-size: 0.9rem;
-      animation: pulse-soft 2s infinite ease-in-out;
-    }
-
-    .dots span {
-      animation: blink 1.4s infinite both;
-      font-size: 1.2rem;
-    }
-
-    .dots span:nth-child(2) { animation-delay: 0.2s; }
-    .dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes blink {
-      0% { opacity: 0.2; }
-      20% { opacity: 1; }
-      100% { opacity: 0.2; }
-    }
-
-    @keyframes pulse-soft {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.7; transform: scale(0.98); }
-    }
-
-    /* Mobile Player Info - Top */
-    .mobile-player-info {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      background: #2a2a2a;
-      border-radius: 10px;
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .player-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      background: #333;
-      border-radius: 8px;
-      flex: 1;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-
-    .player-badge.active {
-      background: #374151;
-      border: 2px solid #6366f1;
-      animation: pulse 1.5s infinite;
-    }
-
-    .player-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .player-color.red { background: #ef4444; }
-    .player-color.black { background: #111827; border: 2px solid #555; }
-
-    .player-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 80px;
-    }
-
-    .vs-badge {
-      font-size: 0.75rem;
-      font-weight: bold;
-      color: #6366f1;
-      flex-shrink: 0;
-    }
-
-    .player-color-dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
-
-    .player-color-dot.red { background: #ef4444; }
-    .player-color-dot.black { background: #111827; border: 2px solid #555; }
-
-    /* Result Modal */
-    .result-modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .result-modal {
-      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-      border-radius: 24px;
-      padding: 40px;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      animation: scaleIn 0.4s ease;
-    }
-
-    .result-icon {
-      font-size: 5rem;
-      margin-bottom: 20px;
-      animation: bounceIn 0.6s ease;
-    }
-
-    .result-icon.win { animation: winPulse 1.5s infinite; }
-    .result-icon.lose { opacity: 0.8; }
-
-    .result-title {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
-    }
-
-    .result-title.win { color: #10b981; }
-    .result-title.lose { color: #ef4444; }
-
-    .result-coins {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #fbbf24;
-      margin-bottom: 25px;
-      animation: coinPop 0.5s ease 0.3s both;
-    }
-
-    .result-btn {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-      color: white;
-      border: none;
-      padding: 15px 40px;
-      border-radius: 12px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .result-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes scaleIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes bounceIn {
-      0% { transform: scale(0); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes winPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    @keyframes coinPop {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* Desktop only */
-    .desktop-only { display: block; }
-
-    @media (max-width: 950px) {
-        .game-area { flex-direction: column; align-items: center; }
-        .game-sidebar { width: 100%; max-width: 600px; order: 2; }
-        .canvas-wrapper { width: 100%; max-width: 600px; order: 1; }
-        .checkers-wrapper { padding: 10px; padding-top: 80px; align-items: flex-start; }
-        .game-chat { height: 300px; }
-        .mobile-player-info { display: flex; order: 0; }
-        .desktop-only { display: none; }
-    }
-
-    @media (max-width: 500px) {
-        .checkers-wrapper { padding: 5px; padding-top: 70px; }
-        .lobby-container { padding: 20px 15px; }
-        .coin-balance { font-size: 1rem; }
-        .game-chat { height: 250px; }
-        .chat-input { padding: 5px; }
-        .chat-input button { padding: 0 10px; font-size: 0.9rem; }
-        
-        .user-row { flex-direction: column; align-items: flex-start; gap: 5px; }
-        .user-row button { width: 100%; }
-        .user-row span { width: 100%; }
-        
-        .player-name { max-width: 60px; font-size: 0.8rem; }
-        .result-modal { padding: 30px 20px; }
-        .result-icon { font-size: 4rem; }
-        .result-title { font-size: 1.5rem; }
-    }
-  
-  `]
-})
-export class CheckersComponent implements OnInit, OnDestroy {
-  @ViewChild('gameContainer') gameContainer!: ElementRef;
-  @ViewChild('chatScroll') chatScroll!: ElementRef;
-
-  public socket = inject(SocketService);
-  public voiceChat = inject(VoiceChatService);
-  private auth = inject(AuthService);
-  private gamification = inject(GamificationService);
-  private lang = inject(LanguageService);
-  private router = inject(Router);
-
-  currentUserId = 0;
-  coins = this.gamification.userCoins;
-  returnUrl: string | null = null;
-  betAmount = 50;
-
-  gameStarted = signal(false);
-  invitation = signal<any>(null);
-  onlinePlayers = signal<number[]>([]);
-  waitingForInviteTo = signal<number | null>(null);
-
-  chatMessages = signal<any[]>([]);
-  newMessage = '';
-
-  // Phaser Game instance
-  private phaserGame?: Phaser.Game;
-  private gameScene?: CheckersScene;
-
-  // Simple game state
-  roomId = signal('');
-  redPlayerId = signal(0);
-  blackPlayerId = signal(0);
-  currentTurn = signal(0);
-  partnerName = 'Partner';
-
-  // Game Result Modal
-  showGameResult = signal(false);
-  gameResultWin = signal(false);
-  private winSound = new Audio('/mp3/Game_succes.mp3');
-
-  private destroy$ = new Subject<void>();
-  private isInitializing = false; // Synchronous flag to prevent race conditions
-
-  ngOnInit() {
-    if (history.state['returnUrl']) {
-      this.returnUrl = history.state['returnUrl'];
-    }
-
-    const user = this.auth.currentUserValue;
-    if (user) this.currentUserId = Number(user.id);
-
-    // Set initial online players
-    this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
-
-    // Listen for status changes
-    this.socket.userStatusChanged$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
-      });
-
-    // Listen for checkers events
-    this.socket.checkersInvite$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(invite => {
-        this.invitation.set(invite);
-        this.socket.playNotificationSound();
-      });
-
-    // Check for active game
-    const activeGame = this.socket.activeCheckersGame();
-    if (activeGame) {
-      this.initGame(activeGame);
-    }
-
-    this.socket.checkersStart$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        this.initGame(data);
-      });
-
-    this.socket.checkersMove$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        if (this.gameScene) {
-          try {
-            this.gameScene.handleOpponentMove(data.move);
-          } catch (error) {
-          }
-        }
-        // Only switch turn if the move was NOT a partial multi-jump
-        if (data.move.endTurn !== false) {
-          this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
-        }
-      });
-
-    this.socket.checkersChat$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        this.chatMessages.update(msgs => [...msgs, { ...data, id: 'checkers_' + Date.now() }]);
-        setTimeout(() => this.scrollToBottom(), 100);
-      });
-
-    this.socket.translationResult$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        this.chatMessages.update(msgs => msgs.map(m =>
-          m.id === data.messageId ? { ...m, translatedText: data.translatedText } : m
-        ));
-      });
-
-    this.socket.checkersGameOver$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(data => {
-        this.onGameOver(data.winnerId);
-      });
-
-    this.socket.checkersError$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(err => {
-        alert(err.message);
-        this.waitingForInviteTo.set(null);
-      });
-
-    this.socket.checkersRejected$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.waitingForInviteTo.set(null);
-      });
-
-    this.socket.partnerLeft$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        if (this.gameStarted()) {
-          this.onGameOver(this.currentUserId);
-        }
-      });
-
-    // Checkers Cancelled (sender cancelled their invite)
-    this.socket.checkersCancelled$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.invitation.set(null);
-      });
-  }
-
-  // Placeholder for partner name logic - should be updated based on opponent data
-  get partnerNameTranslated() {
-    return this.partnerName === 'Partner' ? this.lang.translate('CHECKERS.PARTNER_DEFAULT') : this.partnerName;
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-
-    if (this.phaserGame) {
-      this.phaserGame.destroy(true);
-    }
-    this.gameScene = undefined; // Clear reference
-
-    if (this.roomId()) {
-      this.socket.leaveChat(this.roomId());
-    }
-
-    // Safety Force Reload if leaving mid-game to prevent stuck state
-    if (this.gameStarted()) {
-      window.location.reload();
-    }
-    this.socket.clearCheckersGame();
-  }
-
-  sendInvite(userId: number) {
-    if (this.coins() < this.betAmount) {
-      alert(this.lang.translate('ALERTS.NOT_ENOUGH_COINS'));
-      return;
-    }
-    this.waitingForInviteTo.set(userId);
-    this.socket.sendCheckersInvite(userId, this.betAmount);
-  }
-
-  acceptInvite() {
-    const invite = this.invitation();
-    if (!invite) return;
-
-    if (this.coins() < invite.amount) {
-      alert(this.lang.translate('ALERTS.NOT_ENOUGH_COINS'));
-      return;
-    }
-
-    this.socket.acceptCheckersInvite(invite.socketId, invite.amount);
-    this.invitation.set(null);
-  }
-
-  rejectInvite() {
-    const invite = this.invitation();
-    if (invite) {
-      this.socket.rejectCheckersInvite(invite.socketId);
-    }
-    this.invitation.set(null);
-  }
-
-  initGame(data: any) {
-    // Prevent duplicate initialization with SYNCHRONOUS flag
-    if (this.isInitializing || this.gameStarted()) {
-      return;
-    }
-
-    this.isInitializing = true; // Set immediately to block race conditions
-
-    this.roomId.set(data.roomId);
-    this.betAmount = Number(data.amount);
-    this.redPlayerId.set(Number(data.players[0]));
-    this.blackPlayerId.set(Number(data.players[1]));
-    this.currentTurn.set(Number(data.turn));
-
-    // Explicitly join room to ensure socket membership
-    this.socket.emit('join_checkers_game', { roomId: this.roomId() });
-
-    // Destroy any existing game instance to prevent duplicates
-    if (this.phaserGame) {
-      this.phaserGame.destroy(true);
-      this.phaserGame = undefined;
-      this.gameScene = undefined;
-    }
-
-    // Deduct coins first
-    this.gamification.bet(this.betAmount, 'checkers').subscribe({
-      next: () => {
-        this.waitingForInviteTo.set(null);
-        this.gameStarted.set(true);
-
-        // Initialize Phaser with delay to ensure container is ready
-        setTimeout(() => {
-          if (!this.gameStarted()) return; // Double check
-
-          const config: Phaser.Types.Core.GameConfig = {
-            type: Phaser.AUTO,
-            parent: 'checkers-container',
-            scale: {
-              mode: Phaser.Scale.FIT,
-              autoCenter: Phaser.Scale.CENTER_BOTH,
-              width: 600,
-              height: 600
-            },
-            scene: [new CheckersScene(this)],
-            backgroundColor: '#000000'
-          };
-          this.phaserGame = new Phaser.Game(config);
-        }, 100);
-      },
-      error: (err) => {
-        this.isInitializing = false; // Reset flag on error
-        alert(this.lang.translate('ALERTS.INSUFFICIENT_COINS'));
-        this.leaveGame(); // or just reset
-      }
-    });
-  }
-
-  isMyTurn() {
-    return this.currentTurn() === this.currentUserId;
-  }
-
-  isRedPlayer() {
-    return this.currentUserId === this.redPlayerId();
-  }
-
-  translateMessage(msg: any) {
-    this.socket.emit('translate_message', {
-      messageId: msg.id,
-      text: msg.message,
-      targetLang: this.lang.currentLang()
-    });
-  }
-
-  sendMove(move: any, endTurn: boolean = true) {
-    this.socket.sendCheckersMove(this.roomId(), { ...move, endTurn });
-    if (endTurn) {
-      this.currentTurn.set(this.currentTurn() === this.redPlayerId() ? this.blackPlayerId() : this.redPlayerId());
-    }
-  }
-
-  sendChat() {
-    if (!this.newMessage.trim()) return;
-    this.socket.sendCheckersChat(this.roomId(), this.newMessage);
-    this.newMessage = '';
-  }
-
-  onGameOver(winnerId: number) {
-    const isWinner = winnerId === this.currentUserId;
-
-    if (isWinner) {
-      this.gamification.win(this.betAmount * 2, 'checkers').subscribe();
-      this.playWinSound();
-    }
-
-    // Show result modal instead of alert
-    this.gameResultWin.set(isWinner);
-    this.showGameResult.set(true);
-
-    this.gameStarted.set(false);
-    if (this.phaserGame) {
-      this.phaserGame.destroy(true);
-      this.phaserGame = undefined;
-    }
-    this.socket.clearCheckersGame();
-  }
-
-  closeResultAndNavigate() {
-    this.showGameResult.set(false);
-    if (this.returnUrl) {
-      this.router.navigateByUrl(this.returnUrl);
-    } else {
-      this.router.navigate(['/dashboard/games']);
-    }
-  }
-
-  leaveGame() {
-    if (confirm("Are you sure? You will lose your bet!")) {
-      this.gameStarted.set(false);
-      if (this.phaserGame) {
-        this.phaserGame.destroy(true);
-        this.phaserGame = undefined;
-      }
-      this.socket.leaveChat(this.roomId());
-      this.socket.clearCheckersGame();
-      this.voiceChat.cleanup();
-
-      if (this.returnUrl) {
-        this.router.navigateByUrl(this.returnUrl);
-      } else {
-        this.router.navigate(['/dashboard/games']);
-      }
-    }
-  }
-
-  private scrollToBottom() {
-    if (this.chatScroll) {
-      this.chatScroll.nativeElement.scrollTop = this.chatScroll.nativeElement.scrollHeight;
-    }
-  }
-
-  private playWinSound() {
-    this.winSound.currentTime = 0;
-    this.winSound.play().catch(e => console.error('Error playing win sound:', e));
-  }
-
-  // Voice Chat Integration
-  toggleMic() {
-    if (!this.voiceChat.isActive()) {
-      // Start call (assuming partner ID is known)
-      const partnerId = this.isRedPlayer() ? this.blackPlayerId() : this.redPlayerId();
-      if (partnerId) {
-        this.voiceChat.startCall(partnerId);
-      }
-    } else {
-      this.voiceChat.toggleMute();
-    }
-  }
-
-  retryVoiceConnection() {
-    this.voiceChat.retryConnection();
-  }
+interface Piece {
+    color: PieceColor;
+    isKing: boolean;
 }
 
-// Phaser Scene Class
-class CheckersScene extends Phaser.Scene {
-  private component: CheckersComponent;
-  private board: number[][] = []; // 0: empty, 1: red, 2: black, 11: red-king, 22: black-king
-  private pieces: Map<string, Phaser.GameObjects.Arc> = new Map();
-  private kingLabels: Phaser.GameObjects.Text[] = [];
-  private graphics?: Phaser.GameObjects.Graphics;
+type Difficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'EXPERT';
 
-  private selectedPiece?: { r: number, c: number };
-  private mustJumpPieces: Set<string> = new Set(); // Stores "r,c" of pieces that MUST jump
-  private multiJumpSource: { r: number, c: number } | null = null; // Track piece in middle of multi-jump
-  private tileSize = 75; // 600 / 8
-  private sceneId = Math.random().toString(36).substring(7);
+@Component({
+    selector: 'app-checkers',
+    standalone: true,
+    imports: [CommonModule, FormsModule, TranslatePipe],
+    template: `
+    <div class="checkers-page">
+        <!-- Header -->
+        <div class="game-header">
+            <button class="btn-back" (click)="leaveGame()">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg>
+            </button>
+            <div class="title-section">
+                <h1>{{ 'GAMES.CHECKERS' | translate }}</h1>
+                <div class="difficulty-badge" [class]="difficulty()">
+                    {{ difficulty() }}
+                </div>
+            </div>
+            <div class="wallet-mini">
+                <span>{{ coins() }}</span>
+                <span class="coin-icon">🪙</span>
+            </div>
+        </div>
 
-  constructor(component: CheckersComponent) {
-    super('CheckersScene');
-    this.component = component;
-  }
+        <!-- Lobby / Setup -->
+        @if (!gameStarted()) {
+            <div class="lobby-card">
+                <div class="setup-section">
+                    <div class="bot-hero">
+                        <div class="hero-icon">🤖</div>
+                        <h3>{{ 'CHECKERS.VS_BOT' | translate }}</h3>
+                        <p>{{ 'CHECKERS.BOT_DESC' | translate }}</p>
+                    </div>
 
-  create() {
-    (this.component as any).gameScene = this; // Store reference in component
-    this.graphics = this.add.graphics();
-    this.initBoard();
-    this.drawBoard();
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => this.handleInput(pointer));
+                    <div class="difficulty-label">{{ 'CHECKERS.SELECT_DIFFICULTY' | translate }}</div>
+                    <div class="difficulty-grid">
+                        @for (diff of difficulties; track diff) {
+                            <button [class.selected]="difficulty() === diff" (click)="difficulty.set(diff)">
+                                {{ diff }}
+                            </button>
+                        }
+                    </div>
 
-    // Initial check for forced jumps if I am the starting player
-    // setTimeout to ensure board is ready
-    setTimeout(() => this.updateMandatoryJumps(), 100);
-  }
+                    <div class="fixed-bet">
+                        <span class="label">{{ 'CHECKERS.BET_AMOUNT' | translate }}</span>
+                        <div class="bet-value">
+                            <span class="amount">1</span>
+                            <span class="coin-icon">🪙</span>
+                        </div>
+                    </div>
 
-  initBoard() {
+                    <button class="btn-start" (click)="startSinglePlayer()">
+                        {{ 'GAMES.START' | translate }}
+                    </button>
+                </div>
+            </div>
+        } @else {
+            <!-- Game Board -->
+            <div class="game-container">
+                <div class="stats-bar">
+                    <div class="player-stat" [class.active]="currentPlayer() === PieceColor.WHITE">
+                        <div class="avatar white"></div>
+                        <div class="info">
+                            <span class="name">{{ isRedPlayer() ? ('CHECKERS.YOU' | translate) : 'Opponent' }}</span>
+                            <span class="score">{{ scoreWhite() }} captured</span>
+                        </div>
+                    </div>
+                    <div class="vs-divider">VS</div>
+                    <div class="player-stat" [class.active]="currentPlayer() === PieceColor.BLACK">
+                        <div class="avatar black"></div>
+                        <div class="info">
+                            <span class="name">{{ !isRedPlayer() ? ('CHECKERS.YOU' | translate) : (mode() === 'SP' ? 'Bot' : 'Opponent') }}</span>
+                            <span class="score">{{ scoreBlack() }} captured</span>
+                        </div>
+                    </div>
+                </div>
 
-    // 8x8 Board. 0 is empty.
-    // Red starts at rows 0-2 (top if player is black, bottom if player is red)
-    // To make it simple, player 1 is always red (bottom), player 2 is black (top)
-    // We visually flip it if the current user is black.
+                <div class="board-wrapper">
+                    <div class="board" [class.is-bot-moving]="isBotMoving()">
+                        @for (row of [0,1,2,3,4,5,6,7]; track row) {
+                            @for (col of [0,1,2,3,4,5,6,7]; track col) {
+                                <div class="cell" 
+                                    [class.dark]="(row + col) % 2 === 1"
+                                    [class.selected]="selectedSquare()?.r === row && selectedSquare()?.c === col"
+                                    (click)="onSquareClick(row, col)">
+                                    
+                                    @if (board()[row][col]; as piece) {
+                                        <div class="piece" 
+                                            [class.white]="piece.color === PieceColor.WHITE"
+                                            [class.black]="piece.color === PieceColor.BLACK"
+                                            [class.king]="piece.isKing">
+                                            @if (piece.isKing) { <span class="crown">👑</span> }
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                    @if (isBotMoving()) {
+                        <div class="bot-overlay">
+                            <div class="brain-loader">🧠</div>
+                            <span>Bot is thinking...</span>
+                        </div>
+                    }
+                </div>
 
-    this.board = Array(8).fill(0).map(() => Array(8).fill(0));
-
-    // Pieces placement
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 8; c++) {
-        if ((r + c) % 2 !== 0) {
-          this.board[r][c] = 2; // Black at top
-        }
-      }
-    }
-    for (let r = 5; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        if ((r + c) % 2 !== 0) {
-          this.board[r][c] = 1; // Red at bottom
-        }
-      }
-    }
-  }
-
-  drawBoard() {
-    if (!this.graphics) return;
-    this.graphics.clear();
-
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const isDark = (r + c) % 2 !== 0;
-        this.graphics!.fillStyle(isDark ? 0x2d3748 : 0xf1f5f9);
-        this.graphics!.fillRect(c * this.tileSize, r * this.tileSize, this.tileSize, this.tileSize);
-      }
-    }
-
-    // Draw pieces
-    this.pieces.forEach(p => p.destroy());
-    this.pieces.clear();
-    this.kingLabels.forEach(l => l.destroy());
-    this.kingLabels = [];
-
-
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const val = this.board[r][c];
-        if (val !== 0) {
-
-          const color = (val === 1 || val === 11) ? 0xef4444 : 0x111827;
-          const piece = this.add.circle(c * this.tileSize + this.tileSize / 2, r * this.tileSize + this.tileSize / 2, this.tileSize * 0.4, color);
-          piece.setStrokeStyle(4, 0xffffff, 0.5);
-
-          // Highlight forced jumps
-          if (this.component.isMyTurn() && this.mustJumpPieces.has(`${r},${c}`)) {
-            piece.setStrokeStyle(4, 0xf59e0b, 1); // Orange highlight for forced jump
-          }
-
-          if (val > 10) { // King
-            const label = this.add.text(c * this.tileSize + this.tileSize / 2 - 10, r * this.tileSize + this.tileSize / 2 - 15, 'K', { fontSize: '24px', fontStyle: 'bold' });
-            this.kingLabels.push(label);
-          }
-
-          if (this.selectedPiece && this.selectedPiece.r === r && this.selectedPiece.c === c) {
-            piece.setStrokeStyle(4, 0x6366f1, 1);
-          }
-
-          this.pieces.set(`${r},${c}`, piece);
-        }
-      }
-    }
-  }
-
-  handleInput(pointer: Phaser.Input.Pointer) {
-    if (!this.component.isMyTurn()) return;
-
-    const c = Math.floor(pointer.x / this.tileSize);
-    const r = Math.floor(pointer.y / this.tileSize);
-
-    const val = this.board[r][c];
-    const myType = this.component.currentUserId === this.component.redPlayerId() ? 1 : 2;
-
-    if (val !== 0 && (val === myType || val === myType * 11)) {
-      // Selection
-
-      // Enforce Multi-Jump Constraint
-      if (this.multiJumpSource) {
-        if (r !== this.multiJumpSource.r || c !== this.multiJumpSource.c) {
-          return;
-        }
-      }
-
-      // Enforce Mandatory Jump Constraint
-      if (this.mustJumpPieces.size > 0 && !this.mustJumpPieces.has(`${r},${c}`)) {
-        return;
-      }
-
-      this.selectedPiece = { r, c };
-      this.drawBoard();
-    } else if (this.selectedPiece) {
-      // Move attempt
-      if (this.isValidMove(this.selectedPiece, { r, c })) {
-        const moveIsJump = Math.abs(this.selectedPiece.r - r) === 2;
-
-        // Execute move locally first
-        this.executeMove(this.selectedPiece, { r, c });
-
-        let endTurn = true;
-        this.multiJumpSource = null;
-
-        if (moveIsJump) {
-          // Check for multi-jump availability
-          if (this.canCaptureMore({ r, c })) {
-            endTurn = false;
-            this.multiJumpSource = { r, c };
-            this.selectedPiece = { r, c }; // Keep selected
-            this.updateMandatoryJumps();
-          }
+                <div class="turn-label">
+                    {{ currentPlayer() === PieceColor.WHITE ? ('CHECKERS.TURN_WHITE' | translate) : ('CHECKERS.TURN_BLACK' | translate) }}
+                </div>
+            </div>
         }
 
-        this.component.sendMove({ from: this.selectedPiece, to: { r, c } }, endTurn);
-        if (endTurn) {
-          this.selectedPiece = undefined;
-          this.mustJumpPieces.clear();
+        <!-- Game Over Modal -->
+        @if (gameOver()) {
+            <div class="modal-overlay">
+                <div class="modal-card result-card" [class.win]="isUserWinner()">
+                    <div class="result-icon">{{ isUserWinner() ? '🏆' : '💀' }}</div>
+                    <h2>{{ isUserWinner() ? ('CHECKERS.VICTORY' | translate) : ('CHECKERS.DEFEAT' | translate) }}</h2>
+                    <p>{{ isUserWinner() ? ('CHECKERS.WIN_MSG' | translate) : ('CHECKERS.LOSS_MSG' | translate) }}</p>
+                    <div class="reward" *ngIf="isUserWinner()">
+                        <span>+{{ betAmount() * 2 }}</span>
+                        <span class="coin-icon">🪙</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-primary" (click)="restartGame()">{{ 'GAMES.PLAY_AGAIN' | translate }}</button>
+                        <button class="btn-secondary" (click)="leaveGame()">{{ 'GAMES.EXIT' | translate }}</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    `,
+    styles: [`
+        .checkers-page {
+            min-height: 100vh;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        this.drawBoard();
-
-        // Win check (Stalemate included)
-        if (endTurn && this.checkWin()) {
-          this.component.socket.sendCheckersGameOver(this.component.roomId(), this.component.currentUserId);
+        .game-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
         }
-      }
-    }
-  }
 
-  isValidMove(from: { r: number, c: number }, to: { r: number, c: number }): boolean {
-    // Bounds check
-    if (to.r < 0 || to.r >= 8 || to.c < 0 || to.c >= 8) return false;
-
-    if (this.board[to.r][to.c] !== 0) return false; // Target must be empty
-    if ((to.r + to.c) % 2 === 0) return false; // Must be dark square
-
-    const dy = to.r - from.r;
-    const dx = Math.abs(to.c - from.c);
-    const piece = this.board[from.r][from.c];
-
-    // Basic move
-    if (dx === 1) {
-      if (piece === 1 && dy === -1) return true; // Red moves up
-      if (piece === 2 && dy === 1) return true; // Black moves down
-      if (piece > 10 && Math.abs(dy) === 1) return true; // Kings move any dir
-    }
-
-    // Jump
-    if (dx === 2 && Math.abs(dy) === 2) {
-      const midR = from.r + dy / 2;
-      const midC = from.c + (to.c - from.c) / 2;
-
-      // Bounds check for mid too
-      if (midR < 0 || midR >= 8 || midC < 0 || midC >= 8) return false;
-
-      const midVal = this.board[midR][midC];
-      if (midVal === 0) return false;
-
-      const myType = piece > 10 ? piece / 11 : piece;
-      const enemyType = myType === 1 ? 2 : 1;
-
-      if (midVal === enemyType || midVal === enemyType * 11) {
-        if (piece === 1 && dy === -2) return true;
-        if (piece === 2 && dy === 2) return true;
-        if (piece > 10) return true;
-      }
-    }
-
-    return false;
-  }
-
-  // Calculate if a specific piece can capture anything
-  canCaptureMore(pos: { r: number, c: number }): boolean {
-    const piece = this.board[pos.r][pos.c];
-    if (piece === 0) return false;
-
-    const dirs = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
-    for (const [dr, dc] of dirs) {
-      const targetR = pos.r + dr;
-      const targetC = pos.c + dc;
-
-      if (targetR >= 0 && targetR < 8 && targetC >= 0 && targetC < 8) {
-        if (this.isValidMove(pos, { r: targetR, c: targetC })) {
-          return true;
+        .btn-back {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
         }
-      }
-    }
-    return false;
-  }
 
-  // Scan board for any mandatory jumps for the current player
-  updateMandatoryJumps() {
-    this.mustJumpPieces.clear();
-
-    const myId = this.component.currentUserId;
-    const myType = myId === this.component.redPlayerId() ? 1 : 2;
-
-    // If we are in multi-bump mode, only that piece is mandatory (if it can jump)
-    if (this.multiJumpSource) {
-      if (this.canCaptureMore(this.multiJumpSource)) {
-        this.mustJumpPieces.add(`${this.multiJumpSource.r},${this.multiJumpSource.c}`);
-      }
-      return;
-    }
-
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const val = this.board[r][c];
-        if (val === myType || val === myType * 11) {
-          if (this.canCaptureMore({ r, c })) {
-            this.mustJumpPieces.add(`${r},${c}`);
-          }
+        .title-section { text-align: center; }
+        .title-section h1 { margin: 0; font-size: 1.5rem; }
+        
+        .difficulty-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 4px;
         }
-      }
-    }
-  }
+        .difficulty-badge.EASY { background: #10b981; color: white; }
+        .difficulty-badge.MEDIUM { background: #f59e0b; color: white; }
+        .difficulty-badge.HARD { background: #ef4444; color: white; }
+        .difficulty-badge.EXPERT { background: #8b5cf6; color: white; }
 
-  executeMove(from: { r: number, c: number }, to: { r: number, c: number }) {
-    let piece = this.board[from.r][from.c];
-
-    // Jump over
-    if (Math.abs(to.r - from.r) === 2) {
-      const midR = from.r + (to.r - from.r) / 2;
-      const midC = from.c + (to.c - from.c) / 2;
-      this.board[midR][midC] = 0;
-    }
-
-    this.board[to.r][to.c] = piece;
-    this.board[from.r][from.c] = 0;
-
-    // Promotion
-    if (piece === 1 && to.r === 0) this.board[to.r][to.c] = 11;
-    if (piece === 2 && to.r === 7) this.board[to.r][to.c] = 22;
-  }
-
-  handleOpponentMove(move: any) {
-    this.executeMove(move.from, move.to);
-    this.drawBoard();
-
-    // After opponent moves, check if it's my turn now.
-    // If opponent finished turn (endTurn was true in component), then it IS my turn.
-    // We should update our mandatory jumps.
-    setTimeout(() => {
-      if (this.component.isMyTurn()) {
-        this.updateMandatoryJumps();
-
-        // Check for stalemate (I have no moves)
-        if (!this.hasValidMoves(this.component.currentUserId)) {
-          // I lost because I can't move
-          // In a rigorous implementation, the SERVER should call this.
-          // Here, we can trigger game over for opponents win
-          const opponentId = this.component.currentUserId === this.component.redPlayerId() ? this.component.blackPlayerId() : this.component.redPlayerId();
-          this.component.socket.sendCheckersGameOver(this.component.roomId(), opponentId);
+        .wallet-mini {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #f59e0b;
         }
-      }
-    }, 100);
-  }
 
-  checkWin(): boolean {
-    // Very simple: check if opponent has pieces left
-    const myId = this.component.currentUserId;
-    const enemyType = myId === this.component.redPlayerId() ? 2 : 1;
-
-    let enemyCount = 0;
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const val = this.board[r][c];
-        if (val === enemyType || val === enemyType * 11) enemyCount++;
-      }
-    }
-    return enemyCount === 0;
-  }
-
-  hasValidMoves(playerId: number): boolean {
-    const type = playerId === this.component.redPlayerId() ? 1 : 2;
-
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const val = this.board[r][c];
-        if (val === type || val === type * 11) {
-          // Check simple moves
-          const dirs = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-          for (const [dr, dc] of dirs) {
-            if (this.isValidMove({ r, c }, { r: r + dr, c: c + dc })) return true;
-          }
-          // Check jumps
-          const jumpDirs = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
-          for (const [dr, dc] of jumpDirs) {
-            if (this.isValidMove({ r, c }, { r: r + dr, c: c + dc })) return true;
-          }
+        .lobby-card {
+            background: #1e293b;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
-      }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .mode-selector button {
+            background: #334155;
+            border: 2px solid transparent;
+            color: #94a3b8;
+            padding: 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .mode-selector button.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #818cf8;
+        }
+        .mode-selector .icon { font-size: 1.5rem; }
+
+        .setup-section h3 { font-size: 1.1rem; margin-bottom: 16px; color: #cbd5e1; }
+        
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .difficulty-grid button {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .difficulty-grid button.selected { background: #4f46e5; }
+
+        .fixed-bet {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .fixed-bet .label { color: #94a3b8; font-weight: 500; }
+        .fixed-bet .bet-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #f59e0b;
+        }
+
+        .bot-hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .bot-hero .hero-icon { font-size: 4rem; margin-bottom: 12px; }
+        .bot-hero h3 { font-size: 1.5rem; margin: 0; color: white; }
+        .bot-hero p { color: #94a3b8; font-size: 0.9rem; margin-top: 8px; }
+        .difficulty-label { color: #94a3b8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-weight: 700; }
+
+        .btn-start {
+            width: 100%;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Online Players List */
+        .player-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+        .player-row {
+            background: #334155;
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-invite { background: #4f46e5; border: none; color: white; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+
+        /* Game UI */
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stats-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 12px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .player-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        .player-stat.active { background: rgba(79, 70, 229, 0.2); border: 1px solid #4f46e5; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .avatar.white { background: #f8fafc; border: 2px solid #cbd5e1; }
+        .avatar.black { background: #0f172a; border: 2px solid #334155; }
+        .info { display: flex; flex-direction: column; }
+        .info .name { font-weight: bold; font-size: 0.9rem; }
+        .info .score { font-size: 0.75rem; color: #94a3b8; }
+        .vs-divider { font-weight: bold; color: #4f46e5; opacity: 0.5; }
+
+        .board-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            padding: 10px;
+            background: #334155;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: 100%;
+            height: 100%;
+            border: 4px solid #1e293b;
+            background: #cbd5e1; /* Light squares */
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .cell.dark { background: #475569; }
+        .cell.selected { background: rgba(245, 158, 11, 0.4) !important; }
+
+        .piece {
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+        .piece:hover { transform: scale(1.1); }
+        .piece.white { 
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #cbd5e1 100%);
+            border: 2px solid #94a3b8;
+        }
+        .piece.black { 
+            background: radial-gradient(circle at 30% 30%, #334155 0%, #0f172a 100%);
+            border: 2px solid #1e293b;
+        }
+        .piece.king { border-width: 4px; border-style: double; }
+        .crown { font-size: 1.2rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+
+        .bot-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 10;
+            border-radius: 8px;
+        }
+        .brain-loader { font-size: 3rem; animation: float 2s infinite ease-in-out; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .turn-label {
+            margin-top: 20px;
+            padding: 8px 24px;
+            background: #1e293b;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal-card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 32px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .result-icon { font-size: 5rem; margin-bottom: 20px; }
+        .result-card.win h2 { color: #10b981; }
+        .result-card.win { border: 2px solid #10b981; }
+        .result-card.lose h2 { color: #ef4444; }
+        
+        .reward {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f59e0b;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .modal-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+        .btn-primary { 
+            background: #4f46e5; color: white; border: none; padding: 16px; border-radius: 16px; 
+            font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+        .btn-secondary { background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 12px; border-radius: 16px; cursor: pointer; }
+
+        @media (max-width: 500px) {
+            .board-wrapper { padding: 5px; }
+            .piece { width: 85%; height: 85%; }
+            .crown { font-size: 0.9rem; }
+        }
+    `]
+})
+export class CheckersComponent implements OnInit, OnDestroy {
+    private socket = inject(SocketService);
+    private auth = inject(AuthService);
+    private gamification = inject(GamificationService);
+    private lang = inject(LanguageService);
+    private router = inject(Router);
+
+    PieceColor = PieceColor;
+    currentUserId = 0;
+    coins = this.gamification.userCoins;
+    
+    // Game State
+    gameStarted = signal(false);
+    mode = signal<'SP' | 'MP'>('SP');
+    difficulty = signal<Difficulty>('EASY');
+    betAmount = signal(1);
+    gameOver = signal(false);
+    isUserWinner = signal(false);
+    
+    board = signal<(Piece | null)[][]>(this.createInitialBoard());
+    currentPlayer = signal<PieceColor>(PieceColor.WHITE);
+    selectedSquare = signal<{r: number, c: number} | null>(null);
+    scoreWhite = signal(0);
+    scoreBlack = signal(0);
+    isBotMoving = signal(false);
+
+    // Online State
+    onlinePlayers = signal<number[]>([]);
+    invitation = signal<any>(null);
+    roomId = signal('');
+    redPlayerId = signal(0); // Player 1
+    blackPlayerId = signal(0); // Player 2 / Bot
+
+    difficulties: Difficulty[] = ['EASY', 'MEDIUM', 'HARD', 'EXPERT'];
+
+    private destroy$ = new Subject<void>();
+
+    ngOnInit() {
+        const user = this.auth.currentUserValue;
+        if (user) this.currentUserId = Number(user.id);
+
+        this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
+        this.socket.userStatusChanged$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.onlinePlayers.set(Array.from(this.socket.onlineUsers()));
+        });
+
+        this.socket.checkersInvite$.pipe(takeUntil(this.destroy$)).subscribe(invite => {
+            this.invitation.set(invite);
+            this.mode.set('MP');
+        });
+
+        this.socket.checkersStart$.pipe(takeUntil(this.destroy$)).subscribe(data => {
+            this.initMultiplayerGame(data);
+        });
+
+        this.socket.checkersMove$.pipe(takeUntil(this.destroy$)).subscribe(data => {
+            if (this.mode() === 'MP') {
+                this.handleOpponentMove(data.move);
+            }
+        });
+
+        this.socket.checkersGameOver$.pipe(takeUntil(this.destroy$)).subscribe(data => {
+            this.onGameOver(data.winnerId === this.currentUserId);
+        });
     }
-    return false;
-  }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        if (this.roomId()) this.socket.emit('leave_checkers_game', { roomId: this.roomId() });
+    }
+
+    private createInitialBoard(): (Piece | null)[][] {
+        const board: (Piece | null)[][] = Array(8).fill(null).map(() => Array(8).fill(null));
+        // Black pieces (top)
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 8; c++) {
+                if ((r + c) % 2 === 1) board[r][c] = { color: PieceColor.BLACK, isKing: false };
+            }
+        }
+        // White pieces (bottom)
+        for (let r = 5; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                if ((r + c) % 2 === 1) board[r][c] = { color: PieceColor.WHITE, isKing: false };
+            }
+        }
+        return board;
+    }
+
+    startSinglePlayer() {
+        if (this.coins() < this.betAmount()) {
+            alert('Not enough coins');
+            return;
+        }
+        this.gamification.bet(this.betAmount(), 'checkers').subscribe(() => {
+            this.board.set(this.createInitialBoard());
+            this.currentPlayer.set(PieceColor.WHITE);
+            this.gameStarted.set(true);
+            this.gameOver.set(false);
+            this.scoreWhite.set(0);
+            this.scoreBlack.set(0);
+        });
+    }
+
+    sendInvite(userId: number) {
+        if (this.coins() < this.betAmount()) return alert('Not enough coins');
+        this.socket.sendCheckersInvite(userId, this.betAmount());
+    }
+
+    acceptInvite() {
+        const inv = this.invitation();
+        if (!inv) return;
+        this.socket.acceptCheckersInvite(inv.socketId, inv.amount);
+        this.invitation.set(null);
+    }
+
+    rejectInvite() {
+        const inv = this.invitation();
+        if (inv) this.socket.rejectCheckersInvite(inv.socketId);
+        this.invitation.set(null);
+    }
+
+    private initMultiplayerGame(data: any) {
+        this.roomId.set(data.roomId);
+        this.redPlayerId.set(data.players[0]);
+        this.blackPlayerId.set(data.players[1]);
+        this.currentPlayer.set(data.turn);
+        this.gameStarted.set(true);
+        this.board.set(this.createInitialBoard());
+        this.scoreWhite.set(0);
+        this.scoreBlack.set(0);
+    }
+
+    onSquareClick(r: number, c: number) {
+        if (this.gameOver() || this.isBotMoving()) return;
+        if (this.mode() === 'MP' && this.currentPlayer() !== (this.isRedPlayer() ? PieceColor.WHITE : PieceColor.BLACK)) return;
+
+        const piece = this.board()[r][c];
+        if (piece && piece.color === this.currentPlayer()) {
+            this.selectedSquare.set({ r, c });
+        } else if (this.selectedSquare()) {
+            const from = this.selectedSquare()!;
+            if (this.isValidMove(from, { r, c }, this.board(), this.currentPlayer())) {
+                this.makeMove(from, { r, c });
+            }
+        }
+    }
+
+    private makeMove(from: {r: number, c: number}, to: {r: number, c: number}) {
+        const newBoard = this.board().map(row => [...row]);
+        const piece = { ...newBoard[from.r][from.c]! };
+        newBoard[from.r][from.c] = null;
+
+        // Handle Jump
+        if (Math.abs(to.r - from.r) === 2) {
+            const midR = (from.r + to.r) / 2;
+            const midC = (from.c + to.c) / 2;
+            newBoard[midR][midC] = null;
+            if (this.currentPlayer() === PieceColor.WHITE) this.scoreWhite.update(s => s + 1);
+            else this.scoreBlack.update(s => s + 1);
+        }
+
+        // King Promotion
+        if (this.currentPlayer() === PieceColor.WHITE && to.r === 0) piece.isKing = true;
+        if (this.currentPlayer() === PieceColor.BLACK && to.r === 7) piece.isKing = true;
+
+        newBoard[to.r][to.c] = piece;
+        this.board.set(newBoard);
+        this.selectedSquare.set(null);
+
+        const nextPlayer = this.currentPlayer() === PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
+        
+        // Multi-jump check
+        if (Math.abs(to.r - from.r) === 2 && this.canCaptureMore(to, newBoard, this.currentPlayer())) {
+            this.selectedSquare.set(to);
+            // Don't switch player
+        } else {
+            this.currentPlayer.set(nextPlayer);
+            if (this.mode() === 'MP') {
+                this.socket.sendCheckersMove(this.roomId(), { from, to });
+            }
+            
+            // Bot Turn
+            if (this.mode() === 'SP' && nextPlayer === PieceColor.BLACK && !this.checkWinner(newBoard)) {
+                this.triggerBotMove();
+            }
+        }
+
+        const winner = this.checkWinner(newBoard);
+        if (winner) {
+            this.onGameOver(winner === PieceColor.WHITE);
+        }
+    }
+
+    private triggerBotMove() {
+        this.isBotMoving.set(true);
+        setTimeout(() => {
+            const bestMove = this.findBestMove(this.board(), this.difficulty());
+            if (bestMove) {
+                this.makeMove(bestMove.from, bestMove.to);
+            }
+            this.isBotMoving.set(false);
+        }, 800 + Math.random() * 500);
+    }
+
+    private handleOpponentMove(move: any) {
+        // Implement local update based on socket move
+        const newBoard = this.board().map(row => [...row]);
+        const piece = { ...newBoard[move.from.r][move.from.c]! };
+        newBoard[move.from.r][move.from.c] = null;
+        if (Math.abs(move.to.r - move.from.r) === 2) {
+            newBoard[(move.from.r + move.to.r)/2][(move.from.c + move.to.c)/2] = null;
+            if (piece.color === PieceColor.WHITE) this.scoreWhite.update(s => s + 1);
+            else this.scoreBlack.update(s => s + 1);
+        }
+        if (piece.color === PieceColor.WHITE && move.to.r === 0) piece.isKing = true;
+        if (piece.color === PieceColor.BLACK && move.to.r === 7) piece.isKing = true;
+        newBoard[move.to.r][move.to.c] = piece;
+        this.board.set(newBoard);
+        this.currentPlayer.set(this.currentUserId === this.redPlayerId() ? PieceColor.WHITE : PieceColor.BLACK);
+    }
+
+    private isValidMove(from: {r: number, c: number}, to: {r: number, c: number}, board: (Piece|null)[][], player: PieceColor): boolean {
+        if (to.r < 0 || to.r > 7 || to.c < 0 || to.c > 7) return false;
+        if (board[to.r][to.c]) return false;
+        const dr = to.r - from.r;
+        const dc = Math.abs(to.c - from.c);
+        const piece = board[from.r][from.c];
+        if (!piece) return false;
+
+        if (dc === 1) {
+            if (piece.isKing) return Math.abs(dr) === 1;
+            return player === PieceColor.WHITE ? dr === -1 : dr === 1;
+        }
+        if (dc === 2 && Math.abs(dr) === 2) {
+            if (!piece.isKing) {
+                const validDr = player === PieceColor.WHITE ? -2 : 2;
+                if (dr !== validDr) return false;
+            }
+            const midPiece = board[(from.r + to.r)/2][(from.c + to.c)/2];
+            return midPiece !== null && midPiece.color !== player;
+        }
+        return false;
+    }
+
+    private canCaptureMore(pos: {r: number, c: number}, board: (Piece|null)[][], player: PieceColor): boolean {
+        const dirs = [[2, 2], [2, -2], [-2, 2], [-2, -2]];
+        return dirs.some(([dr, dc]) => this.isValidMove(pos, { r: pos.r + dr, c: pos.c + dc }, board, player));
+    }
+
+    private findBestMove(board: (Piece|null)[][], difficulty: Difficulty): {from: any, to: any} | null {
+        const depth = difficulty === 'EASY' ? 2 : difficulty === 'MEDIUM' ? 3 : difficulty === 'HARD' ? 4 : 5;
+        const possibleMoves = this.getAllValidMoves(board, PieceColor.BLACK);
+        if (possibleMoves.length === 0) return null;
+
+        // Mandatory jumps
+        const jumps = possibleMoves.filter(m => Math.abs(m.from.r - m.to.r) === 2);
+        if (jumps.length > 0) return jumps[Math.floor(Math.random() * jumps.length)];
+        
+        if (difficulty === 'EASY') return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+
+        let bestMove = null;
+        let bestEval = -Infinity;
+
+        for (const move of possibleMoves) {
+            const simulated = this.simulateMove(board, move.from, move.to, PieceColor.BLACK);
+            const evalScore = this.minimax(simulated, depth - 1, -Infinity, Infinity, false);
+            if (evalScore > bestEval) {
+                bestEval = evalScore;
+                bestMove = move;
+            }
+        }
+        return bestMove || possibleMoves[0];
+    }
+
+    private minimax(board: (Piece|null)[][], depth: number, alpha: number, beta: number, maximizing: boolean): number {
+        if (depth === 0) return this.evaluateBoard(board);
+        const winner = this.checkWinner(board);
+        if (winner === PieceColor.BLACK) return 1000 + depth;
+        if (winner === PieceColor.WHITE) return -1000 - depth;
+
+        if (maximizing) {
+            let maxEval = -Infinity;
+            const moves = this.getAllValidMoves(board, PieceColor.BLACK);
+            for (const move of moves) {
+                const simulated = this.simulateMove(board, move.from, move.to, PieceColor.BLACK);
+                const evalScore = this.minimax(simulated, depth - 1, alpha, beta, false);
+                maxEval = Math.max(maxEval, evalScore);
+                alpha = Math.max(alpha, evalScore);
+                if (beta <= alpha) break;
+            }
+            return moves.length === 0 ? -1000 : maxEval;
+        } else {
+            let minEval = Infinity;
+            const moves = this.getAllValidMoves(board, PieceColor.WHITE);
+            for (const move of moves) {
+                const simulated = this.simulateMove(board, move.from, move.to, PieceColor.WHITE);
+                const evalScore = this.minimax(simulated, depth - 1, alpha, beta, true);
+                minEval = Math.min(minEval, evalScore);
+                beta = Math.min(beta, evalScore);
+                if (beta <= alpha) break;
+            }
+            return moves.length === 0 ? 1000 : minEval;
+        }
+    }
+
+    private evaluateBoard(board: (Piece|null)[][]): number {
+        let score = 0;
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const p = board[r][c];
+                if (!p) continue;
+                const val = p.isKing ? 30 : 10;
+                const posBonus = p.color === PieceColor.BLACK ? r : 7 - r;
+                if (p.color === PieceColor.BLACK) score += val + posBonus;
+                else score -= (val + posBonus);
+            }
+        }
+        return score;
+    }
+
+    private getAllValidMoves(board: (Piece|null)[][], player: PieceColor) {
+        const moves = [];
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                if (board[r][c]?.color === player) {
+                    const dirs = [[1,1],[1,-1],[-1,1],[-1,-1],[2,2],[2,-2],[-2,2],[-2,-2]];
+                    for (const [dr, dc] of dirs) {
+                        if (this.isValidMove({r,c}, {r: r+dr, c: c+dc}, board, player)) {
+                            moves.push({ from: {r,c}, to: {r: r+dr, c: c+dc} });
+                        }
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+    private simulateMove(board: (Piece|null)[][], from: any, to: any, player: PieceColor) {
+        const newBoard = board.map(row => row.map(p => p ? { ...p } : null));
+        const piece = newBoard[from.r][from.c]!;
+        newBoard[from.r][from.c] = null;
+        if (Math.abs(to.r - from.r) === 2) newBoard[(from.r+to.r)/2][(from.c+to.c)/2] = null;
+        if (player === PieceColor.WHITE && to.r === 0) piece.isKing = true;
+        if (player === PieceColor.BLACK && to.r === 7) piece.isKing = true;
+        newBoard[to.r][to.c] = piece;
+        return newBoard;
+    }
+
+    private checkWinner(board: (Piece|null)[][]): PieceColor | null {
+        let whiteCount = 0, blackCount = 0;
+        board.forEach(row => row.forEach(p => {
+            if (p?.color === PieceColor.WHITE) whiteCount++;
+            if (p?.color === PieceColor.BLACK) blackCount++;
+        }));
+        if (whiteCount === 0) return PieceColor.BLACK;
+        if (blackCount === 0) return PieceColor.WHITE;
+        return null;
+    }
+
+    private onGameOver(isWin: boolean) {
+        this.gameOver.set(true);
+        this.isUserWinner.set(isWin);
+        if (isWin) this.gamification.win(this.betAmount() * 2, 'checkers').subscribe();
+    }
+
+    restartGame() {
+        this.gameOver.set(false);
+        this.board.set(this.createInitialBoard());
+        this.currentPlayer.set(PieceColor.WHITE);
+        this.scoreWhite.set(0);
+        this.scoreBlack.set(0);
+        if (this.mode() === 'SP') this.startSinglePlayer();
+    }
+
+    leaveGame() {
+        if (this.gameStarted() && !this.gameOver()) {
+            if (!confirm('Leave game? You will lose your bet.')) return;
+        }
+        this.gameStarted.set(false);
+        this.router.navigate(['/dashboard/games']);
+    }
+
+    isRedPlayer() { 
+        return this.mode() === 'SP' || this.currentUserId === this.redPlayerId(); 
+    }
 }
