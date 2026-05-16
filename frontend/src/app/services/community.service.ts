@@ -24,6 +24,7 @@ export interface CommunityPost {
     show_translation?: boolean;
     translating?: boolean;
     is_vip?: boolean | number;
+    is_18_plus?: number;
 }
 
 export interface CommunityComment {

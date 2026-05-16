@@ -298,6 +298,7 @@ export class LanguageService {
                 'CHAT': 'Chat',
                 'PROFILE': 'Profile',
                 'COMMUNITY': 'Community',
+                'LEARNING': 'Learning',
                 'LOGOUT': 'Logout',
                 'LOGIN': 'Login',
                 'LANGUAGE': 'Language',
@@ -363,6 +364,22 @@ export class LanguageService {
                 'TIME_H_AGO': '{{count}}h ago',
                 'TIME_D_AGO': '{{count}}d ago',
                 'VIEW_ALL_COMMENTS': 'View all {{count}} comments'
+            },
+            'LEARNING': {
+                'ADD_CARD': 'Add Card',
+                'STREAK': 'Streak',
+                'TOTAL_CARDS': 'Total Cards',
+                'CORRECTIONS': 'Corrections',
+                'READY_TO_STUDY': 'Ready to Study?',
+                'DUE_CARDS_COUNT': 'You have {{count}} cards due for review.',
+                'START_SESSION': 'Start Session',
+                'TAP_TO_FLIP': 'Tap to flip',
+                'SESSION_COMPLETE': 'Session Complete!',
+                'WELL_DONE': 'Great job! You reviewed all your due cards.',
+                'MY_CARDS': 'My Cards',
+                'ADD_NEW_CARD': 'Add New Flashcard',
+                'FRONT_SIDE': 'Front (Word/Phrase)',
+                'BACK_SIDE': 'Back (Translation/Meaning)'
             },
             'PROFILE': {
                 'DAILY_MISSIONS': 'Daily Missions',
@@ -763,6 +780,7 @@ export class LanguageService {
                 'CHAT': 'Чат',
                 'PROFILE': 'Профиль',
                 'COMMUNITY': 'Сообщество',
+                'LEARNING': 'Обучение',
                 'LOGOUT': 'Выйти',
                 'LOGIN': 'Войти',
                 'LANGUAGE': 'Язык',
@@ -774,6 +792,22 @@ export class LanguageService {
                 'CONTACT_ADMIN': 'Связаться с админом',
                 'LIGHT_MODE': 'Светлая тема',
                 'DARK_MODE': 'Тёмная тема'
+            },
+            'LEARNING': {
+                'ADD_CARD': 'Добавить карточку',
+                'STREAK': 'Серия',
+                'TOTAL_CARDS': 'Всего карточек',
+                'CORRECTIONS': 'Исправления',
+                'READY_TO_STUDY': 'Готовы к учебе?',
+                'DUE_CARDS_COUNT': 'У вас {{count}} карточек для повторения.',
+                'START_SESSION': 'Начать сеанс',
+                'TAP_TO_FLIP': 'Нажмите, чтобы перевернуть',
+                'SESSION_COMPLETE': 'Сеанс завершен!',
+                'WELL_DONE': 'Отличная работа! Вы повторили все нужные карточки.',
+                'MY_CARDS': 'Мои карточки',
+                'ADD_NEW_CARD': 'Добавить новую карточку',
+                'FRONT_SIDE': 'Лицевая сторона (Слово/Фраза)',
+                'BACK_SIDE': 'Обратная сторона (Перевод/Значение)'
             },
             'PROFILE': {
                 'ABOUT': 'О себе',
@@ -1175,6 +1209,7 @@ export class LanguageService {
                 'CHAT': 'Чат',
                 'PROFILE': 'Профил',
                 'COMMUNITY': 'Ҷамъият',
+                'LEARNING': 'Омӯзиш',
                 'LOGOUT': 'Баромад',
                 'LOGIN': 'Ворид шудан',
                 'LANGUAGE': 'Забон',
@@ -1186,6 +1221,22 @@ export class LanguageService {
                 'CONTACT_ADMIN': 'Тамос бо админ',
                 'LIGHT_MODE': 'Реҷаи равшан',
                 'DARK_MODE': 'Реҷаи торик'
+            },
+            'LEARNING': {
+                'ADD_CARD': 'Иловаи корт',
+                'STREAK': 'Силсила',
+                'TOTAL_CARDS': 'Ҳамаи кортҳо',
+                'CORRECTIONS': 'Ислоҳотҳо',
+                'READY_TO_STUDY': 'Ба омӯзиш тайёред?',
+                'DUE_CARDS_COUNT': 'Шумо {{count}} корт барои такрор доред.',
+                'START_SESSION': 'Оғози сессия',
+                'TAP_TO_FLIP': 'Барои гардонидан зер кунед',
+                'SESSION_COMPLETE': 'Сессия ба анҷом расид!',
+                'WELL_DONE': 'Офарин! Шумо ҳамаи кортҳои лозимаро такрор кардед.',
+                'MY_CARDS': 'Кортҳои ман',
+                'ADD_NEW_CARD': 'Иловаи корти нав',
+                'FRONT_SIDE': 'Тарафи пеш (Калима/Ибора)',
+                'BACK_SIDE': 'Тарафи қафо (Тарҷума/Маъно)'
             },
             'PROFILE': {
                 'ABOUT': 'Дар бораи ман',

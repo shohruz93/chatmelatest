@@ -123,7 +123,7 @@ class User {
     }
 
     public function getProfile($id) {
-        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin, is_vip, vip_until, hide_from_connect FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT id, unique_id, name, first_name, family_name, email, avatar, bio, gender, location, native_language, learning_language, last_active, coins, xp, is_admin, is_vip, vip_until, hide_from_connect, (FLOOR(SQRT(COALESCE(xp, 0) / 100)) + 1) as level FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
@@ -220,7 +220,8 @@ class User {
         }
 
         $query = "SELECT id, name, email, avatar, gender, location, bio, native_language, learning_language,
-                  last_active, is_vip, language_level, learning_goal, trust_score,
+                  last_active, is_vip, language_level, learning_goal, trust_score, xp, coins,
+                  (FLOOR(SQRT(COALESCE(xp, 0) / 100)) + 1) as level,
                   ($genderScore) as gender_priority,
                   ($languageScore) as lang_score,
                   ($onlineScore) as online_priority

@@ -34,6 +34,7 @@ require_once __DIR__ . '/../src/WordBankController.php';
 require_once __DIR__ . '/../src/StudyBuddyController.php';
 require_once __DIR__ . '/../src/ProgressController.php';
 require_once __DIR__ . '/../src/ContentController.php';
+require_once __DIR__ . '/../src/FlashcardController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -65,6 +66,7 @@ $wordBankController  = new WordBankController();
 $buddyController     = new StudyBuddyController();
 $progressController  = new ProgressController();
 $contentController   = new ContentController();
+$flashcardController = new FlashcardController();
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -812,7 +814,15 @@ $router->add('DELETE', '/wordbank/word', function() use ($wordBankController) {
 $router->add('GET', '/wordbank/stats', function() use ($wordBankController) {
     $wordBankController->getStats();
 });
-
+$router->add('GET', '/flashcards', function() use ($flashcardController) {
+    $flashcardController->list();
+});
+$router->add('POST', '/flashcards', function() use ($flashcardController) {
+    $flashcardController->save();
+});
+$router->add('DELETE', '/flashcards', function() use ($flashcardController) {
+    $flashcardController->delete();
+});
 // ================================================================
 // Study Buddy Routes
 // ================================================================

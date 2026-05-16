@@ -1,0 +1,170 @@
+<div class="learning-container">
+    <div class="header">
+        <h1>{{ 'NAV.LEARNING' | translate }}</h1>
+        <button class="btn-add" (click)="showAddModal.set(true)">
+            <span class="icon">➕</span> {{ 'LEARNING.ADD_CARD' | translate }}
+        </button>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card streak">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ stats()?.streak || 0 }}</div>
+                <div class="stat-label">{{ 'LEARNING.STREAK' | translate }}</div>
+            </div>
+        </div>
+        <div class="stat-card xp">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ stats()?.xp || 0 }}</div>
+                <div class="stat-label">{{ 'COMMON.XP' | translate }}</div>
+            </div>
+        </div>
+        <div class="stat-card cards">
+            <div class="stat-icon">🗂️</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ flashcards().length }}</div>
+                <div class="stat-label">{{ 'LEARNING.TOTAL_CARDS' | translate }}</div>
+            </div>
+        </div>
+        <div class="stat-card corrections">
+            <div class="stat-icon">✍️</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ stats()?.total_corrections || 0 }}</div>
+                <div class="stat-label">{{ 'LEARNING.CORRECTIONS' | translate }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study Area -->
+    <div class="study-section">
+        @if (!isStudying()) {
+            <div class="start-card">
+                <h2>{{ 'LEARNING.READY_TO_STUDY' | translate }}</h2>
+                <p>{{ 'LEARNING.DUE_CARDS_COUNT' | translate: {count: dueCards().length} }}</p>
+                <div class="deck-actions" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                    <button class="btn-start" [disabled]="dueCards().length === 0" (click)="startStudy()" style="margin:0;">
+                        {{ 'LEARNING.START_SESSION' | translate }}
+                    </button>
+                    <button class="btn-ai-modal" (click)="toggleAiChat()" style="background:#6366f1; color:white; border:none; padding:12px 24px; border-radius:24px; font-weight:bold; cursor:pointer;">
+                        🤖 ИИ Ассистент
+                    </button>
+                </div>
+            </div>
+        } @else if (!studyFinished()) {
+            <div class="study-card-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="(currentIndex() / dueCards().length) * 100"></div>
+                </div>
+                
+                <div class="flashcard" [class.flipped]="showAnswer()" (click)="!showAnswer() && flipCard()">
+                    <div class="card-face front">
+                        <div class="card-content">{{ dueCards()[currentIndex()].front }}</div>
+                        <div class="card-hint">{{ 'LEARNING.TAP_TO_FLIP' | translate }}</div>
+                    </div>
+                    <div class="card-face back">
+                        <div class="card-content">{{ dueCards()[currentIndex()].back }}</div>
+                    </div>
+                </div>
+
+                @if (showAnswer()) {
+                    <div class="grade-buttons">
+                        <button class="grade-btn g0" (click)="submitGrade(0)">0</button>
+                        <button class="grade-btn g1" (click)="submitGrade(1)">1</button>
+                        <button class="grade-btn g2" (click)="submitGrade(2)">2</button>
+                        <button class="grade-btn g3" (click)="submitGrade(3)">3</button>
+                        <button class="grade-btn g4" (click)="submitGrade(4)">4</button>
+                        <button class="grade-btn g5" (click)="submitGrade(5)">5</button>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="finish-card">
+                <div class="finish-icon">🎉</div>
+                <h2>{{ 'LEARNING.SESSION_COMPLETE' | translate }}</h2>
+                <p>{{ 'LEARNING.WELL_DONE' | translate }}</p>
+                <button class="btn-start" (click)="isStudying.set(false)">{{ 'COMMON.CLOSE' | translate }}</button>
+            </div>
+        }
+    </div>
+
+    <!-- Card List -->
+    <div class="card-list-section">
+        <h3>{{ 'LEARNING.MY_CARDS' | translate }}</h3>
+        <div class="cards-grid">
+            @for (card of flashcards(); track card.id) {
+                <div class="mini-card">
+                    <div class="mini-front">{{ card.front }}</div>
+                    <div class="mini-back">{{ card.back }}</div>
+                    <button class="btn-delete-mini" (click)="deleteCard(card.id)">✕</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    @if (showAddModal()) {
+        <div class="modal-overlay" (click)="showAddModal.set(false)">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <h2>{{ 'LEARNING.ADD_NEW_CARD' | translate }}</h2>
+                <div class="form-group">
+                    <label>{{ 'LEARNING.FRONT_SIDE' | translate }}</label>
+                    <textarea [(ngModel)]="newFront" placeholder="Word or phrase..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'LEARNING.BACK_SIDE' | translate }}</label>
+                    <textarea [(ngModel)]="newBack" placeholder="Translation or explanation..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" (click)="showAddModal.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
+                    <button class="btn-save" (click)="saveNewCard()">{{ 'COMMON.SAVE' | translate }}</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- AI Chat Modal -->
+    @if (showAiChat()) {
+        <div class="modal-overlay" (click)="showAiChat.set(false)">
+            <div class="ai-chat-window modal-content" (click)="$event.stopPropagation()" style="width:90%; max-width:400px; padding:0; height:600px; max-height:80vh;">
+                <div class="ai-chat-header">
+                    <h3>🤖 {{ 'CHAT.AI_CHAT_TITLE' | translate }}</h3>
+                    <button class="btn-close-ai" (click)="showAiChat.set(false)">✕</button>
+                </div>
+                
+                <div class="ai-chat-messages">
+                    @if (aiChatHistory().length === 0) {
+                        <div class="ai-empty-state">
+                            <div class="ai-icon-large">🤖</div>
+                            <p>{{ 'CHAT.AI_CHAT_EMPTY' | translate }}</p>
+                        </div>
+                    }
+                    
+                    @for (msg of aiChatHistory(); track $index) {
+                        <div class="ai-msg" [class.user]="msg.sender === 'user'" [class.ai]="msg.sender === 'ai'">
+                            <div class="msg-bubble">{{ msg.text }}</div>
+                        </div>
+                    }
+                    
+                    @if (isAiTyping()) {
+                        <div class="ai-msg ai typing">
+                            <div class="msg-bubble">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="ai-chat-input">
+                    <input type="text" [(ngModel)]="aiMessage" (keyup.enter)="sendAiMessage()" 
+                        [placeholder]="'CHAT.AI_CHAT_PLACEHOLDER' | translate">
+                    <button (click)="sendAiMessage()" [disabled]="!aiMessage.trim() || isAiTyping()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
