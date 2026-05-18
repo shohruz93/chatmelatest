@@ -7,7 +7,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div [class.dark]="isDarkMode" class="font-sans antialiased selection:bg-primary-500/30 selection:text-primary-500 h-screen overflow-hidden">
+    <div class="dark font-sans antialiased selection:bg-primary-500/30 selection:text-primary-500 h-screen overflow-hidden">
       <div class="flex h-screen bg-slate-50 dark:bg-[#0B0F19] transition-colors duration-500">
         
         <!-- Sidebar -->
@@ -116,11 +116,6 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
             </div>
             
             <div class="flex items-center gap-6">
-              <!-- Theme Toggle -->
-              <button (click)="toggleTheme()" class="w-12 h-12 rounded-2xl bg-white dark:bg-[#111827] border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-primary-500 dark:hover:text-primary-400 hover:scale-105 hover:shadow-lg transition-all duration-300">
-                 <i class="fi text-xl transition-transform duration-500" [ngClass]="isDarkMode ? 'fi-rr-sun rotate-180' : 'fi-rr-moon'"></i>
-              </button>
-
               <div class="hidden sm:flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-[#111827] rounded-2xl border border-slate-200/50 dark:border-slate-800/50 text-xs font-bold text-slate-500 tracking-wider shadow-sm">
                  <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                  SYS_ONLINE
@@ -158,30 +153,8 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   `]
 })
 export class AdminLayoutComponent {
-  isDarkMode = true;
-
   ngOnInit() {
-    // Check local storage or system preference
-    const savedTheme = localStorage.getItem('adminTheme');
-    if (savedTheme) {
-      this.isDarkMode = savedTheme === 'dark';
-    } else {
-      this.isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    this.applyTheme();
-  }
-
-  toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('adminTheme', this.isDarkMode ? 'dark' : 'light');
-    this.applyTheme();
-  }
-
-  private applyTheme() {
-    if (this.isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    // Force Dark Mode always for premium look
+    document.documentElement.classList.add('dark');
   }
 }
