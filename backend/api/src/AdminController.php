@@ -691,6 +691,49 @@ class AdminController {
             echo json_encode(['error' => 'Failed to update 18+ status']);
         }
     }
-}
 
+    public function runAiQuery() {
+        $data = json_decode(file_get_contents("php://input"));
+        if (!isset($data->query)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Query is required']);
+            return;
+        }
+
+        $sqlQuery = trim($data->query);
+
+        // Remove any markdown block if AI still added it
+        $sqlQuery = preg_replace('/^```sql\s*|\s*```$/i', '', $sqlQuery);
+        $sqlQuery = trim($sqlQuery);
+
+        if (empty($sqlQuery) || stripos($sqlQuery, 'SELECT') !== 0) {
+            echo json_encode(['error' => "Only SELECT queries are allowed."]);
+            return;
+        }
+
+        try {
+            // Very basic safety check
+            if (preg_match('/(INSERT|UPDATE|DELETE|DROP|ALTER|TRUNCATE|GRANT|REVOKE|REPLACE)/i', $sqlQuery)) {
+                throw new Exception("Only SELECT queries are allowed for security reasons.");
+            }
+
+            $stmt = $this->db->query($sqlQuery);
+            if (!$stmt) {
+                throw new Exception("Query failed");
+            }
+            $dbResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $jsonResult = json_encode($dbResult);
+
+            // Limit result size
+            if (strlen($jsonResult) > 5000) {
+                $jsonResult = substr($jsonResult, 0, 5000) . '... (truncated)';
+            }
+            
+            echo json_encode(['data' => $jsonResult]);
+        } catch (Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+            return;
+        }
+    }
+}
 

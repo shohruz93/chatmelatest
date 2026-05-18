@@ -563,6 +563,10 @@ $router->add('POST', '/admin/community/posts/toggle-18-plus', function() use ($a
     $adminController->togglePost18Plus();
 });
 
+$router->add('POST', '/admin/ai-query', function() use ($adminController) {
+    $adminController->runAiQuery();
+});
+
 // App Version Check (Public)
 $router->add('GET', '/app/version', function() use ($appVersion) {
     $platform = $_GET['platform'] ?? '';

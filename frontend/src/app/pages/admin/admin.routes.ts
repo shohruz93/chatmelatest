@@ -22,6 +22,10 @@ export const ADMIN_ROUTES: Routes = [
             {
                 path: 'community',
                 loadComponent: () => import('./admin-community/admin-community.component').then(m => m.AdminCommunityComponent)
+            },
+            {
+                path: 'ai-chat',
+                loadComponent: () => import('./ai-chat/ai-chat.component').then(m => m.AiChatComponent)
             }
         ]
     }

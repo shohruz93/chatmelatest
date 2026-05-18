@@ -67,6 +67,11 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
                   </svg>
                   Community
                </a>
+               <a routerLink="/admin/ai-chat" routerLinkActive="bg-blue-50/80 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 !font-semibold border-r-4 border-blue-600 dark:border-blue-500 shadow-sm" 
+                  class="flex items-center px-4 py-3 text-slate-600 dark:text-slate-400 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200 group border-r-4 border-transparent">
+                  <i class="fi fi-rr-robot text-lg mr-3 opacity-70 group-hover:scale-110 transition-transform group-hover:opacity-100"></i>
+                  AI Chat
+               </a>
              </nav>
            </div>
         </div>
