@@ -57,8 +57,21 @@ export class AiService {
         );
     }
 
-    fixSentence(text: string): Observable<string> {
-        return this.chat(text, true);
+    fixSentence(text: string, language: string = 'auto'): Observable<string> {
+        const langHint = language && language !== 'auto' ? `Language: ${language}.` : 'Detect the language automatically.';
+        const prompt = `You are a grammar correction assistant.
+${langHint}
+RULES (STRICTLY FOLLOW):
+1. Only fix grammar, spelling, and punctuation errors.
+2. Do NOT change the meaning, style, or vocabulary.
+3. Do NOT translate the text into any other language.
+4. Do NOT add, remove, or rephrase sentences.
+5. If the text has NO errors, return it EXACTLY as-is.
+6. Return ONLY the corrected text. No explanations. No quotes. No labels.
+
+Text to check:
+${text}`;
+        return this.chat(prompt, true);
     }
 
     generateSuggestions(
@@ -67,7 +80,36 @@ export class AiService {
         partnerLanguage: string,
         myName: string
     ): Observable<AiSuggestion[]> {
-        const prompt = `Analyze conversation for '${myName}'. Generate 3 short natural reply options. Format: "Text in ${partnerLanguage} | Text in ${myLanguage}".\nHistory:\n${history}`;
+        const sameLanguage = myLanguage.trim().toLowerCase() === partnerLanguage.trim().toLowerCase();
+        const langRule = sameLanguage
+            ? `Both users speak the same language: "${myLanguage}". Return suggestions in "${myLanguage}" on both sides of "|".`
+            : `CRITICAL LANGUAGE RULES — NEVER VIOLATE:
+- LEFT side of "|": MUST be written ONLY in "${partnerLanguage}" (what ${myName} will send).
+- RIGHT side of "|": MUST be written ONLY in "${myLanguage}" (translation for ${myName} to understand).
+- Do NOT write English unless "${partnerLanguage}" or "${myLanguage}" IS English.
+- Do NOT mix languages or add notes.`;
+
+        const prompt = `You are a chat assistant for a language exchange app.
+User "${myName}" speaks: "${myLanguage}"
+Partner speaks: "${partnerLanguage}"
+
+${langRule}
+
+TASK: Read the conversation below and generate EXACTLY 3 short, natural reply suggestions for "${myName}".
+
+OUTPUT FORMAT (one suggestion per line, nothing else):
+[reply in ${partnerLanguage}] | [translation in ${myLanguage}]
+[reply in ${partnerLanguage}] | [translation in ${myLanguage}]
+[reply in ${partnerLanguage}] | [translation in ${myLanguage}]
+
+RULES:
+1. Exactly 3 lines. No numbering. No bullets. No extra text.
+2. LEFT of "|": in "${partnerLanguage}" ONLY.
+3. RIGHT of "|": in "${myLanguage}" ONLY.
+4. Keep each suggestion short (1-2 sentences).
+
+Conversation:
+${history}`;
 
         return this.chat(prompt).pipe(
             map(response => {
