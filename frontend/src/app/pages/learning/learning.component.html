@@ -64,26 +64,13 @@
                         <div class="card-content">{{ dueCards()[currentIndex()].front }}</div>
                         <div class="card-hint">{{ 'LEARNING.TAP_TO_FLIP' | translate }}</div>
                         <div class="card-actions-ai">
-                            <button class="btn-tool-ai" (click)="$event.stopPropagation(); speak(dueCards()[currentIndex()].front)" [disabled]="isSpeaking()" title="Listen">
-                                @if (isSpeaking()) { <span class="spinner-tiny"></span> } @else { 🔊 }
-                            </button>
                         </div>
                     </div>
                     <div class="card-face back">
                         <div class="card-content">{{ dueCards()[currentIndex()].back }}</div>
                         <div class="card-actions-ai">
-                            <button class="btn-tool-ai" (click)="$event.stopPropagation(); speak(dueCards()[currentIndex()].back)" [disabled]="isSpeaking()" title="Listen">
-                                @if (isSpeaking()) { <span class="spinner-tiny"></span> } @else { 🔊 }
-                            </button>
-                            <button class="btn-tool-ai" (click)="$event.stopPropagation(); generateAiImage()" [disabled]="isGeneratingImage()" title="Generate Visual">🖼️</button>
                             <button class="btn-tool-ai" (click)="$event.stopPropagation(); getAiExplanation()" [disabled]="isExplaining()" title="AI Explanation">💡</button>
                         </div>
-                        
-                        @if (aiImage()) {
-                            <div class="ai-generated-image">
-                                <img [src]="aiImage()" alt="AI representation">
-                            </div>
-                        }
 
                         @if (aiExplanation()) {
                             <div class="ai-explanation">
@@ -91,7 +78,7 @@
                             </div>
                         }
 
-                        @if (isGeneratingImage() || isExplaining()) {
+                        @if (isExplaining()) {
                             <div class="ai-loader-mini">
                                 <span class="spinner-tiny"></span> AI is thinking...
                             </div>

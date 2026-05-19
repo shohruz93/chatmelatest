@@ -106,7 +106,7 @@ export const routes: Routes = [
                 loadComponent: () => import('./pages/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
             },
             {
-                path: 'puter-playground',
+                path: 'ai-playground',
                 loadComponent: () => import('./pages/puter-playground/puter-playground.component').then(m => m.PuterPlaygroundComponent)
             }
         ]

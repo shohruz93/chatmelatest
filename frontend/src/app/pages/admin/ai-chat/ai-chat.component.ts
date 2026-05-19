@@ -196,7 +196,7 @@ Answer the admin's question based on this data. Your answer MUST be in Tajik lan
           this.showAiError("Бубахшед, ман натавонистам ин саволро ба SQL гардонам.\nҶавоби ИИ чунин буд:\n" + sqlResponse);
         }
       },
-      error: (err) => this.showAiError("Хатогӣ ҳангоми пайвастшавӣ ба хидмати ИИ (Puter.js).")
+      error: (err) => this.showAiError("Хатогӣ ҳангоми пайвастшавӣ ба хидмати ИИ (Groq).")
     });
   }
 

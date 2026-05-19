@@ -15,43 +15,43 @@ declare var puter: any;
 export class AiService {
 
     private chat(prompt: string, isFix: boolean = false): Observable<string> {
-        if (typeof puter !== 'undefined') {
-            puter.quiet = true;
-        }
+        const apiKey = "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";
+        const url = 'https://api.groq.com/openai/v1/chat/completions';
+        
+        const requestBody = {
+            model: 'llama-3.3-70b-versatile',
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+            max_tokens: 2048
+        };
 
-        if (typeof puter === 'undefined' || !puter.ai) {
-            return throwError(() => new Error('Puter.js not loaded'));
-        }
-
-        // Puter.js chat returns a promise, we wrap it in an Observable
-        return from(puter.ai.chat(prompt)).pipe(
-            map((res: any) => {
-                let text = '';
-                
-                if (typeof res === 'string') {
-                    text = res;
-                } else if (res?.result?.message?.content && Array.isArray(res.result.message.content)) {
-                    text = res.result.message.content[0]?.text || '';
-                } else if (typeof res?.result?.message?.content === 'string') {
-                    text = res.result.message.content;
-                } else if (res?.message?.content && Array.isArray(res.message.content)) {
-                    text = res.message.content[0]?.text || '';
-                } else if (typeof res?.message?.content === 'string') {
-                    text = res.message.content;
-                } else if (res?.text) {
-                    text = res.text;
-                } else {
-                    try { text = JSON.stringify(res); } catch(e) {}
+        return from(fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(requestBody)
+        })).pipe(
+            switchMap(res => {
+                if (!res.ok) {
+                    return from(res.json().then(err => {
+                        throw new Error(err.error?.message || 'Хатогӣ ҳангоми пайвастшавӣ ба API');
+                    }));
                 }
-
+                return from(res.json());
+            }),
+            map((data: any) => {
+                let text = data.choices[0].message.content;
                 let cleaned = (typeof text === 'string' ? text : String(text)).trim();
+                
                 if (isFix && cleaned.startsWith('`') && cleaned.endsWith('`')) {
                     cleaned = cleaned.replace(/^```[a-z]*\n?/, '').replace(/```$/, '').trim();
                 }
                 return cleaned;
             }),
             catchError(err => {
-                console.error('Puter AI Chat Error:', err);
+                console.error('Groq AI Chat Error:', err);
                 return of("Бубахшед, хатогӣ рӯй дод. Лутфан дубора кӯшиш кунед.");
             })
         );
@@ -105,6 +105,43 @@ export class AiService {
         );
 
 
+    }
+
+    generateIcebreakers(
+        myInterests: string[],
+        partnerInterests: string[],
+        myLanguage: string,
+        partnerLanguage: string
+    ): Observable<AiSuggestion[]> {
+        const myInts = myInterests.join(", ");
+        const partnerInts = partnerInterests.join(", ");
+        const prompt = `Act as a social icebreaker assistant.
+User A interests: ${myInts}
+User B interests: ${partnerInts}
+
+Generate 3 short, engaging, and friendly icebreaker questions or conversation starters that User A can send to User B.
+The questions MUST be written in User B's language: '${partnerLanguage}'.
+BUT, you must also provide a translation of each question into User A's language: '${myLanguage}'.
+Format each suggestion strictly as "Text in ${partnerLanguage} | Text in ${myLanguage}" on a single line.
+Do not include any numbering, bullets, or extra text.`;
+
+        return this.chat(prompt).pipe(
+            map(response => {
+                let lines = response.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length === 1 && lines[0].includes(',')) {
+                    lines = lines[0].split(',').map(l => l.trim());
+                }
+                return lines.map(line => {
+                    let cleanLine = line.replace(/^(\d+\.|-|\*|Suggestion:)\s*/i, '').trim();
+                    if (cleanLine.includes('|')) {
+                        const parts = cleanLine.split('|');
+                        return { textToSend: parts[0]?.trim() || '', textToDisplay: parts[1]?.trim() || parts[0]?.trim() || '' };
+                    } else {
+                        return { textToSend: cleanLine, textToDisplay: cleanLine };
+                    }
+                }).filter(s => s.textToSend.length > 2).slice(0, 3);
+            })
+        );
     }
 
     askAi(question: string): Observable<string> {

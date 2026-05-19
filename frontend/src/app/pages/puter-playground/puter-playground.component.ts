@@ -1,269 +1,536 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, ChangeDetectorRef, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-declare var puter: any;
 
 @Component({
   selector: 'app-puter-playground',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="space-y-8 animate-fade-in-up pb-10 max-w-7xl mx-auto">
-      
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
-        <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold tracking-wider uppercase mb-4">
-            <i class="fi fi-rr-magic-wand"></i>
-            Суҳбат бо ИИ
-          </div>
-          <h2 class="text-4xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight">AI Playground</h2>
-          <p class="text-slate-500 dark:text-slate-400 mt-2 text-lg">Ҳамаи имкониятҳои зеҳни маснӯиро дар як ҷо таҷриба кунед.</p>
+    <div class="ai-page">
+
+      <!-- Ambient glows -->
+      <div class="glow glow-top"></div>
+      <div class="glow glow-bottom"></div>
+
+      <div class="ai-container">
+
+        <!-- Header -->
+        <div class="ai-header">
+          <div class="ai-badge">🪄 Суҳбат бо ИИ</div>
+          <h1 class="ai-title">AI Assistant</h1>
+          <p class="ai-subtitle">Llama 3.3 70B · Groq · Streaming</p>
         </div>
-      </div>
 
-      <!-- Navigation Tabs -->
-      <div class="flex flex-wrap gap-4 p-2 bg-white/60 dark:bg-[#111827]/60 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-slate-800/50 w-max relative z-10 shadow-sm">
-        <button *ngFor="let tab of tabs" 
-                (click)="activeTab.set(tab.id)"
-                [class.bg-gradient-to-r]="activeTab() === tab.id"
-                [class.from-purple-500]="activeTab() === tab.id"
-                [class.to-purple-600]="activeTab() === tab.id"
-                [class.text-white]="activeTab() === tab.id"
-                [class.shadow-lg]="activeTab() === tab.id"
-                [class.text-slate-600]="activeTab() !== tab.id"
-                [class.dark:text-slate-400]="activeTab() !== tab.id"
-                class="px-6 py-3 rounded-2xl font-bold transition-all duration-300 flex items-center gap-2 hover:text-purple-500 dark:hover:text-white">
-            <i [class]="tab.icon"></i>
-            {{ tab.name }}
-        </button>
-      </div>
+        <!-- Chat Card -->
+        <div class="chat-card">
 
-      <!-- Active Content Section -->
-      <div class="relative bg-white/80 dark:bg-[#111827]/80 backdrop-blur-xl rounded-[2rem] p-6 md:p-10 shadow-xl border border-slate-200 dark:border-slate-800/50 overflow-hidden min-h-[500px]">
-         
-         <!-- Background glow -->
-         <div class="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <!-- Messages -->
+          <div class="messages-area" #chatContainer>
 
-         <!-- 1. AI CHAT TAB -->
-         <div *ngIf="activeTab() === 'chat'" class="relative z-10 h-full flex flex-col animate-fade-in-up">
-            <div class="mb-6">
-              <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Суҳбат (Text Generation)</h3>
-              <p class="text-slate-500 dark:text-slate-400">Ҳар саволе доред аз ИИ пурсед.</p>
-            </div>
-            
-            <div class="flex-1 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-4 mb-6 min-h-[400px] max-h-[600px] overflow-y-auto custom-scrollbar">
-                <div *ngIf="chatHistory.length === 0" class="text-center text-slate-400 dark:text-slate-500 my-auto">
-                    <i class="fi fi-rr-robot text-5xl mb-4 block opacity-50"></i>
-                    Суҳбатро оғоз кунед...
-                </div>
-                
-                <div *ngFor="let msg of chatHistory" 
-                     class="max-w-[85%] p-4 rounded-2xl shadow-sm"
-                     [ngClass]="msg.role === 'user' ? 'bg-purple-600 text-white self-end rounded-tr-sm' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 self-start rounded-tl-sm border border-slate-100 dark:border-slate-700'">
-                    {{ msg.content }}
-                </div>
-
-                <div *ngIf="isChatting" class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 self-start p-4 rounded-2xl rounded-tl-sm border border-slate-100 dark:border-slate-700 w-24 flex justify-center items-center gap-2 shadow-sm">
-                    <span class="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></span>
-                    <span class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
-                    <span class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span>
-                </div>
+            <div class="empty-state" *ngIf="chatHistory.length === 0">
+              <div class="empty-icon">🤖</div>
+              <p class="empty-title">Бо ИИ суҳбат оғоз кунед</p>
+              <p class="empty-sub">Ҳар гуна савол, иттилоот ё дархост нависед</p>
             </div>
 
-            <div class="flex gap-4">
-               <input type="text" [(ngModel)]="chatInput" (keyup.enter)="sendChat()"
-                      placeholder="Паёми худро нависед..." 
-                      class="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-6 py-4 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all shadow-sm">
-               <button (click)="sendChat()" [disabled]="isChatting || !chatInput.trim()"
-                       class="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-xl px-8 font-bold transition-all shadow-lg flex items-center justify-center hover:-translate-y-0.5">
-                   <i class="fi fi-rr-paper-plane"></i>
-               </button>
-            </div>
-         </div>
-
-         <!-- 2. AI IMAGE TAB -->
-         <div *ngIf="activeTab() === 'image'" class="relative z-10 h-full flex flex-col animate-fade-in-up">
-            <div class="mb-6">
-              <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Сохтани Расм (Txt2Img)</h3>
-              <p class="text-slate-500 dark:text-slate-400">Бо истифода аз матн расмҳои баландсифат созед.</p>
+            <div *ngFor="let msg of chatHistory"
+                 class="message"
+                 [class.user-msg]="msg.role === 'user'"
+                 [class.ai-msg]="msg.role === 'ai'">
+              <div *ngIf="msg.role === 'ai'" class="ai-label">
+                <span class="ai-dot"></span> AI · Llama 3.3 70B
+              </div>
+              <div class="msg-bubble" [innerHTML]="msg.content"></div>
+              <span *ngIf="msg.isStreaming" class="cursor-blink"></span>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-8">
-               <div class="w-full md:w-1/3 space-y-6">
-                  <div>
-                     <label class="block text-slate-600 dark:text-slate-400 text-sm font-bold mb-2">Матни расм</label>
-                     <textarea [(ngModel)]="imagePrompt" rows="6"
-                               placeholder="Масалан: Як гурбаи кайҳонавард дар рӯи моҳтоб..."
-                               class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none shadow-sm"></textarea>
-                  </div>
-                  <button (click)="generateImage()" [disabled]="isGeneratingImage || !imagePrompt.trim()"
-                          class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 disabled:opacity-50 text-white rounded-xl px-6 py-4 font-bold shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
-                      <i *ngIf="!isGeneratingImage" class="fi fi-rr-picture"></i>
-                      <span *ngIf="isGeneratingImage" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      {{ isGeneratingImage ? 'Дар ҳоли сохтан...' : 'Сохтани Расм' }}
-                  </button>
-               </div>
-
-               <div class="w-full md:w-2/3 flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden min-h-[400px] shadow-inner relative">
-                   <div *ngIf="!generatedImageUrl && !isGeneratingImage" class="text-slate-400 dark:text-slate-500 text-center">
-                      <i class="fi fi-rr-image-polaroid text-6xl mb-4 block opacity-30"></i>
-                      Расми сохташуда дар ин ҷо пайдо мешавад
-                   </div>
-                   <div *ngIf="isGeneratingImage" class="text-purple-500 text-center flex flex-col items-center">
-                      <div class="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mb-4"></div>
-                      Эҷоди шоҳасар...
-                   </div>
-                   <img *ngIf="generatedImageUrl && !isGeneratingImage" [src]="generatedImageUrl" class="w-full h-full object-contain">
-                   
-                   <a *ngIf="generatedImageUrl && !isGeneratingImage" [href]="generatedImageUrl" download="ai-image.jpg"
-                      class="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur text-white p-3 rounded-xl hover:bg-purple-600 transition-colors shadow-lg">
-                      <i class="fi fi-rr-download text-xl"></i>
-                   </a>
-               </div>
-            </div>
-         </div>
-
-         <!-- 3. AI SPEECH TAB -->
-         <div *ngIf="activeTab() === 'speech'" class="relative z-10 h-full flex flex-col animate-fade-in-up">
-            <div class="mb-6">
-              <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">Матн ба Овоз (TTS)</h3>
-              <p class="text-slate-500 dark:text-slate-400">Матнро ба овози табиӣ табдил диҳед.</p>
+            <!-- Thinking dots -->
+            <div *ngIf="isChatting && isWaitingForStream" class="message ai-msg">
+              <div class="ai-label"><span class="ai-dot"></span> AI is thinking...</div>
+              <div class="msg-bubble thinking-dots">
+                <span></span><span></span><span></span>
+              </div>
             </div>
 
-            <div class="max-w-2xl mx-auto w-full space-y-8 bg-slate-50 dark:bg-slate-900/50 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-               <div>
-                  <label class="block text-slate-600 dark:text-slate-400 text-sm font-bold mb-2">Матн барои хондан</label>
-                  <textarea [(ngModel)]="speechText" rows="5"
-                            placeholder="Салом! Хуш омадед ба бахши ҳуши маснӯӣ..."
-                            class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all resize-none shadow-sm"></textarea>
-               </div>
+          </div>
 
-               <div class="flex justify-center">
-                  <button (click)="generateSpeech()" [disabled]="isGeneratingSpeech || !speechText.trim()"
-                          class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 disabled:opacity-50 text-white rounded-full px-10 py-4 font-bold shadow-lg shadow-teal-500/20 transition-all flex items-center gap-3 text-lg hover:-translate-y-0.5">
-                      <i *ngIf="!isGeneratingSpeech" class="fi fi-rr-microphone"></i>
-                      <span *ngIf="isGeneratingSpeech" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                      {{ isGeneratingSpeech ? 'Дар ҳоли табдил...' : 'Садоро гӯш кунед' }}
-                  </button>
-               </div>
-               
-               <div *ngIf="audioUrl" class="mt-8 flex flex-col items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-teal-500/20 shadow-sm">
-                  <span class="text-teal-600 dark:text-teal-400 font-bold text-sm tracking-widest uppercase">Овози сохташуда</span>
-                  <audio [src]="audioUrl" controls class="w-full"></audio>
-               </div>
+          <!-- Input Row -->
+          <div class="input-row">
+            <div class="input-wrapper">
+              <textarea
+                [(ngModel)]="chatInput"
+                (keydown.enter)="onEnter($any($event))"
+                placeholder="Паёми худро нависед... (Enter = Фиристодан)"
+                rows="1"
+                class="chat-input"
+                (input)="autoResize($event)">
+              </textarea>
             </div>
-         </div>
+            <button
+              class="send-btn"
+              (click)="sendChat()"
+              [disabled]="isChatting || !chatInput.trim()">
+              <span *ngIf="!isChatting" class="send-icon">↑</span>
+              <span *ngIf="isChatting" class="spinner"></span>
+            </button>
+          </div>
+
+        </div>
 
       </div>
     </div>
   `,
   styles: [`
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(168, 85, 247, 0.3); border-radius: 20px; }
+    /* ── Layout ── */
+    .ai-page {
+      position: fixed;
+      inset: 0;
+      background: #080c14;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-top {
+      width: 480px; height: 480px;
+      top: -100px; left: 10%;
+      background: radial-gradient(circle, rgba(124,58,237,0.18), transparent 70%);
+    }
+    .glow-bottom {
+      width: 400px; height: 400px;
+      bottom: 0; right: 5%;
+      background: radial-gradient(circle, rgba(59,130,246,0.14), transparent 70%);
+    }
+
+    .ai-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 1rem;
+      box-sizing: border-box;
+      gap: 1rem;
+    }
+
+    /* ── Header ── */
+    .ai-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 9999px;
+      background: rgba(168,85,247,0.12);
+      border: 1px solid rgba(168,85,247,0.25);
+      color: #c084fc;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .ai-title {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: white;
+      letter-spacing: -0.02em;
+    }
+
+    .ai-subtitle {
+      margin: 0;
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Chat Card ── */
+    .chat-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: rgba(15,23,42,0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(51,65,85,0.5);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+
+    /* ── Messages ── */
+    .messages-area {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .messages-area::-webkit-scrollbar { width: 4px; }
+    .messages-area::-webkit-scrollbar-track { background: transparent; }
+    .messages-area::-webkit-scrollbar-thumb {
+      background: rgba(168,85,247,0.35);
+      border-radius: 10px;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      color: #475569;
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .empty-icon { font-size: 3rem; }
+    .empty-title { margin: 0; font-size: 1rem; font-weight: 600; color: #64748b; }
+    .empty-sub   { margin: 0; font-size: 0.82rem; color: #334155; }
+
+    /* ── Messages ── */
+    .message {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      max-width: 78%;
+      animation: fadeUp 0.25s ease forwards;
+    }
+
+    .user-msg {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .ai-msg {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .ai-label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #a855f7;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .ai-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #a855f7;
+      display: inline-block;
+      box-shadow: 0 0 6px #a855f7;
+    }
+
+    .msg-bubble {
+      padding: 0.8rem 1.1rem;
+      border-radius: 1.1rem;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .user-msg .msg-bubble {
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: white;
+      border-radius: 1.1rem 1.1rem 0.25rem 1.1rem;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.3);
+    }
+    .ai-msg .msg-bubble {
+      background: rgba(30,41,59,0.9);
+      color: #e2e8f0;
+      border-radius: 1.1rem 1.1rem 1.1rem 0.25rem;
+      border: 1px solid rgba(51,65,85,0.6);
+    }
+
+    /* ── Thinking dots ── */
+    .thinking-dots {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.75rem 1.1rem;
+    }
+    .thinking-dots span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #7c3aed;
+      display: inline-block;
+      animation: bounce 1.2s infinite;
+    }
+    .thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .thinking-dots span:nth-child(3) { animation-delay: 0.30s; }
+
+    /* ── Streaming cursor ── */
+    .cursor-blink {
+      display: inline-block;
+      width: 8px; height: 17px;
+      background: #a855f7;
+      border-radius: 2px;
+      margin-left: 3px;
+      vertical-align: middle;
+      animation: blink 0.9s infinite;
+    }
+
+    /* ── Input ── */
+    .input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.6rem;
+      padding: 1rem 1.25rem 1.25rem;
+      border-top: 1px solid rgba(51,65,85,0.4);
+      background: rgba(11,15,25,0.5);
+      flex-shrink: 0;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .chat-input {
+      width: 100%;
+      background: rgba(15,23,42,0.8);
+      border: 1.5px solid rgba(71,85,105,0.6);
+      border-radius: 0.9rem;
+      color: white;
+      font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      line-height: 1.5;
+      min-height: 46px;
+      max-height: 140px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .chat-input:focus {
+      border-color: rgba(168,85,247,0.7);
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.12);
+    }
+    .chat-input::placeholder { color: #475569; }
+
+    .send-btn {
+      width: 46px; height: 46px;
+      border-radius: 0.85rem;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      border: none;
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s, opacity 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(124,58,237,0.4);
+    }
+    .send-btn:hover:not(:disabled) {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(124,58,237,0.5);
+    }
+    .send-btn:active:not(:disabled) { transform: scale(0.95); }
+    .send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .send-icon { line-height: 1; }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.25);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.65); opacity: 0.4; }
+      40%            { transform: scale(1);    opacity: 1;   }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .ai-container { padding: 0.75rem 0.6rem 0.6rem; gap: 0.6rem; }
+      .ai-title { font-size: 1.25rem; }
+      .message { max-width: 90%; }
+      .messages-area { padding: 1rem; gap: 0.85rem; }
+      .input-row { padding: 0.75rem 0.75rem 1rem; }
+      .chat-input { font-size: 0.9rem; }
+      .glow-top { width: 260px; height: 260px; }
+      .glow-bottom { width: 220px; height: 220px; }
+    }
   `]
 })
-export class PuterPlaygroundComponent {
+export class PuterPlaygroundComponent implements OnInit, AfterViewChecked {
 
-  tabs = [
-    { id: 'chat', name: 'AI Chat', icon: 'fi fi-rr-comment-alt' },
-    { id: 'image', name: 'AI Image', icon: 'fi fi-rr-picture' },
-    { id: 'speech', name: 'AI Speech', icon: 'fi fi-rr-microphone' }
-  ];
+  @ViewChild('chatContainer') private chatContainer!: ElementRef;
 
-  activeTab = signal('chat');
-
-  // Chat State
   chatInput = '';
-  chatHistory: {role: string, content: string}[] = [];
+  chatHistory: { role: string; content: string; isStreaming?: boolean }[] = [];
   isChatting = false;
+  isWaitingForStream = false;
 
-  // Image State
-  imagePrompt = '';
-  generatedImageUrl: string | null = null;
-  isGeneratingImage = false;
+  private shouldScroll = false;
 
-  // Speech State
-  speechText = '';
-  audioUrl: string | null = null;
-  isGeneratingSpeech = false;
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  constructor() {}
+  ngOnInit() {}
 
-  ngOnInit() {
-      if (typeof puter !== 'undefined') {
-          puter.quiet = true;
-      }
+  ngAfterViewChecked() {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+      this.shouldScroll = false;
+    }
   }
 
-  // --- Chat ---
+  private scrollToBottom(): void {
+    try {
+      const el = this.chatContainer?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    } catch {}
+  }
+
+  onEnter(event: KeyboardEvent) {
+    if (!event.shiftKey) {
+      event.preventDefault();
+      this.sendChat();
+    }
+  }
+
+  autoResize(event: Event) {
+    const el = event.target as HTMLTextAreaElement;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  }
+
   async sendChat() {
-    if (!this.chatInput.trim() || typeof puter === 'undefined') return;
-    
-    this.chatHistory.push({ role: 'user', content: this.chatInput });
-    const prompt = this.chatInput;
+    const text = this.chatInput.trim();
+    if (!text || this.isChatting) return;
+
+    this.chatHistory.push({ role: 'user', content: text });
     this.chatInput = '';
     this.isChatting = true;
+    this.isWaitingForStream = true;
+    this.shouldScroll = true;
+    this.cdr.detectChanges();
+
+    // reset textarea height
+    setTimeout(() => {
+      const el = document.querySelector('.chat-input') as HTMLTextAreaElement;
+      if (el) { el.style.height = 'auto'; }
+    });
+
+    const apiKey = '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';
+    const url = 'https://api.groq.com/openai/v1/chat/completions';
 
     try {
-        const response = await puter.ai.chat(prompt);
-        let text = typeof response === 'string' ? response : (response?.message?.content || JSON.stringify(response));
-        this.chatHistory.push({ role: 'ai', content: text });
-    } catch (e: any) {
-        this.chatHistory.push({ role: 'ai', content: 'Хатогӣ: ' + e.message });
-    } finally {
-        this.isChatting = false;
-    }
-  }
+      const messages = this.chatHistory
+        .filter(m => !m.isStreaming)
+        .map(m => ({
+          role: m.role === 'ai' ? 'assistant' : m.role,
+          content: m.content.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '')
+        }));
 
-  // --- Image ---
-  async generateImage() {
-    if (!this.imagePrompt.trim() || typeof puter === 'undefined') return;
-    
-    this.isGeneratingImage = true;
-    this.generatedImageUrl = null;
-    
-    try {
-        const res = await puter.ai.txt2img(this.imagePrompt);
-        if (res instanceof HTMLImageElement || res?.src) {
-            this.generatedImageUrl = res.src;
-        } else if (res instanceof Blob) {
-            this.generatedImageUrl = URL.createObjectURL(res);
-        } else if (typeof res === 'string') {
-            this.generatedImageUrl = res;
-        }
-    } catch (e: any) {
-        alert('Хатогӣ ҳангоми сохтани расм: ' + e.message);
-    } finally {
-        this.isGeneratingImage = false;
-    }
-  }
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages,
+          stream: true,
+          temperature: 0.7,
+          max_tokens: 2048
+        })
+      });
 
-  // --- Speech ---
-  async generateSpeech() {
-      if (!this.speechText.trim() || typeof puter === 'undefined') return;
-      
-      this.isGeneratingSpeech = true;
-      this.audioUrl = null;
-
-      try {
-          const res = await puter.ai.txt2speech(this.speechText);
-          if (res && typeof res.play === 'function') {
-              this.audioUrl = res.src;
-          } else if (res instanceof Blob) {
-              this.audioUrl = URL.createObjectURL(res);
-          } else if (typeof res === 'string') {
-              this.audioUrl = res;
-          } else if (res?.src) {
-              this.audioUrl = res.src;
-          }
-      } catch (e: any) {
-          alert('Хатогӣ ҳангоми табдил ба овоз: ' + e.message);
-      } finally {
-          this.isGeneratingSpeech = false;
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error?.message || 'Хатогӣ ҳангоми пайвастшавӣ');
       }
-  }
 
+      this.isWaitingForStream = false;
+      this.chatHistory.push({ role: 'ai', content: '', isStreaming: true });
+      const aiIdx = this.chatHistory.length - 1;
+      this.shouldScroll = true;
+      this.cdr.detectChanges();
+
+      const reader = resp.body!.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        for (const line of chunk.split('\n')) {
+          const t = line.trim();
+          if (t.startsWith('data: ') && t !== 'data: [DONE]') {
+            try {
+              const delta = JSON.parse(t.slice(6))?.choices?.[0]?.delta?.content;
+              if (delta) {
+                this.chatHistory[aiIdx].content += delta.replace(/\n/g, '<br>');
+                this.shouldScroll = true;
+                this.cdr.detectChanges();
+              }
+            } catch {}
+          }
+        }
+      }
+
+      this.chatHistory[aiIdx].isStreaming = false;
+
+    } catch (e: any) {
+      this.isWaitingForStream = false;
+      this.chatHistory.push({
+        role: 'ai',
+        content: `<span style="color:#f87171">⚠️ Хатогӣ: ${e.message}</span>`
+      });
+    } finally {
+      this.isChatting = false;
+      this.isWaitingForStream = false;
+      this.shouldScroll = true;
+      this.cdr.detectChanges();
+    }
+  }
 }

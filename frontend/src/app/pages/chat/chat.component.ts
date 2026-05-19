@@ -205,7 +205,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     isAiTyping = signal(false);
     
     // Per-message AI states
-    isMessageSpeaking = signal<{[key: string]: boolean}>({});
     isMessageExplaining = signal<{[key: string]: boolean}>({});
     messageExplanations = signal<{[key: string]: string}>({});
 
@@ -481,16 +480,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     toggleStickerPicker() {
         this.showStickerPicker = !this.showStickerPicker;
-    }
-
-    speakMessage(msg: any) {
-        const text = msg.content;
-        this.isMessageSpeaking.update(map => ({...map, [msg.id]: true}));
-        this.aiService.textToSpeech(text).then(() => {
-            this.isMessageSpeaking.update(map => ({...map, [msg.id]: false}));
-        }).catch(() => {
-            this.isMessageSpeaking.update(map => ({...map, [msg.id]: false}));
-        });
     }
 
     explainMessage(msg: any) {
@@ -847,6 +836,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // AI Logic
     generateAiSuggestions() {
         if (!this.roomId) return;
+        
+        // If there are no messages, generate icebreakers instead
+        if (this.messages().length === 0) {
+            this.generateIcebreakers();
+            return;
+        }
+
         this.isGeneratingAi.set(true);
 
         // Prepare history
@@ -866,6 +862,30 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             },
             error: (err) => {
                 console.error('AI Suggestion error', err);
+                this.isGeneratingAi.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    generateIcebreakers() {
+        if (!this.roomId || !this.partner) return;
+        this.isGeneratingAi.set(true);
+        const myLang = this.languageService.currentLang();
+        const pLang = this.partner?.language || myLang;
+        
+        // Use interests if available, otherwise just general
+        const myInterests = this.currentUser?.interests || [];
+        const partnerInterests = this.partner?.interests || [];
+
+        this.aiService.generateIcebreakers(myInterests, partnerInterests, myLang, pLang).subscribe({
+            next: (suggestions) => {
+                this.aiSuggestions.set(suggestions);
+                this.isGeneratingAi.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('AI Icebreaker error', err);
                 this.isGeneratingAi.set(false);
                 this.cdr.detectChanges();
             }
