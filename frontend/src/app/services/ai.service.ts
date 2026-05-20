@@ -42,7 +42,42 @@ export class AiService {
                 return from(res.json());
             }),
             map((data: any) => {
-                let text = data.choices[0].message.content;
+                let parsedData = data;
+                
+                // If data is a string, try to parse it (handles double-stringified JSON)
+                if (typeof data === 'string') {
+                    try {
+                        parsedData = JSON.parse(data);
+                    } catch (e) {
+                        // ignore and keep as string
+                    }
+                }
+                
+                // If it's still a string (nested double-stringification), try to parse again
+                if (typeof parsedData === 'string') {
+                    try {
+                        parsedData = JSON.parse(parsedData);
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+
+                let text = '';
+                
+                // Extract the content from choices
+                if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].message) {
+                    text = parsedData.choices[0].message.content;
+                } else if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].text) {
+                    text = parsedData.choices[0].text;
+                } else if (parsedData && parsedData.content) {
+                    text = parsedData.content;
+                } else if (typeof parsedData === 'string') {
+                    text = parsedData;
+                } else {
+                    // Fallback to stringifying the object if it doesn't match any known formats
+                    text = JSON.stringify(parsedData);
+                }
+
                 let cleaned = (typeof text === 'string' ? text : String(text)).trim();
                 
                 if (isFix && cleaned.startsWith('`') && cleaned.endsWith('`')) {
@@ -188,6 +223,70 @@ Do not include any numbering, bullets, or extra text.`;
 
     askAi(question: string): Observable<string> {
         return this.chat(question);
+    }
+
+    askAiVoiceCall(question: string): Observable<string> {
+        const apiKey = "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";
+        const url = 'https://api.groq.com/openai/v1/chat/completions';
+
+        const requestBody = {
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                {
+                    role: 'system',
+                    content: `You are a friendly AI voice assistant in a real-time voice call.
+CRITICAL RULES:
+1. Reply in the SAME language as the user's message (Tajik, Russian, or English).
+2. Keep your answer VERY SHORT — maximum 1-2 sentences. No long explanations.
+3. Be natural and conversational, like talking to a friend.
+4. Do NOT use markdown, bullet points, asterisks, or any formatting.
+5. Do NOT start with "Of course", "Certainly", "Great question" or similar filler phrases.`
+                },
+                {
+                    role: 'user',
+                    content: question
+                }
+            ],
+            temperature: 0.7,
+            max_tokens: 150
+        };
+
+        return from(fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(requestBody)
+        })).pipe(
+            switchMap(res => {
+                if (!res.ok) {
+                    return from(res.json().then(err => {
+                        throw new Error(err.error?.message || 'Хатогӣ ҳангоми пайвастшавӣ ба API');
+                    }));
+                }
+                return from(res.json());
+            }),
+            map((data: any) => {
+                let parsedData = data;
+                if (typeof data === 'string') {
+                    try { parsedData = JSON.parse(data); } catch (e) {}
+                }
+                if (typeof parsedData === 'string') {
+                    try { parsedData = JSON.parse(parsedData); } catch (e) {}
+                }
+                let text = '';
+                if (parsedData?.choices?.[0]?.message?.content) {
+                    text = parsedData.choices[0].message.content;
+                } else if (parsedData?.choices?.[0]?.text) {
+                    text = parsedData.choices[0].text;
+                } else if (typeof parsedData === 'string') {
+                    text = parsedData;
+                }
+                return (typeof text === 'string' ? text : String(text)).trim();
+            }),
+            catchError(() => of('Бубахшед, хатогӣ рӯй дод. Дубора кӯшиш кунед.'))
+        );
     }
 
     generateImage(prompt: string): Observable<string> {
