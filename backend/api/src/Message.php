@@ -339,11 +339,20 @@ class Message {
             mkdir($uploadDir, 0755, true);
         }
 
-        $filename = uniqid() . '_' . time() . '.' . $extension;
-        $filepath = $uploadDir . $filename;
-        $relativePath = '/uploads/chat/' . $filename;
+        if ($type === 'image') {
+            require_once __DIR__ . '/ImageOptimizer.php';
+            $filename = uniqid() . '_' . time() . '.webp';
+            $filepath = $uploadDir . $filename;
+            $relativePath = '/uploads/chat/' . $filename;
+            $uploaded = ImageOptimizer::optimizeToWebp($file['tmp_name'], $filepath, 600, 600, 75);
+        } else {
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+            $filepath = $uploadDir . $filename;
+            $relativePath = '/uploads/chat/' . $filename;
+            $uploaded = move_uploaded_file($file['tmp_name'], $filepath);
+        }
 
-        if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+        if (!$uploaded) {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to save file']);
             return;

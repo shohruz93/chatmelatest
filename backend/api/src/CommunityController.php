@@ -72,12 +72,21 @@ class CommunityController {
                 mkdir($uploadDir, 0755, true);
             }
 
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $filename = uniqid() . '_' . time() . '.' . $extension;
-            $filepath = $uploadDir . $filename;
-            $mediaPath = '/uploads/community/' . $userId . '/' . $filename;
+            if ($contentType === 'image') {
+                require_once __DIR__ . '/ImageOptimizer.php';
+                $filename = uniqid() . '_' . time() . '.webp';
+                $filepath = $uploadDir . $filename;
+                $mediaPath = '/uploads/community/' . $userId . '/' . $filename;
+                $uploaded = ImageOptimizer::optimizeToWebp($file['tmp_name'], $filepath, 800, 800, 80);
+            } else {
+                $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = uniqid() . '_' . time() . '.' . $extension;
+                $filepath = $uploadDir . $filename;
+                $mediaPath = '/uploads/community/' . $userId . '/' . $filename;
+                $uploaded = move_uploaded_file($file['tmp_name'], $filepath);
+            }
 
-            if (!move_uploaded_file($file['tmp_name'], $filepath)) {
+            if (!$uploaded) {
                 http_response_code(500);
                 echo json_encode(['error' => 'Failed to save file']);
                 return;

@@ -449,16 +449,16 @@ class SyncApp:
                 if rel_path and rel_path not in files_to_sync_dict:
                     files_to_sync_dict[rel_path] = None
                     
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+            
             synced_files_count = 0
             skipped_files_count = 0
             failed_files_count = 0
             
+            files_to_download = []
+            
             for rel_path, expected_size in files_to_sync_dict.items():
-                remote_file_url = f"{php_url}/uploads/{rel_path}"
                 local_file_path = os.path.join(local_uploads_dir, rel_path.replace('/', os.sep))
-                
-                os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
-                
                 needs_download = True
                 if os.path.exists(local_file_path):
                     if expected_size is not None:
@@ -469,19 +469,34 @@ class SyncApp:
                             needs_download = False
                             
                 if needs_download:
-                    try:
-                        file_res = requests.get(remote_file_url, timeout=15)
-                        if file_res.status_code == 200:
-                            with open(local_file_path, "wb") as f_out:
-                                f_out.write(file_res.content)
+                    files_to_download.append((rel_path, local_file_path))
+                else:
+                    skipped_files_count += 1
+            
+            def download_single_file(item):
+                r_path, l_path = item
+                remote_file_url = f"{php_url}/uploads/{r_path}"
+                os.makedirs(os.path.dirname(l_path), exist_ok=True)
+                try:
+                    file_res = requests.get(remote_file_url, timeout=15)
+                    if file_res.status_code == 200:
+                        with open(l_path, "wb") as f_out:
+                            f_out.write(file_res.content)
+                        return True
+                    return False
+                except Exception:
+                    return False
+
+            if files_to_download:
+                self.log(f"📥 Оғози боргирии ҳамзамон (параллелӣ) барои {len(files_to_download)} файл бо 8 ришта (threads)...")
+                with ThreadPoolExecutor(max_workers=8) as executor:
+                    futures = {executor.submit(download_single_file, item): item for item in files_to_download}
+                    for future in as_completed(futures):
+                        if future.result():
                             synced_files_count += 1
                         else:
                             failed_files_count += 1
-                    except Exception:
-                        failed_files_count += 1
-                else:
-                    skipped_files_count += 1
-                        
+
             self.log(f"✅ Ҳамоҳангсозии файлҳо анҷом ёфт! {synced_files_count} файли нав боргирӣ шуд, {skipped_files_count} файл аллакай мавҷуд буд.")
             if failed_files_count > 0:
                 self.log(f"⚠️ Огоҳӣ: {failed_files_count} файл дар сервер ёфт нашуд ё хатогии боркунӣ рӯй дод.")

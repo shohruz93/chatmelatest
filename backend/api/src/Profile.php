@@ -253,12 +253,12 @@ class Profile {
             $stmt->execute();
             $oldAvatar = $stmt->fetch(PDO::FETCH_ASSOC)['avatar'] ?? null;
             
-            // Generate unique filename
-            $extension = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-            $fileName = uniqid('avatar_') . '_' . time() . '.' . $extension;
+            // Generate unique filename and optimize with ImageOptimizer
+            require_once __DIR__ . '/ImageOptimizer.php';
+            $fileName = uniqid('avatar_') . '_' . time() . '.webp';
             $targetPath = $uploadDir . $fileName;
             
-            if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetPath)) {
+            if (ImageOptimizer::optimizeToWebp($_FILES['avatar']['tmp_name'], $targetPath, 500, 500, 80)) {
                 $avatarUrl = '/uploads/' . $fileName;
                 
                 // Update database
