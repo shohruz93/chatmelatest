@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { ApiService } from '../../services/api.service';
@@ -89,12 +89,14 @@ export class DashboardComponent implements OnInit {
 
         // Refresh unread count on navigation (guests now via WebSocket)
         this.router.events.subscribe((event) => {
-            // Close sidebar on mobile when navigating
-            if (window.innerWidth < 1024) {
-                this.ui.sidebarOpen.set(false);
-            }
+            if (event instanceof NavigationEnd) {
+                // Close sidebar on mobile when navigating
+                if (window.innerWidth < 1024) {
+                    this.ui.sidebarOpen.set(false);
+                }
 
-            this.checkUnread();
+                this.checkUnread();
+            }
             // Guest count is now driven by WebSocket — no HTTP poll on navigation
         });
 

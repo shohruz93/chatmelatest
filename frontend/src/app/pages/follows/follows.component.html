@@ -1,14 +1,48 @@
 <div class="follows-page">
     <header class="page-header">
-        <button class="btn-back" [routerLink]="['/dashboard/profile', userId]">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="btn-back" [routerLink]="['/dashboard/profile', userId]" title="Back to profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
         </button>
         <h2>{{ (type === 'followers' ? 'PROFILE.FOLLOWERS' : 'PROFILE.FOLLOWING') | translate }}</h2>
     </header>
+
+    <!-- Dynamic Router-Linked Navigation Tabs -->
+    <div class="follows-tabs">
+        <a [routerLink]="['/dashboard/profile', userId, 'followers']" 
+           class="tab-btn" 
+           [class.active]="type === 'followers'">
+            <span class="tab-icon">👥</span>
+            <span class="tab-text">{{ 'PROFILE.FOLLOWERS' | translate }}</span>
+        </a>
+        <a [routerLink]="['/dashboard/profile', userId, 'following']" 
+           class="tab-btn" 
+           [class.active]="type === 'following'">
+            <span class="tab-icon">➕</span>
+            <span class="tab-text">{{ 'PROFILE.FOLLOWING' | translate }}</span>
+        </a>
+    </div>
+
+    <!-- Sleek Interactive Search Bar -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon-svg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
+                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </span>
+            <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()" 
+                   placeholder="{{ 'EXPLORE_PAGE.SEARCH_PLACEHOLDER' | translate }}...">
+            @if (searchTerm) {
+                <button class="btn-clear-search" (click)="searchTerm = ''; filterUsers()">×</button>
+            }
+        </div>
+    </div>
 
     <div class="follows-content">
         @if (loading) {
@@ -17,34 +51,41 @@
             <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
         </div>
         } @else {
-            @if (users.length === 0) {
+            @if (filteredUsers.length === 0) {
             <div class="empty-state">
                 <div class="empty-icon">{{ type === 'followers' ? '👥' : '➕' }}</div>
-                <p>{{ (type === 'followers' ? 'COMMUNITY.NO_FOLLOWERS' : 'COMMUNITY.NO_FOLLOWING') | translate }}</p>
+                <h3>{{ (type === 'followers' ? 'COMMUNITY.NO_FOLLOWERS' : 'COMMUNITY.NO_FOLLOWING') | translate }}</h3>
+                <p class="empty-sub">{{ 'No users found matching your current view or search.' }}</p>
             </div>
             } @else {
             <div class="user-list">
-                @for (user of users; track user.id) {
-                <div class="user-item" [routerLink]="['/dashboard/profile', user.id]">
-                    <div class="avatar-wrapper" [class.vip-avatar]="user.is_vip" style="border-radius: 50%; height: max-content;">
-                        <img [src]="user.avatar || getPlaceholder(user.gender)" [alt]="user.name">
+                @for (user of filteredUsers; track user.id) {
+                <div class="user-card" [routerLink]="['/dashboard/profile', user.id]">
+                    <div class="avatar-section">
+                        <div class="avatar-wrapper" [class.vip-avatar]="user.is_vip">
+                            <img [src]="user.avatar || getPlaceholder(user.gender)" [alt]="user.name">
+                        </div>
                     </div>
-                    <div class="user-info">
+                    <div class="user-details">
                         <div class="name-row">
-                            <span class="user-name" [class.vip-text]="user.is_vip" style="display: flex; align-items: center;">
+                            <h3 class="user-name" [class.vip-text]="user.is_vip">
                                 {{ user.name }}
-                                @if (user.is_vip) { <span class="vip-star" style="font-size: 1.1rem; margin-left: 2px;">⭐</span> }
-                            </span>
+                                @if (user.is_vip) { <span class="vip-star">⭐</span> }
+                            </h3>
                         </div>
-                        <p class="user-bio" *ngIf="user.bio">{{ user.bio }}</p>
-                        <div class="location-info" *ngIf="user.location">
-                            <span class="location-icon">📍</span>
-                            {{ user.location }}
-                        </div>
+                        @if (user.bio) {
+                            <p class="user-bio">{{ user.bio }}</p>
+                        }
+                        @if (user.location) {
+                            <div class="location-badge">
+                                <span class="loc-icon">📍</span>
+                                <span class="loc-text">{{ user.location }}</span>
+                            </div>
+                        }
                     </div>
-                    <div class="item-action">
+                    <div class="card-action">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     </div>

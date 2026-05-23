@@ -696,15 +696,82 @@ class SyncApp:
                     
                 # 3. Local conversations list
                 elif "/conversations" in url:
-                    self.log("⚙️ Хондани рӯйхати муколамаҳо аз SQLite...")
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    user_id = int(params.get('userId', ['1'])[0])
+                    
+                    self.log(f"⚙️ Хондани рӯйхати муколамаҳо аз SQLite барои корбар {user_id}...")
                     conn = sqlite3.connect(LOCAL_DB_FILE)
                     conn.row_factory = sqlite3.Row
                     cursor = conn.cursor()
-                    cursor.execute("SELECT * FROM messages GROUP BY room_id ORDER BY created_at DESC")
+                    
+                    cursor.execute("""
+                        SELECT 
+                            last_msg.other_user_id as partner_id,
+                            COALESCE(u.name, 'User ' || last_msg.other_user_id) as partner_name,
+                            u.avatar as partner_avatar,
+                            COALESCE(u.last_active, 0) as partner_last_active,
+                            COALESCE(u.is_vip, 0) as partner_is_vip,
+                            m.content as last_message,
+                            m.created_at as last_message_time,
+                            m.sender_id as last_message_sender_id,
+                            COALESCE(m.is_read, 0) as last_message_is_read,
+                            (SELECT COUNT(*) FROM messages WHERE sender_id = last_msg.other_user_id AND receiver_id = ? AND is_read = 0) as unread_count
+                        FROM (
+                            SELECT 
+                                CASE 
+                                    WHEN sender_id = ? THEN receiver_id 
+                                    ELSE sender_id 
+                                END as other_user_id,
+                                MAX(created_at) as max_created_at
+                            FROM messages
+                            WHERE sender_id = ? OR receiver_id = ?
+                            GROUP BY other_user_id
+                        ) last_msg
+                        LEFT JOIN users u ON u.id = last_msg.other_user_id
+                        JOIN messages m ON (
+                            (m.sender_id = ? AND m.receiver_id = last_msg.other_user_id) OR 
+                            (m.sender_id = last_msg.other_user_id AND m.receiver_id = ?)
+                        ) AND m.created_at = last_msg.max_created_at
+                        ORDER BY last_message_time DESC
+                    """, (user_id, user_id, user_id, user_id, user_id, user_id))
+                    
                     rows = [dict(r) for r in cursor.fetchall()]
+                    
+                    # Normalize Vip values and Unix timestamps
+                    for row in rows:
+                        row['partner_is_vip'] = int(row['partner_is_vip'] or 0)
+                        row['last_message_is_read'] = int(row['last_message_is_read'] or 0)
+                        
+                        # Normalize time
+                        try:
+                            lmt = row['last_message_time']
+                            if isinstance(lmt, str):
+                                if '-' in lmt:
+                                    dt = datetime.datetime.fromisoformat(lmt.replace('Z', '+00:00'))
+                                    row['last_message_time'] = int(dt.timestamp())
+                                else:
+                                    row['last_message_time'] = int(float(lmt))
+                            else:
+                                row['last_message_time'] = int(lmt or 0)
+                        except Exception:
+                            row['last_message_time'] = 0
+                            
+                        try:
+                            pla = row['partner_last_active']
+                            if isinstance(pla, str):
+                                if '-' in pla:
+                                    dt = datetime.datetime.fromisoformat(pla.replace('Z', '+00:00'))
+                                    row['partner_last_active'] = int(dt.timestamp())
+                                else:
+                                    row['partner_last_active'] = int(float(pla))
+                            else:
+                                row['partner_last_active'] = int(pla or 0)
+                        except Exception:
+                            row['partner_last_active'] = 0
+                            
                     cursor.close()
                     conn.close()
-                    
                     res_body = rows
                     
                 # 4. Local profile data
