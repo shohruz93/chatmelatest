@@ -62,25 +62,34 @@ class SyncController {
                 $data['tables'][$table] = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
-            // 2. Scan uploads folder recursively
-            $uploadsDir = __DIR__ . '/../public/uploads';
-            if (!is_dir($uploadsDir)) {
-                $uploadsDir = __DIR__ . '/../public_html/uploads';
-            }
-            if (!is_dir($uploadsDir) && isset($_SERVER['DOCUMENT_ROOT'])) {
-                $uploadsDir = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/uploads';
-            }
-            if (!is_dir($uploadsDir)) {
-                $uploadsDir = __DIR__ . '/../../public_html/uploads';
-            }
-            if (!is_dir($uploadsDir)) {
-                $uploadsDir = __DIR__ . '/../../../public_html/uploads';
+            // 2. Scan all possible uploads folders recursively and merge results
+            $possibleDirs = [
+                __DIR__ . '/../public/uploads',
+                __DIR__ . '/../public_html/uploads',
+                __DIR__ . '/../../public_html/uploads',
+                __DIR__ . '/../../../public_html/uploads'
+            ];
+            if (isset($_SERVER['DOCUMENT_ROOT'])) {
+                $possibleDirs[] = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/uploads';
             }
 
-            if (is_dir($uploadsDir)) {
-                $files = $this->scanDirectory($uploadsDir);
-                $data['files'] = $files;
+            $allFiles = [];
+            $scannedPaths = [];
+            foreach ($possibleDirs as $dir) {
+                if (is_dir($dir)) {
+                    $realDir = realpath($dir);
+                    if ($realDir === false || in_array($realDir, $scannedPaths)) {
+                        continue;
+                    }
+                    $scannedPaths[] = $realDir;
+
+                    $files = $this->scanDirectory($dir);
+                    foreach ($files as $f) {
+                        $allFiles[$f['path']] = $f;
+                    }
+                }
             }
+            $data['files'] = array_values($allFiles);
 
             header('Content-Type: application/json');
             // Remove JSON_PRETTY_PRINT to reduce JSON string size by 40%
