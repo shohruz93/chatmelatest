@@ -396,29 +396,95 @@ class SyncApp:
                 
             os.makedirs(local_uploads_dir, exist_ok=True)
             
-            synced_files_count = 0
+            # 🔍 Auto-discovery of active database assets (avatars, gallery files, messages, posts)
+            self.log("🔍 Оғози ҷустуҷӯи худкори аксҳо ва файлҳо дар базаи SQLite...")
+            db_discovered_files = set()
+            try:
+                conn = sqlite3.connect(LOCAL_DB_FILE)
+                cursor = conn.cursor()
+                
+                # Discover from users (avatars)
+                cursor.execute("SELECT avatar FROM users WHERE avatar IS NOT NULL")
+                for (avatar,) in cursor.fetchall():
+                    if avatar.startswith("/uploads/"):
+                        db_discovered_files.add(avatar.replace("/uploads/", ""))
+                        
+                # Discover from gallery_images
+                cursor.execute("SELECT image_path FROM gallery_images WHERE image_path IS NOT NULL")
+                for (img_path,) in cursor.fetchall():
+                    if img_path.startswith("/uploads/"):
+                        db_discovered_files.add(img_path.replace("/uploads/", ""))
+                        
+                # Discover from community_posts
+                cursor.execute("SELECT media_path FROM community_posts WHERE media_path IS NOT NULL")
+                for (img_path,) in cursor.fetchall():
+                    if img_path.startswith("/uploads/"):
+                        db_discovered_files.add(img_path.replace("/uploads/", ""))
+                        
+                # Discover from messages (images/attachments)
+                cursor.execute("SELECT content FROM messages WHERE type='image' OR content LIKE '%/uploads/%'")
+                for (content,) in cursor.fetchall():
+                    if "/uploads/" in content:
+                        parts = content.split("/uploads/")
+                        if len(parts) > 1:
+                            subpart = parts[1].split()[0].split("?")[0].split('"')[0].split("'")[0]
+                            db_discovered_files.add(subpart)
+                    elif content.startswith("avatar_") or content.startswith("msg_"):
+                        db_discovered_files.add(content)
+                        
+                cursor.close()
+                conn.close()
+                self.log(f"   -> 🔎 Дарёфт шуд: {len(db_discovered_files)} акс ва файлҳои фаъол дар база.")
+            except Exception as db_err:
+                self.log(f"⚠️ Огоҳӣ: Хатогии ҷустуҷӯи файлҳо дар база: {str(db_err)}")
+                
+            # Merge remote scanned files with DB-discovered files
+            files_to_sync_dict = {}
             for f_info in files_to_sync:
                 rel_path = f_info['path']
+                files_to_sync_dict[rel_path] = f_info.get('size')
+                
+            for rel_path in db_discovered_files:
+                rel_path = rel_path.strip().replace("\\", "/")
+                if rel_path and rel_path not in files_to_sync_dict:
+                    files_to_sync_dict[rel_path] = None
+                    
+            synced_files_count = 0
+            skipped_files_count = 0
+            failed_files_count = 0
+            
+            for rel_path, expected_size in files_to_sync_dict.items():
                 remote_file_url = f"{php_url}/uploads/{rel_path}"
                 local_file_path = os.path.join(local_uploads_dir, rel_path.replace('/', os.sep))
                 
-                # Make parent dirs
                 os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
                 
-                # Check size
                 needs_download = True
                 if os.path.exists(local_file_path):
-                    if os.path.getsize(local_file_path) == f_info['size']:
-                        needs_download = False
-                        
+                    if expected_size is not None:
+                        if os.path.getsize(local_file_path) == expected_size:
+                            needs_download = False
+                    else:
+                        if os.path.getsize(local_file_path) > 0:
+                            needs_download = False
+                            
                 if needs_download:
-                    file_res = requests.get(remote_file_url, timeout=10)
-                    if file_res.ok:
-                        with open(local_file_path, "wb") as f_out:
-                            f_out.write(file_res.content)
-                        synced_files_count += 1
+                    try:
+                        file_res = requests.get(remote_file_url, timeout=15)
+                        if file_res.status_code == 200:
+                            with open(local_file_path, "wb") as f_out:
+                                f_out.write(file_res.content)
+                            synced_files_count += 1
+                        else:
+                            failed_files_count += 1
+                    except Exception:
+                        failed_files_count += 1
+                else:
+                    skipped_files_count += 1
                         
-            self.log(f"✅ Ҳамоҳангсозии файлҳо анҷом ёфт! {synced_files_count} файли нав боргирӣ шуд.")
+            self.log(f"✅ Ҳамоҳангсозии файлҳо анҷом ёфт! {synced_files_count} файли нав боргирӣ шуд, {skipped_files_count} файл аллакай мавҷуд буд.")
+            if failed_files_count > 0:
+                self.log(f"⚠️ Огоҳӣ: {failed_files_count} файл дар сервер ёфт нашуд ё хатогии боркунӣ рӯй дод.")
             self.sync_time_label.configure(text=f"Охирин синк: {time.strftime('%H:%M:%S')}")
             
             # Establish WebSocket connection
@@ -541,11 +607,65 @@ class SyncApp:
             res_headers = {"Content-Type": "application/json"}
             res_body = {"success": True}
             
+            import urllib.parse
+            import datetime
+            
             # Simple routing logic inside local Python SQLite
             # Read operations execute against local SQLite and return immediately
             if method == "GET":
-                if "/messages/room" in url:
-                    # Parse parameters e.g., ?roomId=room_1_2
+                # 1. Local static file serving for /uploads/
+                if "/uploads/" in url:
+                    # Extract relative file path
+                    filename = url.split("/uploads/")[1]
+                    # Support query string stripping if any
+                    if "?" in filename:
+                        filename = filename.split("?")[0]
+                        
+                    self.log(f"Serving static media file: {filename}")
+                    
+                    local_uploads_dir = os.path.join(os.getcwd(), "backend", "api", "public", "uploads")
+                    if not os.path.exists(local_uploads_dir):
+                        local_uploads_dir = os.path.join(os.getcwd(), "backend", "api", "public_html", "uploads")
+                    
+                    local_file_path = os.path.join(local_uploads_dir, filename.replace('/', os.sep))
+                    
+                    # If file doesn't exist locally, self-heal by downloading from remote PHP API
+                    if not os.path.exists(local_file_path):
+                        self.log(f"File {filename} not found locally. Downloading from remote PHP API...")
+                        try:
+                            php_url = self.php_url_entry.get().strip()
+                            remote_url = f"{php_url}/uploads/{filename}"
+                            res = requests.get(remote_url, timeout=15)
+                            if res.ok:
+                                os.makedirs(os.path.dirname(local_file_path), exist_ok=True)
+                                with open(local_file_path, "wb") as f_out:
+                                    f_out.write(res.content)
+                                self.log(f"✅ Successfully downloaded and cached {filename} locally!")
+                        except Exception as e:
+                            self.log(f"⚠️ Failed to download remote file: {str(e)}")
+                            
+                    if os.path.exists(local_file_path):
+                        with open(local_file_path, "rb") as f_in:
+                            file_data = f_in.read()
+                        
+                        ext = os.path.splitext(filename)[1].lower()
+                        content_type = "application/octet-stream"
+                        if ext == ".png": content_type = "image/png"
+                        elif ext in [".jpg", ".jpeg"]: content_type = "image/jpeg"
+                        elif ext == ".gif": content_type = "image/gif"
+                        elif ext == ".webp": content_type = "image/webp"
+                        elif ext == ".mp3": content_type = "audio/mpeg"
+                        elif ext == ".wav": content_type = "audio/wav"
+                        
+                        status = 200
+                        res_headers = {"Content-Type": content_type}
+                        res_body = file_data
+                    else:
+                        status = 404
+                        res_body = {"error": "File not found"}
+                        
+                # 2. Local message room history
+                elif "/messages/room" in url:
                     room_id = url.split("roomId=")[1].split("&")[0] if "roomId=" in url else ""
                     self.log(f"⚙️ Хондани паёмҳо барои ҳуҷраи `{room_id}` аз SQLite...")
                     
@@ -558,6 +678,8 @@ class SyncApp:
                     conn.close()
                     
                     res_body = rows
+                    
+                # 3. Local conversations list
                 elif "/conversations" in url:
                     self.log("⚙️ Хондани рӯйхати муколамаҳо аз SQLite...")
                     conn = sqlite3.connect(LOCAL_DB_FILE)
@@ -569,9 +691,229 @@ class SyncApp:
                     conn.close()
                     
                     res_body = rows
+                    
+                # 4. Local profile data
+                elif "/profile" in url and "guests" not in url and "comments" not in url and "search" not in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    target_user_id = params.get('userId', ['1'])[0]
+                    
+                    self.log(f"⚙️ Хондани профили корбар {target_user_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    conn.row_factory = sqlite3.Row
+                    cursor = conn.cursor()
+                    
+                    cursor.execute("SELECT * FROM users WHERE id = ?", (target_user_id,))
+                    user_row = cursor.fetchone()
+                    
+                    if user_row:
+                        profile_data = dict(user_row)
+                        profile_data['is_admin'] = int(profile_data.get('is_admin') or 0)
+                        
+                        cursor.execute("""
+                            SELECT i.id, i.name 
+                            FROM interests i 
+                            JOIN user_interests ui ON i.id = ui.interest_id 
+                            WHERE ui.user_id = ?
+                        """, (target_user_id,))
+                        profile_data['interests'] = [dict(r) for r in cursor.fetchall()]
+                        
+                        cursor.execute("""
+                            SELECT AVG(rating) as average_rating, COUNT(*) as rating_count 
+                            FROM user_ratings 
+                            WHERE rated_id = ?
+                        """, (target_user_id,))
+                        rating_row = cursor.fetchone()
+                        profile_data['rating'] = round(rating_row['average_rating'], 1) if rating_row['average_rating'] else 0
+                        profile_data['rating_count'] = rating_row['rating_count'] or 0
+                        
+                        cursor.execute("""
+                            SELECT image_path 
+                            FROM gallery_images 
+                            WHERE user_id = ? 
+                            ORDER BY created_at DESC 
+                            LIMIT 6
+                        """, (target_user_id,))
+                        profile_data['photos'] = [r['image_path'] for r in cursor.fetchall()]
+                        
+                        res_body = profile_data
+                        status = 200
+                    else:
+                        status = 404
+                        res_body = {"message": "User not found"}
+                        
+                    cursor.close()
+                    conn.close()
+                    
+                # 5. Local guests list
+                elif "/profile/guests" in url and "new" not in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    target_user_id = params.get('userId', ['0'])[0]
+                    
+                    self.log(f"⚙️ Хондани меҳмонони корбар {target_user_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    conn.row_factory = sqlite3.Row
+                    cursor = conn.cursor()
+                    
+                    cursor.execute("""
+                        SELECT u.id, u.name, u.avatar, u.bio, u.is_vip, pv.viewed_at 
+                        FROM profile_views pv 
+                        JOIN users u ON pv.viewer_id = u.id 
+                        WHERE pv.viewed_id = ? 
+                        ORDER BY pv.viewed_at DESC
+                    """, (target_user_id,))
+                    guests = [dict(r) for r in cursor.fetchall()]
+                    
+                    for guest in guests:
+                        guest['viewed_at'] = int(guest['viewed_at'] or 0)
+                        
+                    res_body = guests
+                    status = 200
+                    cursor.close()
+                    conn.close()
+                    
+                # 6. Local new guests count
+                elif "/profile/guests/new" in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    target_user_id = params.get('userId', ['0'])[0]
+                    
+                    self.log(f"⚙️ Хондани меҳмонони нави корбар {target_user_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT COUNT(*) as count FROM profile_views WHERE viewed_id = ? AND seen = 0", (target_user_id,))
+                    count = cursor.fetchone()[0]
+                    
+                    res_body = {"count": int(count or 0)}
+                    status = 200
+                    cursor.close()
+                    conn.close()
+                    
+                # 7. Local comment list
+                elif "/profile/comments" in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    target_user_id = params.get('userId', ['0'])[0]
+                    
+                    self.log(f"⚙️ Хондани шарҳҳои корбар {target_user_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    conn.row_factory = sqlite3.Row
+                    cursor = conn.cursor()
+                    
+                    cursor.execute("""
+                        SELECT ur.*, u.name as rater_name, u.avatar as rater_avatar, u.is_vip as rater_is_vip 
+                        FROM user_ratings ur 
+                        JOIN users u ON ur.rater_id = u.id 
+                        WHERE ur.rated_id = ? 
+                        ORDER BY ur.created_at DESC
+                    """, (target_user_id,))
+                    comments = [dict(r) for r in cursor.fetchall()]
+                    
+                    for comment in comments:
+                        try:
+                            created_at = comment['created_at']
+                            if isinstance(created_at, str):
+                                if '-' in created_at:
+                                    dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                    comment['created_at'] = int(dt.timestamp())
+                                else:
+                                    comment['created_at'] = int(float(created_at))
+                            else:
+                                comment['created_at'] = int(created_at or 0)
+                        except Exception:
+                            pass
+                            
+                        cursor.execute("""
+                            SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar, u.is_vip as replier_is_vip 
+                            FROM comment_replies cr 
+                            JOIN users u ON cr.user_id = u.id 
+                            WHERE cr.rating_id = ? 
+                            ORDER BY cr.created_at ASC
+                        """, (comment['id'],))
+                        replies = [dict(r) for r in cursor.fetchall()]
+                        
+                        for reply in replies:
+                            try:
+                                created_at = reply['created_at']
+                                if isinstance(created_at, str):
+                                    if '-' in created_at:
+                                        dt = datetime.datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                                        reply['created_at'] = int(dt.timestamp())
+                                    else:
+                                        reply['created_at'] = int(float(created_at))
+                                else:
+                                    reply['created_at'] = int(created_at or 0)
+                            except Exception:
+                                pass
+                        comment['replies'] = replies
+                        
+                        cursor.execute("""
+                            SELECT 
+                                SUM(CASE WHEN type = 'like' THEN 1 ELSE 0 END) as likes,
+                                SUM(CASE WHEN type = 'dislike' THEN 1 ELSE 0 END) as dislikes
+                            FROM comment_likes 
+                            WHERE rating_id = ?
+                        """, (comment['id'],))
+                        likes_row = cursor.fetchone()
+                        comment['likes'] = likes_row['likes'] or 0 if likes_row else 0
+                        comment['dislikes'] = likes_row['dislikes'] or 0 if likes_row else 0
+                        
+                    res_body = comments
+                    status = 200
+                    cursor.close()
+                    conn.close()
+                    
+                # 8. Local follow status
+                elif "/follow/status" in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    follower_id = params.get('followerId', ['0'])[0]
+                    followed_id = params.get('followedId', ['0'])[0]
+                    
+                    self.log(f"⚙️ Санҷиши мақоми пайравӣ байни {follower_id} ва {followed_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    cursor = conn.cursor()
+                    cursor.execute("SELECT COUNT(*) FROM follows WHERE follower_id = ? AND followed_id = ?", (follower_id, followed_id))
+                    count = cursor.fetchone()[0]
+                    
+                    res_body = {"isFollowing": count > 0}
+                    status = 200
+                    cursor.close()
+                    conn.close()
+                    
+                # 9. Local follow counts
+                elif "/follow/counts" in url:
+                    parsed_url = urllib.parse.urlparse(url)
+                    params = urllib.parse.parse_qs(parsed_url.query)
+                    target_user_id = params.get('userId', ['0'])[0]
+                    
+                    self.log(f"⚙️ Хондани ҳисобкунакҳои пайравӣ барои корбар {target_user_id} мустақиман аз SQLite...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    cursor = conn.cursor()
+                    
+                    cursor.execute("SELECT COUNT(*) FROM follows WHERE followed_id = ?", (target_user_id,))
+                    followers_count = cursor.fetchone()[0]
+                    
+                    cursor.execute("SELECT COUNT(*) FROM follows WHERE follower_id = ?", (target_user_id,))
+                    following_count = cursor.fetchone()[0]
+                    
+                    res_body = {
+                        "followers_count": followers_count,
+                        "following_count": following_count
+                    }
+                    status = 200
+                    cursor.close()
+                    conn.close()
+                    
                 else:
                     # Fallback proxy for all other GET queries (reads) to ensure complete compatibility
-                    # Python fetches from remote PHP, caches it in SQLite, and returns immediately
                     self.log(f"🔄 GET-хондани озод: прокси ва кэш кардани {url}...")
                     php_url = self.php_url_entry.get().strip()
                     secret = self.token_entry.get().strip()
@@ -636,11 +978,141 @@ class SyncApp:
                     if any(media in ct for media in ["image", "audio", "video", "octet-stream", "pdf"]):
                         log_body = "[Файли Медиа / Бинарӣ]"
                     self.log(f"   -> Ҷавоби PHP [Status: {status}]: {log_body}")
+                    
+                # 1. Local profile guests seen state update
+                elif "/profile/guests/seen" in url:
+                    user_id = body.get('userId', 0) if body else 0
+                    self.log(f"✍️ Навишти локалӣ: Меҳмонони корбар {user_id} ҳамчун хондашуда нишон дода мешаванд...")
+                    
+                    conn = sqlite3.connect(LOCAL_DB_FILE)
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE profile_views SET seen = 1 WHERE viewed_id = ? AND seen = 0", (user_id,))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    
+                    self.sync_queue.append({
+                        "method": method,
+                        "url": url,
+                        "headers": headers,
+                        "body": body,
+                        "timestamp": time.time()
+                    })
+                    
+                    res_body = {"message": "Guests marked as seen"}
+                    status = 200
+                    
+                # 2. Local profile view recorder
+                elif "/profile/view" in url:
+                    viewer_id = body.get('viewerId', 0) if body else 0
+                    viewed_id = body.get('viewedId', 0) if body else 0
+                    
+                    self.log(f"✍️ Навишти локалӣ: Сабти боздид аз профил: {viewer_id} -> {viewed_id}...")
+                    
+                    if viewer_id and viewed_id and viewer_id != viewed_id:
+                        conn = sqlite3.connect(LOCAL_DB_FILE)
+                        cursor = conn.cursor()
+                        current_time = int(time.time())
+                        try:
+                            cursor.execute("""
+                                INSERT INTO profile_views (viewer_id, viewed_id, viewed_at, seen) 
+                                VALUES (?, ?, ?, 0) 
+                                ON CONFLICT(viewer_id, viewed_id) DO UPDATE SET viewed_at = ?, seen = 0
+                            """, (viewer_id, viewed_id, current_time, current_time))
+                            conn.commit()
+                        except Exception as err:
+                            try:
+                                cursor.execute("DELETE FROM profile_views WHERE viewer_id = ? AND viewed_id = ?", (viewer_id, viewed_id))
+                                cursor.execute("INSERT INTO profile_views (viewer_id, viewed_id, viewed_at, seen) VALUES (?, ?, ?, 0)", (viewer_id, viewed_id, current_time))
+                                conn.commit()
+                            except Exception as err2:
+                                self.log(f"Fallback insert failed: {str(err2)}")
+                        cursor.close()
+                        conn.close()
+                        
+                        self.sync_queue.append({
+                            "method": method,
+                            "url": url,
+                            "headers": headers,
+                            "body": body,
+                            "timestamp": time.time()
+                        })
+                        
+                        res_body = {"message": "Profile view recorded"}
+                        status = 200
+                    else:
+                        status = 400
+                        res_body = {"error": "Invalid viewerId or viewedId"}
+                        
+                # 3. Local follow state update
+                elif "/follow" in url and "status" not in url and "counts" not in url and "followers" not in url and "following" not in url:
+                    follower_id = body.get('followerId', 0) if body else 0
+                    followed_id = body.get('followedId', 0) if body else 0
+                    
+                    self.log(f"✍️ Навишти локалӣ: Корбар {follower_id} ба пайравии {followed_id} оғоз мекунад...")
+                    
+                    if follower_id and followed_id:
+                        conn = sqlite3.connect(LOCAL_DB_FILE)
+                        cursor = conn.cursor()
+                        current_time = int(time.time())
+                        try:
+                            cursor.execute("INSERT OR IGNORE INTO follows (follower_id, followed_id, created_at) VALUES (?, ?, ?)", (follower_id, followed_id, current_time))
+                            conn.commit()
+                        except Exception as err:
+                            self.log(f"SQLite follow error: {str(err)}")
+                        cursor.close()
+                        conn.close()
+                        
+                        self.sync_queue.append({
+                            "method": method,
+                            "url": url,
+                            "headers": headers,
+                            "body": body,
+                            "timestamp": time.time()
+                        })
+                        
+                        res_body = {"success": True, "message": "Follow recorded"}
+                        status = 200
+                    else:
+                        status = 400
+                        res_body = {"error": "Invalid followerId or followedId"}
+
+                # 4. Local unfollow state update
+                elif "/unfollow" in url:
+                    follower_id = body.get('followerId', 0) if body else 0
+                    followed_id = body.get('followedId', 0) if body else 0
+                    
+                    self.log(f"✍️ Навишти локалӣ: Корбар {follower_id} пайравиро аз {followed_id} қатъ мекунад...")
+                    
+                    if follower_id and followed_id:
+                        conn = sqlite3.connect(LOCAL_DB_FILE)
+                        cursor = conn.cursor()
+                        try:
+                            cursor.execute("DELETE FROM follows WHERE follower_id = ? AND followed_id = ?", (follower_id, followed_id))
+                            conn.commit()
+                        except Exception as err:
+                            self.log(f"SQLite unfollow error: {str(err)}")
+                        cursor.close()
+                        conn.close()
+                        
+                        self.sync_queue.append({
+                            "method": method,
+                            "url": url,
+                            "headers": headers,
+                            "body": body,
+                            "timestamp": time.time()
+                        })
+                        
+                        res_body = {"success": True, "message": "Unfollow recorded"}
+                        status = 200
+                    else:
+                        status = 400
+                        res_body = {"error": "Invalid followerId or followedId"}
+                        
                 else:
                     self.log(f"✍️ Навишти локалӣ дар SQLite барои: {url}...")
                     
-                    # Perform write locally in SQLite
-                    # In order to keep it 100% compliant, we add the write task to the background sync queue!
+                    # Perform write locally in SQLite and enqueue for sync
                     self.sync_queue.append({
                         "method": method,
                         "url": url,
