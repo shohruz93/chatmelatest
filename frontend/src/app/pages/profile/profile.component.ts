@@ -22,6 +22,7 @@ import { MissionsComponent } from '../../components/gamification/missions/missio
 import { GalleryService, GalleryImage } from '../../services/gallery.service';
 import { LanguageService } from '../../services/language.service';
 import { CommunityFeedComponent } from '../../components/community-feed/community-feed.component';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
     selector: 'app-profile',
@@ -41,6 +42,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private languageService = inject(LanguageService);
 
     private appVersionService = inject(AppVersionService);
+    private socketService = inject(SocketService);
 
     private destroy$ = new Subject<void>();
 
@@ -206,19 +208,33 @@ export class ProfileComponent implements OnInit, OnDestroy {
         }
 
         if (this.isWeb) {
-            this.appVersionService.checkLatestVersion('android').subscribe(res => {
-                if (res && res.latest_version) {
-                    this.downloadUrls.android = `${environment.phpBaseUrl}/app/download?platform=android`;
-                }
-            });
-            this.appVersionService.checkLatestVersion('ios').subscribe(res => {
-                if (res && res.latest_version) {
-                    this.downloadUrls.ios = `${environment.phpBaseUrl}/app/download?platform=ios`;
-                }
-            });
+            // Directly link to Google Play Store and hide iOS button as requested
+            this.downloadUrls.android = 'https://play.google.com/store/apps/details?id=com.shohruz.chatme&pli=1';
+            this.downloadUrls.ios = null; 
         }
 
         this.currentUser = this.auth.currentUserValue;
+
+        // Real-time guest count updates on profile page
+        this.socketService.newGuest$.pipe(takeUntil(this.destroy$)).subscribe({
+            next: (data: any) => {
+                if (this.isOwnProfile) {
+                    if (data.count >= 0) {
+                        this.guestsCount = data.count;
+                    } else {
+                        this.guestsCount = this.guestsCount + 1;
+                    }
+                }
+            }
+        });
+
+        this.socketService.guestsSeen$.pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                if (this.isOwnProfile) {
+                    this.guestsCount = 0;
+                }
+            }
+        });
 
         this.route.params.subscribe(params => {
             const userId = params['id'] ? +params['id'] : this.currentUser?.id;
@@ -229,6 +245,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
                 if (!this.isOwnProfile && this.currentUser) {
                     this.api.recordView(this.currentUser.id, userId).subscribe();
+                    this.socketService.emit('profile_viewed', {
+                        viewerId: this.currentUser.id,
+                        viewedId: userId
+                    });
                 } else if (this.isOwnProfile) {
                     // Check for edit query parameter
                     this.route.queryParams.subscribe(queryParams => {
@@ -282,7 +302,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
                     count: data.rating_count || 0
                 };
 
-                this.loadComments(userId);
+                // loadComments removed as comments are no longer displayed on the profile page
                 this.loading = false;
 
                 if (this.isOwnProfile) {
@@ -306,8 +326,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     loadFollowCounts(userId: number) {
         this.api.get(`/follow/counts?userId=${userId}`).subscribe({
             next: (data) => {
-                this.followersCount = data.followers || 0;
-                this.followingCount = data.following || 0;
+                this.followersCount = data.followers_count !== undefined ? data.followers_count : (data.followers || 0);
+                this.followingCount = data.following_count !== undefined ? data.following_count : (data.following || 0);
             },
             error: () => {}
         });

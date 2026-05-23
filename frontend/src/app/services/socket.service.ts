@@ -48,6 +48,7 @@ export class SocketService implements OnDestroy {
     private checkersRejectedSubject = new Subject<any>();
     private roomUsersSubject = new Subject<any>(); // New subject for room users
     private newGuestSubject = new Subject<any>(); // Real-time guest notifications
+    private guestsSeenSubject = new Subject<void>();
 
     private voiceRoomJoinedSubject = new Subject<any>();
     private voiceUserJoinedSubject = new Subject<any>();
@@ -86,6 +87,7 @@ export class SocketService implements OnDestroy {
     public checkersCancelled$ = this.checkersCancelledSubject.asObservable();
     public roomUsers$ = this.roomUsersSubject.asObservable();
     public newGuest$ = this.newGuestSubject.asObservable();
+    public guestsSeen$ = this.guestsSeenSubject.asObservable();
 
     // Voice Room Observables
     public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable();
@@ -199,6 +201,10 @@ export class SocketService implements OnDestroy {
             console.log('Socket disconnected');
             this.connectionStateSubject.next(false);
         });
+    }
+
+    notifyGuestsSeen() {
+        this.guestsSeenSubject.next();
     }
 
     // Add this method

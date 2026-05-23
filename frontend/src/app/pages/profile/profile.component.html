@@ -405,7 +405,14 @@
         <!-- Community Feed (Posts) -->
         @if (profileUser?.id) {
         <div class="profile-community-section">
-            <app-community-feed [filterUserId]="profileUser.id" [showCreateForm]="isOwnProfile"></app-community-feed>
+            @defer (on viewport) {
+                <app-community-feed [filterUserId]="profileUser.id" [showCreateForm]="isOwnProfile"></app-community-feed>
+            } @placeholder {
+                <div class="loading-state" style="padding: 2rem; text-align: center; color: #a0a0a5; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="loader-large" style="margin-bottom: 1rem;"></div>
+                    <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
+                </div>
+            }
         </div>
         }
 

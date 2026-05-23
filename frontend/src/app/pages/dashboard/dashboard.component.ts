@@ -119,6 +119,13 @@ export class DashboardComponent implements OnInit {
                 this.cdr.detectChanges();
             }
         });
+
+        this.socketService.guestsSeen$.subscribe({
+            next: () => {
+                this.newGuestsCount = 0;
+                this.cdr.detectChanges();
+            }
+        });
     }
 
     toggleTheme() {

@@ -48,7 +48,6 @@ export class MissionsComponent implements OnInit {
     };
 
     ngOnInit() {
-        this.loadMissions();
         this.checkAdCooldown();
     }
 
@@ -90,16 +89,7 @@ export class MissionsComponent implements OnInit {
         this.cooldownRemaining.set(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
     }
 
-    loadMissions() {
-        this.gameService.getMissions().subscribe({
-            next: (data) => {
-                this.missions.set(data);
-            },
-            error: (err) => {
-                console.error('Failed to load missions', err);
-            }
-        });
-    }
+
 
     getProgressPercent(mission: Mission): number {
         const p = mission.progress || 0;
@@ -128,6 +118,10 @@ export class MissionsComponent implements OnInit {
                     this.showAdBanner.set(true);
                     this.adCountdown.set(30);
                     
+                    setTimeout(() => {
+                        this.loadAdScript();
+                    }, 100);
+
                     this.adInterval = setInterval(() => {
                         const current = this.adCountdown();
                         if (current > 0) {
@@ -137,8 +131,6 @@ export class MissionsComponent implements OnInit {
                             this.submitAdClaim();
                         }
                     }, 1000);
-
-                    // The iframe or redirect logic will be handled in the template based on showAdBanner
                 } else {
                     this.adLoading = false;
                     alert('Failed to start ad. Please try again.');
@@ -181,5 +173,27 @@ export class MissionsComponent implements OnInit {
                 }
             }
         });
+    }
+
+    loadAdScript() {
+        // Remove existing script if any to reload
+        const existingScript = document.getElementById('native-ad-script');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
+        const script = document.createElement('script');
+        script.id = 'native-ad-script';
+        script.type = 'text/javascript';
+        script.async = true;
+        script.setAttribute('data-cfasync', 'false');
+        script.src = 'https://turbulentrefreshments.com/09cc432a48f328b7d41a9b783422085d/invoke.js';
+        
+        const container = document.getElementById('container-09cc432a48f328b7d41a9b783422085d');
+        if (container) {
+            container.appendChild(script);
+        } else {
+            document.body.appendChild(script);
+        }
     }
 }

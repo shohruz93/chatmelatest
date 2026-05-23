@@ -1,9 +1,6 @@
 <div class="login-page">
     <header class="header">
         <div class="logo" routerLink="/">Chatme</div>
-        <div class="header-right">
-            <button class="theme-toggle" (click)="toggleTheme()">{{ isDarkMode() ? '☀️' : '🌙' }}</button>
-        </div>
     </header>
 
     <main class="login-container">
@@ -42,15 +39,20 @@
 
                 @if (emailFormOpen()) {
                 <div class="email-form">
-                    <input type="email" class="input-email" placeholder="{{ 'AUTH.EMAIL_PLACEHOLDER' | translate }}" [value]="email()" (input)="email.set($any($event.target).value)" />
+                    <input type="email" class="input-email" placeholder="{{ 'AUTH.EMAIL_PLACEHOLDER' | translate }}"
+                        [value]="email()" (input)="email.set($any($event.target).value)" />
                     <div class="email-actions">
-                        <button (click)="sendCode()" class="btn-send-code btn-facebook" [disabled]="isLoading() || !email() || codeSent()">{{ (codeSent() ? 'AUTH.EMAIL_CODE_SENT' : 'AUTH.SEND_CODE') | translate }}</button>
+                        <button (click)="sendCode()" class="btn-send-code btn-facebook"
+                            [disabled]="isLoading() || !email() || codeSent()">{{ (codeSent() ? 'AUTH.EMAIL_CODE_SENT' :
+                            'AUTH.SEND_CODE') | translate }}</button>
                     </div>
 
                     @if (codeSent()) {
-                    <input type="text" class="input-code" placeholder="{{ 'AUTH.CODE_PLACEHOLDER' | translate }}" [value]="code()" (input)="code.set($any($event.target).value)" />
+                    <input type="text" class="input-code" placeholder="{{ 'AUTH.CODE_PLACEHOLDER' | translate }}"
+                        [value]="code()" (input)="code.set($any($event.target).value)" />
                     <div class="email-actions">
-                        <button (click)="verifyCode()" class="btn-verify btn-google" [disabled]="isLoading() || !code()">{{ 'AUTH.VERIFY_CODE' | translate }}</button>
+                        <button (click)="verifyCode()" class="btn-verify btn-google"
+                            [disabled]="isLoading() || !code()">{{ 'AUTH.VERIFY_CODE' | translate }}</button>
                     </div>
                     }
                 </div>
@@ -62,62 +64,20 @@
                 </div>
                 }
 
-                <!-- <div class="divider">
-                    <span>{{ 'AUTH.OR' | translate }}</span>
-                </div>
-
-                <div class="features-preview">
-                    <div class="feature-item">
-                        <span class="feature-icon">🌍</span>
-                        <span class="feature-text">{{ 'AUTH.REAL_TIME_TRANS' | translate }}</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🎯</span>
-                        <span class="feature-text">{{ 'AUTH.SMART_MATCHING' | translate }}</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">🔒</span>
-                        <span class="feature-text">{{ 'AUTH.PRIVACY_FIRST' | translate }}</span>
-                    </div>
-                </div> -->
-            </div>
-
-            <div class="card-footer">
-                <p class="terms">
-                    {{ 'AUTH.TERMS_AGREE' | translate }}
-                    <a href="#" class="link">{{ 'AUTH.TERMS' | translate }}</a> {{ 'AUTH.AND' | translate }}
-                    <a href="#" class="link">{{ 'AUTH.PRIVACY' | translate }}</a>
-                </p>
-            </div>
-        </div>
-
-        <div class="login-info-section">
-            <h2 class="info-title">{{ 'AUTH.LOGIN_INFO_TITLE' | translate }}</h2>
-            <p class="info-text">{{ 'AUTH.LOGIN_INFO_DESC' | translate }}</p>
-            
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="info-icon">✨</span>
-                    <h3>{{ 'HOME.FEATURE_TRANS_TITLE' | translate }}</h3>
-                    <p>{{ 'HOME.FEATURE_TRANS_DESC' | translate }}</p>
-                </div>
-                <div class="info-item">
-                    <span class="info-icon">🎯</span>
-                    <h3>{{ 'HOME.FEATURE_MATCH_TITLE' | translate }}</h3>
-                    <p>{{ 'HOME.FEATURE_MATCH_DESC' | translate }}</p>
-                </div>
-                <div class="info-item">
-                    <span class="info-icon">🔒</span>
-                    <h3>{{ 'HOME.FEATURE_PRIVACY_TITLE' | translate }}</h3>
-                    <p>{{ 'HOME.FEATURE_PRIVACY_DESC' | translate }}</p>
+                <div class="card-footer">
+                    <p class="terms">
+                        {{ 'AUTH.TERMS_AGREE' | translate }}
+                        <a href="#" class="link">{{ 'AUTH.TERMS' | translate }}</a> {{ 'AUTH.AND' | translate }}
+                        <a href="#" class="link">{{ 'AUTH.PRIVACY' | translate }}</a>
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="background-decoration">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
-            <div class="circle circle-3"></div>
-        </div>
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-3"></div>
+            </div>
     </main>
 </div>

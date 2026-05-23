@@ -932,7 +932,20 @@ class SyncApp:
                     self.log(f"🔄 GET-хондани озод: прокси ва кэш кардани {url}...")
                     php_url = self.php_url_entry.get().strip()
                     secret = self.token_entry.get().strip()
-                    proxy_res = requests.get(f"{php_url}{url}", headers={"X-Sync-Token": secret}, timeout=30)
+                    
+                    headers_to_send = {}
+                    if headers:
+                        for k, v in headers.items():
+                            kl = k.lower()
+                            if kl == "authorization":
+                                headers_to_send["Authorization"] = v
+                            elif kl == "x-sync-token":
+                                headers_to_send["X-Sync-Token"] = v
+                    
+                    if "X-Sync-Token" not in headers_to_send:
+                        headers_to_send["X-Sync-Token"] = secret
+                        
+                    proxy_res = requests.get(f"{php_url}{url}", headers=headers_to_send, timeout=30)
                     status = proxy_res.status_code
                     
                     res_headers = {}
@@ -954,8 +967,8 @@ class SyncApp:
             
             # Write operations: write immediately to local SQLite, return 200, and launch background sync to Cloud PHP
             elif method in ["POST", "PUT", "DELETE"]:
-                if "/auth" in url:
-                    self.log(f"🔄 Воридшавӣ/Санҷиш [AUTH SYSTEM] синхронӣ дар PHP барои: {url}...")
+                if "/auth" in url or "/coins" in url or "/community/post" in url or "/profile" in url or "/gallery/upload" in url or "/messages/upload" in url or "/admin/app-versions" in url:
+                    self.log(f"🔄 Амалиёти синхронӣ дар PHP барои: {url}...")
                     php_url = self.php_url_entry.get().strip()
                     secret = self.token_entry.get().strip()
                     
@@ -1171,6 +1184,11 @@ class SyncApp:
                         "X-Sync-Token": secret,
                         "Content-Type": "application/json"
                     }
+                    if 'headers' in task and task['headers']:
+                        for k, v in task['headers'].items():
+                            kl = k.lower()
+                            if kl == "authorization":
+                                headers["Authorization"] = v
                     
                     res = None
                     if task['method'] == "POST":
@@ -1186,7 +1204,13 @@ class SyncApp:
                     else:
                         err_msg = res.text if res else "No response"
                         self.log(f"⚠️ [BACKGROUND SYNC] Ноком шуд: {err_msg}. Интизори кӯшиши навбатӣ...")
-                        time.sleep(5)  # Backoff before retry
+                        
+                        task['retry_count'] = task.get('retry_count', 0) + 1
+                        if task['retry_count'] >= 5:
+                            self.log(f"⚠️ [BACKGROUND SYNC] Бартараф кардани дархости вайроншуда пас аз 5 кӯшиш: {task['url']}")
+                            self.sync_queue.pop(0)
+                        else:
+                            time.sleep(5)  # Backoff before retry
                 except Exception as e:
                     self.log(f"⚠️ [BACKGROUND SYNC] Хатогии шабака: {str(e)}. Кӯшиши навбатӣ пас аз 5 сония...")
                     time.sleep(5)

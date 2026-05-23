@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { UnixDatePipe } from '../../pipes/unix-date.pipe';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
     selector: 'app-guests',
@@ -19,7 +20,8 @@ export class GuestsComponent implements OnInit {
 
     constructor(
         private apiService: ApiService,
-        private authService: AuthService
+        private authService: AuthService,
+        private socketService: SocketService
     ) { }
 
     ngOnInit() {
@@ -41,7 +43,10 @@ export class GuestsComponent implements OnInit {
                 });
                 this.loading = false;
                 // Mark guests as seen after loading
-                this.apiService.markGuestsAsSeen(this.currentUser.id).subscribe();
+                this.apiService.markGuestsAsSeen(this.currentUser.id).subscribe({
+                    next: () => this.socketService.notifyGuestsSeen(),
+                    error: () => {}
+                });
             },
             error: (error) => {
                 console.error('Error loading guests:', error);

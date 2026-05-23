@@ -13,7 +13,7 @@
             <button class="btn-cta" routerLink="/login">{{ 'HOME.START_CHATTING' | translate }}</button>
         </div>
         <div class="hero-visual">
-            <img src="forHome.png" alt="Chatme Visual" class="hero-image">
+            <img src="forHome.png" alt="Chatme Visual" class="hero-image" loading="eager" fetchpriority="high">
         </div>
     </main>
 
@@ -48,7 +48,7 @@
             </div>
 
             <div class="download-preview">
-                <img src="app_screen.png" alt="Chatme app preview" />
+                <img src="app_screen.png" alt="Chatme app preview" loading="lazy" />
             </div>
         </div>
         <p class="download-note">{{ 'HOME.DOWNLOAD_NOTE' | translate }}</p>
@@ -56,8 +56,8 @@
 
     <section class="features-section">
         <div class="section-header">
-            <h2 class="section-title">{{ 'HOME.SECTION_FEATURES_TITLE' | translate }}</h2>
-            <p class="section-subtitle">{{ 'HOME.SECTION_FEATURES_SUB' | translate }}</p>
+            <h2 class="section-title">{{ 'AUTH.LOGIN_INFO_TITLE' | translate }}</h2>
+            <p class="section-subtitle">{{ 'AUTH.LOGIN_INFO_DESC' | translate }}</p>
         </div>
 
         <div class="features-grid">

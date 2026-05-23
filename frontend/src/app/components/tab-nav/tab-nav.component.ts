@@ -52,6 +52,12 @@ export class TabNavComponent {
             }
         });
 
+        this.socketService.guestsSeen$.subscribe({
+            next: () => {
+                this.newGuestsCount.set(0);
+            }
+        });
+
         this.checkUnread();
         this.checkNewGuests(); // Initial load only
     }

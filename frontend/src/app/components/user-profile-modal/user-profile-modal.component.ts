@@ -9,6 +9,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
 import { LanguageService } from '../../services/language.service';
 import { GalleryService, GalleryImage } from '../../services/gallery.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
     selector: 'app-user-profile-modal',
@@ -28,6 +29,7 @@ export class UserProfileModalComponent implements OnInit {
     public languageService = inject(LanguageService);
     private galleryService = inject(GalleryService);
     private cdr = inject(ChangeDetectorRef);
+    private socketService = inject(SocketService);
 
     currentUser: any;
     ratings: any = { average: 0, count: 0 };
@@ -87,6 +89,10 @@ export class UserProfileModalComponent implements OnInit {
                 this.api.recordView(this.currentUser.id, this.user.id).subscribe({
                     next: () => { },
                     error: () => { }
+                });
+                this.socketService.emit('profile_viewed', {
+                    viewerId: this.currentUser.id,
+                    viewedId: this.user.id
                 });
             }
             this.loadRatingsAndComments();
