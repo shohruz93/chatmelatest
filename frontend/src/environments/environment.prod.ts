@@ -1,6 +1,6 @@
 export const environment = {
     production: true,
-    phpBaseUrl: 'https://shphbjeio23.chatme.tj',
+    phpBaseUrl: 'https://chatmevercel-production.up.railway.app',
     nodeBaseUrl: 'https://chatmevercel-production.up.railway.app',
     firebase: {
         apiKey: "AIzaSyBp5MEqLHPSBabSGyfgF-2kYEJpGcmSqjE",

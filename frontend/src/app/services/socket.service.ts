@@ -47,6 +47,7 @@ export class SocketService implements OnDestroy {
     private checkersErrorSubject = new Subject<any>();
     private checkersRejectedSubject = new Subject<any>();
     private roomUsersSubject = new Subject<any>(); // New subject for room users
+    private newGuestSubject = new Subject<any>(); // Real-time guest notifications
 
     private voiceRoomJoinedSubject = new Subject<any>();
     private voiceUserJoinedSubject = new Subject<any>();
@@ -84,6 +85,7 @@ export class SocketService implements OnDestroy {
     private checkersCancelledSubject = new Subject<any>();
     public checkersCancelled$ = this.checkersCancelledSubject.asObservable();
     public roomUsers$ = this.roomUsersSubject.asObservable();
+    public newGuest$ = this.newGuestSubject.asObservable();
 
     // Voice Room Observables
     public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable();
@@ -164,6 +166,10 @@ export class SocketService implements OnDestroy {
         this.socket.on('checkers_rejected', (data) => this.checkersRejectedSubject.next(data));
         this.socket.on('checkers_cancelled', (data) => this.checkersCancelledSubject.next(data));
         this.socket.on('room_users_update', (data) => this.roomUsersSubject.next(data));
+        this.socket.on('new_guest', (data) => {
+            console.log('[SOCKET] 👁️ Real-time new_guest event received:', data);
+            this.newGuestSubject.next(data);
+        });
 
         this.socket.on('voice_room_created', (data) => console.log('Room created:', data));
         this.socket.on('voice_room_joined', (data) => this.voiceRoomJoinedSubject.next(data));

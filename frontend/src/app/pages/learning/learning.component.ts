@@ -556,15 +556,21 @@ export class LearningComponent implements OnInit, OnDestroy {
                 // 3. Create the utterance
                 const utterance = new SpeechSynthesisUtterance(text);
                 const currentLang = this.languageService.currentLang();
+                const selectedRecognitionLang = this.voiceRecognitionLang ? this.voiceRecognitionLang() : null;
+                const selectedRecognitionBase = selectedRecognitionLang ? selectedRecognitionLang.split('-')[0] : null;
                 
                 // Detect if the text contains Cyrillic characters (Russian or Tajik)
                 const hasCyrillic = /[а-яА-ЯёЁӣҷҳқӯў]/i.test(text);
+                // Detect if the text contains Arabic-script characters (Persian, Arabic, Urdu, etc.)
+                const hasArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/u.test(text);
 
                 let langCode = 'en-US';
-                if (currentLang === 'ru' || (hasCyrillic && currentLang !== 'tj')) {
-                    langCode = 'ru-RU';
-                } else if (currentLang === 'tj') {
+                if (selectedRecognitionBase === 'fa' || currentLang === 'fa' || hasArabic) {
+                    langCode = 'fa-IR';
+                } else if (selectedRecognitionBase === 'tg' || currentLang === 'tj') {
                     langCode = 'tg-TJ';
+                } else if (selectedRecognitionBase === 'ru' || currentLang === 'ru' || (hasCyrillic && currentLang !== 'tj' && currentLang !== 'fa')) {
+                    langCode = 'ru-RU';
                 }
 
                 this.currentUtterance = utterance;
@@ -629,21 +635,34 @@ export class LearningComponent implements OnInit, OnDestroy {
                 setTimeout(() => {
                     try {
                         const voices = window.speechSynthesis.getVoices();
+                        const normalizeLang = (value: string) => (value || '').toLowerCase();
+                        const targetLang = langCode.toLowerCase();
                         let matchedVoice = null;
                         let actualLangCode = langCode;
 
                         if (voices && voices.length > 0) {
+
                             // Try to match target language code first
-                            matchedVoice = voices.find(v => v.lang.startsWith(langCode));
-                            
-                            // Fallback if target is Tajik or contains Cyrillic characters
+                            matchedVoice = voices.find(v => normalizeLang(v.lang).startsWith(targetLang));
+
+                            // Fallback for Tajik or Cyrillic text: prefer Russian voices
                             if (!matchedVoice && (langCode === 'tg-TJ' || hasCyrillic)) {
-                                matchedVoice = voices.find(v => v.lang.startsWith('ru'));
+                                matchedVoice = voices.find(v => normalizeLang(v.lang).startsWith('ru'));
                             }
-                            
-                            // General fallback if no match found
+
+                            // Fallback for Persian/Arabic script: prefer Persian then Arabic voices
+                            if (!matchedVoice && langCode === 'fa-IR') {
+                                matchedVoice = voices.find(v => normalizeLang(v.lang).startsWith('fa')) || voices.find(v => normalizeLang(v.lang).startsWith('ar'));
+                            }
+
+                            // Fallback by voice name if there is no lang code match
+                            if (!matchedVoice && langCode === 'fa-IR') {
+                                matchedVoice = voices.find(v => /persian|farsi|iran/i.test(v.name || '')) || voices.find(v => /arabic|arab/i.test(v.name || ''));
+                            }
+
+                            // General fallback if still no match found
                             if (!matchedVoice) {
-                                matchedVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+                                matchedVoice = voices.find(v => normalizeLang(v.lang).startsWith('en')) || voices[0];
                             }
 
                             if (matchedVoice) {
@@ -651,7 +670,8 @@ export class LearningComponent implements OnInit, OnDestroy {
                             }
                         }
 
-                        utterance.lang = actualLangCode;
+                        const isFaFallbackVoice = matchedVoice && langCode === 'fa-IR' && !normalizeLang(matchedVoice.lang).startsWith('fa') && !normalizeLang(matchedVoice.lang).startsWith('ar');
+                        utterance.lang = isFaFallbackVoice ? langCode : actualLangCode;
                         if (matchedVoice) {
                             utterance.voice = matchedVoice;
                         }

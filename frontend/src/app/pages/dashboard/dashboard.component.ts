@@ -84,10 +84,10 @@ export class DashboardComponent implements OnInit {
         document.documentElement.setAttribute('data-theme', theme);
 
         this.checkUnread();
-        this.checkNewGuests();
+        this.checkNewGuests(); // Initial load only
 
 
-        // Refresh unread/guests count on navigation
+        // Refresh unread count on navigation (guests now via WebSocket)
         this.router.events.subscribe((event) => {
             // Close sidebar on mobile when navigating
             if (window.innerWidth < 1024) {
@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
             }
 
             this.checkUnread();
-            this.checkNewGuests();
+            // Guest count is now driven by WebSocket — no HTTP poll on navigation
         });
 
         this.socketService.onMatchFound().subscribe(() => {
@@ -106,6 +106,18 @@ export class DashboardComponent implements OnInit {
         // Listen for new messages to update unread count
         this.chatStorage.messagesUpdated$.subscribe(() => {
             this.checkUnread();
+        });
+
+        // ✅ Real-time guest count updates via WebSocket
+        this.socketService.newGuest$.subscribe({
+            next: (data: any) => {
+                if (data.count >= 0) {
+                    this.newGuestsCount = data.count;
+                } else {
+                    this.newGuestsCount = this.newGuestsCount + 1;
+                }
+                this.cdr.detectChanges();
+            }
         });
     }
 

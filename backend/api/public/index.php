@@ -35,6 +35,7 @@ require_once __DIR__ . '/../src/StudyBuddyController.php';
 require_once __DIR__ . '/../src/ProgressController.php';
 require_once __DIR__ . '/../src/ContentController.php';
 require_once __DIR__ . '/../src/FlashcardController.php';
+require_once __DIR__ . '/../src/SyncController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -67,6 +68,7 @@ $buddyController     = new StudyBuddyController();
 $progressController  = new ProgressController();
 $contentController   = new ContentController();
 $flashcardController = new FlashcardController();
+$syncController      = new SyncController();
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -896,6 +898,14 @@ $router->add('POST', '/voice/notify-followers', function() use ($voiceController
 });
 
 
+
+// Sync Routes
+$router->add('GET', '/sync/pull', function() use ($syncController) {
+    $syncController->pull();
+});
+$router->add('POST', '/sync/push', function() use ($syncController) {
+    $syncController->push();
+});
 
 // System Routes
 $router->add('GET', '/system/fix-unique-id', function() {

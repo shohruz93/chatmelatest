@@ -31,7 +31,7 @@ export class TabNavComponent {
         ).subscribe((event: any) => {
             this.currentRoute = event.urlAfterRedirects;
             this.checkUnread();
-            this.checkNewGuests();
+            // Guest count is now driven by WebSocket — no HTTP poll on navigation
         });
 
         // Real-time unread updates
@@ -39,10 +39,24 @@ export class TabNavComponent {
             next: () => this.checkUnread()
         });
 
+        // ✅ Real-time guest count updates via WebSocket
+        this.socketService.newGuest$.subscribe({
+            next: (data: any) => {
+                if (data.count >= 0) {
+                    // Server sent the exact count
+                    this.newGuestsCount.set(data.count);
+                } else {
+                    // count === -1: server couldn't fetch count, increment locally
+                    this.newGuestsCount.update(v => v + 1);
+                }
+            }
+        });
+
         this.checkUnread();
-        this.checkNewGuests();
+        this.checkNewGuests(); // Initial load only
     }
 
+    /** Called ONCE on init to set the initial guest badge count */
     checkNewGuests() {
         const user = this.auth.currentUserValue;
         if (user) {
