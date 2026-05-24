@@ -242,6 +242,21 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     // Switch room in Service
                     this.chatService.switchRoom(this.roomId);
 
+                    // Fetch Partner Profile directly via API to ensure auth token is present
+                    this.api.get(`/profile?userId=${partnerId}`).subscribe({
+                        next: (data: any) => {
+                            if (data && data.id) {
+                                this.partner = data;
+                                if (this.partner.avatar && !this.partner.avatar.startsWith('http')) {
+                                    this.partner.avatar = `${this.api.phpBaseUrl}${this.partner.avatar}`;
+                                }
+                                this.partnerStatus = this.socketService.isUserOnline(partnerId) ? 'online' : 'offline';
+                                this.cdr.markForCheck();
+                            }
+                        },
+                        error: (err) => console.warn('Failed to load partner profile:', err)
+                    });
+
                     // Join and get details (SocketService side)
                     this.socketService.emit('join_chat', { roomId: this.roomId });
                     this.socketService.emit('get_room_details', { roomId: this.roomId });
@@ -499,7 +514,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     closeExplanation(msgId: string) {
         this.messageExplanations.update(m => {
             const newMap = { ...m };
-            delete newMap[msgId];
+            Reflect.deleteProperty(newMap, msgId);
             return newMap;
         });
     }
@@ -737,11 +752,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 const base64Sound = result.value.recordDataBase64;
                 try {
                     const binaryString = window.atob(base64Sound);
-                    const len = binaryString.length;
-                    const bytes = new Uint8Array(len);
-                    for (let i = 0; i < len; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
+                    const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
                     const blob = new Blob([bytes], { type: 'audio/m4a' });
                     const file = new File([blob], `voice_${Date.now()}.m4a`, { type: 'audio/m4a' });
 
@@ -823,7 +834,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     // Simple helper to check if date changed from previous message
     showDateHeader(msg: any, index: number): boolean {
         if (index === 0) return true;
-        const prev = this.messages()[index - 1];
+        const prev = this.messages().at(index - 1);
+        if (!prev) return true;
         const date1 = new Date(msg.createdAt).toDateString();
         const date2 = new Date(prev.createdAt).toDateString();
         return date1 !== date2;

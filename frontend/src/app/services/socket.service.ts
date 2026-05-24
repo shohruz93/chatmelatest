@@ -497,6 +497,10 @@ export class SocketService implements OnDestroy {
 
     playNotificationSound() {
         const audio = new Audio('/mp3/notification.wav');
-        audio.play().catch(err => console.error('Error playing notification sound:', err));
+        audio.play().catch(err => {
+            if (err.name !== 'NotAllowedError') {
+                console.warn('Audio playback issue:', err);
+            }
+        });
     }
 }

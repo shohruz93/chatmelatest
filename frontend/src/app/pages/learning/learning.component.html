@@ -1,343 +1,128 @@
-<div class="learning-container">
-    <div class="header">
-        <h1>{{ 'NAV.LEARNING' | translate }}</h1>
-        <button class="btn-add" (click)="showAddModal.set(true)">
-            <span class="icon">➕</span> {{ 'LEARNING.ADD_CARD' | translate }}
-        </button>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="stats-grid">
-        <div class="stat-card streak">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-info">
-                <div class="stat-value">{{ stats()?.streak || 0 }}</div>
-                <div class="stat-label">{{ 'LEARNING.STREAK' | translate }}</div>
-            </div>
+<div class="learning-layout">
+    <!-- Progress & Memory Sidebar -->
+    <aside class="memory-sidebar" [class.open]="showSidebar()">
+        <div class="sidebar-header">
+            <h3>{{ 'LEARNING.YOUR_FEATURES' | translate }}</h3>
+            <button class="icon-btn close-sidebar" (click)="toggleSidebar()"><i class="fas fa-times"></i></button>
         </div>
-        <div class="stat-card xp">
-            <div class="stat-icon">⚡</div>
-            <div class="stat-info">
-                <div class="stat-value">{{ stats()?.xp || 0 }}</div>
-                <div class="stat-label">{{ 'COMMON.XP' | translate }}</div>
-            </div>
-        </div>
-        <div class="stat-card cards">
-            <div class="stat-icon">🗂️</div>
-            <div class="stat-info">
-                <div class="stat-value">{{ flashcards().length }}</div>
-                <div class="stat-label">{{ 'LEARNING.TOTAL_CARDS' | translate }}</div>
-            </div>
-        </div>
-        <div class="stat-card corrections">
-            <div class="stat-icon">✍️</div>
-            <div class="stat-info">
-                <div class="stat-value">{{ stats()?.total_corrections || 0 }}</div>
-                <div class="stat-label">{{ 'LEARNING.CORRECTIONS' | translate }}</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Study Area -->
-    <div class="study-section">
-        @if (!isStudying()) {
-            <div class="start-card">
-                <h2>{{ 'LEARNING.READY_TO_STUDY' | translate }}</h2>
-                <p>{{ 'LEARNING.DUE_CARDS_COUNT' | translate: {count: dueCards().length} }}</p>
-                <div class="deck-actions" style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                    <button class="btn-start" [disabled]="dueCards().length === 0" (click)="startStudy()" style="margin:0;">
-                        {{ 'LEARNING.START_SESSION' | translate }}
-                    </button>
-                    <button class="btn-voice-call-trigger" (click)="startVoiceCall()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border:none; padding:12px 24px; border-radius:24px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:8px;">
-                        📞 Занги Овозӣ
-                    </button>
+        
+        <div class="sidebar-content">
+            <div class="memory-card level-card">
+                <i class="fas fa-medal"></i>
+                <div>
+                    <span class="label">{{ 'LEARNING.KNOWLEDGE_LEVEL' | translate }}</span>
+                    <strong class="value">{{ memoryProfile().currentLevel }}</strong>
                 </div>
             </div>
-        } @else if (!studyFinished()) {
-            <div class="study-card-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" [style.width.%]="(currentIndex() / dueCards().length) * 100"></div>
+
+            <div class="memory-card xp-card">
+                <i class="fas fa-star"></i>
+                <div>
+                    <span class="label">{{ 'LEARNING.TOTAL_XP' | translate }}</span>
+                    <strong class="value">{{ memoryProfile().totalXp }} XP</strong>
                 </div>
+            </div>
+
+            <div class="memory-section">
+                <h4><i class="fas fa-heart"></i> {{ 'LEARNING.YOUR_INTERESTS' | translate }}</h4>
+                <div class="tags">
+                    <span class="tag" *ngFor="let interest of memoryProfile().interests">{{ interest }}</span>
+                    <span class="empty-text" *ngIf="memoryProfile().interests.length === 0">{{ 'LEARNING.NO_INTERESTS_YET' | translate }}</span>
+                </div>
+            </div>
+
+            <div class="memory-section">
+                <h4><i class="fas fa-check-circle"></i> {{ 'LEARNING.LEARNED_WORDS' | translate }}</h4>
+                <div class="tags">
+                    <span class="tag success" *ngFor="let word of memoryProfile().knownWords">{{ word }}</span>
+                    <span class="empty-text" *ngIf="memoryProfile().knownWords.length === 0">{{ 'LEARNING.CHAT_TO_LEARN' | translate }}</span>
+                </div>
+            </div>
+
+            <div class="memory-section">
+                <h4><i class="fas fa-exclamation-circle"></i> {{ 'LEARNING.TO_IMPROVE' | translate }}</h4>
+                <div class="tags">
+                    <span class="tag warning" *ngFor="let mistake of memoryProfile().recentMistakes">{{ mistake }}</span>
+                    <span class="empty-text" *ngIf="memoryProfile().recentMistakes.length === 0">{{ 'LEARNING.NO_MISTAKES' | translate }}</span>
+                </div>
+            </div>
+            
+            <div class="memory-section">
+                <h4><i class="fas fa-chart-line"></i> {{ 'LEARNING.DAILY_PROGRESS' | translate }}</h4>
+                <div class="progress-graph">
+                    <div class="bar-container" *ngFor="let entry of memoryProfile().progressHistory.slice(-7)">
+                        <div class="bar" [style.height.%]="entry.score * 2 > 100 ? 100 : entry.score * 2"></div>
+                        <span class="day">{{ entry.date | slice:8:10 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="chat-main">
+        <!-- Glass Header -->
+        <header class="chat-header">
+            <div class="ai-profile">
+                <div class="avatar-container" [class.speaking]="isMouthMoving()">
+                    <img src="poly-avatar.png" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Poly&colors=indigo,blue'" alt="Poly" class="avatar">
+                    <span class="status-dot"></span>
+                </div>
+                <div class="ai-info">
+                    <h2>Poly</h2>
+                    <p>{{ 'LEARNING.SMART_FRIEND' | translate }}</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" (click)="clearChat()" [title]="'LEARNING.CLEAR_CHAT' | translate"><i class="fas fa-trash-alt"></i></button>
+                <button class="icon-btn" (click)="toggleSidebar()" [title]="'LEARNING.SHOW_MEMORY' | translate"><i class="fas fa-chart-bar"></i></button>
+            </div>
+        </header>
+
+        <!-- Messages Area -->
+        <div class="messages-container" #chatScroll>
+            <div class="message-wrapper" *ngFor="let msg of messages()" [class.mine]="msg.sender === 'user'">
+                <div class="message-bubble">
+                    <p>{{ msg.text }}</p>
+                    <span class="time">{{ msg.timestamp | date:'HH:mm' }}</span>
+                </div>
+            </div>
+
+            <div class="message-wrapper" *ngIf="isTyping()">
+                <div class="message-bubble typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            
+            <div class="message-wrapper" *ngIf="isVoiceMode()">
+                <div class="message-bubble voice-status-bubble">
+                    <i class="fas fa-microphone-alt pulse"></i>
+                    {{ voiceCallStatus() }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-glass" [class.cooldown-active]="cooldownTimer() > 0">
+                <button class="icon-btn voice-btn" [class.active]="isVoiceMode()" (click)="toggleVoiceMode()" [title]="'LEARNING.VOICE_MODE' | translate" [disabled]="cooldownTimer() > 0">
+                    <i class="fas" [class.fa-microphone]="!isVoiceMode()" [class.fa-microphone-slash]="isVoiceMode()"></i>
+                </button>
                 
-                <div class="flashcard" [class.flipped]="showAnswer()" (click)="!showAnswer() && flipCard()">
-                    <div class="card-face front">
-                        <div class="card-content">{{ dueCards()[currentIndex()].front }}</div>
-                        <div class="card-hint">{{ 'LEARNING.TAP_TO_FLIP' | translate }}</div>
-                        <div class="card-actions-ai">
-                        </div>
-                    </div>
-                    <div class="card-face back">
-                        <div class="card-content">{{ dueCards()[currentIndex()].back }}</div>
-                        <div class="card-actions-ai">
-                            <button class="btn-tool-ai" (click)="$event.stopPropagation(); getAiExplanation()" [disabled]="isExplaining()" title="AI Explanation">💡</button>
-                        </div>
-
-                        @if (aiExplanation()) {
-                            <div class="ai-explanation">
-                                <p>{{ aiExplanation() }}</p>
-                            </div>
-                        }
-
-                        @if (isExplaining()) {
-                            <div class="ai-loader-mini">
-                                <span class="spinner-tiny"></span> AI is thinking...
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                @if (showAnswer()) {
-                    <div class="grade-buttons">
-                        <button class="grade-btn g0" (click)="submitGrade(0)">0</button>
-                        <button class="grade-btn g1" (click)="submitGrade(1)">1</button>
-                        <button class="grade-btn g2" (click)="submitGrade(2)">2</button>
-                        <button class="grade-btn g3" (click)="submitGrade(3)">3</button>
-                        <button class="grade-btn g4" (click)="submitGrade(4)">4</button>
-                        <button class="grade-btn g5" (click)="submitGrade(5)">5</button>
-                    </div>
-                }
-            </div>
-        } @else {
-            <div class="finish-card">
-                <div class="finish-icon">🎉</div>
-                <h2>{{ 'LEARNING.SESSION_COMPLETE' | translate }}</h2>
-                <p>{{ 'LEARNING.WELL_DONE' | translate }}</p>
-                <button class="btn-start" (click)="isStudying.set(false)">{{ 'COMMON.CLOSE' | translate }}</button>
-            </div>
-        }
-    </div>
-
-    <!-- Card List -->
-    <div class="card-list-section">
-        <h3>{{ 'LEARNING.MY_CARDS' | translate }}</h3>
-        <div class="cards-grid">
-            @for (card of flashcards(); track card.id) {
-                <div class="mini-card">
-                    <div class="mini-front">{{ card.front }}</div>
-                    <div class="mini-back">{{ card.back }}</div>
-                    <button class="btn-delete-mini" (click)="deleteCard(card.id)">✕</button>
-                </div>
-            }
-        </div>
-    </div>
-
-    <!-- Add Modal -->
-    @if (showAddModal()) {
-        <div class="modal-overlay" (click)="showAddModal.set(false)">
-            <div class="modal-content" (click)="$event.stopPropagation()">
-                <h2>{{ 'LEARNING.ADD_NEW_CARD' | translate }}</h2>
-                <div class="form-group">
-                    <label>{{ 'LEARNING.FRONT_SIDE' | translate }}</label>
-                    <textarea [(ngModel)]="newFront" placeholder="Word or phrase..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>{{ 'LEARNING.BACK_SIDE' | translate }}</label>
-                    <textarea [(ngModel)]="newBack" placeholder="Translation or explanation..."></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-cancel" (click)="showAddModal.set(false)">{{ 'COMMON.CANCEL' | translate }}</button>
-                    <button class="btn-save" (click)="saveNewCard()">{{ 'COMMON.SAVE' | translate }}</button>
-                </div>
-            </div>
-        </div>
-    }
-
-    <!-- AI Chat Modal -->
-    @if (showAiChat()) {
-        <div class="modal-overlay" (click)="showAiChat.set(false)">
-            <div class="ai-chat-window modal-content" (click)="$event.stopPropagation()" style="width:90%; max-width:400px; padding:0; height:600px; max-height:80vh;">
-                <div class="ai-chat-header">
-                    <h3>🤖 {{ 'CHAT.AI_CHAT_TITLE' | translate }}</h3>
-                    <button class="btn-close-ai" (click)="showAiChat.set(false)">✕</button>
-                </div>
+                <input 
+                    type="text" 
+                    [(ngModel)]="messageText" 
+                    (keyup.enter)="sendMessage()" 
+                    [disabled]="isVoiceMode() || cooldownTimer() > 0"
+                    [placeholder]="cooldownTimer() > 0 ? ('LEARNING.PLEASE_WAIT' | translate:{n: cooldownTimer()}) : ('LEARNING.TYPE_MESSAGE' | translate)" 
+                    class="chat-input"
+                >
                 
-                <div class="ai-chat-messages">
-                    @if (aiChatHistory().length === 0) {
-                        <div class="ai-empty-state">
-                            <div class="ai-icon-large">🤖</div>
-                            <p>{{ 'CHAT.AI_CHAT_EMPTY' | translate }}</p>
-                        </div>
-                    }
-                    
-                    @for (msg of aiChatHistory(); track $index) {
-                        <div class="ai-msg" [class.user]="msg.sender === 'user'" [class.ai]="msg.sender === 'ai'">
-                            <div class="msg-bubble">{{ msg.text }}</div>
-                        </div>
-                    }
-                    
-                    @if (isAiTyping()) {
-                        <div class="ai-msg ai typing">
-                            <div class="msg-bubble">
-                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <div class="ai-chat-input">
-                    <input type="text" [(ngModel)]="aiMessage" (keyup.enter)="sendAiMessage()" 
-                        [placeholder]="'CHAT.AI_CHAT_PLACEHOLDER' | translate">
-                    <button (click)="sendAiMessage()" [disabled]="!aiMessage.trim() || isAiTyping()">
-                        ➤
-                    </button>
-                </div>
+                <button class="send-btn" (click)="sendMessage()" [disabled]="!messageText.trim() || isVoiceMode() || cooldownTimer() > 0">
+                    <i class="fas fa-paper-plane" *ngIf="cooldownTimer() === 0"></i>
+                    <span *ngIf="cooldownTimer() > 0">{{ cooldownTimer() }}</span>
+                </button>
             </div>
         </div>
-    }
-
-    <!-- Voice Call Modal Overlay -->
-    @if (isVoiceCallActive()) {
-        <div class="voice-call-overlay">
-            <div class="voice-call-window">
-                <!-- Header with timer and status -->
-                <div class="voice-call-header">
-                    <div class="call-info">
-                        <span class="pulse-red"></span>
-                        <span class="call-duration">{{ callDuration() }}</span>
-                    </div>
-                    <div class="call-title">Видеовизов бо ИИ</div>
-                    <div class="call-status-pill" [class.speaking]="voiceCallStatus() === 'ИИ ҷавоб медиҳад...'"
-                         [class.listening]="voiceCallStatus() === 'Гӯш карда истодаам...'"
-                         [class.thinking]="voiceCallStatus() === 'ИИ фикр дорад...'">
-                        {{ voiceCallStatus() }}
-                    </div>
-                </div>
-
-                <!-- Language Selector Dropdown (corner button) -->
-                <div class="lang-dropdown-wrapper" (click)="$event.stopPropagation()">
-                    <button class="lang-trigger-btn" (click)="toggleLangDropdown()" title="Забони шинохт">
-                        <span>{{ getActiveLangFlag() }}</span>
-                        <span class="lang-trigger-code">{{ voiceRecognitionLang().split('-')[0] }}</span>
-                        <span class="lang-caret">{{ showLangDropdown() ? '▲' : '▼' }}</span>
-                    </button>
-
-                    @if (showLangDropdown()) {
-                        <div class="lang-dropdown-list">
-                            @for (lang of recognitionLangs; track lang.code) {
-                                <button class="lang-dropdown-item"
-                                        [class.active]="voiceRecognitionLang() === lang.code"
-                                        (click)="switchRecognitionLang(lang.code)">
-                                    <span>{{ lang.flag }}</span>
-                                    <span class="lang-item-name">{{ lang.name }}</span>
-                                    @if (voiceRecognitionLang() === lang.code) {
-                                        <span class="lang-check">✓</span>
-                                    }
-                                </button>
-                            }
-                        </div>
-                    }
-                </div>
-
-                <!-- Central Avatar & Visualization Area -->
-                <div class="avatar-container">
-                    <!-- Glowing Background Rings -->
-                    <div class="glowing-rings" [class.listening]="voiceCallStatus() === 'Гӯш карда истодаам...'" 
-                         [class.thinking]="voiceCallStatus() === 'ИИ фикр дорад...'" 
-                         [class.speaking]="voiceCallStatus() === 'ИИ ҷавоб медиҳад...'">
-                        <div class="ring r1"></div>
-                        <div class="ring r2"></div>
-                        <div class="ring r3"></div>
-                    </div>
-
-                    <!-- Interactive SVG Avatar -->
-                    <svg class="ai-avatar-svg" viewBox="0 0 200 200" [class.mouth-moving]="isMouthMoving()">
-                        <defs>
-                            <radialGradient id="faceGlow" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#818cf8" stop-opacity="0.6"/>
-                                <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
-                            </radialGradient>
-                            <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#06b6d4" />
-                                <stop offset="100%" stop-color="#3b82f6" />
-                            </linearGradient>
-                            <linearGradient id="neonPurple" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#a855f7" />
-                                <stop offset="100%" stop-color="#ec4899" />
-                            </linearGradient>
-                        </defs>
-                        <!-- Glow -->
-                        <circle cx="100" cy="100" r="80" fill="url(#faceGlow)" />
-                        
-                        <!-- Base Head Outer Ring -->
-                        <circle cx="100" cy="100" r="70" stroke="url(#neonCyan)" stroke-width="2" fill="none" stroke-dasharray="10 5" class="outer-rotating-ring" />
-                        
-                        <!-- Eyes -->
-                        <g class="avatar-eyes">
-                            <ellipse class="eye left-eye" cx="75" cy="90" rx="6" ry="6" fill="#e0f2fe" />
-                            <ellipse class="eye right-eye" cx="125" cy="90" rx="6" ry="6" fill="#e0f2fe" />
-                        </g>
-
-                        <!-- Cyber Facial Lines -->
-                        <path d="M 60 115 Q 100 135 140 115" stroke="url(#neonPurple)" stroke-width="1.5" fill="none" class="facial-cyber-line" />
-                        
-                        <!-- Animated Mouth -->
-                        <path class="avatar-mouth" d="M 85 125 Q 100 125 115 125" stroke="#f472b6" stroke-width="4" stroke-linecap="round" fill="none" />
-                    </svg>
-
-                    <!-- Wave Equalizer Visualizer at the bottom of avatar -->
-                    <div class="equalizer-container" [class.speaking]="voiceCallStatus() === 'ИИ ҷавоб медиҳад...'">
-                        <span class="bar b1"></span>
-                        <span class="bar b2"></span>
-                        <span class="bar b3"></span>
-                        <span class="bar b4"></span>
-                        <span class="bar b5"></span>
-                        <span class="bar b6"></span>
-                        <span class="bar b7"></span>
-                    </div>
-                </div>
-
-                <!-- Subtitles Area -->
-                <div class="subtitles-container">
-                    @if (lastUserSpoken()) {
-                        <div class="subtitle-user">
-                            <span class="sub-label">Шумо:</span>
-                            <span>{{ lastUserSpoken() }}</span>
-                        </div>
-                    }
-                    @if (lastAiSpoken()) {
-                        <div class="subtitle-ai">
-                            <span class="sub-label">ИИ:</span>
-                            <span>{{ lastAiSpoken() }}</span>
-                        </div>
-                    }
-                </div>
-
-                <!-- Glassmorphic Text Input inside Call -->
-                <div class="call-text-input-container">
-                    <input type="text" [(ngModel)]="voiceCallInputText" (keyup.enter)="sendVoiceCallTextInput()" 
-                           placeholder="Навиштани паём..." [disabled]="voiceCallStatus() === 'ИИ фикр дорад...'">
-                    <button (click)="sendVoiceCallTextInput()" [disabled]="!voiceCallInputText.trim() || voiceCallStatus() === 'ИИ фикр дорад...'">
-                        ➤
-                    </button>
-                </div>
-
-                <!-- Self Video View (PIP) -->
-                <div class="user-camera-pip" [class.camera-off]="isCameraOff()">
-                    <video id="userCameraStream" autoplay playsinline muted></video>
-                    @if (isCameraOff()) {
-                        <div class="camera-off-placeholder">
-                            <span>📷 Off</span>
-                        </div>
-                    }
-                </div>
-
-                <!-- Call Control Buttons -->
-                <div class="call-controls">
-                    <button class="ctrl-btn mute-btn" [class.active]="isMuted()" (click)="toggleMute()" title="Mute Microphone">
-                        <span class="icon">{{ isMuted() ? '🎙️' : '🎙️' }}</span>
-                    </button>
-                    
-                    <button class="ctrl-btn end-call-btn" (click)="stopVoiceCall()" title="End Call">
-                        <span class="icon">📞</span>
-                    </button>
-
-                    <button class="ctrl-btn camera-btn" [class.active]="isCameraOff()" (click)="toggleCamera()" title="Toggle Camera">
-                        <span class="icon">{{ isCameraOff() ? '📹' : '📹' }}</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    }
-
+    </main>
 </div>
-

@@ -182,6 +182,11 @@ export class ConversationsComponent implements OnInit, OnDestroy {
                     if (conv.partner_avatar && !conv.partner_avatar.startsWith('http')) {
                         conv.partner_avatar = `${this.api.phpBaseUrl}${conv.partner_avatar}`;
                     }
+                    if (!conv.roomId && conv.partner_id) {
+                        const min = Math.min(this.currentUser.id, Number(conv.partner_id));
+                        const max = Math.max(this.currentUser.id, Number(conv.partner_id));
+                        conv.roomId = `room_${min}_${max}`;
+                    }
                     return conv;
                 });
 

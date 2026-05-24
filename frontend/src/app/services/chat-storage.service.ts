@@ -101,15 +101,17 @@ export class ChatStorageService {
       }
     }
 
+    // Ensure created_at is present for the roomId_createdAt index
+    const createdAt = msg.created_at || msg.createdAt || (msg.timestamp ? (msg.timestamp > 1e11 ? msg.timestamp : msg.timestamp * 1000) : Date.now());
+
     return {
       ...msg,
       id: String(msg.id),
       roomId: msg.roomId || msg.room_id,
-      // Ensure created_at is always set for indexing (index uses created_at snake_case)
-      created_at: msg.created_at || msg.createdAt || (msg.timestamp ? msg.timestamp * 1000 : Date.now()),
       sender_id: msg.sender_id || msg.senderId,
       messageType: msgType,
-      message_type: msgType // Store snake_case version too just in case
+      message_type: msgType, // Store snake_case version too just in case
+      created_at: createdAt
     };
   }
 
@@ -304,6 +306,8 @@ export class ChatStorageService {
       throw new Error('Database not initialized');
     }
 
+    const normalizedMsg = this.normalizeMessage(realMessage);
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(MESSAGES_STORE, 'readwrite');
       const store = transaction.objectStore(MESSAGES_STORE);
@@ -312,7 +316,7 @@ export class ChatStorageService {
       store.delete(tempId);
 
       // Add real message
-      store.put(realMessage);
+      store.put(normalizedMsg);
 
       transaction.oncomplete = () => {
         this.messagesUpdated.next();
@@ -421,18 +425,27 @@ export class ChatStorageService {
       // We use roomId or a composite key. But for the list, we can just put all.
       conversations.forEach(conv => {
         // Ensure roomId exists for the keyPath
-        if (!conv.roomId && conv.id) conv.roomId = conv.id;
+        if (!conv.roomId && conv.id) conv.roomId = String(conv.id);
+
+        if (!conv.roomId) {
+            console.warn('[STORAGE] Skipping conversation without roomId or id:', conv);
+            return;
+        }
 
         // Get existing to preserve partnerInfo if not present in list
-        const getReq = store.get(conv.roomId);
-        getReq.onsuccess = () => {
-          const existing = getReq.result || {};
-          store.put({
-            ...existing,
-            ...conv,
-            last_updated: Date.now()
-          });
-        };
+        try {
+            const getReq = store.get(conv.roomId);
+            getReq.onsuccess = () => {
+              const existing = getReq.result || {};
+              store.put({
+                ...existing,
+                ...conv,
+                last_updated: Date.now()
+              });
+            };
+        } catch (err) {
+            console.error('[STORAGE] Error storing conv:', err, conv);
+        }
       });
 
       transaction.oncomplete = () => resolve();
@@ -467,44 +480,11 @@ export class ChatStorageService {
 
   // Delete messages for any room NOT in validRoomIds, and clean up conversation records too
   async clearOrphanRooms(validRoomIds: Set<string>): Promise<void> {
-    if (!this.db) {
-      return;
-    }
+    if (!this.db) return;
 
-    // 1. Clear orphan messages by looking up all unique room IDs in the messages store
-    await new Promise<void>((resolve, reject) => {
-      const transaction = this.db!.transaction(MESSAGES_STORE, 'readwrite');
-      const store = transaction.objectStore(MESSAGES_STORE);
-      const index = store.index('roomId');
-      const seenRooms = new Set<string>();
+    const orphanRoomsToClear = new Set<string>();
 
-      const request = index.openCursor();
-      request.onsuccess = (event) => {
-        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-        if (cursor) {
-          const roomId: string = cursor.value.roomId;
-          if (!seenRooms.has(roomId)) {
-            seenRooms.add(roomId);
-            if (!validRoomIds.has(roomId)) {
-              // Delete all messages in this orphan room
-              const rangeReq = index.openCursor(IDBKeyRange.only(roomId));
-              rangeReq.onsuccess = (ev2) => {
-                const c2 = (ev2.target as IDBRequest<IDBCursorWithValue>).result;
-                if (c2) {
-                  store.delete(c2.primaryKey);
-                  c2.continue();
-                }
-              };
-            }
-          }
-          cursor.continue();
-        }
-      };
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
-    });
-
-    // 2. Clear orphan conversation records
+    // 1. Clear orphan conversation records and collect their roomIds
     await new Promise<void>((resolve, reject) => {
       const transaction = this.db!.transaction(CONVERSATIONS_STORE, 'readwrite');
       const store = transaction.objectStore(CONVERSATIONS_STORE);
@@ -513,6 +493,7 @@ export class ChatStorageService {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         if (cursor) {
           if (!validRoomIds.has(cursor.value.roomId)) {
+            orphanRoomsToClear.add(cursor.value.roomId);
             cursor.delete();
           }
           cursor.continue();
@@ -521,5 +502,33 @@ export class ChatStorageService {
       transaction.oncomplete = () => resolve();
       transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
     });
+
+    // 2. Quickly find any unique roomIds directly from messages using 'nextunique'
+    await new Promise<void>((resolve, reject) => {
+      const transaction = this.db!.transaction(MESSAGES_STORE, 'readonly');
+      const store = transaction.objectStore(MESSAGES_STORE);
+      const index = store.index('roomId');
+      
+      const request = index.openKeyCursor(null, 'nextunique');
+      request.onsuccess = (event) => {
+        const cursor = (event.target as IDBRequest<IDBCursor>).result;
+        if (cursor) {
+          const roomId = cursor.key as string;
+          if (!validRoomIds.has(roomId)) {
+            orphanRoomsToClear.add(roomId);
+          }
+          cursor.continue();
+        }
+      };
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = (event) => reject((event.target as IDBTransaction).error);
+    });
+
+    if (orphanRoomsToClear.size === 0) return;
+
+    // 3. Delete all messages for the identified orphan rooms
+    for (const roomId of orphanRoomsToClear) {
+      await this.clearRoom(roomId);
+    }
   }
 }

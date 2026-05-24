@@ -15,11 +15,10 @@ declare var puter: any;
 export class AiService {
 
     private chat(prompt: string, isFix: boolean = false): Observable<string> {
-        const apiKey = "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";
-        const url = 'https://api.groq.com/openai/v1/chat/completions';
+        const url = `${environment.nodeBaseUrl}/api/ai/chat`;
         
         const requestBody = {
-            model: 'llama-3.3-70b-versatile',
+            model: 'llama-3.1-8b-instant',
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.7,
             max_tokens: 2048
@@ -28,8 +27,7 @@ export class AiService {
         return from(fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         })).pipe(
@@ -66,7 +64,11 @@ export class AiService {
                 
                 // Extract the content from choices
                 if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].message) {
-                    text = parsedData.choices[0].message.content;
+                    if (parsedData.choices[0].message.refusal) {
+                        text = "Бубахшед, ман ин дархостро иҷро карда наметавонам.";
+                    } else {
+                        text = parsedData.choices[0].message.content;
+                    }
                 } else if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].text) {
                     text = parsedData.choices[0].text;
                 } else if (parsedData && parsedData.content) {
@@ -221,16 +223,137 @@ Do not include any numbering, bullets, or extra text.`;
         );
     }
 
+    askAiTutor(message: string, memoryPrompt: string, history: any[], learningLang: string, nativeLang: string, fallbackAttempt = false): Observable<string> {
+        const url = `${environment.nodeBaseUrl}/api/ai/chat`;
+
+        // Format history for Groq
+        // We take the last 6 messages for context to save tokens and prevent rate limit
+        const recentHistory = history.slice(-6).map(msg => ({
+            role: msg.sender === 'ai' ? 'assistant' : 'user',
+            content: msg.text
+        }));
+
+        const requestBody = {
+            model: fallbackAttempt ? 'llama-3.1-8b-instant' : 'llama-3.3-70b-versatile',
+            messages: [
+                {
+                    role: 'system',
+                    content: `You are 'Poly', a super fun, warm, empathetic, and highly intelligent AI Language Partner. You act like a real best friend.
+
+MEMORY AND ADAPTATION:
+${memoryPrompt}
+
+RULES FOR YOUR PERSONALITY & TEACHING:
+1. ONBOARDING: If the user's Native Language or Target Learning Language is 'Unknown', your FIRST priority is to warmly welcome them and ask what their native language is and what language they want to learn. Do this in whatever language they speak to you in. Ask friendly questions to get to know them.
+2. GRADUAL IMMERSION: If their native and target languages are known, use a 'gradual immersion' technique. Start the conversation entirely in their Native Language. Then, naturally and seamlessly swap 1-2 key nouns, verbs, or adjectives into the Target Language within the same sentence to help them learn organically without feeling like studying. Example (if Native=Tajik, Target=Russian): "Ман имрӯз ба магазин рафтам 🛍️." (instead of мағоза).
+3. Be highly engaging, use emojis, joke around, and talk like a real friend. Do NOT act like a robotic tutor.
+4. Spaced Repetition: Naturally bring up 'Known Target Words' or 'Recent Mistakes' in your conversation to reinforce them. Do NOT announce that you are doing this.
+5. Create a learning plan organically through conversation. Ask follow-up questions related to their interests.
+6. Keep your responses relatively short (2-4 sentences max).
+
+DO NOT output markdown lists or robotic formats. Just send a natural chat message.`
+                },
+                ...recentHistory,
+                {
+                    role: 'user',
+                    content: message
+                }
+            ],
+            temperature: 0.8,
+            max_tokens: 500
+        };
+
+        return from(fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        })).pipe(
+            switchMap(res => {
+                if (res.status === 429) {
+                    if (!fallbackAttempt) {
+                        // Automatically retry with Gemma2 which has much higher limits
+                        return this.askAiTutor(message, memoryPrompt, history, learningLang, nativeLang, true);
+                    }
+                    return throwError(() => new Error('RATE_LIMIT'));
+                }
+                if (!res.ok) {
+                    return throwError(() => new Error('Error'));
+                }
+                return from(res.json());
+            }),
+            map((data: any) => {
+                // If the switchMap returned an observable from the recursive call (string), handle it properly
+                if (typeof data === 'string') return data;
+                return data?.choices?.[0]?.message?.content || "Oops, I didn't get that!"
+            }),
+            catchError((err) => {
+                if (err.message === 'RATE_LIMIT') {
+                    return throwError(() => err);
+                }
+                return of('Хатогӣ рӯй дод. Дубора бигӯед?');
+            })
+        );
+    }
+
+    extractMemory(recentChatText: string): Observable<any> {
+        const url = `${environment.nodeBaseUrl}/api/ai/chat`;
+        
+        const requestBody = {
+            model: 'llama-3.1-8b-instant',
+            messages: [
+                {
+                    role: 'system',
+                    content: `Analyze this recent chat segment between a language learner and an AI tutor.
+Extract new data to update the user's learning profile.
+
+OUTPUT STRICTLY AS JSON WITH THE FOLLOWING STRUCTURE:
+{
+  "newInterests": ["string"], // Any hobbies or topics they mentioned they like
+  "newKnownWords": ["string"], // Any new words in the target language they used correctly
+  "newMistakes": ["string"], // Any grammar or vocab mistakes they made
+  "levelEstimate": "string", // E.g., 'Beginner', 'Intermediate'
+  "scoreIncrease": number, // 0 to 5, based on how much effort they showed
+  "nativeLanguage": "string", // Extract if they mention their native language (e.g. 'Tajik')
+  "learningLanguage": "string" // Extract if they mention the language they want to learn (e.g. 'Russian')
+}
+
+Output ONLY valid JSON. No markdown ticks, no extra text.`
+                },
+                {
+                    role: 'user',
+                    content: recentChatText
+                }
+            ],
+            temperature: 0.1,
+            max_tokens: 300,
+            response_format: { type: "json_object" }
+        };
+
+        return from(fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
+        })).pipe(
+            switchMap(res => res.ok ? from(res.json()) : throwError(() => new Error('Error'))),
+            map((data: any) => {
+                let content = data?.choices?.[0]?.message?.content || "{}";
+                // Clean up possible markdown
+                content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                return JSON.parse(content);
+            }),
+            catchError(() => of({})) // Return empty if parsing fails
+        );
+    }
+
     askAi(question: string): Observable<string> {
         return this.chat(question);
     }
 
     askAiVoiceCall(question: string): Observable<string> {
-        const apiKey = "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";
-        const url = 'https://api.groq.com/openai/v1/chat/completions';
+        const url = `${environment.nodeBaseUrl}/api/ai/chat`;
 
         const requestBody = {
-            model: 'llama-3.3-70b-versatile',
+            model: 'llama-3.1-8b-instant',
             messages: [
                 {
                     role: 'system',
@@ -254,8 +377,7 @@ CRITICAL RULES:
         return from(fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
         })).pipe(
@@ -276,9 +398,13 @@ CRITICAL RULES:
                     try { parsedData = JSON.parse(parsedData); } catch (e) {}
                 }
                 let text = '';
-                if (parsedData?.choices?.[0]?.message?.content) {
-                    text = parsedData.choices[0].message.content;
-                } else if (parsedData?.choices?.[0]?.text) {
+                if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].message) {
+                    if (parsedData.choices[0].message.refusal) {
+                        text = "Бубахшед, ман ин дархостро иҷро карда наметавонам.";
+                    } else {
+                        text = parsedData.choices[0].message.content;
+                    }
+                } else if (parsedData && parsedData.choices && parsedData.choices[0] && parsedData.choices[0].text) {
                     text = parsedData.choices[0].text;
                 } else if (typeof parsedData === 'string') {
                     text = parsedData;
@@ -343,19 +469,19 @@ CRITICAL RULES:
     }
 
     explainWord(word: string, translation: string = '', targetLang: string = 'en'): Observable<string> {
-        const langNames: any = {
-            'en': 'English',
-            'ru': 'Russian',
-            'tj': 'Tajik (Тоҷикӣ)',
-            'es': 'Spanish',
-            'ar': 'Arabic',
-            'fr': 'French',
-            'de': 'German',
-            'zh': 'Chinese',
-            'hi': 'Hindi',
-            'fa': 'Persian'
-        };
-        const langName = langNames[targetLang] || 'English';
+        const langNames = new Map<string, string>([
+            ['en', 'English'],
+            ['ru', 'Russian'],
+            ['tj', 'Tajik (Тоҷикӣ)'],
+            ['es', 'Spanish'],
+            ['ar', 'Arabic'],
+            ['fr', 'French'],
+            ['de', 'German'],
+            ['zh', 'Chinese'],
+            ['hi', 'Hindi'],
+            ['fa', 'Persian']
+        ]);
+        const langName = langNames.get(targetLang) || 'English';
 
         const prompt = `You are a professional language tutor. 
         Your task is to explain the foreign word/phrase: "${word}".

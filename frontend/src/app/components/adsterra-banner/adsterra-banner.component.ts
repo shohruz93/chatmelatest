@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, Renderer2, ViewChild, AfterViewInit, HostBinding } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, Renderer2, ViewChild, AfterViewInit, HostBinding, NgZone, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
@@ -22,19 +22,21 @@ import { AuthService } from '../../services/auth.service';
     }
   `]
 })
-export class AdsterraBannerComponent implements AfterViewInit, OnInit {
+export class AdsterraBannerComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() key!: string;
   @Input() width!: number;
   @Input() height!: number;
   @ViewChild('adContainer', { static: false }) adContainer?: ElementRef;
 
   isVip = false;
+  private observer?: IntersectionObserver;
+  private loaded = false;
 
   @HostBinding('class.hidden-ad') get hidden() {
     return this.isVip;
   }
 
-  constructor(private renderer: Renderer2, private authService: AuthService) {}
+  constructor(private renderer: Renderer2, private authService: AuthService, private ngZone: NgZone) {}
 
   ngOnInit() {
     const user = this.authService.currentUserValue;
@@ -42,11 +44,30 @@ export class AdsterraBannerComponent implements AfterViewInit, OnInit {
   }
 
   ngAfterViewInit() {
-    if (this.isVip) return;
-    if (!this.adContainer) return;
-    if (!this.key || !this.width || !this.height) return;
+    if (this.isVip || !this.adContainer) return;
 
-    // Create an iframe to safely isolate the document.write call from invoke.js
+    this.ngZone.runOutsideAngular(() => {
+      this.observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !this.loaded) {
+          this.loadAd();
+          this.loaded = true;
+          this.observer?.disconnect();
+        }
+      }, { rootMargin: '200px' }); // Load slightly before it comes into view
+
+      this.observer.observe(this.adContainer!.nativeElement);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  private loadAd() {
+    if (!this.key || !this.width || !this.height || !this.adContainer) return;
+
     const iframe = this.renderer.createElement('iframe');
     this.renderer.setAttribute(iframe, 'width', this.width.toString());
     this.renderer.setAttribute(iframe, 'height', this.height.toString());
@@ -55,7 +76,6 @@ export class AdsterraBannerComponent implements AfterViewInit, OnInit {
     this.renderer.setStyle(iframe, 'border', 'none');
     this.renderer.setStyle(iframe, 'overflow', 'hidden');
     
-    // Create HTML content for the iframe
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -81,18 +101,20 @@ export class AdsterraBannerComponent implements AfterViewInit, OnInit {
     
     this.renderer.appendChild(this.adContainer.nativeElement, iframe);
     
-    // Write content to iframe safely
-    setTimeout(() => {
-      try {
-        const iframeDoc = iframe.contentWindow?.document || iframe.contentDocument;
-        if (iframeDoc) {
-          iframeDoc.open();
-          iframeDoc.write(htmlContent);
-          iframeDoc.close();
+    // Use requestAnimationFrame to yield to the browser
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        try {
+          const iframeDoc = iframe.contentWindow?.document || iframe.contentDocument;
+          if (iframeDoc) {
+            iframeDoc.open();
+            iframeDoc.write(htmlContent);
+            iframeDoc.close();
+          }
+        } catch (e) {
+          console.error('Failed to load Adsterra banner:', e);
         }
-      } catch (e) {
-        console.error('Failed to load Adsterra banner:', e);
-      }
-    }, 100);
+      }, 50);
+    });
   }
 }
