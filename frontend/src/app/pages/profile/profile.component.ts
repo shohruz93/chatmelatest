@@ -240,7 +240,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             const userId = params['id'] ? +params['id'] : this.currentUser?.id;
 
             if (userId) {
-                this.isOwnProfile = (userId === this.currentUser?.id);
+                this.isOwnProfile = (userId === Number(this.currentUser?.id));
                 this.loadProfile(userId);
 
                 if (!this.isOwnProfile && this.currentUser) {
@@ -334,27 +334,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     loadComments(userId: number) {
-        this.api.getComments(userId).subscribe({
-            next: (data) => {
-                this.comments = data;
-                this.comments.map(comment => {
-                    comment.rater_avatar = `${this.api.phpBaseUrl}${comment.rater_avatar}`;
-                    comment.replies?.map((reply: any) => {
-                        reply.replier_avatar = `${this.api.phpBaseUrl}${reply.replier_avatar}`;
-                        return reply;
-                    })
-                })
-
-                // Check if current user has already rated this profile
-                if (this.currentUser) {
-
-                    this.hasRated = this.comments.some(
-                        c => c.rater_id === this.currentUser.id && c.rating !== null && c.rating > 0
-                    );
-                }
-            },
-            error: (err) => console.error('Error loading comments', err)
-        });
+        this.comments = [];
+        this.hasRated = false;
     }
 
     toggleEdit() {

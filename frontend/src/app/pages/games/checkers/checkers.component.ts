@@ -9,6 +9,7 @@ import { AuthService } from '../../../services/auth.service';
 import { GamificationService } from '../../../services/gamification.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { AdsterraBannerComponent } from '../../../components/adsterra-banner/adsterra-banner.component';
 
 enum PieceColor { WHITE = 1, BLACK = 2 }
 
@@ -22,7 +23,7 @@ type Difficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'EXPERT';
 @Component({
     selector: 'app-checkers',
     standalone: true,
-    imports: [CommonModule, FormsModule, TranslatePipe],
+    imports: [CommonModule, FormsModule, TranslatePipe, AdsterraBannerComponent],
     template: `
     <div class="checkers-page">
         <!-- Header -->
@@ -39,6 +40,16 @@ type Difficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'EXPERT';
             <div class="wallet-mini">
                 <span>{{ coins() }}</span>
                 <span class="coin-icon">🪙</span>
+            </div>
+        </div>
+
+        <!-- Ad Banner Container -->
+        <div class="ad-banner-container flex flex-col items-center justify-center w-full ad-wrapper" style="margin-bottom: 20px;">
+            <div class="hidden md:flex">
+                <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
+            </div>
+            <div class="flex md:hidden">
+                <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
             </div>
         </div>
 

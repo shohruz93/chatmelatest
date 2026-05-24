@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AdsterraBannerComponent } from '../../components/adsterra-banner/adsterra-banner.component';
 
 @Component({
   selector: 'app-games',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe, AdsterraBannerComponent],
   template: `
     <div class="games-container">
       <div class="games-header">
@@ -15,7 +16,18 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
         <p>{{ 'GAMES.SUBTITLE' | translate }}</p>
       </div>
 
+      <!-- Ad Banner Container -->
+      <div class="ad-banner-container flex flex-col items-center justify-center w-full my-6 ad-wrapper">
+        <div class="hidden md:flex">
+          <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
+        </div>
+        <div class="flex md:hidden">
+          <app-adsterra-banner key="18eed32956c99770165c9a1e71978d34" [width]="300" [height]="250"></app-adsterra-banner>
+        </div>
+      </div>
+
       <div class="games-grid">
+
 
 
         <div class="game-card checkers">

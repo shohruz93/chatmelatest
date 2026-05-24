@@ -219,38 +219,10 @@ export class UserProfileModalComponent implements OnInit {
     }
 
     loadComments() {
-        this.api.getComments(this.user.id).subscribe({
-            next: (data) => {
-                this.comments = data;
-                this.comments = this.comments.map(comment => {
-                    if (comment.rater_avatar && !comment.rater_avatar.startsWith('http')) {
-                        comment.rater_avatar = `${this.api.phpBaseUrl}${comment.rater_avatar}`;
-                    }
-                    if (comment.replies) {
-                        comment.replies = comment.replies.map((reply: any) => {
-                            if (reply.replier_avatar && !reply.replier_avatar.startsWith('http')) {
-                                reply.replier_avatar = `${this.api.phpBaseUrl}${reply.replier_avatar}`;
-                            }
-                            return reply;
-                        });
-                    }
-                    return comment;
-                });
-
-                // Check if current user has already rated
-                if (this.currentUser) {
-                    this.userRating = this.comments.find(
-                        c => c.rater_id === this.currentUser.id && c.rating !== null && c.rating > 0
-                    );
-                    this.hasRated = !!this.userRating;
-                }
-                this.cdr.detectChanges();
-            },
-            error: (err) => {
-                console.error('Error loading comments', err);
-                this.cdr.detectChanges();
-            }
-        });
+        this.comments = [];
+        this.hasRated = false;
+        this.userRating = null;
+        this.cdr.detectChanges();
     }
 
     setRating(stars: number) {

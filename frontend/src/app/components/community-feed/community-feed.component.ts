@@ -404,24 +404,64 @@ export class CommunityFeedComponent implements OnInit {
     likePost(post: CommunityPost) {
         if (!this.currentUser?.id) return;
 
+        // Optimistic UI update
+        const isCurrentlyLiked = post.user_liked;
+        const newLikesCount = isCurrentlyLiked ? Math.max(0, post.likes_count - 1) : post.likes_count + 1;
+
+        this.posts.update(posts => posts.map(p => {
+            if (p.id === post.id) {
+                return {
+                    ...p,
+                    likes_count: newLikesCount,
+                    user_liked: !isCurrentlyLiked
+                };
+            }
+            return p;
+        }));
+
+        const updatedPost = this.posts().find(p => p.id === post.id);
+        if (updatedPost) {
+            this.communityStorage.updatePost(updatedPost);
+        }
+
         this.communityService.likePost(this.currentUser.id, post.id).subscribe({
             next: (res) => {
+                // If service worker intercepted and didn't return actual data, keep optimistic state
+                if (res && res.likes_count !== undefined && res.liked !== undefined) {
+                    this.posts.update(posts => posts.map(p => {
+                        if (p.id === post.id) {
+                            return {
+                                ...p,
+                                likes_count: res.likes_count,
+                                user_liked: res.liked
+                            };
+                        }
+                        return p;
+                    }));
+                    const serverUpdatedPost = this.posts().find(p => p.id === post.id);
+                    if (serverUpdatedPost) {
+                        this.communityStorage.updatePost(serverUpdatedPost);
+                    }
+                }
+            },
+            error: (err) => {
+                console.error('Failed to like post', err);
+                // Revert optimistic update on error
                 this.posts.update(posts => posts.map(p => {
                     if (p.id === post.id) {
                         return {
                             ...p,
-                            likes_count: res.likes_count,
-                            user_liked: res.liked
+                            likes_count: isCurrentlyLiked ? p.likes_count + 1 : Math.max(0, p.likes_count - 1),
+                            user_liked: isCurrentlyLiked
                         };
                     }
                     return p;
                 }));
-                const updatedPost = this.posts().find(p => p.id === post.id);
-                if (updatedPost) {
-                    this.communityStorage.updatePost(updatedPost);
+                const revertedPost = this.posts().find(p => p.id === post.id);
+                if (revertedPost) {
+                    this.communityStorage.updatePost(revertedPost);
                 }
-            },
-            error: (err) => console.error('Failed to like post', err)
+            }
         });
     }
 

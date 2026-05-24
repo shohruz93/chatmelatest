@@ -143,10 +143,7 @@ $router->add('POST', '/profile/guests/seen', function() use ($profile) {
     $profile->markGuestsAsSeen($userId);
 });
 
-$router->add('GET', '/profile/comments', function() use ($profile) {
-    $userId = $_GET['userId'] ?? 0;
-    $profile->getComments($userId);
-});
+
 
 $router->add('POST', '/profile/comment/reply', function() use ($profile) {
     $profile->addReply();

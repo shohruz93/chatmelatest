@@ -35,7 +35,6 @@ export class HeaderComponent {
             filter(event => event instanceof NavigationEnd)
         ).subscribe((event: any) => {
             this.currentRoute = event.urlAfterRedirects;
-            this.checkUnread();
         });
     }
 

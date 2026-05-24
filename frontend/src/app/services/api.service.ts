@@ -14,7 +14,7 @@ export class ApiService {
     private cache = new Map<string, Observable<any>>();
     private cacheTimers = new Map<string, any>();
     private readonly CACHE_DURATION = 5 * 60 * 1000;
-    private readonly CACHEABLE_ENDPOINTS = ['/profile/guests', '/profile/comments', '/conversations', '/profile?'];
+    private readonly CACHEABLE_ENDPOINTS = ['/profile/guests', '/conversations', '/profile?'];
 
     constructor(private http: HttpClient) { }
 
@@ -102,9 +102,6 @@ export class ApiService {
     }
 
     // Comments & Ratings
-    getComments(userId: number): Observable<any> {
-        return this.http.get(`${this.apiUrl}/profile/comments?userId=${userId}`);
-    }
 
     getAdminContact(): Observable<any> {
         return this.http.get(`${this.apiUrl}/support/admin-contact`);

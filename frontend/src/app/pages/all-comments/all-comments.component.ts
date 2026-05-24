@@ -49,17 +49,8 @@ export class AllCommentsComponent implements OnInit {
     }
 
     loadComments() {
-        this.loading = true;
-        this.api.getComments(this.userId).subscribe({
-            next: (data) => {
-                this.comments = data;
-                this.loading = false;
-            },
-            error: (err) => {
-                console.error('Error loading comments', err);
-                this.loading = false;
-            }
-        });
+        this.loading = false;
+        this.comments = [];
     }
 
     toggleReply(commentId: number) {

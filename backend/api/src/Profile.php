@@ -401,64 +401,7 @@ class Profile {
     }
 
 
-    public function getComments($userId) {
-        // Get ratings/comments
-        $query = "SELECT ur.*, u.name as rater_name, u.avatar as rater_avatar, u.is_vip as rater_is_vip 
-                  FROM user_ratings ur 
-                  JOIN users u ON ur.rater_id = u.id 
-                  WHERE ur.rated_id = :user_id 
-                  ORDER BY ur.created_at DESC";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":user_id", $userId);
-        $stmt->execute();
-        $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        TimestampHelper::convertRowsToUnix($comments, ['created_at']);
-
-        // For each comment, get replies and likes
-        foreach ($comments as &$comment) {
-            // Fix rater avatar URL
-            if ($comment['rater_avatar']) {
-                $comment['rater_avatar'] = $comment['rater_avatar'];
-            }
-
-            // Get replies
-            $query = "SELECT cr.*, u.name as replier_name, u.avatar as replier_avatar, u.is_vip as replier_is_vip 
-                      FROM comment_replies cr 
-                      JOIN users u ON cr.user_id = u.id 
-                      WHERE cr.rating_id = :rating_id 
-                      ORDER BY cr.created_at ASC";
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":rating_id", $comment['id']);
-            $stmt->execute();
-            $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            TimestampHelper::convertRowsToUnix($replies, ['created_at']);
-
-            // Fix replier avatar URLs
-            foreach ($replies as &$reply) {
-                if ($reply['replier_avatar']) {
-                    $reply['replier_avatar'] = $reply['replier_avatar'];
-                }
-            }
-            $comment['replies'] = $replies;
-
-            // Get likes count
-            $query = "SELECT 
-                        SUM(CASE WHEN type = 'like' THEN 1 ELSE 0 END) as likes,
-                        SUM(CASE WHEN type = 'dislike' THEN 1 ELSE 0 END) as dislikes
-                      FROM comment_likes 
-                      WHERE rating_id = :rating_id";
-            $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":rating_id", $comment['id']);
-            $stmt->execute();
-            $likesData = $stmt->fetch(PDO::FETCH_ASSOC);
-            $comment['likes'] = $likesData['likes'] ?? 0;
-            $comment['dislikes'] = $likesData['dislikes'] ?? 0;
-        }
-
-        echo json_encode($comments);
-    }
 
 
     public function addReply() {

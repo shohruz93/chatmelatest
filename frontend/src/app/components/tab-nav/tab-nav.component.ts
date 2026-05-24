@@ -30,8 +30,6 @@ export class TabNavComponent {
             filter(event => event instanceof NavigationEnd)
         ).subscribe((event: any) => {
             this.currentRoute = event.urlAfterRedirects;
-            this.checkUnread();
-            // Guest count is now driven by WebSocket — no HTTP poll on navigation
         });
 
         // Real-time unread updates

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { GamificationService } from '../../../services/gamification.service';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../../pipes/translate.pipe';
+import { AdsterraBannerComponent } from '../../../components/adsterra-banner/adsterra-banner.component';
 
 enum ArrowDirection { UP = 'UP', RIGHT = 'RIGHT', DOWN = 'DOWN', LEFT = 'LEFT' }
 
@@ -20,7 +21,7 @@ interface ArrowShape {
 @Component({
   selector: 'app-arrows',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, AdsterraBannerComponent],
   template: `
     <div class="game-wrapper" [class.dark]="isDark">
       <div class="header">
@@ -38,6 +39,16 @@ interface ArrowShape {
         </div>
 
         <button class="exit-btn" (click)="exit()">✕</button>
+      </div>
+
+      <!-- Ad Banner Container -->
+      <div class="ad-banner-container flex flex-col items-center justify-center w-full ad-wrapper" style="margin-bottom: 5px;">
+        <div class="hidden md:flex">
+          <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
+        </div>
+        <div class="flex md:hidden">
+          <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
+        </div>
       </div>
 
       <div class="board-container" #boardContainer>

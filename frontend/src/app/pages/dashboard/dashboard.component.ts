@@ -87,17 +87,13 @@ export class DashboardComponent implements OnInit {
         this.checkNewGuests(); // Initial load only
 
 
-        // Refresh unread count on navigation (guests now via WebSocket)
+        // Close sidebar on mobile when navigating
         this.router.events.subscribe((event) => {
             if (event instanceof NavigationEnd) {
-                // Close sidebar on mobile when navigating
                 if (window.innerWidth < 1024) {
                     this.ui.sidebarOpen.set(false);
                 }
-
-                this.checkUnread();
             }
-            // Guest count is now driven by WebSocket — no HTTP poll on navigation
         });
 
         this.socketService.onMatchFound().subscribe(() => {
