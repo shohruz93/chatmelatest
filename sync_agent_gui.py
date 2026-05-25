@@ -7,7 +7,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import requests
-import socketio
+import socketio  # type: ignore  # python-socketio: pip install python-socketio
 
 # Global configuration
 DEFAULT_PHP_URL = "https://shphbjeio23.chatme.tj"
@@ -1203,6 +1203,64 @@ class SyncApp:
                     else:
                         status = 400
                         res_body = {"error": "Invalid followerId or followedId"}
+
+                elif "/api/ai/chat" in url:
+                    self.log("🤖 Дархости ИИ қабул шуд. Фиристодан ба Ollama бо модели gemma4:31b-cloud...")
+                    try:
+                        # Prepare request payload for Ollama
+                        ollama_payload = {
+                            "model": "gemma4:31b-cloud",
+                            "messages": body.get("messages", []),
+                            "temperature": body.get("temperature", 0.7),
+                            "stream": False
+                        }
+                        
+                        # Call Ollama OpenAI-compatible endpoint first
+                        ollama_url = "http://localhost:11434/v1/chat/completions"
+                        self.log(f"   -> Дархост ба {ollama_url} фиристода мешавад...")
+                        
+                        try:
+                            ollama_res = requests.post(ollama_url, json=ollama_payload, timeout=120)
+                            if ollama_res.ok:
+                                res_body = ollama_res.json()
+                                status = 200
+                                self.log("✅ Ҷавоби ИИ аз Ollama бомуваффақият қабул шуд (OpenAI endpoint).")
+                            else:
+                                raise Exception(f"Ollama returned status {ollama_res.status_code}: {ollama_res.text}")
+                        except Exception as e:
+                            self.log(f"⚠️ Хатогӣ дар OpenAI endpoint-и Ollama: {str(e)}. Кӯшиши API-и мустақим...")
+                            # Fallback to direct Ollama /api/chat endpoint
+                            direct_url = "http://localhost:11434/api/chat"
+                            ollama_res = requests.post(direct_url, json=ollama_payload, timeout=120)
+                            if ollama_res.ok:
+                                direct_data = ollama_res.json()
+                                # Format as OpenAI compatible structure for frontend
+                                res_body = {
+                                    "choices": [
+                                        {
+                                            "message": {
+                                                "role": "assistant",
+                                                "content": direct_data.get("message", {}).get("content", "")
+                                            },
+                                            "finish_reason": "stop"
+                                        }
+                                    ],
+                                    "model": "gemma4:31b-cloud"
+                                }
+                                status = 200
+                                self.log("✅ Ҷавоби ИИ аз Ollama бомуваффақият қабул шуд (Direct endpoint).")
+                            else:
+                                raise Exception(f"Direct Ollama API returned status {ollama_res.status_code}")
+                                
+                    except Exception as e:
+                        self.log(f"❌ Хатогии пайвастшавӣ ба Ollama: {str(e)}")
+                        self.log("Ишора: Боварӣ ҳосил кунед, ки Ollama кор карда истодааст ва модели gemma4:31b-cloud насб шудааст.")
+                        status = 500
+                        res_body = {
+                            "error": {
+                                "message": f"Хатогии пайваст ба модели локалии Оллама: {str(e)}. Боварӣ ҳосил кунед, ки барномаи Ollama фаъол аст ва модели gemma4:31b-cloud насб шудааст."
+                            }
+                        }
                         
                 else:
                     self.log(f"✍️ Навишти локалӣ дар SQLite барои: {url}...")
