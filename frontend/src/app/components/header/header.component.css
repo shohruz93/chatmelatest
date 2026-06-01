@@ -3,8 +3,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem 0;
+    padding: 2rem 5vw;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .header-right {
@@ -195,7 +196,7 @@
     }
 
     .header {
-        padding: 1rem 0;
+        padding: 1rem 5vw;
     }
 }
 

@@ -36,6 +36,7 @@ require_once __DIR__ . '/../src/ProgressController.php';
 require_once __DIR__ . '/../src/ContentController.php';
 require_once __DIR__ . '/../src/FlashcardController.php';
 require_once __DIR__ . '/../src/SyncController.php';
+require_once __DIR__ . '/../src/StatsController.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -69,6 +70,7 @@ $progressController  = new ProgressController();
 $contentController   = new ContentController();
 $flashcardController = new FlashcardController();
 $syncController      = new SyncController();
+$statsController     = new StatsController($db);
 
 // Auth Routes
 $router->add('POST', '/auth/google', function() use ($auth) {
@@ -910,6 +912,11 @@ $router->add('GET', '/system/fix-unique-id', function() {
 });
 $router->add('POST', '/system/fix-unique-id', function() {
     require_once __DIR__ . '/../fix_unique_id.php';
+});
+
+// Public Stats Route (no auth required, for home page)
+$router->add('GET', '/stats/public', function() use ($statsController) {
+    $statsController->getPublicStats();
 });
 
 // Test Route

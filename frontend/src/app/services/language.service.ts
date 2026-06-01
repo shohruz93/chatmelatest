@@ -123,7 +123,6 @@ export class LanguageService {
 
     setLanguage(code: string) {
         if (this.supportedLanguages.find(l => l.code === code)) {
-            this.currentLang.set(code);
             localStorage.setItem('lang', code);
             this.updateLayoutDirection(code);
             this.loadTranslations(code);

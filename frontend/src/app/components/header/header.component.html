@@ -18,7 +18,10 @@
             </div>
             }
         </div>
-        <button class="btn-login" routerLink="/login" [title]="'NAV.LOGIN' | translate">👤</button>
-        <!-- <button class="theme-toggle" (click)="toggleTheme()">{{ isDarkMode() ? '☀️' : '🌙' }}</button> -->
+        <button class="btn-login" routerLink="/login" [title]="'NAV.LOGIN' | translate"
+            id="header-login-btn" aria-label="Login">👤</button>
+        <button class="theme-toggle" (click)="toggleTheme()" id="header-theme-btn"
+            [title]="isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+            [attr.aria-label]="isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">{{ isDarkMode() ? '☀️' : '🌙' }}</button>
     </div>
 </header>

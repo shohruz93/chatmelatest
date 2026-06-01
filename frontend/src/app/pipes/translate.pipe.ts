@@ -10,6 +10,7 @@ export class TranslatePipe implements PipeTransform {
     private languageService = inject(LanguageService);
 
     transform(key: string, params?: any): string {
+        this.languageService.currentLang(); // Access signal to register dependency in OnPush templates
         return this.languageService.translate(key, params);
     }
 }

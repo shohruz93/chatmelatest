@@ -1,4 +1,4 @@
-import { Component, signal, inject, HostListener } from '@angular/core';
+import { Component, OnInit, signal, inject, HostListener } from '@angular/core';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -7,7 +7,6 @@ import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
 import { LanguageService } from '../../services/language.service';
 import { ChatStorageService } from '../../services/chat-storage.service';
-
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
@@ -17,13 +16,13 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
     templateUrl: './header.component.html',
     styleUrl: './header.component.css'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
     protected isDarkMode = signal(true);
     protected isMobileMenuOpen = signal(false);
     protected unreadCount = signal(0);
     private router = inject(Router);
-    private api = inject(ApiService); // Assuming ApiService is available in same scope or imported
-    private auth = inject(AuthService); // Need auth to get user ID
+    private api = inject(ApiService);
+    private auth = inject(AuthService);
     private socketService = inject(SocketService);
     private chatStorage = inject(ChatStorageService);
     public languageService = inject(LanguageService);
@@ -48,7 +47,6 @@ export class HeaderComponent {
         if (user) {
             this.api.get(`/conversations?userId=${user.id}`).subscribe({
                 next: (data: any) => {
-                    // Sum up unread counts
                     const total = data.reduce((acc: number, curr: any) => acc + parseInt(curr.unread_count), 0);
                     this.unreadCount.set(total);
                 },
@@ -68,8 +66,10 @@ export class HeaderComponent {
         this.isDarkMode.set(!this.isDarkMode());
         if (this.isDarkMode()) {
             document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
         } else {
             document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
         }
     }
 
@@ -86,10 +86,16 @@ export class HeaderComponent {
     }
 
     ngOnInit() {
-        // Initialize theme based on current state or default
-        if (document.documentElement.getAttribute('data-theme') !== 'dark' && this.isDarkMode()) {
+        // Read saved theme from localStorage (default: dark)
+        const savedTheme = localStorage.getItem('theme') ?? 'dark';
+        const isDark = savedTheme !== 'light';
+        this.isDarkMode.set(isDark);
+        if (isDark) {
             document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
         }
+
         this.currentRoute = this.router.url;
 
         // Listen for new messages to update unread count
