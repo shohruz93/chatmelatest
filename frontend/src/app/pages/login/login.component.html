@@ -1,6 +1,15 @@
 <div class="login-page">
     <header class="header">
         <div class="logo" routerLink="/">Chatme</div>
+        <div class="header-right">
+            <a routerLink="/" class="back-home-btn glass-button">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+            </a>
+            <button class="theme-toggle" (click)="toggleTheme()" [title]="isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                {{ isDarkMode() ? '☀️' : '🌙' }}
+            </button>
+        </div>
     </header>
 
     <main class="login-container">
@@ -67,8 +76,8 @@
                 <div class="card-footer">
                     <p class="terms">
                         {{ 'AUTH.TERMS_AGREE' | translate }}
-                        <a href="#" class="link">{{ 'AUTH.TERMS' | translate }}</a> {{ 'AUTH.AND' | translate }}
-                        <a href="#" class="link">{{ 'AUTH.PRIVACY' | translate }}</a>
+                        <a routerLink="/terms" class="link">{{ 'AUTH.TERMS' | translate }}</a> {{ 'AUTH.AND' | translate }}
+                        <a routerLink="/privacy" class="link">{{ 'AUTH.PRIVACY' | translate }}</a>
                     </p>
                 </div>
             </div>

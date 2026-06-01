@@ -9,7 +9,7 @@
     <main class="content">
         <!-- Back Button -->
         <div class="back-home-wrap">
-            <a routerLink="/" class="back-home-btn glass-button">
+            <a (click)="goBack()" class="back-home-btn glass-button">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>{{ 'NAV.DASHBOARD' | translate }}</span>
             </a>

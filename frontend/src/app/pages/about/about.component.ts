@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, PLATFORM_ID, ChangeDetectorRef, effect } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
@@ -15,6 +15,11 @@ export class AboutComponent implements OnInit {
     public languageService = inject(LanguageService);
     private platformId = inject(PLATFORM_ID);
     private cdr = inject(ChangeDetectorRef);
+    private location = inject(Location);
+
+    goBack() {
+        this.location.back();
+    }
 
     constructor() {
         effect(() => {

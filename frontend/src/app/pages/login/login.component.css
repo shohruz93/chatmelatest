@@ -33,6 +33,31 @@
     gap: 1rem;
 }
 
+.back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-radius: 100px;
+    background: var(--glass-bg);
+    border: 1px solid var(--border-glass);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-home-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--primary-color);
+    background: var(--bg-secondary);
+    transform: translateX(-4px);
+    box-shadow: 0 6px 16px var(--shadow-color);
+}
+
 .logo {
     font-size: 1.5rem;
     font-weight: 700;
