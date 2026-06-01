@@ -1,82 +1,137 @@
 <div class="page-container">
-    <div class="header-wrapper">
-        <app-header></app-header>
+    <!-- Floating background elements -->
+    <div class="about-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
     <main class="content">
+        <!-- Back Button -->
+        <div class="back-home-wrap">
+            <a routerLink="/" class="back-home-btn glass-button">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+            </a>
+        </div>
+
         <section class="hero-section">
+            <span class="about-badge">{{ 'HOME.ABOUT_BADGE' | translate }}</span>
             <h1 class="page-title">{{ 'ABOUT_PAGE.TITLE' | translate }}</h1>
             <p class="page-subtitle">{{ 'ABOUT_PAGE.SUBTITLE' | translate }}</p>
         </section>
 
         <section class="about-content">
-            <div class="about-section">
-                <h2 class="section-title">{{ 'ABOUT_PAGE.MISSION_TITLE' | translate }}</h2>
-                <p class="section-text">
-                    {{ 'ABOUT_PAGE.MISSION_DESC' | translate }}
-                </p>
+            <!-- Mission & What We Do Grid -->
+            <div class="info-grid">
+                <div class="about-section glass-panel animate-on-scroll">
+                    <div class="card-icon-header">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <h2 class="section-title">{{ 'ABOUT_PAGE.MISSION_TITLE' | translate }}</h2>
+                    <p class="section-text">
+                        {{ 'ABOUT_PAGE.MISSION_DESC' | translate }}
+                    </p>
+                </div>
+    
+                <div class="about-section glass-panel animate-on-scroll" style="animation-delay: 0.1s;">
+                    <div class="card-icon-header">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <h2 class="section-title">{{ 'ABOUT_PAGE.WHAT_WE_DO_TITLE' | translate }}</h2>
+                    <p class="section-text">
+                        {{ 'ABOUT_PAGE.WHAT_WE_DO_DESC' | translate }}
+                    </p>
+                </div>
             </div>
 
-            <div class="about-section">
-                <h2 class="section-title">{{ 'ABOUT_PAGE.WHAT_WE_DO_TITLE' | translate }}</h2>
-                <p class="section-text">
-                    {{ 'ABOUT_PAGE.WHAT_WE_DO_DESC' | translate }}
-                </p>
-            </div>
-
+            <!-- Stats Grid -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card glass-panel animate-on-scroll">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-users"></i></div>
                     <div class="stat-number">50K+</div>
                     <div class="stat-label">{{ 'ABOUT_PAGE.STATS.USERS' | translate }}</div>
                 </div>
-                <div class="stat-card">
+                
+                <div class="stat-card glass-panel animate-on-scroll" style="animation-delay: 0.1s;">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-earth-americas"></i></div>
                     <div class="stat-number">100+</div>
                     <div class="stat-label">{{ 'ABOUT_PAGE.STATS.COUNTRIES' | translate }}</div>
                 </div>
-                <div class="stat-card">
+                
+                <div class="stat-card glass-panel animate-on-scroll" style="animation-delay: 0.2s;">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-comments"></i></div>
                     <div class="stat-number">1M+</div>
                     <div class="stat-label">{{ 'ABOUT_PAGE.STATS.CONVERSATIONS' | translate }}</div>
                 </div>
-                <div class="stat-card">
+                
+                <div class="stat-card glass-panel animate-on-scroll" style="animation-delay: 0.3s;">
+                    <div class="stat-icon-wrap"><i class="fa-solid fa-language"></i></div>
                     <div class="stat-number">30+</div>
                     <div class="stat-label">{{ 'ABOUT_PAGE.STATS.LANGUAGES' | translate }}</div>
                 </div>
             </div>
 
-            <div class="about-section">
-                <h2 class="section-title">{{ 'ABOUT_PAGE.VALUES_TITLE' | translate }}</h2>
+            <!-- Values Section -->
+            <div class="about-section values-section">
+                <div class="section-header-center">
+                    <h2 class="section-title-center">{{ 'ABOUT_PAGE.VALUES_TITLE' | translate }}</h2>
+                    <div class="title-underline"></div>
+                </div>
+                
                 <div class="values-grid">
-                    <div class="value-item">
-                        <h3 class="value-title">🤝 {{ 'ABOUT_PAGE.VALUES.CONNECTION' | translate }}</h3>
-                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.CONNECTION_DESC' | translate }}
-                        </p>
+                    <div class="value-item glass-panel animate-on-scroll">
+                        <h3 class="value-title">
+                            <span class="val-icon">🤝</span> 
+                            <span>{{ 'ABOUT_PAGE.VALUES.CONNECTION' | translate }}</span>
+                        </h3>
+                        <p class="value-text">{{ 'ABOUT_PAGE.VALUES.CONNECTION_DESC' | translate }}</p>
                     </div>
-                    <div class="value-item">
-                        <h3 class="value-title">🌍 {{ 'ABOUT_PAGE.VALUES.INCLUSIVITY' | translate }}</h3>
+                    
+                    <div class="value-item glass-panel animate-on-scroll" style="animation-delay: 0.1s;">
+                        <h3 class="value-title">
+                            <span class="val-icon">🌍</span> 
+                            <span>{{ 'ABOUT_PAGE.VALUES.INCLUSIVITY' | translate }}</span>
+                        </h3>
                         <p class="value-text">{{ 'ABOUT_PAGE.VALUES.INCLUSIVITY_DESC' | translate }}</p>
                     </div>
-                    <div class="value-item">
-                        <h3 class="value-title">🔒 {{ 'ABOUT_PAGE.VALUES.PRIVACY' | translate }}</h3>
+                    
+                    <div class="value-item glass-panel animate-on-scroll" style="animation-delay: 0.2s;">
+                        <h3 class="value-title">
+                            <span class="val-icon">🔒</span> 
+                            <span>{{ 'ABOUT_PAGE.VALUES.PRIVACY' | translate }}</span>
+                        </h3>
                         <p class="value-text">{{ 'ABOUT_PAGE.VALUES.PRIVACY_DESC' | translate }}</p>
                     </div>
-                    <div class="value-item">
-                        <h3 class="value-title">✨ {{ 'ABOUT_PAGE.VALUES.INNOVATION' | translate }}</h3>
+                    
+                    <div class="value-item glass-panel animate-on-scroll" style="animation-delay: 0.3s;">
+                        <h3 class="value-title">
+                            <span class="val-icon">✨</span> 
+                            <span>{{ 'ABOUT_PAGE.VALUES.INNOVATION' | translate }}</span>
+                        </h3>
                         <p class="value-text">{{ 'ABOUT_PAGE.VALUES.INNOVATION_DESC' | translate }}</p>
                     </div>
                 </div>
             </div>
 
-            <div class="about-section">
-                <h2 class="section-title">{{ 'ABOUT_PAGE.JOIN_TITLE' | translate }}</h2>
-                <p class="section-text">
-                    {{ 'ABOUT_PAGE.JOIN_DESC' | translate }}
-                </p>
-                <button class="btn-cta" routerLink="/login">{{ 'ABOUT_PAGE.CTA' | translate }}</button>
+            <!-- CTA Section -->
+            <div class="about-section join-section glass-panel animate-on-scroll">
+                <div class="join-content">
+                    <h2 class="join-title">{{ 'ABOUT_PAGE.JOIN_TITLE' | translate }}</h2>
+                    <p class="join-text">
+                        {{ 'ABOUT_PAGE.JOIN_DESC' | translate }}
+                    </p>
+                    <button class="btn-cta" routerLink="/login">
+                        <span>{{ 'ABOUT_PAGE.CTA' | translate }}</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
+        <div class="footer-divider"></div>
         <div class="footer-content">
             <p>{{ 'ABOUT_PAGE.FOOTER' | translate }}</p>
             <div class="footer-links">

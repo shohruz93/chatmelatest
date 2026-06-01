@@ -1,17 +1,66 @@
 <div class="terms-container">
+    <div class="terms-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <!-- Back to Home Button -->
+    <div class="back-home-wrap">
+        <a routerLink="/" class="back-home-btn glass-button">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>{{ 'NAV.DASHBOARD' | translate }}</span>
+        </a>
+    </div>
+    
     <div class="terms-header">
+        <span class="terms-badge">{{ 'AUTH.TERMS' | translate }}</span>
         <h1>{{ 'terms.title' | translate }}</h1>
-        <p class="last-updated">{{ 'terms.last_updated' | translate }}: March 03, 2026</p>
+        <p class="last-updated">
+            <i class="fa-regular fa-clock"></i> 
+            {{ 'terms.last_updated' | translate }}: March 03, 2026
+        </p>
     </div>
 
-    <div class="terms-content">
-        <div *ngFor="let section of sections" class="terms-section">
-            <h2>{{ section.title | translate }}</h2>
-            <p>{{ section.content | translate }}</p>
-        </div>
+    <div class="terms-layout">
+        <!-- Sidebar Navigation (Table of Contents) -->
+        <aside class="terms-sidebar">
+            <div class="sidebar-sticky">
+                <nav class="sidebar-nav">
+                    <a *ngFor="let section of sections; let i = index" 
+                       (click)="scrollToSection('section-' + i)" 
+                       class="sidebar-link"
+                       [class.active]="activeSection === 'section-' + i">
+                       <span class="step-num">0{{ i + 1 }}</span>
+                       <span class="step-text">{{ section.title | translate }}</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Sections -->
+        <main class="terms-main">
+            <!-- Dynamic Sections -->
+            <section *ngFor="let section of sections; let i = index" 
+                 [id]="'section-' + i" 
+                 class="policy-card glass-panel animate-on-scroll">
+                <div class="card-header">
+                    <div class="card-num">0{{ i + 1 }}</div>
+                    <h2>{{ section.title | translate }}</h2>
+                </div>
+                <div class="card-body">
+                    <p>{{ section.content | translate }}</p>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <div class="terms-footer">
+    <!-- Footer Links inside Terms Page -->
+    <footer class="terms-footer">
+        <div class="footer-divider"></div>
         <p>{{ 'terms.footer_text' | translate }}</p>
-    </div>
+        <div class="footer-links">
+            <a routerLink="/privacy">{{ 'AUTH.PRIVACY' | translate }}</a>
+            <a routerLink="/terms" class="active">{{ 'AUTH.TERMS' | translate }}</a>
+        </div>
+    </footer>
 </div>
