@@ -56,6 +56,7 @@ export class SocketService implements OnDestroy {
     private voiceChatMessageSubject = new Subject<any>();
     private voiceRoomsListSubject = new Subject<any[]>();
     private voiceRoomsUpdateSubject = new Subject<any[]>();
+    private voiceRoomClosedSubject = new Subject<any>();
     private connectionStateSubject = new BehaviorSubject<boolean>(false);
     // Generic pass-through subjects for new server events
     private genericEventSubjects = new Map<string, Subject<any>>();
@@ -91,11 +92,13 @@ export class SocketService implements OnDestroy {
 
     // Voice Room Observables
     public voiceRoomJoined$ = this.voiceRoomJoinedSubject.asObservable();
+    public voiceRoomState$ = this.voiceRoomJoinedSubject.asObservable(); // Map state stream to voiceRoomJoined$
     public voiceUserJoined$ = this.voiceUserJoinedSubject.asObservable();
     public voiceUserLeft$ = this.voiceUserLeftSubject.asObservable();
     public voiceChatMessage$ = this.voiceChatMessageSubject.asObservable();
     public voiceRoomsList$ = this.voiceRoomsListSubject.asObservable();
     public voiceRoomsUpdate$ = this.voiceRoomsUpdateSubject.asObservable();
+    public voiceRoomClosed$ = this.voiceRoomClosedSubject.asObservable();
     public connectionState$ = this.connectionStateSubject.asObservable();
     private voiceErrorSubject = new Subject<any>();
     public voiceError$ = this.voiceErrorSubject.asObservable();
@@ -177,6 +180,7 @@ export class SocketService implements OnDestroy {
         this.socket.on('voice_room_joined', (data) => this.voiceRoomJoinedSubject.next(data));
         this.socket.on('voice_user_joined', (data) => this.voiceUserJoinedSubject.next(data));
         this.socket.on('voice_user_left', (data) => this.voiceUserLeftSubject.next(data));
+        this.socket.on('voice_room_closed', (data) => this.voiceRoomClosedSubject.next(data));
         this.socket.on('voice_chat_message', (data) => this.voiceChatMessageSubject.next(data));
         this.socket.on('voice_rooms_list', (data) => { this.voiceRoomsListSubject.next(data); this.voiceRoomsUpdateSubject.next(data); });
         this.socket.on('voice_rooms_update', (data) => { this.voiceRoomsListSubject.next(data); this.voiceRoomsUpdateSubject.next(data); });
@@ -448,6 +452,14 @@ export class SocketService implements OnDestroy {
 
     sendVoiceRoomMessage(roomId: string, content: string, senderName?: string, avatar?: string) {
         this.socket.emit('voice_room_message', { roomId, content, senderName, avatar });
+    }
+
+    getCurrentUser() {
+        return this.auth.currentUserValue;
+    }
+
+    setVoiceMute(roomId: string, isMuted: boolean) {
+        this.socket.emit('toggle_voice_mute', { roomId, isMuted });
     }
 
     // Generic methods for raw access

@@ -1,138 +1,218 @@
-<div class="room-wrapper">
-    <!-- ── HEADER ──────────────────────────────── -->
+<div class="voice-room-container flex flex-col xl:flex-row gap-6 justify-center">
+  <div class="voice-room-card glass-panel flex-1 w-full">
+    <!-- ═════════ HEADER ═════════ -->
     <header class="room-header">
-        <button class="btn-icon" (click)="leaveRoom()">
-            <span class="material-icons">arrow_back</span>
+      <div class="header-left">
+        <button class="back-btn-modern" (click)="leaveRoom()" [attr.aria-label]="'VOICE_ROOMS.LEAVE' | translate" title="{{ 'VOICE_ROOMS.LEAVE' | translate }}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
         </button>
-        <div class="header-center">
-            <div class="header-lang" *ngIf="language">
-                <span class="material-icons" style="font-size:14px">mic</span>
-                {{ language }}
+        <div class="room-title-info">
+          <h2 class="room-topic-text">{{ room()?.topic || ('VOICE_ROOMS.LOADING' | translate) }}</h2>
+          <div class="room-status-badges">
+            @if (room()) {
+            <span class="live-status-pill">
+              <span class="pulse-ring"></span>
+              <span class="pulse-dot-red"></span>
+              <span class="pill-text">LIVE</span>
+            </span>
+            }
+            <span class="lang-pill" *ngIf="room()?.language">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              {{ room()?.language }}
+            </span>
+            <!-- Live Audio Visualizer/Equalizer animation -->
+            <div class="audio-equalizer" *ngIf="room() && speakers().length > 0">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
             </div>
-            <h2 class="room-title">{{ topic }}</h2>
+          </div>
         </div>
-        <div class="header-controls">
-            <button class="btn-ctrl" [class.muted]="voiceService.isMuted()" (click)="voiceService.toggleMute()"
-                title="Mute">
-                <span class="material-icons">{{ voiceService.isMuted() ? 'mic_off' : 'mic' }}</span>
-            </button>
-            <button class="btn-end" (click)="leaveRoom()" title="Leave">
-                <span class="material-icons">call_end</span>
-            </button>
+      </div>
+
+      <div class="header-right">
+        <div class="users-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <span class="users-count">{{ participants().length }}</span>
         </div>
+
+        <button class="action-control-btn mic-btn" [class.muted]="isMuted()" (click)="toggleMute()" [attr.aria-label]="(isMuted() ? 'VOICE_ROOMS.UNMUTE' : 'VOICE_ROOMS.MUTE') | translate" title="{{ (isMuted() ? 'VOICE_ROOMS.UNMUTE' : 'VOICE_ROOMS.MUTE') | translate }}">
+          @if (!isMuted()) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+            <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          }
+        </button>
+
+        <button class="action-control-btn end-btn" (click)="leaveRoom()" [attr.aria-label]="'VOICE_ROOMS.LEAVE' | translate" title="{{ 'VOICE_ROOMS.LEAVE' | translate }}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <!-- ── STAGE (8 Slots Grid) ───────────────── -->
-    <div class="stage-section">
-        <div class="section-label">The Stage</div>
-        <div class="stage-grid">
-            <ng-container *ngFor="let slot of stageSlots(); let i = index">
-                <!-- Filled slot -->
-                <div class="stage-slot" *ngIf="slot; else emptySlot">
-                    <div class="avatar-ring" [class.speaking]="slot.isSpeaking" [class.vip-avatar]="slot.is_vip">
-                        <img *ngIf="slot.avatar" [src]="slot.avatar" class="stage-avatar" [alt]="slot.name">
-                        <div *ngIf="!slot.avatar" class="stage-avatar-ph">
-                            {{ (slot.name||'U')[0].toUpperCase() }}
-                        </div>
-                        <!-- Crown for index 0 (host) -->
-                        <div class="host-crown" *ngIf="i === 0">
-                            <span class="material-icons" style="font-size:12px">star</span>
-                        </div>
-                    </div>
-                    <span class="slot-name" [class.vip-text]="slot.is_vip" style="display: flex; align-items: center; justify-content: center;">
-                        {{ slot.name || ('User '+slot.id) }}
-                        @if (slot.is_vip) { <span class="vip-star" style="font-size: 0.9rem; margin-left: 2px;">⭐</span> }
-                    </span>
-                    <div class="audio-bars" [class.active]="slot.isSpeaking">
-                        <span></span><span></span><span></span><span></span>
-                    </div>
-                    <!-- Host: remove from stage button (admin only, not on host slot) -->
-                    <button class="btn-remove-speaker" *ngIf="isHost && i > 0" (click)="removeSpeaker(slot.id)"
-                        title="Remove from stage">
-                        <span class="material-icons" style="font-size:14px">close</span>
-                    </button>
-                </div>
-                <!-- Empty slot -->
-                <ng-template #emptySlot>
-                    <div class="stage-slot empty">
-                        <div class="empty-slot-circle">{{ i + 1 }}</div>
-                    </div>
-                </ng-template>
-            </ng-container>
-        </div>
-    </div>
+    <div class="room-content-split">
+      <!-- ═════════ LEFT SIDE: STAGE & AUDIENCE ═════════ -->
+      <div class="stage-area">
+        <!-- Speakers / Stage -->
+        <section class="stage-section">
+          <h3 class="stage-title">
+            <span class="glow-bullet"></span>
+            <span class="stage-title-text">{{ 'VOICE_ROOMS.SPEAKERS' | translate }}</span>
+            <span class="badge-count">{{ speakers().length }}</span>
+          </h3>
 
-    <!-- ── AUDIENCE SECTION ────────────────────── -->
-    <div class="audience-section" *ngIf="audienceParticipants().length > 0">
-        <div class="section-label">Others in the room</div>
-        <div class="audience-row">
-            <div class="audience-member" *ngFor="let p of audienceParticipants()" (click)="onAudienceAvatarClick(p)"
-                [title]="p.name || 'User '+p.id">
-                <div [class.vip-avatar]="p.is_vip" style="border-radius: 50%; height: max-content;">
-                    <img *ngIf="p.avatar" [src]="p.avatar" class="audience-avatar" [alt]="p.name">
-                    <div *ngIf="!p.avatar" class="audience-avatar audience-avatar-ph">
-                        {{ (p.name||'U')[0] }}
-                    </div>
+          <div class="speakers-flex-grid">
+            @for (p of speakers(); track p.userId; let i = $index) {
+            <div class="premium-speaker-card" [class.speaking]="p.isSpeaking" [class.vip-user]="p.is_vip" [style.animation-delay.ms]="i * 40">
+              <div class="avatar-container">
+                <div class="avatar-ring-glow"></div>
+                <div class="speaking-wave-ring"></div>
+                
+                <img *ngIf="p.avatar" [src]="getAvatarUrl(p.avatar)" class="avatar-image" [alt]="p.name">
+                <div *ngIf="!p.avatar" class="avatar-placeholder">
+                  {{ (p.name || 'U')[0].toUpperCase() }}
                 </div>
-                <span class="audience-name" [class.vip-text]="p.is_vip" style="display: flex; align-items: center; justify-content: center;">
-                    {{ (p.name || ('User '+p.id)).split(' ')[0] }}
-                    @if (p.is_vip) { <span class="vip-star" style="font-size: 0.8rem; margin-left: 1px;">⭐</span> }
+
+                <span class="host-pill-badge" *ngIf="p.userId === room()?.hostId">
+                  <span class="crown-icon">👑</span>
+                  <span>{{ 'VOICE_ROOMS.HOST' | translate }}</span>
                 </span>
-                <!-- Admin "invite to stage" badge -->
-                <div class="stage-request-badge" *ngIf="isHost && pendingRequestIds.has(p.id)">!</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- ── NON-HOST: Request to speak button ──── -->
-    <div class="request-bar" *ngIf="!isHost && !isOnStage">
-        <button class="btn-request" (click)="requestSpeakerSlot()" [disabled]="hasSentRequest">
-            <span class="material-icons">pan_tool</span>
-            {{ hasSentRequest ? 'Request Sent…' : 'Request to Speak' }}
-        </button>
-    </div>
-
-    <!-- ── CHAT SECTION ───────────────────────── -->
-    <div class="chat-section">
-        <div class="messages-list" #messagesContainer>
-            <div *ngFor="let msg of messages()" class="msg-row" [class.mine]="isMyMessage(msg)">
-                <img *ngIf="!isMyMessage(msg) && msg.avatar" [src]="msg.avatar" class="msg-avatar">
-                <div *ngIf="!isMyMessage(msg) && !msg.avatar" class="msg-avatar msg-avatar-ph">
-                    {{ (msg.senderName||'U')[0] }}
-                </div>
-                <div class="msg-bubble-wrap">
-                    <span class="msg-sender" *ngIf="!isMyMessage(msg)">{{ msg.senderName || 'User '+msg.senderId
-                        }}</span>
-                    <div class="msg-bubble">{{ msg.content }}</div>
-                </div>
-                <button class="btn-wave" *ngIf="!isMyMessage(msg)" title="Wave">
-                    <span>👋</span>
-                </button>
+                <span class="mic-status-badge" [class.muted]="p.isMuted">
+                  @if (p.isMuted) {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                    <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+                  </svg>
+                  } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  </svg>
+                  }
+                </span>
+              </div>
+              <div class="speaker-meta-info">
+                <span class="speaker-display-name" [class.vip-gradient]="p.is_vip">{{ p.name }}</span>
+                <span class="vip-star-icon" *ngIf="p.is_vip">⭐</span>
+              </div>
             </div>
-        </div>
-        <div class="chat-input-bar">
-            <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Comment…"
-                class="chat-input">
-            <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
-                <span class="material-icons">send</span>
+            }
+          </div>
+        </section>
+
+        <!-- Listeners / Audience -->
+        <section class="audience-section" *ngIf="listeners().length > 0">
+          <h3 class="stage-title">
+            <span class="glow-bullet audience-bullet"></span>
+            <span class="stage-title-text">{{ 'VOICE_ROOMS.LISTENERS' | translate }}</span>
+            <span class="badge-count count-audience">{{ listeners().length }}</span>
+          </h3>
+
+          <div class="listeners-avatar-cloud">
+            @for (p of listeners(); track p.userId; let i = $index) {
+            <div class="premium-listener-avatar-wrap" [class.vip-user]="p.is_vip" [style.animation-delay.ms]="i * 20" [attr.title]="p.name">
+              <img *ngIf="p.avatar" [src]="getAvatarUrl(p.avatar)" class="listener-avatar-img" [alt]="p.name">
+              <div *ngIf="!p.avatar" class="listener-avatar-ph">
+                {{ (p.name || 'U')[0].toUpperCase() }}
+              </div>
+            </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <!-- ═════════ RIGHT SIDE: LIVE EPHEMERAL CHAT ═════════ -->
+      <div class="chat-area">
+        <div class="chat-box-card">
+          <div class="chat-box-header">
+            <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="chat-header-title">{{ 'VOICE_ROOMS.MESSAGES' | translate }}</span>
+          </div>
+
+          <div class="chat-messages-container" #messagesContainer>
+            @for (m of messages(); track m.id; let i = $index) {
+            <div class="chat-message-row" [class.own-msg]="m.userId === myUserId" [style.animation-delay.ms]="i * 25">
+              <div class="msg-avatar-wrap" [class.vip-user]="m.is_vip">
+                <img *ngIf="m.avatar" [src]="getAvatarUrl(m.avatar)" class="msg-avatar-img" [alt]="m.name">
+                <div *ngIf="!m.avatar" class="msg-avatar-ph">
+                  {{ (m.name || 'U')[0].toUpperCase() }}
+                </div>
+              </div>
+              <div class="msg-body-wrapper">
+                <div class="msg-sender-meta">
+                  <span class="msg-sender-name" [class.vip-gradient]="m.is_vip">{{ m.name }}</span>
+                  <span class="vip-star-mini" *ngIf="m.is_vip">⭐</span>
+                  <span class="msg-timestamp">{{ m.time | date:'shortTime' }}</span>
+                </div>
+                <div class="msg-text-bubble">{{ m.text }}</div>
+              </div>
+            </div>
+            }
+            @if (messages().length === 0) {
+            <div class="empty-chat-state">
+              <div class="empty-chat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <p class="empty-chat-text">{{ 'VOICE_ROOMS.NO_MESSAGES' | translate }}</p>
+            </div>
+            }
+          </div>
+
+          <form class="chat-composer-form" (submit)="sendMessage($event)">
+            <input type="text" [(ngModel)]="newMessage" name="newMessage"
+                   [placeholder]="'VOICE_ROOMS.MESSAGE_PLACEHOLDER' | translate"
+                   class="chat-input-field"
+                   autocomplete="off"
+                   maxlength="500">
+            <button type="submit" class="send-message-btn" [disabled]="!newMessage.trim()" [attr.aria-label]="'VOICE_ROOMS.SEND' | translate">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
             </button>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- ── ADMIN: Stage Request Dialog ───────── -->
-    <div class="request-dialog-overlay" *ngIf="pendingRequests.length > 0 && isHost">
-        <div class="request-dialog">
-            <ng-container *ngIf="pendingRequests[0] as req">
-                <div class="req-avatar-wrap">
-                    <img *ngIf="req.userAvatar" [src]="req.userAvatar" class="req-avatar">
-                    <div *ngIf="!req.userAvatar" class="req-avatar req-avatar-ph">{{ (req.userName||'U')[0] }}</div>
-                </div>
-                <p><strong>{{ req.userName }}</strong> wants to speak on stage</p>
-                <div class="req-actions">
-                    <button class="btn-reject" (click)="rejectSpeaker(req.userId)">Reject</button>
-                    <button class="btn-approve" (click)="approveSpeaker(req.userId)">Allow</button>
-                </div>
-            </ng-container>
-        </div>
+  <!-- ═════════ Right Sidebar (Adsterra Banner) ═════════ -->
+  <div class="hidden xl:block w-[160px] flex-shrink-0 ad-wrapper">
+    <div class="sticky top-4">
+      <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
     </div>
+  </div>
 </div>

@@ -1,88 +1,209 @@
-<div class="page-wrapper">
-  <!-- Header -->
-  <div class="page-header">
-    <div class="tabs">
-      <button class="tab active">Voice</button>
-    </div>
-    <button class="btn-create" (click)="showCreateModal = true">
-      <span class="material-icons">mic</span>
-    </button>
-  </div>
+<div class="voice-rooms-page flex flex-col xl:flex-row gap-6 justify-center w-full max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+  <div class="flex-1 w-full max-w-[1100px] flex flex-col">
 
-  <!-- Language Filters -->
-  <div class="lang-filters">
-    <button class="lang-chip" [class.active]="filterLang === ''" (click)="setFilter('')">All</button>
-    <button class="lang-chip" *ngFor="let l of languages" [class.active]="filterLang === l" (click)="setFilter(l)">{{ l }}</button>
-  </div>
-
-  <!-- Rooms List -->
-  <div class="rooms-list">
-    <div class="room-card" *ngFor="let room of filteredRooms()" (click)="joinRoom(room.id)">
-      <div class="room-meta">
-        <span class="lang-badge">
-          <span class="material-icons" style="font-size:13px; vertical-align:middle">mic</span>
-          {{ room.language || 'EN' }}
+    <!-- ═════════ Header ═════════ -->
+    <header class="page-header bg-transparent !border-b-0 !p-0 mb-5">
+      <div class="header-title-area flex items-center gap-3 flex-wrap">
+        <h2>{{ 'NAV.VOICE_ROOMS' | translate }}</h2>
+        <span class="live-pulse-badge" aria-label="Live">
+          <span class="pulse-dot"></span>
+          <span class="text-xs font-bold uppercase tracking-wider">Live</span>
         </span>
-        <span class="count-badge">
-          <span class="material-icons" style="font-size:13px; vertical-align:middle">people</span>
-          {{ room.participantsCount || 0 }}
-        </span>
+        @if (loading && rooms().length === 0) {
+        <div class="sync-indicator flex items-center gap-1.5">
+          <svg class="animate-spin h-4 w-4 text-[var(--accent-primary,#818cf8)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span class="text-xs text-[var(--text-secondary)] font-medium">Loading…</span>
+        </div>
+        }
       </div>
 
-      <h3 class="room-topic">{{ room.topic }}</h3>
+      <button class="btn-create" (click)="showCreateModal = true" [attr.aria-label]="'VOICE_ROOMS.CREATE' | translate" [title]="'VOICE_ROOMS.CREATE' | translate">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+    </header>
 
-      <div class="room-host-row">
-        <div class="host-avatar-wrap" [class.vip-avatar]="room.host_is_vip" style="border-radius: 50%;">
-          <img *ngIf="room.hostAvatar" [src]="getAvatarUrl(room.hostAvatar)" class="host-avatar" [alt]="room.hostName">
-          <div *ngIf="!room.hostAvatar" class="host-avatar host-avatar-placeholder">
-            {{ (room.hostName || 'H')[0].toUpperCase() }}
+    <!-- ═════════ Language Filters ═════════ -->
+    <div class="lang-filters" role="tablist" aria-label="Filter by language">
+      <button class="lang-chip" [class.active]="filterLang === ''" (click)="setFilter('')" role="tab" [attr.aria-selected]="filterLang === ''">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>{{ 'EXPLORE_PAGE.ANY_LANGUAGE' | translate }}</span>
+      </button>
+      <button class="lang-chip" *ngFor="let l of languages; let i = index"
+              [class.active]="filterLang === l"
+              (click)="setFilter(l)"
+              [style.animation-delay.ms]="i * 40"
+              role="tab"
+              [attr.aria-selected]="filterLang === l">
+        <span class="lang-dot" [style.background]="getLangColor(l)"></span>
+        <span>{{ l }}</span>
+      </button>
+    </div>
+
+    <!-- ═════════ Rooms List ═════════ -->
+    <div class="rooms-list">
+      <!-- Real rooms -->
+      @for (room of filteredRooms(); track room.id; let i = $index) {
+      <div class="room-card" [style.animation-delay.ms]="i * 60" (click)="joinRoom(room.id)" tabindex="0" (keyup.enter)="joinRoom(room.id)">
+        <div class="room-card-glow"></div>
+
+        <div class="room-meta">
+          <span class="lang-badge" [style.background]="getLangColor(room.language) + '22'" [style.color]="getLangColor(room.language)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            {{ room.language || 'EN' }}
+          </span>
+          <span class="count-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            {{ room.participantsCount || 0 }}
+          </span>
+          @if (room.participantsCount > 0) {
+          <span class="live-mini">
+            <span class="pulse-dot-mini"></span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">On Air</span>
+          </span>
+          }
+        </div>
+
+        <h3 class="room-topic">{{ room.topic }}</h3>
+
+        <div class="room-host-row">
+          <div class="host-avatar-wrap" [class.vip-avatar]="room.host_is_vip">
+            <img *ngIf="room.hostAvatar" [src]="getAvatarUrl(room.hostAvatar)" class="host-avatar" [alt]="room.hostName">
+            <div *ngIf="!room.hostAvatar" class="host-avatar host-avatar-placeholder">
+              {{ (room.hostName || 'H')[0].toUpperCase() }}
+            </div>
           </div>
-        </div>
-        <span class="host-name" [class.vip-text]="room.host_is_vip" style="display: flex; align-items: center;">
-          {{ room.hostName || ('User ' + room.hostId) }}
-          @if (room.host_is_vip) { <span class="vip-star" style="font-size: 0.9rem; margin-left: 2px;">⭐</span> }
-        </span>
 
-        <div class="avatar-strip" *ngIf="room.avatarPreview?.length">
-          <ng-container *ngFor="let p of room.avatarPreview">
-            <img *ngIf="p.avatar" [src]="getAvatarUrl(p.avatar)" class="strip-avatar" [title]="p.name">
-            <div *ngIf="!p.avatar" class="strip-avatar strip-avatar-ph">{{ (p.name||'U')[0] }}</div>
-          </ng-container>
+          <span class="host-name" [class.vip-text]="room.host_is_vip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;vertical-align:-1px">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            {{ room.hostName || ('User ' + room.hostId) }}
+            @if (room.host_is_vip) { <span class="vip-star" aria-label="VIP">⭐</span> }
+          </span>
+
+          <div class="avatar-strip" *ngIf="room.avatarPreview?.length">
+            <ng-container *ngFor="let p of room.avatarPreview">
+              <img *ngIf="p.avatar" [src]="getAvatarUrl(p.avatar)" class="strip-avatar" [title]="p.name">
+              <div *ngIf="!p.avatar" class="strip-avatar strip-avatar-ph">{{ (p.name||'U')[0] }}</div>
+            </ng-container>
+            @if ((room.participantsCount || 0) > (room.avatarPreview?.length || 0)) {
+            <div class="strip-avatar strip-avatar-more">+{{ (room.participantsCount || 0) - (room.avatarPreview?.length || 0) }}</div>
+            }
+          </div>
+
+          <button class="room-join-btn" (click)="$event.stopPropagation(); joinRoom(room.id)" [attr.aria-label]="'VOICE_ROOMS.JOIN' | translate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
-    </div>
+      }
 
-    <div *ngIf="filteredRooms().length === 0" class="empty-state">
-      <span class="material-icons empty-icon">mic_none</span>
-      <p>No active voice rooms.<br>Start one to talk with people!</p>
-      <button class="btn-create-big" (click)="showCreateModal = true">+ Create Room</button>
+      <!-- ═════════ Skeleton loaders ═════════ -->
+      @if (loading && rooms().length === 0) {
+      <div class="room-skeleton" *ngFor="let i of [1,2,3,4]" [style.animation-delay.ms]="i * 80">
+        <div class="sk-meta">
+          <div class="sk-badge"></div>
+          <div class="sk-badge small"></div>
+        </div>
+        <div class="sk-topic"></div>
+        <div class="sk-host">
+          <div class="sk-avatar"></div>
+          <div class="sk-line"></div>
+        </div>
+      </div>
+      }
+
+      <!-- ═════════ Empty state ═════════ -->
+      @if (!loading && filteredRooms().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </div>
+        <h3 class="empty-title">{{ 'VOICE_ROOMS.EMPTY_TITLE' | translate }}</h3>
+        <p class="empty-desc">{{ 'VOICE_ROOMS.EMPTY_DESC' | translate }}</p>
+        <button class="btn-create-big" (click)="showCreateModal = true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>{{ 'VOICE_ROOMS.CREATE' | translate }}</span>
+        </button>
+      </div>
+      }
     </div>
   </div>
 
-  <!-- Create Room Modal -->
-  <div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false">
-    <div class="modal-box" (click)="$event.stopPropagation()">
-      <h3>Create Voice Room</h3>
-      <input type="text" [(ngModel)]="newRoomTopic" placeholder="Room topic…" class="modal-input" autofocus>
-      <select [(ngModel)]="newRoomLang" class="modal-input">
-        <option value="EN">🇺🇸 English (EN)</option>
-        <option value="RU">🇷🇺 Russian (RU)</option>
-        <option value="TJ">🇹🇯 Tajik (TJ)</option>
-        <option value="ES">🇪🇸 Spanish (ES)</option>
-        <option value="CN">🇨🇳 Chinese (CN)</option>
-        <option value="AR">🇸🇦 Arabic (AR)</option>
-        <option value="FR">🇫🇷 French (FR)</option>
-        <option value="DE">🇩🇪 German (DE)</option>
-        <option value="ID">🇮🇩 Indonesian (ID)</option>
-        <option value="JA">🇯🇵 Japanese (JA)</option>
-        <option value="KO">🇰🇷 Korean (KO)</option>
-        <option value="PT">🇧🇷 Portuguese (PT)</option>
-        <option value="TR">🇹🇷 Turkish (TR)</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn-cancel" (click)="showCreateModal = false">Cancel</button>
-        <button class="btn-confirm" (click)="createRoom()" [disabled]="!newRoomTopic.trim()">Create</button>
-      </div>
+  <!-- ═════════ Right Sidebar ═════════ -->
+  <div class="hidden xl:block w-[160px] flex-shrink-0 ad-wrapper">
+    <div class="sticky top-4">
+      <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════ Create Room Modal ═════════ -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="showCreateModal = false" role="dialog" aria-modal="true">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ 'VOICE_ROOMS.CREATE_TITLE' | translate }}</h3>
+      <button class="modal-close-x" (click)="showCreateModal = false" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <input type="text" [(ngModel)]="newRoomTopic" [placeholder]="'VOICE_ROOMS.TOPIC_PLACEHOLDER' | translate" class="modal-input" autofocus maxlength="80">
+    <select [(ngModel)]="newRoomLang" class="modal-input">
+      <option value="EN">🇺🇸 English (EN)</option>
+      <option value="RU">🇷🇺 Russian (RU)</option>
+      <option value="TJ">🇹🇯 Tajik (TJ)</option>
+      <option value="ES">🇪🇸 Spanish (ES)</option>
+      <option value="CN">🇨🇳 Chinese (CN)</option>
+      <option value="AR">🇸🇦 Arabic (AR)</option>
+      <option value="FR">🇫🇷 French (FR)</option>
+      <option value="DE">🇩🇪 German (DE)</option>
+      <option value="ID">🇮🇩 Indonesian (ID)</option>
+      <option value="JA">🇯🇵 Japanese (JA)</option>
+      <option value="KO">🇰🇷 Korean (KO)</option>
+      <option value="PT">🇧🇷 Portuguese (PT)</option>
+      <option value="TR">🇹🇷 Turkish (TR)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showCreateModal = false">{{ 'VOICE_ROOMS.CANCEL' | translate }}</button>
+      <button class="btn-confirm" (click)="createRoom()" [disabled]="!newRoomTopic.trim()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        <span>{{ 'VOICE_ROOMS.GO_LIVE' | translate }}</span>
+      </button>
     </div>
   </div>
 </div>
