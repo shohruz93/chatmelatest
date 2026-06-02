@@ -1,136 +1,419 @@
 <div class="dashboard-container">
-    <!-- Sidebar -->
-    <aside class="sidebar" [class.open]="ui.sidebarOpen()">
-        <div class="sidebar-header">
-            <div class="logo" routerLink="explore">Chatme</div>
-            <button class="sidebar-close" (click)="ui.toggleSidebar()">✕</button>
-        </div>
 
-        <div class="sidebar-content">
-            <!-- Profile Link -->
-            <div class="user-profile" routerLink="profile" routerLinkActive="active"
-                [title]="'NAV.GO_TO_PROFILE' | translate">
-                <div class="profile-avatar" [class.vip-avatar]="currentUser?.is_vip">
-                    <img [src]="userAvatar || 'default-avatar.png'" [alt]="userDisplayName">
-                    <span class="online-status-dot"></span>
-                    @if (newGuestsCount > 0) {
-                    <span class="badge guest-badge-sidebar">{{ newGuestsCount }}</span>
-                    }
-                </div>
-                <div class="profile-info">
-                    <div class="profile-name" [class.vip-text]="currentUser?.is_vip">
-                        {{ userDisplayName }}
-                        @if (currentUser?.is_vip) {
-                        <span class="vip-star">⭐</span>
-                        }
-                    </div>
-                    <div class="profile-stats">
-                        <span class="stat-item coins" [title]="'COMMON.COINS' | translate">
-                            <span class="stat-icon">🪙</span>
-                            <span class="stat-value">{{ gameService.userCoins() }}</span>
-                        </span>
-                        <span class="stat-item xp" [title]="'COMMON.XP' | translate">
-                            <span class="stat-icon">⚡</span>
-                            <span class="stat-value">{{ gameService.userXp() }}</span>
-                        </span>
-                    </div>
-                </div>
-            </div>
+    <!-- ══════════════════════════════════════════════════════
+         TOP NAVIGATION BAR — Modern Glassmorphism Design
+    ══════════════════════════════════════════════════════ -->
+    <nav class="top-nav" [class.scrolled]="navScrolled">
+        <div class="nav-inner">
 
-            <!-- Messages Link -->
-            <a routerLink="conversations" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">💬</span>
-                <span>{{ 'NAV.MESSAGES' | translate }}</span>
-                @if (unreadCount > 0) {
-                <span class="badge">{{ unreadCount }}</span>
-                }
+            <!-- Logo -->
+            <a routerLink="explore" class="nav-logo" aria-label="Chatme Home">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="url(#logoGrad)"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#818cf8"/>
+                                <stop offset="100%" style="stop-color:#a855f7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="logo-text">Chatme</span>
             </a>
 
-            <!-- Explore Link -->
-            <a routerLink="explore" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">🔍</span>
+            <!-- Desktop Navigation Links -->
+            <div class="nav-links">
+
+                <!-- Explore / Users -->
+                <a routerLink="explore" routerLinkActive="active" class="nav-item" id="nav-explore" [title]="'NAV.EXPLORE' | translate">
+                    <div class="nav-item-inner">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <span class="nav-label">{{ 'NAV.EXPLORE' | translate }}</span>
+                    </div>
+                    <div class="nav-indicator"></div>
+                </a>
+
+                <!-- Messages / Conversations -->
+                <a routerLink="conversations" routerLinkActive="active" class="nav-item" id="nav-messages" [title]="'NAV.MESSAGES' | translate">
+                    <div class="nav-item-inner">
+                        <div class="nav-icon-wrap">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            @if (unreadCount > 0) {
+                            <span class="nav-badge" aria-label="{{ unreadCount }} unread messages">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+                            }
+                        </div>
+                        <span class="nav-label">{{ 'NAV.MESSAGES' | translate }}</span>
+                    </div>
+                    <div class="nav-indicator"></div>
+                </a>
+
+                <!-- Community -->
+                <a routerLink="community" routerLinkActive="active" class="nav-item" id="nav-community" [title]="'NAV.COMMUNITY' | translate">
+                    <div class="nav-item-inner">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span class="nav-label">{{ 'NAV.COMMUNITY' | translate }}</span>
+                    </div>
+                    <div class="nav-indicator"></div>
+                </a>
+
+                <!-- Learning / Омӯзиш -->
+                <a routerLink="learning" routerLinkActive="active" class="nav-item" id="nav-learning" [title]="'NAV.LEARNING' | translate">
+                    <div class="nav-item-inner">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                        <span class="nav-label">{{ 'NAV.LEARNING' | translate }}</span>
+                    </div>
+                    <div class="nav-indicator"></div>
+                </a>
+
+                <!-- Voice Rooms -->
+                <a routerLink="voice-rooms" routerLinkActive="active" class="nav-item nav-item-voice" id="nav-voice" [title]="'NAV.VOICE_ROOMS' | translate">
+                    <div class="nav-item-inner">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                        <span class="nav-label">{{ 'NAV.VOICE_ROOMS' | translate }}</span>
+                        <span class="live-dot" aria-label="Live"></span>
+                    </div>
+                    <div class="nav-indicator"></div>
+                </a>
+
+            </div>
+
+            <!-- Right side actions -->
+            <div class="nav-actions">
+
+                <!-- Theme toggle -->
+                <button class="action-btn" (click)="toggleTheme()" id="nav-theme-btn"
+                    [title]="isDarkMode() ? 'Switch to Light' : 'Switch to Dark'"
+                    [attr.aria-label]="isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                    @if (isDarkMode()) {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    } @else {
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                    }
+                </button>
+
+                <!-- Language -->
+                <div class="lang-wrap">
+                    <button class="action-btn lang-btn" (click)="$event.stopPropagation(); showLangMenu = !showLangMenu" id="nav-lang-btn"
+                        [title]="'NAV.LANGUAGE' | translate">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="2" y1="12" x2="22" y2="12"/>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                        </svg>
+                        <span class="lang-code">{{ languageService.getCurrentLanguage() | uppercase }}</span>
+                    </button>
+                    @if (showLangMenu) {
+                    <div class="lang-dropdown" (click)="$event.stopPropagation()">
+                        @for (lang of languageService.supportedLanguages; track lang.code) {
+                        <button class="lang-option" (click)="setLanguage(lang.code); showLangMenu = false"
+                            [class.active]="languageService.getCurrentLanguage() === lang.code">
+                            <span class="lang-flag">{{ lang.flag }}</span>
+                            <span>{{ lang.name }}</span>
+                        </button>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <!-- Profile Avatar -->
+                <a routerLink="profile" class="profile-btn" id="nav-profile-btn"
+                    [title]="'NAV.GO_TO_PROFILE' | translate">
+                    <div class="profile-avatar-wrap" [class.vip-avatar]="currentUser?.is_vip">
+                        @if (userAvatar) {
+                        <img [src]="userAvatar" [alt]="userDisplayName" class="profile-img" loading="lazy">
+                        } @else {
+                        <div class="profile-initials">{{ userDisplayName.charAt(0) || 'U' }}</div>
+                        }
+                        <span class="status-dot"></span>
+                        @if (newGuestsCount > 0) {
+                        <span class="profile-badge">{{ newGuestsCount > 9 ? '9+' : newGuestsCount }}</span>
+                        }
+                    </div>
+                    @if (currentUser?.is_vip) {
+                    <span class="vip-crown" title="VIP">👑</span>
+                    }
+                </a>
+
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button class="hamburger-btn" (click)="ui.toggleSidebar()" id="nav-hamburger" aria-label="Open menu">
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+                <span class="ham-line"></span>
+                @if (unreadCount + newGuestsCount > 0) {
+                <span class="ham-badge">{{ (unreadCount + newGuestsCount) > 9 ? '9+' : (unreadCount + newGuestsCount) }}</span>
+                }
+            </button>
+
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar Overlay -->
+    @if (ui.sidebarOpen()) {
+    <div class="sidebar-overlay" (click)="ui.sidebarOpen.set(false)" aria-hidden="true"></div>
+    }
+
+    <!-- Mobile Sidebar Drawer -->
+    <aside class="sidebar-drawer" [class.open]="ui.sidebarOpen()" role="navigation" aria-label="Main navigation">
+        <div class="drawer-header">
+            <div class="drawer-logo">Chatme</div>
+            <button class="drawer-close" (click)="ui.sidebarOpen.set(false)" aria-label="Close menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Profile in drawer -->
+        <a routerLink="profile" class="drawer-profile" (click)="ui.sidebarOpen.set(false)">
+            <div class="drawer-avatar" [class.vip-avatar]="currentUser?.is_vip">
+                @if (userAvatar) {
+                <img [src]="userAvatar" [alt]="userDisplayName" loading="lazy">
+                } @else {
+                <div class="drawer-avatar-text">{{ userDisplayName.charAt(0) || 'U' }}</div>
+                }
+                <span class="status-dot"></span>
+                @if (newGuestsCount > 0) {
+                <span class="profile-badge">{{ newGuestsCount }}</span>
+                }
+            </div>
+            <div class="drawer-user-info">
+                <div class="drawer-name" [class.vip-text]="currentUser?.is_vip">
+                    {{ userDisplayName }}
+                    @if (currentUser?.is_vip) {<span class="vip-star">⭐</span>}
+                </div>
+                <div class="drawer-stats">
+                    <span class="stat-coins">🪙 {{ gameService.userCoins() }}</span>
+                    <span class="stat-xp">⚡ {{ gameService.userXp() }}</span>
+                </div>
+            </div>
+        </a>
+
+        <div class="drawer-divider"></div>
+
+        <!-- Drawer nav links -->
+        <div class="drawer-nav">
+            <a routerLink="explore" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
                 <span>{{ 'NAV.EXPLORE' | translate }}</span>
             </a>
 
-            <!-- Community Link -->
-            <a routerLink="community" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">📱</span>
+            <a routerLink="conversations" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <div class="drawer-link-icon-wrap">
+                    <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    @if (unreadCount > 0) {
+                    <span class="drawer-badge">{{ unreadCount }}</span>
+                    }
+                </div>
+                <span>{{ 'NAV.MESSAGES' | translate }}</span>
+            </a>
+
+            <a routerLink="community" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
                 <span>{{ 'NAV.COMMUNITY' | translate }}</span>
             </a>
 
-            <!-- Learning Link -->
-            <a routerLink="learning" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">📚</span>
+            <a routerLink="voice-rooms" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                <span>{{ 'NAV.VOICE_ROOMS' | translate }}</span>
+                <span class="drawer-live">LIVE</span>
+            </a>
+
+            <a routerLink="learning" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
                 <span>{{ 'NAV.LEARNING' | translate }}</span>
             </a>
 
-            <!-- Leaderboard Link -->
-            <a routerLink="leaderboard" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">🏆</span>
+            <a routerLink="leaderboard" routerLinkActive="active" class="drawer-link" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/>
+                </svg>
                 <span>{{ 'NAV.LEADERBOARD' | translate }}</span>
             </a>
 
-            <!-- Voice Rooms Link -->
-            <a routerLink="voice-rooms" routerLinkActive="active" class="btn-messages">
-                <span class="btn-icon">🎙️</span>
-                <span>{{ 'NAV.VOICE_ROOMS' | translate }}</span>
-            </a>
-
-
-
-            <!-- Admin Link -->
             @if (currentUser?.is_admin) {
-            <a routerLink="/admin" routerLinkActive="active" class="btn-messages admin-link">
-                <span class="btn-icon">🛡️</span>
+            <a routerLink="/admin" routerLinkActive="active" class="drawer-link drawer-admin" (click)="ui.sidebarOpen.set(false)">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
                 <span>{{ 'NAV.ADMIN_PANEL' | translate }}</span>
             </a>
             }
 
-            <!-- Contact Admin -->
-            <button (click)="contactAdmin()" class="btn-messages">
-                <span class="btn-icon">🎧</span>
+            <button (click)="contactAdmin(); ui.sidebarOpen.set(false)" class="drawer-link">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+                </svg>
                 <span>{{ 'NAV.CONTACT_ADMIN' | translate }}</span>
             </button>
+        </div>
 
-            <!-- Language Selector -->
-            <div class="sidebar-section">
-                <button class="btn-messages" (click)="showLangMenu = !showLangMenu">
-                    <span class="btn-icon">🌐</span>
-                    <span>{{ 'NAV.LANGUAGE' | translate }}</span>
-                    <span class="lang-badge">{{ languageService.getCurrentLanguage() | uppercase }}</span>
+        <div class="drawer-divider"></div>
+
+        <!-- Language in drawer -->
+        <div class="drawer-lang">
+            <button class="drawer-link" (click)="showLangMenu = !showLangMenu">
+                <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                <span>{{ 'NAV.LANGUAGE' | translate }}</span>
+                <span class="drawer-lang-badge">{{ languageService.getCurrentLanguage() | uppercase }}</span>
+            </button>
+            @if (showLangMenu) {
+            <div class="drawer-lang-options">
+                @for (lang of languageService.supportedLanguages; track lang.code) {
+                <button class="drawer-link lang-option-drawer" (click)="setLanguage(lang.code); showLangMenu = false"
+                    [class.active]="languageService.getCurrentLanguage() === lang.code">
+                    <span>{{ lang.flag }}</span>
+                    <span>{{ lang.name }}</span>
                 </button>
-
-                @if (showLangMenu) {
-                <div class="sidebar-lang-dropdown">
-                    @for (lang of languageService.supportedLanguages; track lang.code) {
-                    <button class="btn-messages lang-option" (click)="setLanguage(lang.code); showLangMenu = false"
-                        [class.active]="languageService.getCurrentLanguage() === lang.code">
-                        <span class="btn-icon">{{ lang.flag }}</span>
-                        <span>{{ lang.name }}</span>
-                    </button>
-                    }
-                </div>
                 }
             </div>
-
+            }
         </div>
+
+        <!-- Theme toggle in drawer -->
+        <button class="drawer-link drawer-theme" (click)="toggleTheme()">
+            @if (isDarkMode()) {
+            <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <span>Light Mode</span>
+            } @else {
+            <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <span>Dark Mode</span>
+            }
+        </button>
+
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Mobile Header -->
-        <header class="mobile-header">
-            <button class="sidebar-toggle" (click)="ui.toggleSidebar()">
-                ☰
-                @if (unreadCount + newGuestsCount > 0) {
-                <span class="toggle-badge">{{ unreadCount + newGuestsCount }}</span>
-                }
-            </button>
-            <div class="logo-mobile">Chatme</div>
-        </header>
-
+    <!-- ══ Main Content ══ -->
+    <main class="main-content" (click)="showLangMenu = false">
         <div class="content-area">
             <router-outlet></router-outlet>
         </div>
     </main>
+
+    <!-- ══ Mobile Bottom Navigation ══ -->
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+        <a routerLink="explore" routerLinkActive="active" class="bottom-tab" id="btm-explore">
+            <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <span class="bottom-label">{{ 'NAV.EXPLORE' | translate }}</span>
+        </a>
+
+        <a routerLink="conversations" routerLinkActive="active" class="bottom-tab" id="btm-messages">
+            <div class="bottom-icon-wrap">
+                <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                @if (unreadCount > 0) {
+                <span class="bottom-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+                }
+            </div>
+            <span class="bottom-label">{{ 'NAV.MESSAGES' | translate }}</span>
+        </a>
+
+        <a routerLink="community" routerLinkActive="active" class="bottom-tab" id="btm-community">
+            <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span class="bottom-label">{{ 'NAV.COMMUNITY' | translate }}</span>
+        </a>
+
+        <a routerLink="voice-rooms" routerLinkActive="active" class="bottom-tab" id="btm-voice">
+            <div class="bottom-icon-wrap">
+                <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                <span class="live-pulse"></span>
+            </div>
+            <span class="bottom-label">Voice</span>
+        </a>
+
+        <a routerLink="learning" routerLinkActive="active" class="bottom-tab" id="btm-learning">
+            <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            <span class="bottom-label">{{ 'NAV.LEARNING' | translate }}</span>
+        </a>
+
+
+        <a routerLink="profile" routerLinkActive="active" class="bottom-tab bottom-tab-profile" id="btm-profile">
+            <div class="bottom-avatar-wrap" [class.vip-avatar]="currentUser?.is_vip">
+                @if (userAvatar) {
+                <img [src]="userAvatar" [alt]="userDisplayName" class="bottom-avatar-img" loading="lazy">
+                } @else {
+                <div class="bottom-avatar-text">{{ userDisplayName.charAt(0) || 'U' }}</div>
+                }
+                @if (newGuestsCount > 0) {
+                <span class="bottom-badge">{{ newGuestsCount > 9 ? '9+' : newGuestsCount }}</span>
+                }
+            </div>
+            <span class="bottom-label">{{ 'NAV.PROFILE' | translate }}</span>
+        </a>
+    </nav>
+
 </div>

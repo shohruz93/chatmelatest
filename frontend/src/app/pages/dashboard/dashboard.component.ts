@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
@@ -31,9 +31,15 @@ export class DashboardComponent implements OnInit {
 
     currentUser = this.auth.currentUserValue;
     isDarkMode = signal(false);
+    navScrolled = false;
     showLangMenu = false;
     unreadCount = 0;
     newGuestsCount = 0;
+
+    @HostListener('document:click')
+    closeDropdowns() {
+        this.showLangMenu = false;
+    }
 
     userAvatar: string | null = null;
     userDisplayName: string = '';
