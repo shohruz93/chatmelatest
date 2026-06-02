@@ -22,11 +22,13 @@ import { CountrySelectComponent } from '../../components/country-select/country-
 import { UserProfileModalComponent } from '../../components/user-profile-modal/user-profile-modal.component';
 import { ImageModalComponent } from '../../components/image-modal/image-modal.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { UnixDatePipe } from '../../pipes/unix-date.pipe';
+import { ChatStorageService } from '../../services/chat-storage.service';
 
 @Component({
     selector: 'app-chat',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe],
+    imports: [CommonModule, FormsModule, RouterModule, CountrySelectComponent, ImageModalComponent, UserProfileModalComponent, TranslatePipe, UnixDatePipe],
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.css', './chat-messages.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,

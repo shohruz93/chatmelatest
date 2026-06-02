@@ -58,7 +58,7 @@
     display: flex;
     flex-wrap: wrap;
     min-height: 100vh;
-    background: var(--bg-primary);
+    background: transparent;
     gap: 2rem;
     padding: 2rem;
 }
@@ -838,8 +838,6 @@
 
 /* Dark Mode Variables */
 :host {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
     --text-primary: #111827;
     --text-secondary: #6b7280;
     --text-tertiary: #9ca3af;
@@ -849,8 +847,6 @@
 }
 
 :host-context([data-theme="dark"]) {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
     --text-tertiary: #94a3b8;

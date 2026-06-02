@@ -1,23 +1,46 @@
-<div class="conversations-page">
-    <header class="page-header">
-        <h2>{{ 'NAV.MESSAGES' | translate }}</h2>
+<div class="conversations-page flex flex-col xl:flex-row gap-6 justify-center w-full max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+  <div class="flex-1 w-full max-w-[1100px] flex flex-col">
+    <!-- Header -->
+    <header class="page-header bg-transparent !border-b-0 !p-0 mb-6">
+        <div class="header-title-area flex items-center gap-3">
+            <h2>{{ 'NAV.MESSAGES' | translate }}</h2>
+            @if (isSyncing()) {
+            <div class="sync-indicator flex items-center gap-1.5" title="Ҳамоҳангсозӣ...">
+                <svg class="animate-spin h-4 w-4 text-[var(--accent-primary, #8b5cf6)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-xs text-[var(--text-secondary)] font-medium">Syncing...</span>
+            </div>
+            }
+        </div>
     </header>
 
-    <div class="conversations-content">
+    <div class="conversations-content !p-0">
         <!-- Horizontal Banner: shown above chat list, centered -->
-        <div class="hidden md:flex justify-center mb-4 w-full ad-wrapper">
+        <div class="hidden md:flex justify-center mb-6 w-full ad-wrapper">
             <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
         </div>
-        <div class="flex md:hidden justify-center mb-4 w-full ad-wrapper">
+        <div class="flex md:hidden justify-center mb-6 w-full ad-wrapper">
             <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
         </div>
 
-        @if (loading) {
-        <div class="loading-state">
-            <div class="loader-large"></div>
-            <p>{{ 'EXPLORE_PAGE.LOADING' | translate }}</p>
+        @if (loading && conversations.length === 0) {
+        <div class="conversations-skeleton">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+            <div class="skeleton-item">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton-header">
+                        <div class="skeleton-name"></div>
+                        <div class="skeleton-time"></div>
+                    </div>
+                    <div class="skeleton-message"></div>
+                </div>
+            </div>
+            }
         </div>
-        } @else if (error) {
+        } @else if (error && conversations.length === 0) {
         <div class="error-state">
             <div class="error-icon">⚠️</div>
             <h3>Oops! Something went wrong</h3>
@@ -29,10 +52,10 @@
         <!-- Chat list: strictly centered, unaffected by sidebar -->
         <div class="conversations-list">
             @for (conv of conversations; track conv.partner_id) {
-            <div class="conversation-item-wrapper">
+            <div class="conversation-item-wrapper" [class.vip-wrapper]="conv.partner_is_vip">
                 <a (click)="openConversation($event, conv.partner_id)" class="conversation-item">
-                    <div class="conversation-avatar" [class.vip-avatar]="conv.partner_is_vip" style="border-radius: 50%;">
-                        <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name">
+                    <div class="conversation-avatar" [class.vip-avatar]="conv.partner_is_vip">
+                        <img [src]="conv.partner_avatar || 'default-avatar.png'" [alt]="conv.partner_name" (error)="$event.target.src='default-avatar.png'">
                         @if (socketService.isUserOnline(conv.partner_id)) {
                         <span class="online-indicator"></span>
                         }
@@ -40,9 +63,9 @@
 
                     <div class="conversation-info">
                         <div class="conversation-header">
-                            <h3 class="partner-name" [class.vip-text]="conv.partner_is_vip" style="display: flex; align-items: center;">
+                            <h3 class="partner-name" [class.vip-text]="conv.partner_is_vip">
                                 {{ conv.partner_name || 'Anonymous User' }}
-                                @if (conv.partner_is_vip) { <span class="vip-star" style="font-size: 1.1rem; margin-left: 2px;">⭐</span> }
+                                @if (conv.partner_is_vip) { <span class="vip-badge">VIP</span> }
                             </h3>
                             <span class="last-time">{{ conv.last_message_time | unixDate:'short' }}</span>
                         </div>
@@ -66,7 +89,12 @@
                     </div>
                 </a>
                 <button class="conv-delete-btn" (click)="deleteConversation($event, conv.partner_id)"
-                    title="Delete conversation">🗑️</button>
+                    title="Delete conversation">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
             </div>
             }
 
@@ -79,14 +107,14 @@
             </div>
             }
         </div>
-
-        <!-- Vertical Ad: absolutely positioned on the right, independent of chat list -->
-        <div class="vertical-ad-sidebar ad-wrapper">
-            <div class="sticky top-4">
-                <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
-            </div>
-        </div>
-
         }
     </div>
+  </div>
+
+  <!-- Right Sidebar for Vertical Ad on Large Screens -->
+  <div class="hidden xl:block w-[160px] flex-shrink-0 ad-wrapper">
+    <div class="sticky top-4">
+      <app-adsterra-banner key="ab043353dbbdd6f417ba14816da5d0e7" [width]="160" [height]="300"></app-adsterra-banner>
+    </div>
+  </div>
 </div>

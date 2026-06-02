@@ -27,6 +27,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
     conversations: any[] = [];
     loading = true;
+    isSyncing = signal(false);
     error: string | null = null;
     currentUser: any;
     private hasLoadedConversations = false;
@@ -174,6 +175,7 @@ export class ConversationsComponent implements OnInit, OnDestroy {
 
     loadConversations() {
         if (this.conversations.length === 0) this.loading = true; // Added conditional loading
+        this.isSyncing.set(true);
         this.error = null;
         this.api.get(`/conversations?userId=${this.currentUser.id}`).subscribe({
             next: async (data: any) => {
@@ -212,9 +214,11 @@ export class ConversationsComponent implements OnInit, OnDestroy {
                 this.storage.saveConversations(this.conversations);
 
                 this.loading = false;
+                this.isSyncing.set(false);
             },
             error: (err) => {
                 console.error('Error loading conversations', err);
+                this.isSyncing.set(false);
                 if (this.conversations.length === 0) { // Added conditional error/loading
                     this.error = 'Failed to load conversations. Please try again later.';
                     this.loading = false;
