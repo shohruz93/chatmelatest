@@ -36,6 +36,11 @@ export class DashboardComponent implements OnInit {
     unreadCount = 0;
     newGuestsCount = 0;
 
+    isInActiveChatRoom(): boolean {
+        const urlParts = this.router.url.split('/');
+        return urlParts.length >= 4 && urlParts[2] === 'chat' && !isNaN(Number(urlParts[3]));
+    }
+
     @HostListener('document:click')
     closeDropdowns() {
         this.showLangMenu = false;

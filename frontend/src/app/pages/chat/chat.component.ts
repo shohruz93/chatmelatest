@@ -63,13 +63,212 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     public callService = inject(CallService);
     public voiceService = inject(VoiceChatService);
     private aiService = inject(AiService);
-
+    private storage = inject(ChatStorageService);
 
     // Signals from Service
     messages = this.chatService.orderedMessages;
     loadingMessages = this.chatService.loadingMessages;
     isSyncing = this.chatService.isSyncing;
     usersInRoom = signal<number[]>([]); // Track users in current room
+
+    conversations = signal<any[]>([]);
+    isSyncingConversations = signal(false);
+    searchTerm = signal('');
+    loadingConversations = false;
+
+    onSearchConversations(event: Event) {
+        const value = (event.target as HTMLInputElement).value;
+        this.searchTerm.set(value);
+    }
+
+    filteredConversations() {
+        const term = this.searchTerm().toLowerCase().trim();
+        if (!term) return this.conversations();
+        return this.conversations().filter(c => 
+            (c.partner_name && c.partner_name.toLowerCase().includes(term)) ||
+            (c.last_message && c.last_message.toLowerCase().includes(term))
+        );
+    }
+
+    async initStorageAndLoadCache() {
+        if (!this.currentUser) return;
+        this.loadingConversations = true;
+        try {
+            await this.storage.openDb(this.currentUser.id);
+            const cached: any[] = await this.storage.getConversations();
+            if (cached && cached.length > 0) {
+                this.conversations.set(cached);
+                this.loadingConversations = false;
+                this.cdr.detectChanges();
+            }
+        } catch (err: any) {
+            console.warn('Storage error', err);
+        }
+        this.loadConversations();
+    }
+
+    loadConversations() {
+        this.isSyncingConversations.set(true);
+        this.api.get(`/conversations?userId=${this.currentUser.id}`).subscribe({
+            next: async (data: any) => {
+                const mapped = data.map((conv: any) => {
+                    if (conv.partner_avatar && !conv.partner_avatar.startsWith('http')) {
+                        conv.partner_avatar = `${this.api.phpBaseUrl}${conv.partner_avatar}`;
+                    }
+                    if (!conv.roomId && conv.partner_id) {
+                        const min = Math.min(this.currentUser.id, Number(conv.partner_id));
+                        const max = Math.max(this.currentUser.id, Number(conv.partner_id));
+                        conv.roomId = `room_${min}_${max}`;
+                    }
+                    return conv;
+                });
+                
+                this.conversations.set(mapped);
+                
+                try {
+                    await this.storage.saveConversations(mapped);
+                } catch (err) {
+                    console.warn('Failed to save conversations', err);
+                }
+                
+                this.loadingConversations = false;
+                this.isSyncingConversations.set(false);
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error loading conversations', err);
+                this.loadingConversations = false;
+                this.isSyncingConversations.set(false);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    handleNewMessage(msg: any, isSent: boolean) {
+        const partnerId = isSent
+            ? (msg.roomId ? this.getPartnerIdFromRoom(msg.roomId) : null)
+            : Number(msg.senderId || msg.sender_id);
+
+        if (!partnerId) return;
+
+        const currentUrl = this.router.url;
+        const isInThisChat = currentUrl.includes(`/dashboard/chat/${partnerId}`);
+
+        const listCopy = [...this.conversations()];
+        const index = listCopy.findIndex(c => Number(c.partner_id) === partnerId);
+
+        if (index > -1) {
+            const conv = { ...listCopy[index] };
+            conv.last_message = msg.content;
+            conv.last_message_time = msg.createdAt || msg.created_at || Date.now();
+            conv.last_message_sender_id = msg.senderId || msg.sender_id;
+            conv.last_message_is_read = msg.is_read || (msg.status === 'read' ? 1 : 0);
+
+            if (isSent || isInThisChat) {
+                conv.unread_count = 0;
+            } else {
+                conv.unread_count = (conv.unread_count || 0) + 1;
+            }
+
+            listCopy.splice(index, 1);
+            listCopy.unshift(conv);
+
+            this.conversations.set(listCopy);
+            this.storage.saveConversations([conv]);
+            this.cdr.detectChanges();
+        } else {
+            this.loadConversations();
+        }
+    }
+
+    getPartnerIdFromRoom(roomId: string): number | null {
+        if (!roomId) return null;
+        const parts = roomId.split('_');
+        if (parts.length < 3) return null;
+        const id1 = Number(parts[1]);
+        const id2 = Number(parts[2]);
+        return id1 === this.currentUser.id ? id2 : id1;
+    }
+
+    async deleteConversation(event: Event, partnerId: number) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!confirm('Оё мехоҳед ин суҳбатро нест кунед?')) return;
+
+        try {
+            await this.api.delete(`/conversations?userId=${this.currentUser.id}&partnerId=${partnerId}`).toPromise();
+
+            const myId = this.currentUser.id;
+            const min = Math.min(myId, partnerId);
+            const max = Math.max(myId, partnerId);
+            const roomId = `room_${min}_${max}`;
+
+            await this.storage.clearRoom(roomId);
+
+            const filtered = this.conversations().filter((c: any) => Number(c.partner_id) !== partnerId);
+            this.conversations.set(filtered);
+            
+            if (this.partner && Number(this.partner.id) === partnerId) {
+                this.router.navigate(['/dashboard/chat']);
+            }
+            this.cdr.detectChanges();
+        } catch (err) {
+            console.error('Failed to delete conversation:', err);
+            alert('Хатогӣ ҳангоми нест кардан. Лутфан дубора кӯшиш кунед.');
+        }
+    }
+
+    openConversation(event: Event, partnerId: number) {
+        event.preventDefault();
+
+        const listCopy = [...this.conversations()];
+        const index = listCopy.findIndex(c => Number(c.partner_id) === partnerId);
+        if (index > -1) {
+            listCopy[index] = { ...listCopy[index], unread_count: 0 };
+            this.conversations.set(listCopy);
+            this.cdr.detectChanges();
+        }
+
+        this.api.post('/conversations/read', {
+            userId: this.currentUser.id,
+            otherUserId: partnerId
+        }).subscribe({
+            next: () => {
+                this.router.navigate(['/dashboard/chat', partnerId]);
+            },
+            error: (err) => {
+                console.error('Error marking messages as read:', err);
+                this.router.navigate(['/dashboard/chat', partnerId]);
+            }
+        });
+    }
+
+    backToList() {
+        this.roomId = null;
+        this.partner = null;
+        this.router.navigate(['/dashboard/chat']);
+    }
+
+    getMessagePreview(message: string): string {
+        if (!message) return '';
+        if (message.includes('/uploads/images/') || message.includes('.jpg') || message.includes('.png')) {
+            return '📷 Акс';
+        }
+        if (message.includes('/uploads/audio/') || message.includes('.m4a') || message.includes('.mp3')) {
+            return '🎤 Садо';
+        }
+        if (message.startsWith('data:image')) {
+            return '📷 Акс';
+        }
+        if (message.startsWith('data:audio')) {
+            return '🎤 Садо';
+        }
+        if (message.length > 100 && !message.includes(' ') && (message.startsWith('/9j/') || message.startsWith('iVBOR'))) {
+            return '📷 Акс';
+        }
+        return message;
+    }
 
     newMessage: string = '';
     roomId: string | null = null;
@@ -232,6 +431,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.currentUser = JSON.parse(userStr);
         }
 
+        // Initialize caching storage and load conversations
+        this.initStorageAndLoadCache();
+
         // Room ID Listener
         this.subs.add(this.route.paramMap.subscribe(params => {
             const partnerIdStr = params.get('userId');
@@ -263,6 +465,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                     this.socketService.emit('join_chat', { roomId: this.roomId });
                     this.socketService.emit('get_room_details', { roomId: this.roomId });
                 }
+            } else {
+                this.roomId = null;
+                this.partner = null;
+                this.chatService.switchRoom(null);
+                this.cdr.markForCheck();
             }
         }));
 
@@ -271,6 +478,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
             if (data.roomId === this.roomId) {
                 this.usersInRoom.set(data.users);
             }
+        }));
+
+        // Listen for incoming messages to update the conversations sidebar list
+        this.subs.add(this.socketService.messageReceived$.subscribe((msg: any) => {
+            if (msg) this.handleNewMessage(msg, false);
+        }));
+
+        // Listen for sent messages to update the conversations sidebar list
+        this.subs.add(this.socketService.messageSent$.subscribe((msg: any) => {
+            if (msg) this.handleNewMessage(msg, true);
         }));
 
         this.setupSocketEvents();

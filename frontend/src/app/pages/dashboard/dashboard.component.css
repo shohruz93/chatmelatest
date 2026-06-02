@@ -1165,3 +1165,16 @@
         transition: none;
     }
 }
+
+/* Direct Chat Room Fullscreen overrides (Mobile native experience) */
+.top-nav.hidden {
+    display: none !important;
+}
+
+.bottom-nav.hidden {
+    display: none !important;
+}
+
+.content-area.no-padding-bottom {
+    padding-bottom: 0 !important;
+}

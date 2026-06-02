@@ -3,7 +3,7 @@
     <!-- ══════════════════════════════════════════════════════
          TOP NAVIGATION BAR — Modern Glassmorphism Design
     ══════════════════════════════════════════════════════ -->
-    <nav class="top-nav" [class.scrolled]="navScrolled">
+    <nav class="top-nav" [class.scrolled]="navScrolled" [class.hidden]="isInActiveChatRoom()">
         <div class="nav-inner">
 
             <!-- Logo -->
@@ -342,15 +342,14 @@
 
     </aside>
 
-    <!-- ══ Main Content ══ -->
     <main class="main-content" (click)="showLangMenu = false">
-        <div class="content-area">
+        <div class="content-area" [class.no-padding-bottom]="isInActiveChatRoom()">
             <router-outlet></router-outlet>
         </div>
     </main>
 
     <!-- ══ Mobile Bottom Navigation ══ -->
-    <nav class="bottom-nav" aria-label="Mobile navigation">
+    <nav class="bottom-nav" aria-label="Mobile navigation" [class.hidden]="isInActiveChatRoom()">
         <a routerLink="explore" routerLinkActive="active" class="bottom-tab" id="btm-explore">
             <svg class="bottom-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>

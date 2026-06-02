@@ -55,7 +55,13 @@ export const routes: Routes = [
             },
             {
                 path: 'conversations',
-                loadComponent: () => import('./pages/conversations/conversations.component').then(m => m.ConversationsComponent)
+                redirectTo: 'chat',
+                pathMatch: 'full'
+            },
+            {
+                path: 'conversations/:userId',
+                redirectTo: 'chat/:userId',
+                pathMatch: 'full'
             },
             {
                 path: 'explore',

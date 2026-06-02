@@ -175,9 +175,13 @@ export class ChatService {
         });
     }
 
-    public async switchRoom(roomId: string) {
+    public async switchRoom(roomId: string | null) {
         this.currentRoomId.set(roomId);
         this.messages.set([]); // Clear current view
+        if (!roomId) {
+            this.loadingMessages.set(false);
+            return;
+        }
         this.loadingMessages.set(true);
 
         try {
