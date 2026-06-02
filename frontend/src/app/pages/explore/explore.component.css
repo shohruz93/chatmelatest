@@ -776,7 +776,7 @@
 }
 
 /* Dark Mode Variables */
-:root {
+:host {
     --bg-primary: #ffffff;
     --bg-secondary: #f9fafb;
     --text-primary: #111827;
@@ -787,7 +787,7 @@
     --accent-hover: #4f46e5;
 }
 
-[data-theme="dark"] {
+:host-context([data-theme="dark"]) {
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
     --text-primary: #f1f5f9;
