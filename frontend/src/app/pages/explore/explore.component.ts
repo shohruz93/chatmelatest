@@ -56,6 +56,7 @@ export class ExploreComponent implements OnInit, OnDestroy {
     users: UserProfile[] = [];
     filteredUsers: UserProfile[] = [];
     currentUser: any;
+    followingIds = new Set<number>();
     isLoading = signal(false);
     isLoadingMore = signal(false);
     selectedUser: UserProfile | null = null;
@@ -217,6 +218,17 @@ export class ExploreComponent implements OnInit, OnDestroy {
             } catch (e) {
                 console.error('Failed to sync profile:', e);
             }
+        }
+
+        if (this.currentUser?.id) {
+            this.api.get(`/follow/following?userId=${this.currentUser.id}`).subscribe({
+                next: (data: any[]) => {
+                    if (Array.isArray(data)) {
+                        this.followingIds = new Set(data.map(u => Number(u.id)));
+                    }
+                },
+                error: (err) => console.error('Error loading following list:', err)
+            });
         }
 
         // Check if user needs to complete profile (missing gender or languages)
@@ -608,6 +620,51 @@ export class ExploreComponent implements OnInit, OnDestroy {
         }
         // Navigate to chat with this user
         this.router.navigate(['/dashboard/chat', user.id]);
+    }
+
+    toggleFollow(user: UserProfile, event: Event) {
+        event.stopPropagation();
+        if (!this.currentUser?.id) return;
+
+        const followerId = this.currentUser.id;
+        const followedId = user.id;
+        const isFollowing = this.followingIds.has(followedId);
+
+        // 1. Optimistically update UI immediately!
+        if (isFollowing) {
+            this.followingIds.delete(followedId);
+        } else {
+            this.followingIds.add(followedId);
+        }
+        
+        // Recreate Set to trigger Angular Change Detection (OnPush) instantly
+        this.followingIds = new Set(this.followingIds);
+
+        // 2. Send request to backend
+        const endpoint = isFollowing ? '/unfollow' : '/follow';
+        this.api.post(endpoint, { followerId, followedId }).subscribe({
+            next: (res: any) => {
+                if (!res.success) {
+                    // Rollback if backend reports failure
+                    if (isFollowing) {
+                        this.followingIds.add(followedId);
+                    } else {
+                        this.followingIds.delete(followedId);
+                    }
+                    this.followingIds = new Set(this.followingIds);
+                }
+            },
+            error: (err) => {
+                // Rollback on network/server error
+                if (isFollowing) {
+                    this.followingIds.add(followedId);
+                } else {
+                    this.followingIds.delete(followedId);
+                }
+                this.followingIds = new Set(this.followingIds);
+                console.error('Error following/unfollowing:', err);
+            }
+        });
     }
 
     downloadUpdate(event: Event) {
