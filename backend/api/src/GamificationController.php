@@ -61,14 +61,19 @@ class GamificationController {
             $userId = $_GET['userId'] ?? 0;
         }
 
-        // Get Top 50 users by xp
-        $queryTop = "SELECT id, name, avatar, is_vip, xp, FLOOR(SQRT(xp / 100)) + 1 as level 
-                     FROM users 
-                     ORDER BY xp DESC 
-                     LIMIT 50";
-        $stmtTop = $this->conn->prepare($queryTop);
-        $stmtTop->execute();
-        $topUsers = $stmtTop->fetchAll(PDO::FETCH_ASSOC);
+        // Get Top 50 users by xp with caching
+        $cacheKey = "leaderboard_top_50";
+        $topUsers = Cache::get($cacheKey);
+        if ($topUsers === null) {
+            $queryTop = "SELECT id, name, avatar, is_vip, xp, FLOOR(SQRT(xp / 100)) + 1 as level 
+                         FROM users 
+                         ORDER BY xp DESC 
+                         LIMIT 50";
+            $stmtTop = $this->conn->prepare($queryTop);
+            $stmtTop->execute();
+            $topUsers = $stmtTop->fetchAll(PDO::FETCH_ASSOC);
+            Cache::set($cacheKey, $topUsers, 300); // Cache for 5 minutes
+        }
 
         $currentUserRank = null;
         if ($userId) {

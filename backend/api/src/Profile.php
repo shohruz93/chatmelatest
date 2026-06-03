@@ -24,6 +24,13 @@ class Profile {
         // Track gamification progress for login/activity
         GamificationController::updateProgress($userId, 'login');
 
+        $cacheKey = "user_profile_" . $userId;
+        $cachedProfile = Cache::get($cacheKey);
+        if ($cachedProfile !== null) {
+            echo json_encode($cachedProfile);
+            return;
+        }
+
         $profile = $this->user->getProfile($userId);
         if ($profile) {
             $profile['is_admin'] = (int)($profile['is_admin'] ?? 0);
@@ -52,6 +59,7 @@ class Profile {
             $photoStmt->execute();
             $profile['photos'] = $photoStmt->fetchAll(PDO::FETCH_COLUMN);
 
+            Cache::set($cacheKey, $profile, 30); // Cache for 30 seconds
             echo json_encode($profile);
         } else {
             http_response_code(404);
@@ -279,6 +287,9 @@ class Profile {
             }
         }
 
+        // Invalidate profile cache
+        Cache::delete("user_profile_" . $userId);
+
         echo json_encode([
             "message" => "Profile updated successfully",
             "avatar" => $avatarUrl
@@ -472,6 +483,8 @@ class Profile {
         $stmt->bindParam(":comment", $comment);
         
         if ($stmt->execute()) {
+            // Invalidate profile cache of the rated user
+            Cache::delete("user_profile_" . $ratedId);
             // Track gamification progress
             GamificationController::updateProgress($raterId, 'add_rating');
             echo json_encode(["message" => "Rating added", "updated" => false]);
@@ -507,6 +520,8 @@ class Profile {
         $stmt->bindParam(":comment", $comment);
         
         if ($stmt->execute()) {
+            // Invalidate profile cache of the commented user
+            Cache::delete("user_profile_" . $ratedId);
             try {
                 $commenterName = $this->user->getNameById($userId);
                 $commentPreview = substr($comment, 0, 100);

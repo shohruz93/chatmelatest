@@ -14,6 +14,7 @@ ErrorMiddleware::init();
 
 require_once __DIR__ . '/../src/Router.php';
 require_once __DIR__ . '/../src/Database.php';
+require_once __DIR__ . '/../src/Cache.php';
 require_once __DIR__ . '/../src/Auth.php';
 require_once __DIR__ . '/../src/Profile.php';
 require_once __DIR__ . '/../src/MatchController.php';

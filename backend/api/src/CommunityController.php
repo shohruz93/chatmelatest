@@ -109,6 +109,9 @@ class CommunityController {
         $stmt->execute([$userId, $contentType, $textContent, $mediaPath, $videoDuration, $now]);
         $postId = $this->db->lastInsertId();
 
+        // Invalidate feed cache
+        Cache::deleteByPrefix("community_feed_");
+
         // Get user info
         $stmt = $this->db->prepare("SELECT name, avatar FROM users WHERE id = ?");
         $stmt->execute([$userId]);
@@ -136,10 +139,17 @@ class CommunityController {
      * Get community feed with pagination
      */
     public function getFeed($viewerId = null, $page = 1, $limit = 20) {
-        $offset = ($page - 1) * $limit;
-
         $sort = $_GET['sort'] ?? 'newest';
         $timeRange = $_GET['time_range'] ?? 'all';
+
+        $cacheKey = "community_feed_" . ($viewerId ?? 0) . "_" . $page . "_" . $limit . "_" . $sort . "_" . $timeRange;
+        $cachedFeed = Cache::get($cacheKey);
+        if ($cachedFeed !== null) {
+            echo json_encode($cachedFeed);
+            return;
+        }
+
+        $offset = ($page - 1) * $limit;
 
         $orderBy = "ORDER BY RAND()";
         if ($sort === 'likes') {
@@ -203,6 +213,7 @@ class CommunityController {
             $post['recent_comments'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        Cache::set($cacheKey, $posts, 60); // Cache for 1 minute
         echo json_encode($posts);
     }
 
@@ -301,6 +312,9 @@ class CommunityController {
         $stmt->execute([$postId]);
         $updated = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Invalidate feed cache on reaction
+        Cache::deleteByPrefix("community_feed_");
+
         echo json_encode([
             'success' => true,
             'liked' => $liked,
@@ -361,6 +375,9 @@ class CommunityController {
             ];
             $notif->send($info['author_id'], $title, $body, $payload);
         }
+
+        // Invalidate feed cache on comment
+        Cache::deleteByPrefix("community_feed_");
 
         echo json_encode([
             'success' => true,
@@ -425,6 +442,9 @@ class CommunityController {
         // Delete from database (cascades to reactions and comments)
         $stmt = $this->db->prepare("DELETE FROM community_posts WHERE id = ?");
         $stmt->execute([$postId]);
+
+        // Invalidate feed cache on deletion
+        Cache::deleteByPrefix("community_feed_");
 
         echo json_encode(['success' => true]);
     }

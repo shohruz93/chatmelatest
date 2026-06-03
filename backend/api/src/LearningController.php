@@ -77,6 +77,13 @@ class LearningController {
         $goal   = $_GET['goal'] ?? null;
         $lang   = $_GET['language'] ?? 'en';
 
+        $cacheKey = "scenarios_" . $lang . "_" . ($level ?? 'all') . "_" . ($goal ?? 'all');
+        $cachedScenarios = Cache::get($cacheKey);
+        if ($cachedScenarios !== null) {
+            echo json_encode($cachedScenarios);
+            return;
+        }
+
         $where  = "WHERE is_active=1 AND language=:lang";
         $params = [':lang' => $lang];
 
@@ -88,7 +95,10 @@ class LearningController {
 
         $stmt = $this->conn->prepare("SELECT * FROM learning_scenarios $where ORDER BY level ASC, id ASC");
         $stmt->execute($params);
-        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        $scenarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        Cache::set($cacheKey, $scenarios, 3600); // Cache for 1 hour
+        echo json_encode($scenarios);
     }
 
     // POST /learning/scenario/start

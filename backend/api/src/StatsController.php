@@ -17,6 +17,13 @@ class StatsController {
         header('Content-Type: application/json');
         header('Cache-Control: public, max-age=300'); // Cache 5 minutes in browser/CDN
 
+        $cacheKey = "stats_public";
+        $cachedStats = Cache::get($cacheKey);
+        if ($cachedStats !== null) {
+            echo json_encode($cachedStats);
+            return;
+        }
+
         try {
             // Total registered users
             $stmtUsers = $this->db->prepare("SELECT COUNT(*) as total FROM users WHERE is_banned = 0");
@@ -53,7 +60,7 @@ class StatsController {
             $stmtLangs->execute();
             $totalLanguages = (int)($stmtLangs->fetch()['total'] ?? 0);
 
-            echo json_encode([
+            $response = [
                 'success'         => true,
                 'totalUsers'      => $totalUsers,
                 'onlineUsers'     => $onlineUsers,
@@ -61,7 +68,10 @@ class StatsController {
                 'totalMessages'   => $totalMessages,
                 'totalLanguages'  => max($totalLanguages, 30), // at least 30
                 'generatedAt'     => date('c')
-            ]);
+            ];
+
+            Cache::set($cacheKey, $response, 300); // Cache for 5 minutes
+            echo json_encode($response);
         } catch (Exception $e) {
             error_log('[StatsController] Error: ' . $e->getMessage());
             http_response_code(500);

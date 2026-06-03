@@ -9,6 +9,12 @@ class AppVersion {
     }
 
     public function getLatestVersion($platform) {
+        $cacheKey = "app_version_latest_" . $platform;
+        $cached = Cache::get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+
         $query = "SELECT * FROM " . $this->table_name . " 
                   WHERE platform = :platform 
                   ORDER BY CAST(version_code AS UNSIGNED) DESC 
@@ -18,7 +24,9 @@ class AppVersion {
         $stmt->bindParam(":platform", $platform);
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        Cache::set($cacheKey, $result, 86400); // Cache for 24 hours
+        return $result;
     }
 
     public function create($platform, $version, $version_code, $file_path, $release_notes) {
@@ -36,6 +44,7 @@ class AppVersion {
         $stmt->bindParam(":release_notes", $release_notes);
 
         if ($stmt->execute()) {
+            Cache::delete("app_version_latest_" . $platform);
             return true;
         }
         return false;
