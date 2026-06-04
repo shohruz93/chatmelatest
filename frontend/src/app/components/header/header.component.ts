@@ -37,9 +37,12 @@ export class HeaderComponent implements OnInit {
         });
     }
 
-    @HostListener('document:click')
-    closeMenu() {
-        this.showLangMenu = false;
+    @HostListener('document:click', ['$event'])
+    closeMenu(event: Event) {
+        const target = event.target as HTMLElement;
+        if (target && !target.closest('.language-selector')) {
+            this.showLangMenu = false;
+        }
     }
 
     checkUnread() {

@@ -5,14 +5,22 @@
       <div class="header-content">
         <h1>{{ 'EXPLORE_PAGE.TITLE' | translate }}</h1>
       </div>
-      <button class="connect-random-btn" (click)="connectRandomly()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l-5 5M4 4l5 5" />
-        </svg>
-        <span>{{ 'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate }}</span>
-      </button>
-      <button class="reset-btn" (click)="toggleFilterPanel()" style="margin-left:8px">{{ 'EXPLORE_PAGE.FILTERS' | translate }}</button>
+      <div class="explore-header-actions">
+        <button class="connect-random-btn" (click)="connectRandomly()" [title]="'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l-5 5M4 4l5 5" />
+          </svg>
+          <span class="btn-text">{{ 'EXPLORE_PAGE.CONNECT_RANDOMLY' | translate }}</span>
+        </button>
+        <button class="reset-btn toggle-filters-btn" (click)="toggleFilterPanel()" [title]="'EXPLORE_PAGE.FILTERS' | translate">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="filter-icon-svg">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span class="btn-text">{{ 'EXPLORE_PAGE.FILTERS' | translate }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Filter Bar (horizontal) -->

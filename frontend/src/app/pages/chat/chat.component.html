@@ -443,15 +443,40 @@
         </div>
         } @else {
         <div class="input-wrapper">
-            <button class="btn-toggle-media" (click)="showMediaMenu = !showMediaMenu" [class.active]="showMediaMenu"
-                [class.rotated]="showMediaMenu">+</button>
+            <button class="btn-toggle-media" (click)="$event.stopPropagation(); showMediaMenu = !showMediaMenu" [class.active]="showMediaMenu"
+                [class.rotated]="showMediaMenu">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
 
             <!-- Media Actions: Always visible on desktop, toggled on mobile -->
-            <div class="media-actions" [class.show]="showMediaMenu">
-                <button class="btn-media" (click)="triggerFileInput()" title="Image">📷</button>
-                <button class="btn-media" (click)="startRecording()" title="Voice">🎤</button>
+            <div class="media-actions" [class.show]="showMediaMenu" (click)="$event.stopPropagation()">
+                <button class="btn-media" (click)="triggerFileInput()" title="Image">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-media" (click)="startRecording()" title="Voice">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
                 <button class="btn-media" (click)="toggleStickerPicker()" title="Sticker"
-                    [class.active]="showStickerPicker">😊</button>
+                    [class.active]="showStickerPicker">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                    </svg>
+                </button>
             </div>
 
             <div class="text-input-container">
@@ -465,18 +490,42 @@
                     <button class="btn-ai-action fix-btn" (click)="fixMySentence()" [disabled]="isFixingSentence()"
                         [title]="'CHAT.FIX_GRAMMAR' | translate">
                         @if (isFixingSentence()) { <div class="loader-tiny"></div> }
-                        @else { 🪄 }
+                        @else { 
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m19 11-8 8"></path>
+                                <path d="m19 2-2 2 2 2 2-2-2-2Z"></path>
+                                <path d="M11.5 7.5 16.5 12.5"></path>
+                                <path d="m2 22 5-5"></path>
+                                <path d="M19 17h.01"></path>
+                                <path d="M15 21h.01"></path>
+                                <path d="M22 21h.01"></path>
+                            </svg>
+                        }
                     </button>
                     }
                     <button class="btn-ai-action suggest-btn" (click)="generateAiSuggestions()"
                         [disabled]="isGeneratingAi()" [title]="'CHAT.GENERATE_AI' | translate">
                         @if (isGeneratingAi()) { <div class="loader-tiny"></div> }
-                        @else { ✨ }
+                        @else { 
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+                                <path d="m5 3 1 2.5L8.5 6 6 7 5 9.5 4 7 1.5 6 4 5.5 5 3Z" opacity="0.7"></path>
+                                <path d="m19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z" opacity="0.7"></path>
+                            </svg>
+                        }
                     </button>
 
-
                     <button class="btn-send" (click)="sendMessage()" [disabled]="!newMessage.trim()">
-                        {{ isEditing ? '✓' : '➤' }}
+                        @if (isEditing) {
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        } @else {
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg); margin-left: -2px; margin-top: 2px;">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        }
                     </button>
                 </div>
 

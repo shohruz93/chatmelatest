@@ -28,7 +28,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       <div class="hidden md:flex justify-center my-4 w-full ad-wrapper">
         <app-adsterra-banner key="8342fca62e8c8234f4a70eb5ef1d0784" [width]="728" [height]="90"></app-adsterra-banner>
       </div>
-      <div class="flex md:hidden justify-center my-4 w-full ad-wrapper">
+      <div class="flex md:hidden justify-center my-2 w-full ad-wrapper">
         <app-adsterra-banner key="dbce7f5203c055b563c8ee393acb030e" [width]="320" [height]="50"></app-adsterra-banner>
       </div>
 
@@ -67,6 +67,15 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
       margin: 0;
       font-size: 1.8rem;
       color: var(--text-primary);
+    }
+    @media (max-width: 768px) {
+      .page-header {
+        padding: 0.25rem 1rem;
+        margin-bottom: 0.25rem;
+      }
+      .page-header h2 {
+        font-size: 1.4rem;
+      }
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush

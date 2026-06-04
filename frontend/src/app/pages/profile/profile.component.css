@@ -920,11 +920,67 @@ input[type="text"] {
 }
 
 @media (max-width: 768px) {
+    .profile-page {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .search-user-bar {
+        max-width: none;
+        flex-grow: 1;
+    }
+
+    .search-id-input {
+        width: 100%;
+    }
+
+    .profile-content {
+        gap: 1rem;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .profile-card {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 2rem;
+        gap: 1.5rem;
+        padding: 1.25rem 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-edit-top {
+        padding: 0.5rem;
+        border-radius: 50%;
+        width: 38px;
+        height: 38px;
+        justify-content: center;
+        align-items: center;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+
+    .btn-edit-top .btn-edit-text {
+        display: none;
     }
 
     .avatar-wrapper {
@@ -932,6 +988,24 @@ input[type="text"] {
     }
 
     .info-section {
+        width: 100%;
+    }
+
+    .vip-promo-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .vip-promo-left {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+        text-align: center;
+    }
+
+    .btn-get-vip {
         width: 100%;
     }
 
@@ -970,6 +1044,13 @@ input[type="text"] {
 
     .switch-label {
         width: 100%;
+    }
+
+    .profile-community-section {
+        padding: 0.5rem;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 }
 
@@ -2044,4 +2125,75 @@ a.stat-item:hover {
     color: var(--primary-color);
     background: rgba(129, 140, 248, 0.08);
     transform: scale(1.08);
+}
+
+/* ── App Download Promo Section ── */
+.app-download-promo {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.download-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.download-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+}
+
+.download-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-download-app {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-download-app:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-download-app.android {
+    background: #16a34a;
+}
+
+.btn-download-app.android:hover {
+    background: #15803d;
+}
+
+.btn-download-app.ios {
+    background: #000000;
+}
+
+.btn-download-app.ios:hover {
+    background: #1f2937;
+}
+
+.download-icon-os {
+    font-size: 1.2rem;
 }

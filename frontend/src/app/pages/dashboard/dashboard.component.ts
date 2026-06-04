@@ -33,6 +33,7 @@ export class DashboardComponent implements OnInit {
     isDarkMode = signal(false);
     navScrolled = false;
     showLangMenu = false;
+    showMobileLangModal = false;
     unreadCount = 0;
     newGuestsCount = 0;
 
@@ -41,9 +42,28 @@ export class DashboardComponent implements OnInit {
         return urlParts.length >= 4 && urlParts[2] === 'chat' && !isNaN(Number(urlParts[3]));
     }
 
-    @HostListener('document:click')
-    closeDropdowns() {
-        this.showLangMenu = false;
+    @HostListener('document:click', ['$event'])
+    closeDropdowns(event: Event) {
+        const target = event.target as HTMLElement;
+        if (target && !target.closest('.lang-wrap') && !target.closest('.drawer-lang')) {
+            this.showLangMenu = false;
+        }
+    }
+
+    @HostListener('window:focusin', ['$event'])
+    onFocusIn(event: FocusEvent) {
+        const target = event.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+            document.body.classList.add('keyboard-open');
+        }
+    }
+
+    @HostListener('window:focusout', ['$event'])
+    onFocusOut(event: FocusEvent) {
+        const target = event.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+            document.body.classList.remove('keyboard-open');
+        }
     }
 
     userAvatar: string | null = null;
@@ -135,6 +155,20 @@ export class DashboardComponent implements OnInit {
                 this.cdr.detectChanges();
             }
         });
+
+        // Detect mobile keyboard using visualViewport
+        if (window.visualViewport) {
+            const vv = window.visualViewport;
+            const initialHeight = vv.height;
+            vv.addEventListener('resize', () => {
+                // If height reduces significantly (more than 150px), keyboard is likely shown
+                if (initialHeight - vv.height > 150) {
+                    document.body.classList.add('keyboard-open');
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                }
+            });
+        }
     }
 
     toggleTheme() {

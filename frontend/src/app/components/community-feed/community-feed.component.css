@@ -856,12 +856,12 @@
     .create-post-card,
     .post-card,
     .posts-container {
-        width: calc(100vw - 2rem) !important;
-        /* Account for parent padding */
-        max-width: calc(100vw - 2rem) !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
         overflow-x: hidden !important;
+        box-sizing: border-box !important;
     }
 
     .community-feed {

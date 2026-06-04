@@ -133,3 +133,9 @@
 .ad-wrapper:has(app-adsterra-banner.hidden-ad):not(:has(app-adsterra-banner:not(.hidden-ad))) {
   display: none !important;
 }
+
+/* Hide bottom navigation when keyboard is open on mobile */
+body.keyboard-open .bottom-nav,
+body.keyboard-open .tab-nav {
+  display: none !important;
+}

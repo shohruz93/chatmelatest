@@ -54,25 +54,47 @@
 
 @media (max-width: 768px) {
     .tab-nav {
-        padding: 0;
+        padding: 0 1rem;
+        padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 12px));
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+        background: var(--bg-secondary);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-top: 1px solid var(--border-color);
+        border-bottom: none;
     }
 
     .tab-link {
-        padding: 0.75rem 0.5rem;
+        padding: 0.85rem 0.5rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        border-bottom: none;
+        border-top: 3px solid transparent;
+    }
+
+    .tab-link.active {
+        border-bottom-color: transparent;
+        border-top-color: #8b5cf6;
     }
 
     .tab-icon {
-        font-size: 1.25rem;
+        font-size: 1.6rem;
     }
 
     .tab-label {
-        font-size: 0.75rem;
+        display: none;
+    }
+
+    .badge {
+        top: 0.4rem;
+        right: calc(50% - 1.5rem);
     }
 }
 

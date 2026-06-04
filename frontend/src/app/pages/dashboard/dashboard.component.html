@@ -299,7 +299,7 @@
 
         <!-- Language in drawer -->
         <div class="drawer-lang">
-            <button class="drawer-link" (click)="showLangMenu = !showLangMenu">
+            <button class="drawer-link" (click)="$event.stopPropagation(); showMobileLangModal = true">
                 <svg class="drawer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="2" y1="12" x2="22" y2="12"/>
@@ -308,17 +308,6 @@
                 <span>{{ 'NAV.LANGUAGE' | translate }}</span>
                 <span class="drawer-lang-badge">{{ languageService.getCurrentLanguage() | uppercase }}</span>
             </button>
-            @if (showLangMenu) {
-            <div class="drawer-lang-options">
-                @for (lang of languageService.supportedLanguages; track lang.code) {
-                <button class="drawer-link lang-option-drawer" (click)="setLanguage(lang.code); showLangMenu = false"
-                    [class.active]="languageService.getCurrentLanguage() === lang.code">
-                    <span>{{ lang.flag }}</span>
-                    <span>{{ lang.name }}</span>
-                </button>
-                }
-            </div>
-            }
         </div>
 
         <!-- Theme toggle in drawer -->
@@ -414,5 +403,29 @@
             <span class="bottom-label">{{ 'NAV.PROFILE' | translate }}</span>
         </a>
     </nav>
+
+    <!-- Language Selection Modal -->
+    @if (showMobileLangModal) {
+    <div class="lang-modal-overlay" (click)="showMobileLangModal = false">
+        <div class="modal-content glass-panel lang-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ 'NAV.LANGUAGE' | translate }}</h3>
+                <button class="modal-close" (click)="showMobileLangModal = false">✕</button>
+            </div>
+            <div class="lang-modal-body">
+                @for (lang of languageService.supportedLanguages; track lang.code) {
+                <button class="lang-modal-option" (click)="setLanguage(lang.code); showMobileLangModal = false"
+                    [class.active]="languageService.getCurrentLanguage() === lang.code">
+                    <span class="lang-flag">{{ lang.flag }}</span>
+                    <span class="lang-name">{{ lang.name }}</span>
+                    @if (languageService.getCurrentLanguage() === lang.code) {
+                    <span class="lang-check">✓</span>
+                    }
+                </button>
+                }
+            </div>
+        </div>
+    </div>
+    }
 
 </div>
