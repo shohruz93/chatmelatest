@@ -1,0 +1,295 @@
+/* ════════════════════════════════════════════
+   Settings Page — Premium Design
+   ════════════════════════════════════════════ */
+
+.settings-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 0 4rem;
+    min-height: 100vh;
+}
+
+/* ── Header ── */
+.settings-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 1.25rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-primary, #0f0f1a);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.07);
+    color: var(--text-primary, #fff);
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+.btn-back:hover { background: rgba(255,255,255,0.14); }
+
+.settings-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.settings-icon { font-size: 1.4rem; }
+
+/* ── Body ── */
+.settings-body {
+    padding: 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ── Section ── */
+.settings-section {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1rem 1.25rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary, #a0a0b0);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.section-icon { font-size: 1rem; }
+
+/* ── Language Options ── */
+.lang-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.lang-option-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.9rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary, #fff);
+    cursor: pointer;
+    transition: background 0.18s;
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 1rem;
+}
+.lang-option-card:last-child { border-bottom: none; }
+.lang-option-card:hover { background: rgba(255,255,255,0.05); }
+.lang-option-card.active { background: rgba(129, 140, 248, 0.12); }
+.lang-flag { font-size: 1.5rem; }
+.lang-name { flex: 1; font-weight: 500; }
+.lang-check {
+    color: #818cf8;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ── Theme Options ── */
+.theme-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 1rem 1rem 1rem;
+}
+
+.theme-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: var(--text-primary, #fff);
+    position: relative;
+    overflow: hidden;
+}
+.theme-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+.theme-card.active { border-color: #818cf8; background: rgba(129,140,248,0.1); }
+
+.theme-preview {
+    width: 100%;
+    height: 70px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Light preview */
+.light-preview { background: #f1f5f9; }
+.light-preview .preview-nav {
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 3px;
+}
+.light-preview .preview-content {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    padding: 0 4px;
+}
+.light-preview .preview-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Dark preview */
+.dark-preview { background: #0f0f1a; }
+.dark-preview .preview-nav {
+    height: 14px;
+    background: #1a1a2e;
+    border-radius: 3px;
+}
+.dark-preview .preview-content {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    padding: 0 4px;
+}
+.dark-preview .preview-card {
+    flex: 1;
+    background: #1e1e35;
+    border-radius: 4px;
+}
+
+.theme-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.theme-check {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: #818cf8;
+    font-weight: 700;
+}
+
+/* ── Toggle Rows ── */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.18s;
+    user-select: none;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-row:hover { background: rgba(255,255,255,0.04); }
+.toggle-row:active { background: rgba(255,255,255,0.08); }
+
+.toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+.toggle-icon { font-size: 1.4rem; }
+.toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.toggle-title {
+    font-size: 0.97rem;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+.toggle-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #a0a0b0);
+}
+
+/* Toggle switch */
+.toggle-switch {
+    width: 50px;
+    height: 28px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    transition: background 0.25s cubic-bezier(0.4,0,0.2,1);
+    flex-shrink: 0;
+}
+.toggle-switch.on {
+    background: linear-gradient(135deg, #818cf8, #a855f7);
+}
+.toggle-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.toggle-switch.on .toggle-knob {
+    transform: translateX(22px);
+}
+
+/* ── Logout Card ── */
+.btn-logout-card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.18s;
+    color: #ef4444;
+    text-align: left;
+}
+.btn-logout-card:hover { background: rgba(239,68,68,0.08); }
+.btn-logout-card:active { background: rgba(239,68,68,0.15); }
+.logout-card-icon { font-size: 1.4rem; }
+.logout-card-text {
+    flex: 1;
+    font-size: 0.97rem;
+    font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+    .settings-header { padding: 1rem; }
+    .settings-body { padding: 0.75rem; gap: 1rem; }
+}

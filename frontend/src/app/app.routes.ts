@@ -110,6 +110,10 @@ export const routes: Routes = [
             {
                 path: 'leaderboard',
                 loadComponent: () => import('./pages/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
+            },
+            {
+                path: 'settings',
+                loadComponent: () => import('./pages/settings/settings.component').then(m => m.SettingsComponent)
             }
         ]
     },

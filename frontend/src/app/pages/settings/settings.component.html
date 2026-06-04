@@ -1,0 +1,137 @@
+<div class="settings-page">
+
+    <!-- Header -->
+    <header class="settings-header">
+        <button class="btn-back" (click)="goBack()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <h1 class="settings-title">
+            <span class="settings-icon">⚙️</span>
+            {{ 'SETTINGS.TITLE' | translate }}
+        </h1>
+    </header>
+
+    <div class="settings-body">
+
+        <!-- ── Language Section ── -->
+        <section class="settings-section">
+            <div class="section-label">
+                <span class="section-icon">🌐</span>
+                {{ 'SETTINGS.LANGUAGE' | translate }}
+            </div>
+            <div class="lang-options">
+                @for (lang of languageService.supportedLanguages; track lang.code) {
+                <button class="lang-option-card"
+                    [class.active]="languageService.getCurrentLanguage() === lang.code"
+                    (click)="setLanguage(lang.code)">
+                    <span class="lang-flag">{{ lang.flag }}</span>
+                    <span class="lang-name">{{ lang.name }}</span>
+                    @if (languageService.getCurrentLanguage() === lang.code) {
+                        <span class="lang-check">✓</span>
+                    }
+                </button>
+                }
+            </div>
+        </section>
+
+        <!-- ── Appearance Section ── -->
+        <section class="settings-section">
+            <div class="section-label">
+                <span class="section-icon">🎨</span>
+                {{ 'SETTINGS.APPEARANCE' | translate }}
+            </div>
+            <div class="theme-options">
+                <button class="theme-card" [class.active]="!isDarkMode()" (click)="isDarkMode() && toggleTheme()">
+                    <div class="theme-preview light-preview">
+                        <div class="preview-nav"></div>
+                        <div class="preview-content">
+                            <div class="preview-card"></div>
+                            <div class="preview-card"></div>
+                        </div>
+                    </div>
+                    <span class="theme-name">☀️ {{ 'SETTINGS.LIGHT_MODE' | translate }}</span>
+                    @if (!isDarkMode()) { <span class="theme-check">✓</span> }
+                </button>
+                <button class="theme-card" [class.active]="isDarkMode()" (click)="!isDarkMode() && toggleTheme()">
+                    <div class="theme-preview dark-preview">
+                        <div class="preview-nav"></div>
+                        <div class="preview-content">
+                            <div class="preview-card"></div>
+                            <div class="preview-card"></div>
+                        </div>
+                    </div>
+                    <span class="theme-name">🌙 {{ 'SETTINGS.DARK_MODE' | translate }}</span>
+                    @if (isDarkMode()) { <span class="theme-check">✓</span> }
+                </button>
+            </div>
+        </section>
+
+        <!-- ── Preferences Section ── -->
+        <section class="settings-section">
+            <div class="section-label">
+                <span class="section-icon">🔧</span>
+                {{ 'SETTINGS.PREFERENCES' | translate }}
+            </div>
+
+            <!-- Sound Toggle -->
+            <div class="toggle-row" (click)="toggleSound()">
+                <div class="toggle-left">
+                    <span class="toggle-icon">🔔</span>
+                    <div class="toggle-info">
+                        <span class="toggle-title">{{ 'SETTINGS.SOUND' | translate }}</span>
+                        <span class="toggle-desc">{{ 'SETTINGS.SOUND_DESC' | translate }}</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" [class.on]="soundEnabled()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+
+            <!-- 18+ Toggle -->
+            <div class="toggle-row" (click)="toggleNsfw()">
+                <div class="toggle-left">
+                    <span class="toggle-icon">🔞</span>
+                    <div class="toggle-info">
+                        <span class="toggle-title">{{ 'SETTINGS.NSFW_TITLE' | translate }}</span>
+                        <span class="toggle-desc">{{ 'SETTINGS.NSFW_DESC' | translate }}</span>
+                    </div>
+                </div>
+                <div class="toggle-switch" [class.on]="nsfwAllowed()">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Account Section ── -->
+        <section class="settings-section">
+            <div class="section-label">
+                <span class="section-icon">👤</span>
+                {{ 'SETTINGS.ACCOUNT' | translate }}
+            </div>
+            <button class="btn-logout-card" (click)="logout()">
+                <span class="logout-card-icon">🚪</span>
+                <span class="logout-card-text">{{ 'NAV.LOGOUT' | translate }}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </section>
+
+    </div>
+
+    <!-- Logout Confirm Dialog -->
+    <app-confirm-dialog
+        [isOpen]="showLogoutDialog"
+        [title]="'PROFILE.LOGOUT_CONFIRM_TITLE' | translate"
+        [message]="'PROFILE.LOGOUT_CONFIRM_MESSAGE' | translate"
+        [confirmText]="'NAV.LOGOUT' | translate"
+        [cancelText]="'PROFILE.STAY' | translate"
+        confirmButtonClass="btn-danger"
+        icon="🚪"
+        (confirmed)="confirmLogout()"
+        (cancelled)="cancelLogout()">
+    </app-confirm-dialog>
+
+</div>
