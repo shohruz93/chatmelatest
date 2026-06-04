@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { SocketService } from './services/socket.service';
@@ -26,14 +26,42 @@ export class App implements OnInit, OnDestroy {
   private pushService = inject(PushService);
   private heartbeatService = inject(HeartbeatService);
   public callService = inject(CallService);
+  private cdr = inject(ChangeDetectorRef);
 
   showIncomingRequestModal = false;
   showExitModal = false;
   incomingRequest: any = null;
   private chatRequestSub!: Subscription;
 
+  // Real-time network properties
+  isOffline = false;
+  showOnlineStatus = false;
+  private onlineStatusTimeout: any = null;
+  private socketSub!: Subscription;
+
   ngOnInit() {
     this.pushService.init();
+
+    // Listen to Socket connection state
+    let firstEmission = true;
+    this.socketSub = this.socketService.connectionState$.subscribe(connected => {
+      console.log('Socket connection state changed:', connected);
+      if (firstEmission) {
+        firstEmission = false;
+        // Only set offline initially if the browser itself is offline
+        if (!connected && !navigator.onLine) {
+          this.isOffline = true;
+          this.cdr.detectChanges();
+        }
+        return;
+      }
+
+      if (!connected) {
+        this.handleNoInternet();
+      } else {
+        this.handleInternetRestored();
+      }
+    });
 
     // Global listener for incoming chat requests
     this.chatRequestSub = this.socketService.onChatRequestReceived().subscribe(request => {
@@ -41,20 +69,6 @@ export class App implements OnInit, OnDestroy {
       this.incomingRequest = request;
       this.showIncomingRequestModal = true;
     });
-
-    // Network status listener
-    Network.addListener('networkStatusChange', status => {
-      console.log('Network status changed', status);
-      if (!status.connected) {
-        this.handleNoInternet();
-      }
-      else {
-        this.handleInternetRestored();
-      }
-    });
-
-    // Initial check
-    this.checkInitialNetwork();
 
     // Back button listener for Android
     if (Capacitor.getPlatform() === 'android') {
@@ -71,32 +85,37 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  async checkInitialNetwork() {
-    const status = await Network.getStatus();
-    if (!status.connected) {
-      this.handleNoInternet();
-    }
-  }
-
   handleNoInternet() {
-    const message = 'Internet connection lost. Please check your network settings.';
-    if (Capacitor.isNativePlatform()) {
-      alert(message);
-    } else {
-      console.warn(message);
+    console.log('App: No internet connection (Socket disconnected)');
+    if (this.isOffline) return; // Already offline
+    
+    this.isOffline = true;
+    this.showOnlineStatus = false;
+    if (this.onlineStatusTimeout) {
+      clearTimeout(this.onlineStatusTimeout);
     }
+    this.cdr.detectChanges();
   }
 
   handleInternetRestored() {
-    const message = 'Internet connection restored.';
-    if (Capacitor.isNativePlatform()) {
-      console.log(message);
-      // Optional: alert('Internet connection restored.');
+    console.log('App: Internet connection restored (Socket connected)');
+    if (this.isOffline) {
+      this.isOffline = false;
+      this.showOnlineStatus = true;
+      if (this.onlineStatusTimeout) {
+        clearTimeout(this.onlineStatusTimeout);
+      }
+      this.onlineStatusTimeout = setTimeout(() => {
+        this.showOnlineStatus = false;
+        this.cdr.detectChanges();
+      }, 4000);
+      this.cdr.detectChanges();
     }
   }
 
   ngOnDestroy() {
     if (this.chatRequestSub) this.chatRequestSub.unsubscribe();
+    if (this.socketSub) this.socketSub.unsubscribe();
   }
 
   acceptChatRequest() {

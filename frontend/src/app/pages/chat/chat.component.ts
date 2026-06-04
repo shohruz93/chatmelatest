@@ -841,6 +841,47 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         return !!this.voiceService.speakerActivity().get(this.partner?.id);
     }
 
+    blockUser() {
+        if (!this.partner) return;
+        const msg = this.languageService.translate('CHAT.CONFIRM_BLOCK') || 'Оё мехоҳед ин корбарро масдуд кунед?';
+        if (confirm(msg)) {
+            // Call API or emit socket event to block
+            this.api.post('/profile/block', {
+                userId: this.currentUser.id,
+                blockedId: this.partner.id
+            }).subscribe({
+                next: () => {
+                    alert(this.languageService.translate('CHAT.USER_BLOCKED') || 'Корбар масдуд карда шуд');
+                    this.backToList();
+                },
+                error: (err) => {
+                    console.error('Failed to block user', err);
+                    alert(err.error?.error || 'Хатогӣ ҳангоми масдуд кардан');
+                }
+            });
+        }
+    }
+
+    reportUser() {
+        if (!this.partner) return;
+        const reason = prompt(this.languageService.translate('CHAT.REPORT_REASON') || 'Лутфан сабаби шикоятро нависед:');
+        if (reason && reason.trim()) {
+            this.api.post('/profile/report', {
+                userId: this.currentUser.id,
+                reportedId: this.partner.id,
+                reason: reason.trim()
+            }).subscribe({
+                next: () => {
+                    alert(this.languageService.translate('CHAT.REPORT_SUBMITTED') || 'Шикояти шумо қабул шуд. Ташаккур!');
+                },
+                error: (err) => {
+                    console.error('Failed to submit report', err);
+                    alert(err.error?.error || 'Хатогӣ ҳангоми фиристодани шикоят');
+                }
+            });
+        }
+    }
+
     openSendCoinsModal() {
         this.showSendCoinsModal = true;
         this.sendCoinsAmount = 10;

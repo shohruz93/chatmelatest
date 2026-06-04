@@ -93,3 +93,32 @@
     </div>
 </div>
 }
+
+<!-- ── Real-time Network Connection Banners (Glassmorphism & animations) ── -->
+@if (isOffline) {
+<div class="network-status-banner offline">
+    <div class="network-inner">
+        <div class="network-icon-wrapper pulsing">
+            <span class="material-icons">wifi_off</span>
+        </div>
+        <div class="network-info">
+            <span class="network-title">{{ 'NETWORK.OFFLINE_TITLE' | translate }}</span>
+            <span class="network-desc">{{ 'NETWORK.OFFLINE_DESC' | translate }}</span>
+        </div>
+    </div>
+</div>
+}
+
+@if (showOnlineStatus) {
+<div class="network-status-banner online">
+    <div class="network-inner">
+        <div class="network-icon-wrapper success">
+            <span class="material-icons animate-pop">wifi</span>
+        </div>
+        <div class="network-info">
+            <span class="network-title">{{ 'NETWORK.ONLINE_TITLE' | translate }}</span>
+            <span class="network-desc">{{ 'NETWORK.ONLINE_DESC' | translate }}</span>
+        </div>
+    </div>
+</div>
+}
