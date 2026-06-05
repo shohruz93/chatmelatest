@@ -14,8 +14,6 @@ import { AdsterraBannerComponent } from '../../components/adsterra-banner/adster
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AppVersionService } from '../../services/app-version.service';
 import { GamificationService } from '../../services/gamification.service';
-import { Capacitor } from '@capacitor/core';
-import { App } from '@capacitor/app';
 
 
 interface UserProfile {
@@ -250,36 +248,14 @@ export class ExploreComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.checkForUpdates();
+
 
         // Track explore page visit as a daily login mission
         this.gamificationService.trackMission('login');
     }
 
     async checkForUpdates() {
-        const platform = Capacitor.getPlatform();
-        if (platform === 'ios' || platform === 'android') {
-            try {
-                const info = await App.getInfo();
-                const currentBuild = parseInt(info.build);
-
-                this.appVersionService.checkLatestVersion(platform as 'android' | 'ios').subscribe({
-                    next: (res) => {
-                        if (res.update_available && res.latest_version) {
-                            const latestBuild = parseInt(res.latest_version.version_code);
-                            if (latestBuild > currentBuild) {
-                                this.updateAvailable.set({
-                                    ...res.latest_version,
-                                    download_url: `${this.api.phpBaseUrl}/app/download?platform=${platform}`
-                                });
-                            }
-                        }
-                    }
-                });
-            } catch (e) {
-                console.error('Error checking for updates', e);
-            }
-        }
+        // App update check removed as it's web-only now
     }
 
     ngOnDestroy() {

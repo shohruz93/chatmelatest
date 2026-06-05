@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Capacitor } from '@capacitor/core';
 import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -201,11 +200,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isDarkMode.set(savedTheme === 'dark');
         this.nsfwAllowed = localStorage.getItem('allow_nsfw_content') === 'true';
 
-        try {
-            this.isWeb = !Capacitor.isNativePlatform();
-        } catch (e) {
-            this.isWeb = true;
-        }
+        this.isWeb = true;
 
         if (this.isWeb) {
             // Directly link to Google Play Store and hide iOS button as requested

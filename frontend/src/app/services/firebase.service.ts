@@ -11,8 +11,6 @@ import {
 } from 'firebase/auth';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
-import { Capacitor } from '@capacitor/core';
 
 @Injectable({
     providedIn: 'root'
@@ -32,44 +30,11 @@ export class FirebaseService {
         this.googleProvider.setCustomParameters({
             prompt: 'select_account'
         });
-
-        // Initialize Google Auth for native platforms
-        if (Capacitor.isNativePlatform()) {
-            this.initializeNativeGoogleAuth();
-        }
-    }
-
-    private async initializeNativeGoogleAuth() {
-        try {
-            await GoogleAuth.initialize({
-                clientId: '1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com',
-                scopes: ['profile', 'email'],
-                grantOfflineAccess: true,
-            });
-        } catch (error) {
-            console.error('Error initializing Google Auth:', error);
-        }
     }
 
     // Sign in with Google
     async signInWithGoogle(): Promise<{ idToken: string | null, profile?: any }> {
         try {
-            if (Capacitor.isNativePlatform()) {
-                // Ensure initialization before sign-in
-                await this.initializeNativeGoogleAuth();
-                const result = await GoogleAuth.signIn();
-                return {
-                    idToken: result.authentication.idToken,
-                    profile: {
-                        given_name: (result as any).givenName,
-                        family_name: (result as any).familyName,
-                        name: (result as any).displayName,
-                        picture: (result as any).imageUrl
-                    }
-                };
-            }
-
-
             const result = await signInWithPopup(this.auth, this.googleProvider);
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const additionalInfo = getAdditionalUserInfo(result);
@@ -86,12 +51,6 @@ export class FirebaseService {
             };
         } catch (error: any) {
             console.error('Error signing in with Google:', error);
-            // Alert for mobile debugging
-            if (Capacitor.isNativePlatform()) {
-                const errorMessage = error.message || JSON.stringify(error);
-                alert('Sign-In Error: ' + errorMessage);
-                console.error('Detailed Auth Error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-            }
             throw error;
         }
     }

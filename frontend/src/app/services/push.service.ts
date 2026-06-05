@@ -1,14 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import {
-  PushNotifications,
-  Token,
-  PushNotificationSchema,
-  ActionPerformed,
-  PermissionStatus,
-} from '@capacitor/push-notifications';
-import { Capacitor } from '@capacitor/core';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
@@ -25,42 +17,7 @@ export class PushService {
   ) { }
 
   init() {
-    if (Capacitor.getPlatform() !== 'web') {
-      this.registerPush();
-    }
-  }
-
-  private registerPush() {
-    PushNotifications.requestPermissions().then((result: PermissionStatus) => {
-      if (result.receive === 'granted') {
-        PushNotifications.register();
-      } else {
-        // Show some error
-      }
-    });
-
-    PushNotifications.addListener('registration', (token: Token) => {
-      console.log('Push registration success, token: ' + token.value);
-      this.sendTokenToServer(token.value);
-    });
-
-    PushNotifications.addListener('registrationError', (error: any) => {
-      console.error('Error on registration: ' + JSON.stringify(error));
-    });
-
-    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-      console.log('Push received: ' + JSON.stringify(notification));
-    });
-
-    PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-      const data = notification.notification.data;
-      console.log('Push action performed: ' + JSON.stringify(notification));
-      if (data.type === 'message') {
-        this.router.navigate(['/dashboard/chat', data.senderId]);
-      } else if (data.type === 'guest') {
-        this.router.navigate(['/guests']);
-      }
-    });
+    // Web push logic can be implemented here later
   }
 
   private sendTokenToServer(token: string) {
@@ -69,7 +26,7 @@ export class PushService {
       return;
     }
 
-    const platform = Capacitor.getPlatform();
+    const platform = 'web';
     this.http.post(`${this.apiUrl}/push/subscribe`, {
       userId,
       token,

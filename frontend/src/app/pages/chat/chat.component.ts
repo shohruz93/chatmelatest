@@ -13,7 +13,7 @@ import { GamificationService } from '../../services/gamification.service';
 import { CallService } from '../../services/call.service';
 import { VoiceChatService } from '../../services/voice-chat.service';
 import { Subscription } from 'rxjs';
-import { VoiceRecorder } from '@independo/capacitor-voice-recorder';
+
 import { AiService, AiSuggestion } from '../../services/ai.service';
 
 
@@ -305,6 +305,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     sendCoinsNote: string = '';
     sendingCoins = false;
     private recordingInterval: any = null;
+    private mediaRecorder: MediaRecorder | null = null;
+    private audioChunks: Blob[] = [];
     stickers = [
         '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌',
         '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓',
@@ -974,25 +976,51 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     async startRecording() {
         try {
-            const status = await VoiceRecorder.requestAudioRecordingPermission();
-            if (status.value) {
-                // Set bitrate to 128kbps as requested. Note: Plugin support may vary by platform.
-                await (VoiceRecorder as any).startRecording({
-                    bitrate: 128000
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.mediaRecorder = new MediaRecorder(stream);
+            this.audioChunks = [];
+
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.audioChunks.push(event.data);
+                }
+            };
+
+            this.mediaRecorder.onstop = () => {
+                const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                const file = new File([blob], `voice_${Date.now()}.webm`, { type: 'audio/webm' });
+
+                this.api.uploadFile(file, 'voice').subscribe({
+                    next: (res: any) => {
+                        if (res.success && res.url) {
+                            this.chatService.sendMessage(res.url, this.replyingToMessage, 'audio');
+                            this.playSendSound();
+                            this.showMediaMenu = false;
+                        } else {
+                            alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Audio upload failed', err);
+                        alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
+                    }
                 });
-                this.isRecording = true;
 
-                this.recordingDuration = 0;
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            this.mediaRecorder.start();
+            this.isRecording = true;
+            this.recordingDuration = 0;
+            this.cdr.markForCheck();
+
+            this.recordingInterval = setInterval(() => {
+                this.recordingDuration++;
                 this.cdr.markForCheck();
-
-                // Start timer
-                this.recordingInterval = setInterval(() => {
-                    this.recordingDuration++;
-                    this.cdr.markForCheck();
-                }, 1000);
-            }
+            }, 1000);
         } catch (e) {
             console.error('Error starting recording', e);
+            alert('Could not access microphone');
         }
     }
 
@@ -1003,38 +1031,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 this.recordingInterval = null;
             }
 
-            const result = await VoiceRecorder.stopRecording();
+            if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                this.mediaRecorder.stop();
+            }
+
             this.isRecording = false;
             this.recordingDuration = 0;
             this.cdr.markForCheck();
-
-            if (result.value && result.value.recordDataBase64) {
-                const base64Sound = result.value.recordDataBase64;
-                try {
-                    const binaryString = window.atob(base64Sound);
-                    const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
-                    const blob = new Blob([bytes], { type: 'audio/m4a' });
-                    const file = new File([blob], `voice_${Date.now()}.m4a`, { type: 'audio/m4a' });
-
-                    this.api.uploadFile(file, 'voice').subscribe({
-                        next: (res: any) => {
-                            if (res.success && res.url) {
-                                this.chatService.sendMessage(res.url, this.replyingToMessage, 'audio');
-                                this.playSendSound();
-                                this.showMediaMenu = false;
-                            } else {
-                                alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
-                            }
-                        },
-                        error: (err) => {
-                            console.error('Audio upload failed', err);
-                            alert(this.languageService.translate('CHAT.UPLOAD_FAILED') || 'Failed to upload audio');
-                        }
-                    });
-                } catch (e) {
-                    console.error('Error converting base64 to file', e);
-                }
-            }
         } catch (e) {
             console.error('Error stopping recording', e);
             this.isRecording = false;
@@ -1049,7 +1052,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
                 this.recordingInterval = null;
             }
 
-            await VoiceRecorder.stopRecording();
+            if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                this.mediaRecorder.onstop = () => {
+                    this.mediaRecorder?.stream.getTracks().forEach(track => track.stop());
+                };
+                this.mediaRecorder.stop();
+            }
+
             this.isRecording = false;
             this.recordingDuration = 0;
             this.cdr.markForCheck();

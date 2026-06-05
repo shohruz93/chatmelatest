@@ -6,9 +6,7 @@ import { PushService } from './services/push.service';
 import { HeartbeatService } from './services/heartbeat.service';
 import { CallService } from './services/call.service';
 import { Subscription } from 'rxjs';
-import { Network } from '@capacitor/network';
-import { Capacitor } from '@capacitor/core';
-import { App as NativeApp } from '@capacitor/app';
+
 
 import { TranslatePipe } from './pipes/translate.pipe';
 
@@ -70,19 +68,7 @@ export class App implements OnInit, OnDestroy {
       this.showIncomingRequestModal = true;
     });
 
-    // Back button listener for Android
-    if (Capacitor.getPlatform() === 'android') {
-      NativeApp.addListener('backButton', () => {
-        const url = this.router.url || '';
-        // If user is on the Explore page, show exit confirmation
-        if (url.includes('/explore')) {
-          this.showExitModal = true;
-        } else {
-          // Otherwise navigate back to the previous page
-          this.location.back();
-        }
-      });
-    }
+    // Back button listener for Android removed
   }
 
   handleNoInternet() {
@@ -135,7 +121,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   confirmExit() {
-    NativeApp.exitApp();
+    // NativeApp.exitApp(); removed
   }
 
   closeExitModal() {

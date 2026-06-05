@@ -15,7 +15,6 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../components/header/header.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { Capacitor } from '@capacitor/core';
 import { AppVersionService } from '../../services/app-version.service';
 import { HomeService, PublicStats } from '../../services/home.service';
 import { LanguageService } from '../../services/language.service';
@@ -69,11 +68,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    try {
-      this.isWeb = !Capacitor.isNativePlatform();
-    } catch {
-      this.isWeb = true;
-    }
+    this.isWeb = true;
 
     if (this.isWeb) {
       this.downloadUrls.android =

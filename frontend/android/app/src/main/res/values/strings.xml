@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">ChatMe</string>
-    <string name="title_activity_main">ChatMe</string>
-    <string name="package_name">com.shohruz.chatme</string>
-    <string name="custom_url_scheme">com.shohruz.chatme</string>
-    <string name="server_client_id">1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com</string>
-    <string name="google_client_id">1021066705022-ic2rk68rst25k5u80s1se4qkjoicligd.apps.googleusercontent.com</string>
-</resources>
