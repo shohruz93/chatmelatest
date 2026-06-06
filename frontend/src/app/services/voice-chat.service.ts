@@ -5,6 +5,7 @@ import {
     RoomEvent,
     RemoteParticipant,
     Track,
+    LocalAudioTrack,
 } from 'livekit-client';
 
 @Injectable({
@@ -19,12 +20,26 @@ export class VoiceChatService {
     private audioPollingInterval: any = null;
     private audioElements = new Map<string, HTMLAudioElement>(); // identity -> <audio>
 
+    // Audio mixing properties
+    private micStream: MediaStream | null = null;
+    private micSourceNode: MediaStreamAudioSourceNode | null = null;
+    private musicAudio: HTMLAudioElement | null = null;
+    private musicSourceNode: MediaElementAudioSourceNode | null = null;
+    private musicGainNode: GainNode | null = null;
+    private mixedDestination: MediaStreamAudioDestinationNode | null = null;
+    private localAudioTrack: LocalAudioTrack | null = null;
+
     // Signals for UI state
     isActive = signal(false);
     isMuted = signal(false);
     connectionError = signal<string | null>(null);
     isConnecting = signal(false);
     public speakerActivity = signal<Map<number, boolean>>(new Map());
+
+    // Music control signals
+    musicPlaying = signal(false);
+    musicVolume = signal(0.2);
+    musicFileName = signal<string | null>(null);
 
     private myUserId: number = 0;
 
@@ -65,6 +80,69 @@ export class VoiceChatService {
         // Connection continues in setupSocketListeners -> livekit_token handler
     }
 
+    async initAudioMixer() {
+        if (this.audioContext) return;
+        try {
+            this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            
+            this.musicAudio = new Audio();
+            this.musicAudio.loop = true;
+
+            this.musicSourceNode = this.audioContext.createMediaElementSource(this.musicAudio);
+            this.musicGainNode = this.audioContext.createGain();
+            this.musicGainNode.gain.value = this.musicVolume();
+
+            this.mixedDestination = this.audioContext.createMediaStreamDestination();
+
+            // Connect nodes
+            this.musicSourceNode.connect(this.musicGainNode);
+            this.musicGainNode.connect(this.mixedDestination);
+
+            // Connect music to output so the speaker can hear the background music
+            this.musicGainNode.connect(this.audioContext.destination);
+        } catch (e) {
+            console.error('[VoiceService] Failed to initialize AudioContext:', e);
+        }
+    }
+
+    async setMusicFile(file: File) {
+        await this.initAudioMixer();
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+        if (this.musicAudio) {
+            this.musicFileName.set(file.name);
+            this.musicAudio.src = URL.createObjectURL(file);
+            this.musicAudio.play()
+                .then(() => this.musicPlaying.set(true))
+                .catch(e => console.warn('[VoiceService] Music autoplay blocked or failed:', e));
+        }
+    }
+
+    setMusicVolume(volume: number) {
+        this.musicVolume.set(volume);
+        if (this.musicGainNode && this.audioContext) {
+            this.musicGainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+        }
+    }
+
+    toggleMusic() {
+        if (!this.musicAudio) return;
+        if (this.musicAudio.paused) {
+            this.musicAudio.play().then(() => this.musicPlaying.set(true));
+        } else {
+            this.musicAudio.pause();
+            this.musicPlaying.set(false);
+        }
+    }
+
+    stopMusic() {
+        if (!this.musicAudio) return;
+        this.musicAudio.pause();
+        this.musicAudio.currentTime = 0;
+        this.musicPlaying.set(false);
+    }
+
     private async connectToLiveKit(url: string, token: string) {
         try {
             console.log('[VoiceService] Connecting to LiveKit:', url);
@@ -91,15 +169,12 @@ export class VoiceChatService {
                 .on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
                     console.log('[VoiceService] Track subscribed from', participant.identity, track.kind);
                     if (track.kind === Track.Kind.Audio) {
-                        // IMPORTANT: attach() creates an <audio> element but it MUST be added to
-                        // the DOM for the browser to actually play back the audio.
                         const audioEl = track.attach() as HTMLAudioElement;
                         audioEl.autoplay = true;
                         audioEl.volume = 1.0;
                         audioEl.style.display = 'none'; // Hidden but in DOM
                         document.body.appendChild(audioEl);
                         this.audioElements.set(participant.identity, audioEl);
-                        // Attempt play in case autoplay was blocked
                         audioEl.play().catch(e => console.warn('[VoiceService] Autoplay blocked:', e));
                         console.log('[VoiceService] Audio element added to DOM for', participant.identity);
                     }
@@ -126,14 +201,34 @@ export class VoiceChatService {
 
             await newRoom.connect(url, token, { autoSubscribe: true });
 
-            // Enable microphone
-            await newRoom.localParticipant.setMicrophoneEnabled(true);
-            this.isMuted.set(false);
-            console.log('[VoiceService] Microphone enabled');
+            // Initialize AudioContext mixer and microphone
+            await this.initAudioMixer();
+            if (this.audioContext && this.audioContext.state === 'suspended') {
+                await this.audioContext.resume();
+            }
+
+            // Capture mic stream
+            this.micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (this.audioContext && this.mixedDestination) {
+                this.micSourceNode = this.audioContext.createMediaStreamSource(this.micStream);
+                this.micSourceNode.connect(this.mixedDestination);
+
+                // Publish mixed stream track to LiveKit
+                const mixedTrack = this.mixedDestination.stream.getAudioTracks()[0];
+                this.localAudioTrack = new LocalAudioTrack(mixedTrack);
+                await newRoom.localParticipant.publishTrack(this.localAudioTrack);
+                this.isMuted.set(false);
+                console.log('[VoiceService] Mixed microphone and music track published successfully');
+            } else {
+                // Fallback to default behavior if audio mixing setup failed
+                await newRoom.localParticipant.setMicrophoneEnabled(true);
+                this.isMuted.set(false);
+                console.log('[VoiceService] Fallback: Microphone enabled');
+            }
 
             this.room = newRoom;
 
-            // Start local audio-level polling every 100ms (no server latency)
+            // Start local audio-level polling every 100ms
             this.startAudioLevelPolling(newRoom);
 
         } catch (e: any) {
@@ -143,14 +238,12 @@ export class VoiceChatService {
         }
     }
 
-    /** Poll audioLevel directly from LiveKit — 100ms, no server round-trip.
-     *  key=0 → local user, key=userId → remote participants */
     private startAudioLevelPolling(lkRoom: Room) {
         if (this.audioPollingInterval) clearInterval(this.audioPollingInterval);
         this.audioPollingInterval = setInterval(() => {
             const activity = new Map<number, boolean>();
 
-            // Local participant: key=0, threshold 0.006 (audible speech)
+            // Local participant level
             const localLevel = lkRoom.localParticipant.audioLevel;
             activity.set(0, localLevel > 0.006);
 
@@ -167,43 +260,78 @@ export class VoiceChatService {
     }
 
     async initLocalStream() {
-        // With LiveKit, this is handled internally. No-op.
+        // Handled internally.
     }
 
     async startCall(targetUserId: number) {
-        // With LiveKit SFU, no P2P calls needed. No-op.
+        // Handled internally.
     }
 
     removeParticipant(userId: number) {
-        // LiveKit handles cleanup automatically. No-op.
+        // Handled internally.
     }
 
     toggleMute() {
-        if (this.room) {
-            const newMuted = !this.isMuted();
+        const newMuted = !this.isMuted();
+        if (this.localAudioTrack) {
+            const promise = newMuted ? this.localAudioTrack.mute() : this.localAudioTrack.unmute();
+            promise.then(() => {
+                this.isMuted.set(newMuted);
+                console.log('[VoiceService] Custom track mute set:', newMuted);
+            }).catch(err => {
+                console.error('[VoiceService] Custom track mute failed:', err);
+            });
+        } else if (this.room) {
             this.room.localParticipant.setMicrophoneEnabled(!newMuted).then(() => {
                 this.isMuted.set(newMuted);
-                console.log('[VoiceService] Mic muted:', newMuted);
+                console.log('[VoiceService] Fallback mic mute set:', newMuted);
             });
         }
     }
 
     retryConnection() {
-        // No-op with LiveKit — auto-reconnect is built-in
+        // Built-in
     }
 
     cleanup() {
         console.log('[VoiceService] Cleaning up LiveKit room');
+        this.stopMusic();
+        if (this.musicAudio) {
+            this.musicAudio.src = '';
+            this.musicAudio = null;
+        }
         if (this.audioPollingInterval) {
             clearInterval(this.audioPollingInterval);
             this.audioPollingInterval = null;
         }
-        // Remove all audio elements from DOM
         this.audioElements.forEach(el => el.remove());
         this.audioElements.clear();
         if (this.room) {
             this.room.disconnect();
             this.room = null;
+        }
+        if (this.localAudioTrack) {
+            this.localAudioTrack.stop();
+            this.localAudioTrack = null;
+        }
+        if (this.micSourceNode) {
+            this.micSourceNode.disconnect();
+            this.micSourceNode = null;
+        }
+        if (this.musicSourceNode) {
+            this.musicSourceNode.disconnect();
+            this.musicSourceNode = null;
+        }
+        if (this.musicGainNode) {
+            this.musicGainNode.disconnect();
+            this.musicGainNode = null;
+        }
+        if (this.mixedDestination) {
+            this.mixedDestination = null;
+        }
+        if (this.micStream) {
+            this.micStream.getTracks().forEach(t => t.stop());
+            this.micStream = null;
         }
         if (this.localStream) {
             this.localStream.getTracks().forEach(t => t.stop());
@@ -218,5 +346,6 @@ export class VoiceChatService {
         this.isConnecting.set(false);
         this.speakerActivity.set(new Map());
         this.connectionError.set(null);
+        this.musicFileName.set(null);
     }
 }

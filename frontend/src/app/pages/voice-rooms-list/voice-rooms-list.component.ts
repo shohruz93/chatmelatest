@@ -50,8 +50,6 @@ export class VoiceRoomsListComponent implements OnInit, OnDestroy {
     private loadingTimer: any = null;
 
     ngOnInit() {
-        this.socketService.getVoiceRooms();
-
         this.subs.add(this.socketService.voiceRoomsList$.subscribe((data: any) => {
             this.handleRooms(data);
         }));
@@ -60,8 +58,17 @@ export class VoiceRoomsListComponent implements OnInit, OnDestroy {
             this.handleRooms(data);
         }));
 
+        // Request the rooms list. Also re-request whenever socket reconnects.
+        this.subs.add(this.socketService.connected$.subscribe(() => {
+            this.socketService.getVoiceRooms();
+        }));
+
+        this.socketService.getVoiceRooms();
+
         this.subs.add(this.socketService.voiceRoomJoined$.subscribe((data: any) => {
-            if (data?.roomId) {
+            if (data?.room?.id) {
+                this.router.navigate(['/dashboard/voice-room', data.room.id]);
+            } else if (data?.roomId) {
                 this.router.navigate(['/dashboard/voice-room', data.roomId]);
             }
         }));
@@ -94,7 +101,12 @@ export class VoiceRoomsListComponent implements OnInit, OnDestroy {
 
     createRoom() {
         if (this.newRoomTopic.trim()) {
-            this.socketService.createVoiceRoom(this.newRoomTopic.trim(), this.newRoomLang);
+            const user = this.socketService.getCurrentUser();
+            const profile = {
+                name: user?.name || `User ${user?.id || ''}`,
+                avatar: user?.avatar || user?.photo_url || user?.photoUrl || ''
+            };
+            this.socketService.createVoiceRoom(this.newRoomTopic.trim(), this.newRoomLang, profile);
             this.newRoomTopic = '';
             this.showCreateModal = false;
         }

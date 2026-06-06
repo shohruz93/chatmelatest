@@ -129,6 +129,68 @@
           </div>
         </section>
 
+        <!-- Background Music Control Panel (Only visible to speakers) -->
+        <div class="bg-music-panel glass-panel-sub mb-6" *ngIf="isSpeaker()">
+          <div class="music-panel-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="music-icon-main">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+            <span class="music-panel-title">Мусиқии пасзамина (Background Music)</span>
+          </div>
+          <div class="music-panel-body flex flex-wrap items-center gap-4">
+            <!-- File Input - Hidden, referenced via ViewChild -->
+            <input #musicFileInput type="file" (change)="onMusicFileSelected($event)" accept="audio/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+            <!-- Clickable Button to open file dialog -->
+            <button type="button" class="music-file-label cursor-pointer flex items-center justify-center" (click)="openMusicFilePicker()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>Интихоби мусиқӣ</span>
+            </button>
+            
+            <div class="music-controls flex items-center flex-wrap gap-4" *ngIf="voiceChatService.musicFileName()">
+              <span class="music-file-name" [title]="voiceChatService.musicFileName()">
+                {{ voiceChatService.musicFileName() }}
+              </span>
+              
+              <div class="control-buttons flex items-center gap-2">
+                <button class="music-btn-circle" (click)="voiceChatService.toggleMusic()" [attr.aria-label]="(voiceChatService.musicPlaying() ? 'Pause' : 'Play')">
+                  @if (voiceChatService.musicPlaying()) {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16"></rect>
+                      <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  }
+                </button>
+                
+                <button class="music-btn-circle stop-btn" (click)="voiceChatService.stopMusic()" aria-label="Stop">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="4" y="4" width="16" height="16"></rect>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Volume Control -->
+              <div class="volume-slider-container flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="volume-icon">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <input type="range" min="0" max="1" step="0.05" [value]="voiceChatService.musicVolume()" (input)="onVolumeChange($event)" class="volume-range-input">
+                <span class="volume-percent">{{ (voiceChatService.musicVolume() * 100) | number:'1.0-0' }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Listeners / Audience -->
         <section class="audience-section" *ngIf="listeners().length > 0">
           <h3 class="stage-title">
@@ -191,13 +253,13 @@
             }
           </div>
 
-          <form class="chat-composer-form" (submit)="sendMessage($event)">
+          <form class="chat-composer-form" (ngSubmit)="sendMessage($event)">
             <input type="text" [(ngModel)]="newMessage" name="newMessage"
                    [placeholder]="'VOICE_ROOMS.MESSAGE_PLACEHOLDER' | translate"
                    class="chat-input-field"
                    autocomplete="off"
                    maxlength="500">
-            <button type="submit" class="send-message-btn" [disabled]="!newMessage.trim()" [attr.aria-label]="'VOICE_ROOMS.SEND' | translate">
+            <button type="submit" class="send-message-btn" [disabled]="!newMessage.trim()" (click)="sendMessage($event)" [attr.aria-label]="'VOICE_ROOMS.SEND' | translate">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>

@@ -435,23 +435,23 @@ export class SocketService implements OnDestroy {
 
     // Voice Room Methods
     getVoiceRooms() {
-        this.socket.emit('get_voice_rooms');
+        this.emit('get_voice_rooms', null);
     }
 
-    createVoiceRoom(topic: string, language: string = 'EN') {
-        this.socket.emit('create_voice_room', { topic, language });
+    createVoiceRoom(topic: string, language: string = 'EN', profile?: { name: string, avatar: string }) {
+        this.emit('create_voice_room', { topic, language, profile });
     }
 
     joinVoiceRoom(roomId: string, profile?: { name: string, avatar: string }) {
-        this.socket.emit('join_voice_room', { roomId, profile });
+        this.emit('join_voice_room', { roomId, profile });
     }
 
     leaveVoiceRoom(roomId: string) {
-        this.socket.emit('leave_voice_room', { roomId });
+        this.emit('leave_voice_room', { roomId });
     }
 
     sendVoiceRoomMessage(roomId: string, content: string, senderName?: string, avatar?: string) {
-        this.socket.emit('voice_room_message', { roomId, content, senderName, avatar });
+        this.emit('voice_room_message', { roomId, content, senderName, avatar });
     }
 
     getCurrentUser() {
@@ -459,7 +459,7 @@ export class SocketService implements OnDestroy {
     }
 
     setVoiceMute(roomId: string, isMuted: boolean) {
-        this.socket.emit('toggle_voice_mute', { roomId, isMuted });
+        this.emit('toggle_voice_mute', { roomId, isMuted });
     }
 
     // Generic methods for raw access
@@ -471,18 +471,8 @@ export class SocketService implements OnDestroy {
 
         // Ensure connection and registration, then emit once connected
         this.socket.connect();
-        this.socket.on('connect', () => {
-            console.log('Socket connected');
-            this.connectionStateSubject.next(true);
-            const current = this.auth.currentUserValue;
-            if (current && current.id) {
-                this.socket.emit('register', current.id);
-            }
-        });
-
-        this.socket.on('disconnect', () => {
-            console.log('Socket disconnected');
-            this.connectionStateSubject.next(false);
+        this.socket.once('connect', () => {
+            this.socket.emit(eventName, data);
         });
     }
 
