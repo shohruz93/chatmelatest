@@ -129,8 +129,8 @@
           </div>
         </section>
 
-        <!-- Background Music Control Panel (Only visible to speakers) -->
-        <div class="bg-music-panel glass-panel-sub mb-6" *ngIf="isSpeaker()">
+        <!-- Background Music Control Panel (visible to all participants) -->
+        <div class="bg-music-panel glass-panel-sub mb-6" *ngIf="room()">
           <div class="music-panel-header">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="music-icon-main">
               <path d="M9 18V5l12-2v13"></path>
@@ -140,10 +140,8 @@
             <span class="music-panel-title">Мусиқии пасзамина (Background Music)</span>
           </div>
           <div class="music-panel-body flex flex-wrap items-center gap-4">
-            <!-- File Input - Hidden, referenced via ViewChild -->
-            <input #musicFileInput type="file" (change)="onMusicFileSelected($event)" accept="audio/*" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
-            <!-- Clickable Button to open file dialog -->
-            <button type="button" class="music-file-label cursor-pointer flex items-center justify-center" (click)="openMusicFilePicker()">
+            <!-- Clickable Button to open file dialog (input is created dynamically in TS) -->
+            <button type="button" class="music-file-label" (click)="openMusicFilePicker()">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>

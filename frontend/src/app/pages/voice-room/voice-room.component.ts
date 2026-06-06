@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, computed, AfterViewChecked, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -20,11 +20,9 @@ export class VoiceRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
     private socketService = inject(SocketService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private cdr = inject(ChangeDetectorRef);
     public voiceChatService = inject(VoiceChatService);
 
     @ViewChild('messagesContainer') private messagesContainer?: ElementRef<HTMLDivElement>;
-    @ViewChild('musicFileInput') private musicFileInput?: ElementRef<HTMLInputElement>;
 
     roomId: string = '';
     myUserId: string = '';
@@ -199,22 +197,24 @@ export class VoiceRoomComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     openMusicFilePicker() {
-        if (this.musicFileInput?.nativeElement) {
-            this.musicFileInput.nativeElement.value = '';
-            this.musicFileInput.nativeElement.click();
-        } else {
-            // Fallback: find and click any file input
-            const input = document.querySelector('input[type="file"][accept="audio/*"]') as HTMLInputElement;
-            if (input) { input.value = ''; input.click(); }
-        }
-    }
-
-    onMusicFileSelected(event: any) {
-        const file = event.target.files?.[0];
-        if (file) {
-            this.voiceChatService.setMusicFile(file);
-            this.cdr.detectChanges();
-        }
+        // Create a fresh hidden input dynamically — most reliable cross-browser approach.
+        // This guarantees the browser recognises it as a direct user gesture.
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'audio/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+        input.addEventListener('change', (event: Event) => {
+            const file = (event.target as HTMLInputElement).files?.[0];
+            if (file) {
+                this.voiceChatService.setMusicFile(file);
+            }
+            document.body.removeChild(input);
+        });
+        input.addEventListener('cancel', () => {
+            document.body.removeChild(input);
+        });
+        input.click();
     }
 
     onVolumeChange(event: any) {
