@@ -210,7 +210,23 @@ export class ExploreComponent implements OnInit, OnDestroy {
                 // Fetch latest profile to ensure we have current languages/interests
                 const latestProfile = await lastValueFrom(this.api.get(`/profile?userId=${this.currentUser.id}`));
                 if (latestProfile) {
-                    this.currentUser = { ...this.currentUser, ...latestProfile };
+                    // Safe merge: do not overwrite existing truthy profile fields with empty/null/undefined from the server
+                    const mergedUser = { ...this.currentUser };
+                    const fieldsToProtect = ['gender', 'native_language', 'learning_language'];
+                    fieldsToProtect.forEach(field => {
+                        if (latestProfile[field] !== null && latestProfile[field] !== undefined && latestProfile[field] !== '') {
+                            mergedUser[field] = latestProfile[field];
+                        }
+                    });
+                    
+                    // Merge other fields
+                    Object.keys(latestProfile).forEach(key => {
+                        if (!fieldsToProtect.includes(key)) {
+                            mergedUser[key] = latestProfile[key];
+                        }
+                    });
+
+                    this.currentUser = mergedUser;
                     this.auth.updateUser(this.currentUser);
                 }
             } catch (e) {

@@ -118,7 +118,17 @@ export class AuthService {
     }
 
     updateUser(userData: any) {
-        const updatedUser = { ...this.userSubject.value, ...userData };
+        const currentUser = this.userSubject.value || {};
+        const safeUserData = { ...userData };
+        
+        const fieldsToProtect = ['gender', 'native_language', 'learning_language'];
+        fieldsToProtect.forEach(field => {
+            if (currentUser[field] && (safeUserData[field] === null || safeUserData[field] === undefined || safeUserData[field] === '')) {
+                safeUserData[field] = currentUser[field];
+            }
+        });
+
+        const updatedUser = { ...currentUser, ...safeUserData };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         this.userSubject.next(updatedUser);
     }

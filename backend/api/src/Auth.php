@@ -251,11 +251,16 @@ class Auth {
             }
 
             // Fetch user profile
-            $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
+            $userProfile = $this->user->getProfile($userId);
+
+            // Fetch interests
+            $query = "SELECT i.id, i.name FROM interests i 
+                      JOIN user_interests ui ON i.id = ui.interest_id 
+                      WHERE ui.user_id = :user_id";
             $stmt = $this->db->prepare($query);
-            $stmt->bindParam(":id", $userId);
+            $stmt->bindParam(":user_id", $userId);
             $stmt->execute();
-            $userProfile = $stmt->fetch(PDO::FETCH_ASSOC);
+            $interests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $sessionToken = base64_encode(json_encode([
                 "id" => $userId,
@@ -276,6 +281,9 @@ class Auth {
                     "bio" => $userProfile['bio'] ?? null,
                     "gender" => $userProfile['gender'] ?? null,
                     "location" => $userProfile['location'] ?? null,
+                    "native_language" => $userProfile['native_language'] ?? null,
+                    "learning_language" => $userProfile['learning_language'] ?? null,
+                    "interests" => $interests,
                     "is_admin" => (int)($userProfile['is_admin'] ?? 0)
                 ]
             ]);
@@ -320,11 +328,16 @@ class Auth {
         file_put_contents($storeFile, json_encode($codes));
 
         // Fetch user profile
-        $query = "SELECT id, name, first_name, family_name, email, avatar, bio, gender, location, is_admin FROM users WHERE id = :id";
+        $userProfile = $this->user->getProfile($userId);
+
+        // Fetch interests
+        $query = "SELECT i.id, i.name FROM interests i 
+                  JOIN user_interests ui ON i.id = ui.interest_id 
+                  WHERE ui.user_id = :user_id";
         $stmt = $this->db->prepare($query);
-        $stmt->bindParam(":id", $userId);
+        $stmt->bindParam(":user_id", $userId);
         $stmt->execute();
-        $userProfile = $stmt->fetch(PDO::FETCH_ASSOC);
+        $interests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $sessionToken = base64_encode(json_encode([
             "id" => $userId,
@@ -345,6 +358,9 @@ class Auth {
                 "bio" => $userProfile['bio'] ?? null,
                 "gender" => $userProfile['gender'] ?? null,
                 "location" => $userProfile['location'] ?? null,
+                "native_language" => $userProfile['native_language'] ?? null,
+                "learning_language" => $userProfile['learning_language'] ?? null,
+                "interests" => $interests,
                 "is_admin" => (int)($userProfile['is_admin'] ?? 0)
             ]
         ]);
