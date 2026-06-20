@@ -654,7 +654,6 @@ class User {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":amount", $amount, PDO::PARAM_INT);
         $stmt->bindParam(":id", $userId);
-        $stmt->bindParam(":id", $userId);
         return $stmt->execute();
     }
 

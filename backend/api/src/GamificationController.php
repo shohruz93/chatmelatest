@@ -217,28 +217,41 @@ class GamificationController {
 
     // Helper: Initialize daily missions for user
     public function assignDailyMissions($userId) {
+        if (!$this->conn) return;
+
         // Get all daily missions
         $query = "SELECT id FROM missions WHERE type = 'daily'";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        $dailyMissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $dailyMissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        foreach ($dailyMissions as $m) {
-            // Check if exists for today
-            $checkQuery = "SELECT id FROM user_missions 
-                           WHERE user_id = :user_id 
-                           AND mission_id = :mission_id 
-                           AND DATE(created_at) = CURDATE()";
-            $checkStmt = $this->conn->prepare($checkQuery);
-            $checkStmt->execute([':user_id' => $userId, ':mission_id' => $m['id']]);
+        if (empty($dailyMissions)) return;
 
-            if ($checkStmt->rowCount() == 0) {
-                // Assign it
-                $insQuery = "INSERT INTO user_missions (user_id, mission_id, status, progress, created_at) 
-                             VALUES (:user_id, :mission_id, 'active', 0, NOW())";
-                $insStmt = $this->conn->prepare($insQuery);
-                $insStmt->execute([':user_id' => $userId, ':mission_id' => $m['id']]);
+        // Check which missions the user already has today
+        $placeholders = implode(',', array_fill(0, count($dailyMissions), '?'));
+        $checkQuery = "SELECT mission_id FROM user_missions 
+                       WHERE user_id = ? 
+                       AND mission_id IN ($placeholders) 
+                       AND DATE(created_at) = CURDATE()";
+        $checkStmt = $this->conn->prepare($checkQuery);
+        $params = array_merge([$userId], $dailyMissions);
+        $checkStmt->execute($params);
+        $existingMissions = $checkStmt->fetchAll(PDO::FETCH_COLUMN);
+
+        $missingMissions = array_diff($dailyMissions, $existingMissions);
+
+        if (!empty($missingMissions)) {
+            $insertValues = [];
+            $insertParams = [];
+            foreach ($missingMissions as $missionId) {
+                $insertValues[] = "(?, ?, 'active', 0, NOW())";
+                $insertParams[] = $userId;
+                $insertParams[] = $missionId;
             }
+            $insQuery = "INSERT INTO user_missions (user_id, mission_id, status, progress, created_at) 
+                         VALUES " . implode(', ', $insertValues);
+            $insStmt = $this->conn->prepare($insQuery);
+            $insStmt->execute($insertParams);
         }
     }
 
@@ -246,15 +259,14 @@ class GamificationController {
     // Example usage: GamificationController::updateProgress($userId, 'send_message', 1);
     public static function updateProgress($userId, $conditionKey, $amount = 1) {
         $instance = new self();
-        $instance->assignDailyMissions($userId);
-
-        $db = new Database();
-        $conn = $db->getConnection();
+        $conn = $instance->conn;
         
         if (!$conn) {
             error_log("GamificationController::updateProgress - Database connection failed");
             return;
         }
+
+        $instance->assignDailyMissions($userId);
 
         // Find active missions matching this condition
         // For daily missions, ensure we only update today's instance

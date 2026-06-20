@@ -342,12 +342,12 @@ class LearningController {
 
         // Update learning_stats longest streak
         $this->conn->prepare("INSERT INTO learning_stats (user_id, total_streak_days, longest_streak, last_active_date)
-            VALUES (:uid, :s, :s, :d)
+            VALUES (:uid, :s1, :s2, :d1)
             ON DUPLICATE KEY UPDATE
                 total_streak_days = total_streak_days + 1,
-                longest_streak = GREATEST(longest_streak, :s2),
+                longest_streak = GREATEST(longest_streak, :s3),
                 last_active_date = :d2")
-            ->execute([':uid'=>$userId, ':s'=>$streak, ':d'=>$today, ':s2'=>$streak, ':d2'=>$today]);
+            ->execute([':uid'=>$userId, ':s1'=>$streak, ':s2'=>$streak, ':d1'=>$today, ':s3'=>$streak, ':d2'=>$today]);
 
         // Gamification
         require_once __DIR__ . '/GamificationController.php';
